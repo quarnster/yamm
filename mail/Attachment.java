@@ -27,7 +27,7 @@ import java.io.*;
 /**
  * This class parses attachments
  * @author Fredrik Ehnbom
- * @version $Id: Attachment.java,v 1.10 2003/03/07 10:52:36 fredde Exp $
+ * @version $Id: Attachment.java,v 1.11 2003/03/07 14:06:27 fredde Exp $
  */
 public class Attachment {
 
@@ -56,9 +56,9 @@ public class Attachment {
 		if (mhp.getHeaderField("Content-Type") != null) {
 			contentType = name = mhp.getHeaderField("Content-Type").trim();
 
-			if (name.indexOf("name=") != -1) {
+			if (name.toLowerCase().indexOf("name=") != -1) {
 				// remove unwanted info
-				name = name.substring(name.indexOf("name=") + 5, name.length()).trim();
+				name = name.substring(name.toLowerCase().indexOf("name=") + 5, name.length()).trim();
 
 				if (name.indexOf(";") != -1) {
 					name = name.substring(0, name.indexOf(";")).trim();
@@ -77,8 +77,8 @@ public class Attachment {
 
 			if (name == null) {
 				name = contentDisposition;
-				if (name.indexOf("filename=") != -1) {
-					name = name.substring(name.indexOf("filename=") + 9, name.length()).trim();
+				if (name.toLowerCase().indexOf("filename=") != -1) {
+					name = name.substring(name.toLowerCase().indexOf("filename=") + 9, name.length()).trim();
 
 					if (name.indexOf(";") != -1) {
 						name = name.substring(0, name.indexOf(";"));
@@ -92,6 +92,8 @@ public class Attachment {
 				}
 			}
 		}
+
+		if (name != null) name = Mailbox.unMime(name);
 
 		if (mhp.getHeaderField("Content-Transfer-Encoding") != null) {
 			encoding = mhp.getHeaderField("Content-Transfer-Encoding").trim();
@@ -140,7 +142,7 @@ public class Attachment {
 			} else if (contentType.indexOf("text/plain") != -1)
 				fileName = baseFile + ".message.txt";
 			else if (name != null) {
-				fileName = baseFile + ".other." + name;
+				fileName = baseFile + ".attach." + name;
 			} else {
 				System.err.println(contentDisposition);
 				System.err.println(contentType);
@@ -204,6 +206,9 @@ public class Attachment {
 /*
  * Changes:
  * $Log: Attachment.java,v $
+ * Revision 1.11  2003/03/07 14:06:27  fredde
+ * better attachment name parsing. also unmimes attachment names.
+ *
  * Revision 1.10  2003/03/07 10:52:36  fredde
  * filter attachments in a thread
  *
