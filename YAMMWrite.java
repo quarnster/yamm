@@ -1,4 +1,4 @@
-/*  $Id: YAMMWrite.java,v 1.25 2001/05/27 08:57:00 fredde Exp $
+/*  $Id: YAMMWrite.java,v 1.26 2003/03/08 17:44:06 fredde Exp $
  *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ import org.gjt.fredde.yamm.gui.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Revision: 1.25 $
+ * @version $Revision: 1.26 $
  */
 public class YAMMWrite extends JFrame {
 
@@ -77,6 +77,17 @@ public class YAMMWrite extends JFrame {
 
 	public YAMMWrite(String to, String from, String subject, String body) {
 		super(subject);
+		GridBagLayout gridbag = new GridBagLayout();
+		GridBagConstraints c1 = new GridBagConstraints();
+		GridBagConstraints c2 = new GridBagConstraints();
+		JPanel fieldPanel = new JPanel(gridbag);
+
+		c1.fill = GridBagConstraints.HORIZONTAL;
+		c1.gridwidth = GridBagConstraints.RELATIVE;
+
+		c2.fill = GridBagConstraints.BOTH;
+		c2.weightx = 1;
+		c2.gridwidth = GridBagConstraints.REMAINDER;
 
 		setBounds(
 			Integer.parseInt(YAMM.getProperty("writex", "0")),
@@ -100,10 +111,8 @@ public class YAMMWrite extends JFrame {
 
 		setJMenuBar(Meny);
 
-		Box fields = Box.createHorizontalBox();
 		Box vert3 = Box.createVerticalBox();
 		Box hori1 = Box.createHorizontalBox();
-		Box hori2 = Box.createHorizontalBox();
 
 		JButton myButton = new JButton();
 		myButton.setToolTipText(YAMM.getString("button.send"));
@@ -137,30 +146,26 @@ public class YAMMWrite extends JFrame {
 		Dimension size = new Dimension(fm.stringWidth(YAMM.getString("mail.subject")) + 25, height);
 
 		JLabel myLabel = new JLabel(YAMM.getString("mail.to"));
-		myLabel.setMaximumSize(size);
-		myLabel.setMinimumSize(size);
-		fields.add(myLabel);
+		myLabel.setHorizontalAlignment(JLabel.RIGHT);
+		gridbag.setConstraints(myLabel, c1);
+		fieldPanel.add(myLabel);
 
-		toField.setMaximumSize(new Dimension(1200, height));
-		toField.setMinimumSize(new Dimension(75, height));
 		toField.setText(to);
 		toField.setToolTipText(YAMM.getString("tofield.tooltip"));
-		fields.add(toField);
+		gridbag.setConstraints(toField, c2);
+		fieldPanel.add(toField);
 
-		vert3.add(fields);
-		fields = Box.createHorizontalBox();
 
 		myLabel = new JLabel(YAMM.getString("mail.from"));
-		myLabel.setMaximumSize(size);
-		myLabel.setMinimumSize(size);
-		fields.add(myLabel);
+		myLabel.setHorizontalAlignment(JLabel.RIGHT);
+		gridbag.setConstraints(myLabel, c1);
+		fieldPanel.add(myLabel);
 
 		fromField = new JComboBox(YAMM.profiler.getProfileList());
-		fromField.setMaximumSize(new Dimension(1200, height));
-		fromField.setMinimumSize(new Dimension(75, height));
 		fromField.setFont(toField.getFont());
 		fromField.setEditable(true);
-		fields.add(fromField);
+		gridbag.setConstraints(fromField, c2);
+		fieldPanel.add(fromField);
 
 		if (!from.equals("")) {
 			String prof = YAMM.profiler.getProfileString(from);
@@ -171,13 +176,10 @@ public class YAMMWrite extends JFrame {
 			fromField.setSelectedIndex(YAMM.profiler.getDefault());
 		}
 
-		vert3.add(fields);
-		fields = Box.createHorizontalBox();
-
 		myLabel = new JLabel(YAMM.getString("mail.subject"));
-		myLabel.setMaximumSize(size);
-		myLabel.setMinimumSize(size);
-		fields.add(myLabel);
+		myLabel.setHorizontalAlignment(JLabel.RIGHT);
+		gridbag.setConstraints(myLabel, c1);
+		fieldPanel.add(myLabel);
 
 		subjectField.addKeyListener(
 			new KeyAdapter() {
@@ -190,23 +192,20 @@ public class YAMMWrite extends JFrame {
 				}
 			}
 		);
-		subjectField.setMaximumSize(new Dimension(1200, height));
-		subjectField.setMinimumSize(new Dimension(75, height));
 		subjectField.setText(subject);
-		fields.add(subjectField);
-
-		vert3.add(fields);
-		fields = Box.createHorizontalBox();
+		gridbag.setConstraints(subjectField, c2);
+		fieldPanel.add(subjectField);
 
 		myLabel = new JLabel(YAMM.getString("mail.cc"));
-		myLabel.setMaximumSize(size);
-		myLabel.setMinimumSize(size);
-		fields.add(myLabel);
+		myLabel.setHorizontalAlignment(JLabel.RIGHT);
+		gridbag.setConstraints(myLabel, c1);
+		fieldPanel.add(myLabel);
 
-		ccField.setMaximumSize(new Dimension(1200, height));
-		ccField.setMinimumSize(new Dimension(75, height));
-		fields.add(ccField);
-		vert3.add(fields);
+
+		gridbag.setConstraints(ccField, c2);
+		fieldPanel.add(ccField);
+
+		vert3.add(fieldPanel);
 
 		myTextArea = new JTextArea();
 		myTextArea.setText(body);
@@ -270,7 +269,13 @@ public class YAMMWrite extends JFrame {
 			myPanel
 		);
 
-		vert3.add(JTPane);
+
+		c2.gridheight = GridBagConstraints.REMAINDER;
+		c2.weighty = 1;
+		gridbag.setConstraints(JTPane, c2);
+		fieldPanel.add(JTPane);
+
+		vert3.add(fieldPanel);
 		getContentPane().add(vert3);
 
 		addWindowListener(new FLyssnare());
@@ -494,6 +499,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.26  2003/03/08 17:44:06  fredde
+ * Much nicer layout
+ *
  * Revision 1.25  2001/05/27 08:57:00  fredde
  * Fixed signature stuff thanks to wYRd
  *
