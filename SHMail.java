@@ -19,6 +19,7 @@ package org.gjt.fredde.yamm;
 
 import java.io.*;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import org.gjt.fredde.util.net.*;
@@ -34,6 +35,9 @@ public class SHMail extends Thread {
    /** Properties for smtpserver etc */
   static protected Properties props = new Properties();
 
+  /** Language settings */
+  protected static ResourceBundle res;
+
   JButton knappen;
   YAMM frame;
 
@@ -43,8 +47,9 @@ public class SHMail extends Thread {
    * @param name the name of this thread.
    * @param knapp the button to disable.
    */
-  public SHMail(YAMM frame1, String name, JButton knapp) {
+  public SHMail(YAMM frame1, String name, JButton knapp, ResourceBundle res) {
     super(name);
+    this.res = res;
     knappen = knapp;
     knappen.setEnabled(false);
     frame = frame1;
@@ -78,14 +83,15 @@ public class SHMail extends Thread {
 
       if(type != null && server != null && username != null && password != null) {
         if(type.equals("pop3")) {
-          frame.status.setStatus("contaction server: " + server);
+          frame.status.setStatus(res.getString("server.contact") + server);
 
           try { 
             Pop3 pop = new Pop3(username, password, server, System.getProperty("user.home") + "/.yamm/boxes/.filter");
             int messages = pop.getMessageCount();
 
             for(int j = 1; j<=messages;j++) {
-              frame.status.setStatus("Getting mail " + j + " of " + messages);
+              frame.status.setStatus(res.getString("server.get") + j + 
+                                     res.getString("server.get2") + messages);
 
               frame.status.progress(100 - ( ( 100 * messages - 100 * j ) / messages ) );
               pop.getMessage(j);
@@ -93,9 +99,9 @@ public class SHMail extends Thread {
             }
             pop.closeConnection();
           }
-          catch (IOException ioe) { new MsgDialog(frame, "Error!", ioe.toString()); }
+          catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
         }
-        else new MsgDialog(frame, "Error!", "Server isn't configurated correctly!");
+        else new MsgDialog(frame, res.getString("msg.error"), res.getString("server.bad"));
       }
     }
 
@@ -155,7 +161,7 @@ public class SHMail extends Thread {
 
               else if(temp.equals(".")) {
                 smtp.sendMessage();
-                frame.status.setStatus("Sending mail " + i);
+                frame.status.setStatus(res.getString("server.send") + i);
                 
                 i++;
                 break;
@@ -171,23 +177,22 @@ public class SHMail extends Thread {
         smtp.closeConnection();
 
       }
-      catch(IOException ioe) { new MsgDialog(frame, "Error!", ioe.toString()); }
+      catch(IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
     }
-    frame.status.setStatus("done!");
+    frame.status.setStatus(res.getString("msg.done"));
     frame.status.progress(100);
 
     if(Mailbox.hasMail(System.getProperty("user.home") + "/.yamm/boxes/.filter")) {
-      frame.status.setStatus("Applying filters...");
+      frame.status.setStatus(res.getString("server.filter"));
       frame.status.progress(0);
 
       try { new Filter(); }
-      catch (IOException ioe) { new MsgDialog(frame, "Error!", ioe.toString()); }
+      catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
 
-      frame.status.setStatus("done!");
+      frame.status.setStatus(res.getString("msg.done"));
       frame.status.progress(100);
     }
     
     knappen.setEnabled(true);
   }
 }
-  
