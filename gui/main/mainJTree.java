@@ -39,7 +39,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Id: mainJTree.java,v 1.21 2000/03/15 13:42:30 fredde Exp $
+ * @version $Id: mainJTree.java,v 1.22 2000/03/18 17:08:15 fredde Exp $
  */
 public class mainJTree extends JTree implements DropTargetListener {
 
@@ -223,6 +223,8 @@ public class mainJTree extends JTree implements DropTargetListener {
 
 			Utilities.delUnNeededFiles();
 			Mailbox.createList(frame.selectedbox, frame.listOfMails);
+			Mailbox.updateIndex(box);
+			updateUI();
 			frame.mailList.updateUI();
 		}
 	}
@@ -351,6 +353,9 @@ public class mainJTree extends JTree implements DropTargetListener {
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.22  2000/03/18 17:08:15  fredde
+ * update tree on drag 'n' drop
+ *
  * Revision 1.21  2000/03/15 13:42:30  fredde
  * moved out newBoxDialog and newGroupDialog with methods
  *
