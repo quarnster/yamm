@@ -32,6 +32,7 @@ import javax.swing.tree.*;
 import javax.swing.event.*;
 import org.gjt.fredde.yamm.YAMM;
 import org.gjt.fredde.yamm.mail.Mailbox;
+import org.gjt.fredde.yamm.gui.BoxTreeRenderer;
 import org.gjt.fredde.util.gui.MsgDialog;
 
 /**
@@ -56,7 +57,6 @@ public class mainJTree extends JTree implements DropTargetListener {
    frame = frame2;
    tbar = tbar2;
    top = top2;
-  // tree = this;
 
    new DropTarget(this, // component
      DnDConstants.ACTION_COPY_OR_MOVE, // actions
@@ -64,7 +64,7 @@ public class mainJTree extends JTree implements DropTargetListener {
 
     tm = new DefaultTreeModel(top);
     setModel(tm);
-    myTreeRenderer rend = new myTreeRenderer();
+    BoxTreeRenderer rend = new BoxTreeRenderer();
     rend.setFont(new Font("SansSerif", Font.PLAIN, 12));
     setCellRenderer(rend); //new myTreeRenderer());
     getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -200,85 +200,6 @@ public class mainJTree extends JTree implements DropTargetListener {
     }
   }
 
-  /**
-   * The renderer for the tree
-   */
-  class myTreeRenderer extends JLabel implements TreeCellRenderer {
-
-    /** Whether or not the item that was last configured is selected. */
-    protected boolean selected;
-
-    public Component getTreeCellRendererComponent(
-      JTree   tree,
-      Object  value,
-      boolean selected,
-      boolean expanded,
-      boolean leaf,
-      int     row,
-      boolean hasFocus)
-    {
-      String s = value.toString();
-      StringTokenizer tok = new StringTokenizer(s, YAMM.sep);
-      String thisbox = null;
-
-      while(tok.hasMoreTokens()) thisbox = tok.nextToken();
-
-
-      if(leaf && !thisbox.endsWith(".g")) {
-        if(thisbox.equals(YAMM.getString("box.inbox")))
-          setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/inbox.gif"));
-        else if(thisbox.equals(YAMM.getString("box.outbox")) ||
-                thisbox.equals(YAMM.getString("box.sent")))
-          setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/outbox.gif"));
-        else if(thisbox.equals(YAMM.getString("box.trash")))
-          setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/trash.gif"));
-        else setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/box.gif"));
-      }
-      else if(!leaf) {
-        if(expanded)
-          setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/dir2.gif"));
-        else setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/dir.gif"));
-      }
-      else setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/dir.gif"));
-
-      if(thisbox.endsWith(".g"))
-        setText(thisbox.substring(0, thisbox.length() -2));
-      else setText(thisbox);
-      setForeground(Color.black);
-      this.selected = selected;
-      return this;
-    }
-
-
-    /**
-      * paint is subclassed to draw the background correctly.  JLabel
-      * currently does not allow backgrounds other than white, and it
-      * will also fill behind the icon.  Something that isn't desirable.
-      */
-    public void paint(Graphics g) {
-	Color            bColor;
-	Icon             currentI = getIcon();
-
-	if(selected)
-            bColor = new Color(204, 204, 255);
-	else if(getParent() != null)
-            // Pick background color up from parent (which will come from the JTree we're contained in).
-	    bColor = getParent().getBackground();
-	else
-	    bColor = getBackground();
-	g.setColor(bColor);
-
-	if(currentI != null && getText() != null) {
-	    int          offset = (currentI.getIconWidth() + getIconTextGap());
-
-	    g.fillRect(offset, 0, getWidth() - 1 - offset,
-		       getHeight() - 1);
-	}
-	else
-	    g.fillRect(0, 0, getWidth()-1, getHeight()-1);
-	super.paint(g);
-    }
-  }
 
   public void createNodes(DefaultMutableTreeNode top, File f) {
     DefaultMutableTreeNode dir = null;
