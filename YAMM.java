@@ -1,5 +1,5 @@
 /*  YAMM.java - main class
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ package org.gjt.fredde.yamm;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.print.*;
+// import java.awt.print.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -41,6 +41,8 @@ import org.gjt.fredde.yamm.encode.*;
 
 /**
  * The big Main-class of YAMM
+ * @author Fredrik Ehnbom
+ * @version $Id: YAMM.java,v 1.41 2000/02/28 13:45:44 fredde Exp $
  */
 public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
@@ -57,10 +59,10 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	public static String selectedbox = home + sep + "boxes" + sep;
 
 	/** The version of YAMM */
-	public static String version  = "0.7.4";
+	public static String version  = Utilities.cvsToVersion("$Name:  $");
 
 	/** The compileDate of YAMM */
-	public static    String                 compDate     = "2000-02-01";
+	public static String compDate = Utilities.cvsToDate("$Date: 2000/02/28 13:45:44 $");
 
 	/** the file that contains the current mail */
 	public String mailPageString = "file:///" + home + "/tmp/cache/";
@@ -108,6 +110,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	/** The names for the exception dialogs buttons */
 	public static String[] exceptionNames = null;
 
+	public static PrintStream debug = null;
 
 	/**
 	 * Returns the translated string.
@@ -383,70 +386,64 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		}
 	}
 
-  ActionListener BListener = new ActionListener() {
-    public void actionPerformed(ActionEvent e) {
-      String arg = ((JButton)e.getSource()).getToolTipText();
-     
-      if (arg.equals(res.getString("button.view_extract"))) {
-        int whichAtt = myList.getSelectedIndex();
+	/**
+	 * The actionListener for the view/extract button
+	 */
+	ActionListener BListener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int whichAtt = myList.getSelectedIndex();
 
-        if(whichAtt != -1) {
-          String filename =
-              ((Vector)attach.elementAt(whichAtt)).elementAt(0).toString();
-          String encode =
-              ((Vector)attach.elementAt(whichAtt)).elementAt(1).toString();
-          String file =
-              ((Vector)attach.elementAt(whichAtt)).elementAt(2).toString();
-          String target = home  + "/tmp/" + filename;
+			if (whichAtt != -1) {
+				String filename =
+					((Vector)attach.elementAt(whichAtt)).elementAt(0).toString();
+				String encode =
+					((Vector)attach.elementAt(whichAtt)).elementAt(1).toString();
+				String file =
+					((Vector)attach.elementAt(whichAtt)).elementAt(2).toString();
+				String target = home  + "/tmp/" + filename;
 
-          if (filename.toLowerCase().endsWith(".jpg") ||
-                filename.toLowerCase().endsWith(".gif")) {
-            if (encode.equalsIgnoreCase("base64")) {
-              if (base64) {
-                new Base64Decode("B64Decode " + filename, file, target).start();
-              }
-              else new MsgDialog("No Support for base64 encoded files...");
-            }
-            if (encode.equalsIgnoreCase("x-uuencode")) {
-              new UUDecode(null, "UUDecode " + filename, file,
-                           target, true).start();
-            }
-          }
-          else if (encode.equalsIgnoreCase("base64")) {
-            if (base64) {
-              JFileChooser jfs = new JFileChooser();
-              jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
-              jfs.setMultiSelectionEnabled(false);
-              jfs.setSelectedFile(new File(filename));
-              int ret = jfs.showSaveDialog(null);
-    
-              if(ret == JFileChooser.APPROVE_OPTION) {
-                if(jfs.getSelectedFile() != null) {
-                  new Base64Decode("B64Decode " + filename, file,
-                                   jfs.getSelectedFile().toString()).start();
-                }
-              }
-            }
-            else System.out.println("No support for base64 encoded files...");
-          }
-          else if(encode.equalsIgnoreCase("x-uuencode")) {
-            JFileChooser jfs = new JFileChooser();
-            jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            jfs.setMultiSelectionEnabled(false);
-            jfs.setSelectedFile(new File(filename));
-            int ret = jfs.showSaveDialog(null);
-            
-            if(ret == JFileChooser.APPROVE_OPTION) {
-              if(jfs.getSelectedFile() != null) {
-                new UUDecode(null, "UUDecode " + filename, file,
-                             jfs.getSelectedFile().toString(), false).start();
-              }
-            }
-          }
-        }
-      }
-    }
-  };
+				if (filename.toLowerCase().endsWith(".jpg") ||
+					filename.toLowerCase().endsWith(".gif")) {
+					if (encode.equalsIgnoreCase("base64")) {
+						if (base64)
+							new Base64Decode("B64Decode " + filename, file, target).start();
+						else new MsgDialog("No Support for base64 encoded files...");
+					} else if (encode.equalsIgnoreCase("x-uuencode")) {
+						new UUDecode(null, "UUDecode " + filename, file,
+							target, true).start();
+					}
+				} else if (encode.equalsIgnoreCase("base64")) {
+					if (base64) {
+						JFileChooser jfs = new JFileChooser();
+						jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
+						jfs.setMultiSelectionEnabled(false);
+						jfs.setSelectedFile(new File(filename));
+						int ret = jfs.showSaveDialog(null);
+
+						if (ret == JFileChooser.APPROVE_OPTION) {
+							if (jfs.getSelectedFile() != null) {
+								new Base64Decode("B64Decode " + filename, file,
+								jfs.getSelectedFile().toString()).start();
+							}
+						}
+					} else System.out.println("No support for base64 encoded files...");
+				} else if(encode.equalsIgnoreCase("x-uuencode")) {
+					JFileChooser jfs = new JFileChooser();
+					jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					jfs.setMultiSelectionEnabled(false);
+					jfs.setSelectedFile(new File(filename));
+					int ret = jfs.showSaveDialog(null);
+
+					if (ret == JFileChooser.APPROVE_OPTION) {
+						if (jfs.getSelectedFile() != null) {
+							new UUDecode(null, "UUDecode " + filename, file,
+								jfs.getSelectedFile().toString(), false).start();
+						}
+					}
+				}
+			}
+		}
+	};
 
 	public void createAttachList() {
 		attach = new Vector();
@@ -474,7 +471,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		}
 	}
 
-	protected void addinfo(String where, Vector attach) {
+	private void addinfo(String where, Vector attach) {
 		Vector tmp = new Vector();
 
 		try {
@@ -531,61 +528,23 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 					YAMM.exceptionNames);
 		}
 
+		if (debug != System.err) {
+			debug.flush();
+			debug.close();
+		}
 		dispose();
-		delUnNeededFiles();
+		Utilities.delUnNeededFiles();
 		System.exit(0);
 	}
 
-	public void delUnNeededFiles(){
-		boolean debug = false;
-		
-		if (YAMM.getProperty("debug.cachedel", "false").equals("true"))
-			debug = true;
-			
-		Vector delFile = new Vector(), delDir = new Vector();
-
-		if (debug)
-			System.err.println("Creating list of unneeded files...");
-		createDelList(delFile, delDir, new File(home + "/tmp/"), debug);
-		if (debug)
-			System.err.println("\nDeleting unneeded files...");
-
-		delFiles(delFile, debug);
-		delFiles(delDir, debug);
-	}
-
-
-	protected void createDelList(Vector delFile, Vector delDir, File dir, boolean debug) {
-		String files[] = dir.list();
-
-		for(int i = 0; i < files.length; i++) {
-			if (debug) {
-				System.err.println("added \"" + files[i]);
-			}
-			File dir2 = new File(dir, files[i]);
-
-			if (dir2.isDirectory()) {
-				delDir.add(dir2);
-				createDelList(delFile, delDir, dir2, debug);
-			} else {
-				delFile.add(dir2);
-			}
+	/**
+	 * The WindowListener.
+	 */
+	class FLyssnare extends WindowAdapter {
+		public void windowClosing(WindowEvent event) {
+			Exit();
 		}
 	}
-
-  public void delFiles(Vector delFile, boolean debug) {
-    for(int i = 0; i < delFile.size(); i++) {
-      String file = delFile.elementAt(i).toString();
-      if(!new File(file).delete() && debug) {
-        System.err.println("Couldn't delete \"" + file + "\"");
-      }
-    }
-  }
-  class FLyssnare extends WindowAdapter {
-    public void windowClosing(WindowEvent event) {
-      Exit();
-    }
-  }
 
 	/**
 	 * Shows a SplashScreen while starting the program.
@@ -596,15 +555,30 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	public static void main(String argv[]) {
 		YAMM nFrame = null;
 		SplashScreen splash = null;
+		boolean firstRun = false;
+
+		if (!(new File(home)).exists()) {
+			firstRun = true;
+
+			try {
+				(new File(home + "/servers")).mkdirs();
+				(new File(home + "/boxes")).mkdirs();
+				(new File(home + "/.config")).createNewFile();
+				(new File(home + "/.filters")).createNewFile();
+				(new File(home + "/tmp")).mkdirs();
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+				System.exit(1);
+			}
+		}
 
 		try {             
 			InputStream in = new FileInputStream(home + "/.config");
 			props.load(in);
 			in.close();    
 		} catch (IOException propsioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-					propsioe,
-					YAMM.exceptionNames);
+			propsioe.printStackTrace();
+			System.exit(1);
 		}
 		Locale l = Locale.getDefault();
 		String resLanguage = l.getLanguage();
@@ -628,6 +602,16 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			mre.printStackTrace();
 			System.exit(1);
 		}
+
+		if (props.getProperty("debug.file") != null) {
+			try {
+				debug = new PrintStream(
+					new BufferedOutputStream(
+					new FileOutputStream(props.getProperty("debug.file"))));
+			} catch (IOException ioe) {
+				debug = System.err;
+			}
+		} else debug = System.err;
 
 		if (props.getProperty("plaf") != null) {
 			try {
@@ -657,7 +641,8 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
 		exceptionNames = tmp;
 
-		if (!(new File(home + "/boxes")).exists()) {
+
+		if (firstRun) {
 			try {
 				String user = System.getProperty("user.name");
 				SimpleDateFormat dateFormat =
@@ -668,8 +653,6 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 				String host = myInetaddr.getHostName();
 				if (host == null) host = "localhost";
 
-				(new File(home + "/servers")).mkdirs();
-				(new File(home + "/boxes")).mkdirs();
 				PrintWriter out = new PrintWriter(
 					new BufferedOutputStream(
 					new FileOutputStream(home + "/boxes/" + 
@@ -694,9 +677,6 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 					getString("box.trash"))).createNewFile();
 				(new File(home + "/boxes/" +
 					getString("box.sent"))).createNewFile();
-				(new File(home + "/.config")).createNewFile();
-				(new File(home + "/.filters")).createNewFile();
-				(new File(home + "/tmp")).mkdirs();
 			} catch(IOException ioe) { 
 				new ExceptionDialog(YAMM.getString("msg.error"),
 					ioe,
@@ -716,3 +696,10 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	}
 }
 
+/*
+ * Changes
+ * $Log: YAMM.java,v $
+ * Revision 1.41  2000/02/28 13:45:44  fredde
+ * added changelog and some javadoc tags. Moved some functions to Utilities. Added a debug PrintStream and smart version control. fixed some startup bugs. cleaned up a little
+ *
+ */
