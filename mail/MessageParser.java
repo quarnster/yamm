@@ -26,7 +26,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Parses messages
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: MessageParser.java,v 1.16 2001/04/21 09:33:37 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.17 2003/03/05 15:10:43 fredde Exp $
  */
 public class MessageParser {
 
@@ -50,91 +50,72 @@ public class MessageParser {
 		return null;
 	}
 
+	private static String[] startList = new String[] {
+		":",
+		";",
+		" ",
+		"(",
+		"<",
+		"\"",
+		"\'"
+	};
+	private static String[] endList = new String[] {
+		")",
+		">",
+		"<",
+		"&gt;",
+		"\"",
+		"\'",
+		"&nbsp;",
+		"!",
+	};
+
 	public static String[] parseLink(String link) {
 		String begin = "";
 		String end   = "";
 		String temp = link;
 		boolean stuff = false;
+		int startIndex = 0;
+
+		if ((startIndex = link.indexOf("://")) == -1) {
+			if ((startIndex = link.indexOf("www.")) == -1) {
+				if ((startIndex = link.indexOf("@")) == -1) {
+					System.err.println("WARNING: Unsupported URL");
+					return new String[] {begin,temp,end};
+				}
+			}
+		}
+			
 
 		for (;;) {
-
-			if (temp.endsWith(".")) {
-				temp = temp.substring(0, temp.length() - 1);
-				end = ".";
-
-				stuff = true;
+			for (int i = 0; i < startList.length; i++) {
+				int index = temp.indexOf(startList[i]);
+				if (index != -1 && index < startIndex) {
+					index += startList[i].length();
+					begin += temp.substring(0, index);
+					temp = temp.substring(index);
+					stuff = true;
+					startIndex -= index;
+					break;
+				}
 			}
 
-			if (temp.endsWith(",")) {
-				temp = temp.substring(0, temp.length() - 1);
-				end = "," + end;
-				stuff = true;
+			if (stuff != true) {
+				break;
 			}
+			stuff = false;
+		}
+		stuff = false;
 
-			if (temp.startsWith("mailto:")) {
-				temp = temp.substring(7, temp.length());
-				begin = "mailto:";
-				stuff = true;
-			}
-
-			if (temp.startsWith("(")) {
-				temp = temp.substring(1, temp.length());
-				begin = begin + "(";
-				stuff = true;
-			}
-
-			if (temp.endsWith(")")) {
-				temp = temp.substring(0, temp.length() - 1);
-				end = ")" + end;
-				stuff = true;
-			}
-
-			if (temp.startsWith("<")) {
-				temp = temp.substring(1, temp.length());
-				begin = begin + "&lt;";
-				stuff = true;
-			}
-
-			if (temp.endsWith(">")) {
-				temp = temp.substring(0, temp.length() - 1);
-				end = "&gt;" + end;
-				stuff = true;
-			}
-
-			if (temp.startsWith("&lt;")) {
-				temp = temp.substring(4, temp.length());
-				begin = begin + "&lt;";
-				stuff = true;
-			}
-
-			if (temp.endsWith("&gt;")) {
-				temp = temp.substring(0, temp.length() - 4);
-				end  = "&gt;" + end;
-				stuff = true;
-			}
-
-			if (temp.startsWith("\"")) {
-				temp = temp.substring(1, temp.length());
-				begin = begin + "\"";
-				stuff = true;
-			}
-
-			if (temp.endsWith("\"")) {
-				temp = temp.substring(0, temp.length() - 1);
-				end = "\"" + end;
-				stuff = true;
-			}
-
-			if (temp.startsWith("\'")) {
-				temp = temp.substring(1, temp.length());
-				begin = begin + "\'";
-				stuff = true;
-			}
-
-			if (temp.endsWith("\'")) {
-				temp = temp.substring(0, temp.length() - 1);
-				end = "\'" + end;
-				stuff = true;
+		for (;;) {
+			for (int i = 0; i < endList.length; i++) {
+				int index = temp.indexOf(endList[i]);
+				if (index != -1) {
+					end = temp.substring(index) + end;
+					temp = temp.substring(0, index);
+					stuff = true;
+					break;
+				}
 			}
 
 			if (stuff != true) {
@@ -143,7 +124,7 @@ public class MessageParser {
 				stuff = false;
 			}
 		}
-
+		System.out.println("temp: " + temp);
 		String[] tmp = { begin, temp, end };
 		return tmp;
 	}
@@ -151,6 +132,7 @@ public class MessageParser {
 	public MessageParser(BufferedReader in, PrintWriter out, String file)
 		throws IOException, MessageParseException
 	{
+		boolean html = false;
 		file = file.substring(0, file.length() - 5);
 		MessageHeaderParser mhp = new MessageHeaderParser();
 		mhp.parse(in);
@@ -207,7 +189,6 @@ public class MessageParser {
 		out.println("</table>");
 		out.println("</td></tr>");
 		out.println("</table>");
-		out.println("<br><pre>");
 
 		String boundary = null;
 
@@ -231,14 +212,19 @@ public class MessageParser {
 			if (boundary != null) {
 				for (;;) {
 					if (in.readLine().equals("--" +	boundary)) {
-						new Attachment().parse(in, null);
+						Attachment a = new Attachment();
+						a.parse(in, null);
+						if (a.contentType != null && a.contentType.indexOf("text/html") != -1) html = true;
 						break;
 					}
 				}
 			}
 		}
 
-		MessageBodyParser mbp = new MessageBodyParser(true);
+		if (!html)
+			out.println("<br><pre>");
+
+		MessageBodyParser mbp = new MessageBodyParser(true, html);
 
 		bigLoop:
 		for (;;) {
@@ -254,7 +240,7 @@ public class MessageParser {
 						)
 					);
 
-				
+
 					for (;;) {
 						// Attachment found
 						test = a.parse(in, atOut);
@@ -295,7 +281,9 @@ public class MessageParser {
 			}
 		}
 
-		out.println("</pre></body>");
+		if (html)
+			out.println("</pre>");
+		out.println("</body>");
 		out.println("</html>");
 	}
 }
