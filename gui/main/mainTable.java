@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.45 2003/03/10 20:00:59 fredde Exp $
+/*  $Id: mainTable.java,v 1.46 2003/03/11 15:17:15 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.45 $
+ * @version $Revision: 1.46 $
  */
 public class mainTable
 	extends JTable
@@ -467,9 +467,7 @@ public class mainTable
 
 					dataModel.fireTableRowsUpdated(row, row);
 					yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
-					row = yamm.tree.getSelectedRow();
-					if (row != -1)
-						yamm.tree.dataModel.fireTableRowsUpdated(row, row);
+					yamm.tree.update();
 				}
 				changeButtonMode(true);
 				if (me.getClickCount() == 2) new MailReader(yamm.mailPage);
@@ -531,10 +529,7 @@ public class mainTable
 
 				update();
 				yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
-				int row = yamm.tree.getSelectedRow();
-				if (row != -1)
-					yamm.tree.dataModel.fireTableRowsUpdated(row, row);
-
+				yamm.tree.fullUpdate();
 
 				if (yamm.listOfMails.length < 0) {
 					return;
@@ -571,9 +566,7 @@ public class mainTable
 
 				update();
 				yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
-				int row = yamm.tree.getSelectedRow();
-				if (row != -1)
-					yamm.tree.dataModel.fireTableRowsUpdated(row, row);
+				yamm.tree.fullUpdate();
 
 				changeButtonMode(false);
 				clearSelection();
@@ -624,9 +617,8 @@ public class mainTable
 			Arrays.sort(copyList);
 			Mailbox.copyMail(yamm.selectedbox, name, copyList);
 			yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
-			int row = yamm.tree.getSelectedRow();
-			if (row != -1)
-				yamm.tree.dataModel.fireTableRowsUpdated(row, row);
+			yamm.tree.unreadTable.put(name, Mailbox.getUnread(name));
+			yamm.tree.fullUpdate();
 		}
 	};
 
@@ -651,15 +643,17 @@ public class mainTable
 			Mailbox.createList(yamm.selectedbox, yamm);
 			update();
 			yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
-			int row = yamm.tree.getSelectedRow();
-			if (row != -1)
-				yamm.tree.dataModel.fireTableRowsUpdated(row, row);
+			yamm.tree.unreadTable.put(name, Mailbox.getUnread(name));
+			yamm.tree.fullUpdate();
 		}
 	};
 }
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.46  2003/03/11 15:17:15  fredde
+ * better updating of the tree when doing various mail operations
+ *
  * Revision 1.45  2003/03/10 20:00:59  fredde
  * sorting now done by a mergesort routine
  *
