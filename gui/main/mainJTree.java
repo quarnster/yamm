@@ -39,29 +39,26 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Id: mainJTree.java,v 1.20 2000/02/28 13:46:21 fredde Exp $
+ * @version $Id: mainJTree.java,v 1.21 2000/03/15 13:42:30 fredde Exp $
  */
 public class mainJTree extends JTree implements DropTargetListener {
 
-	JPopupMenu treepop;
-
-	DefaultMutableTreeNode top;
+	private JPopupMenu treepop;
+	private DefaultMutableTreeNode top = new DefaultMutableTreeNode(YAMM.getString("box.boxes"));
 	private static YAMM frame;
 	private static mainToolBar tbar;
-	DefaultTreeModel tm;
+	private DefaultTreeModel tm;
 	private boolean sentbox = false;
 
-  
 	/**
 	 * Creates the tree and adds all the treestuff to the tree.
 	 * @param frame2 The JFrame that will be used for error messages etc
 	 * @param top2 The TreeNode that this tree will use.
 	 * @param tbar2 The mainToolBar to disable/enable buttons on.
 	 */
-	public mainJTree(YAMM frame2,  DefaultMutableTreeNode top2, mainToolBar tbar2) { 
-		frame = frame2;
-		tbar = tbar2;
-		top = top2;
+	public mainJTree(YAMM frame2, mainToolBar tbar2) { 
+		this.frame = frame2;
+		this.tbar = tbar2;
 		sentbox = YAMM.getProperty("sentbox", "false").equals("true");
 
 		new DropTarget(this, // component
@@ -87,24 +84,24 @@ public class mainJTree extends JTree implements DropTargetListener {
 						frame.selectedbox = YAMM.home + YAMM.sep + "boxes" + YAMM.sep + YAMM.getString("box.inbox");
 						Mailbox.createList(frame.selectedbox, frame.listOfMails);
 						frame.mailList.clearSelection();
-						((JTable)frame.mailList).updateUI();
+						frame.mailList.updateUI();
 					} else if (!box.isDirectory()) {
 						frame.selectedbox = node.toString();
 						Mailbox.createList(frame.selectedbox, frame.listOfMails);
 						frame.mailList.clearSelection();
-						((JTable)frame.mailList).updateUI();
+						frame.mailList.updateUI();
 					}
 				}
 
 				if ( ((mainTable)frame.mailList).getSelectedRow() != -1 &&
 						!(((JTable)frame.mailList).getSelectedRow() >= frame.listOfMails.size())) {
-					((JButton)tbar.reply).setEnabled(true);
-					((JButton)tbar.forward).setEnabled(true);
-					//((JButton)tbar.print).setEnabled(true);
+					tbar.reply.setEnabled(true);
+					tbar.forward.setEnabled(true);
+					//tbar.print.setEnabled(true);
 				} else {
-					((JButton)tbar.reply).setEnabled(false);
-					((JButton)tbar.forward).setEnabled(false);
-					//((JButton)tbar.print).setEnabled(false);
+					tbar.reply.setEnabled(false);
+					tbar.forward.setEnabled(false);
+					//tbar.print.setEnabled(false);
 				}
 			}
 		});
@@ -145,6 +142,28 @@ public class mainJTree extends JTree implements DropTargetListener {
 		mi.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		mi.addActionListener(treepoplistener);
 		treepop.add(mi);
+	}
+
+	/**
+	 * Updates the box list
+	 */
+	public void updateNodes() {
+		top.removeAllChildren();
+		top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
+			+ YAMM.getString("box.inbox"))));
+		top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
+			+ YAMM.getString("box.outbox"))));
+
+		if (sentbox) {
+			top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
+				+ YAMM.getString("box.sent"))));
+		}
+
+		createNodes(top, new File(YAMM.home + "/boxes/"));
+		top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
+			+ YAMM.getString("box.trash"))));
+
+		updateUI();
 	}
 
 	public void drop(DropTargetDropEvent e) {
@@ -242,34 +261,14 @@ public class mainJTree extends JTree implements DropTargetListener {
 		}
 	}
 
-	public void createGroupList(Vector vect, File f) {
-		String sep = YAMM.sep;
-		String home = YAMM.home;
-
-		if ((f.toString()).equals(home + sep + "boxes")) {
-			vect.add(sep);
-			String list[] = f.list();
-			for (int i = 0; i < list.length; i++)
-				createGroupList(vect, new File(f, list[i]));
-		} else if (f.isDirectory() && f.toString().endsWith(".g")) {
-			String dir = f.toString();
-			dir = dir.substring((home + sep + "boxes").length(), dir.length() -2);
-			vect.add(dir);
-
-			String list[] = f.list();
-			for (int i = 0; i < list.length; i++)
-				createGroupList(vect, new File(f, list[i]));
-		}
-	}
-
-	ActionListener treepoplistener = new ActionListener() {
+	private ActionListener treepoplistener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 			String kommando = ((JMenuItem)ae.getSource()).getText();
       
 			if (kommando.equals(YAMM.getString("tree.new.box"))) {
-				new newBoxDialog(frame);
+				new NewBoxDialog(frame);
 			} else if (kommando.equals(YAMM.getString("tree.new.group"))) {
-				new newGroupDialog(frame);
+				new NewGroupDialog(frame);
 			} else {
 				if (getLastSelectedPathComponent() != null) {
 					File del = new File(getLastSelectedPathComponent().toString());
@@ -304,9 +303,9 @@ public class mainJTree extends JTree implements DropTargetListener {
 							updateUI();
 							expandRow(0);
 
-							((mainTable)frame.mailList).popup = new JPopupMenu();
-							((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
-							((mainTable)frame.mailList).createPopup(((mainTable)frame.mailList).popup);
+							frame.mailList.popup = new JPopupMenu();
+							frame.mailList.popup.setInvoker(frame.mailList);
+							frame.mailList.createPopup(((mainTable)frame.mailList).popup);
 						}
 					} else if(del.exists()) {
 						if (!del.delete()) {
@@ -340,7 +339,7 @@ public class mainJTree extends JTree implements DropTargetListener {
 		}
 	};
 
-	MouseListener mouseListener2 = new MouseAdapter() {
+	private MouseListener mouseListener2 = new MouseAdapter() {
 		public void mouseReleased(MouseEvent me) {
 			if (me.isPopupTrigger()) treepop.show(getParent(), me.getX(), me.getY());
 		}
@@ -348,216 +347,13 @@ public class mainJTree extends JTree implements DropTargetListener {
 			if (me.isPopupTrigger()) treepop.show(getParent(), me.getX(), me.getY());
 		}
 	};
-
-	protected void removeDotG(Vector vect) {
-		for (int i = 0; i < vect.size(); i++) {
-			String temp = vect.elementAt(i).toString();
-
-			while (temp.indexOf(".g") != -1) {
-				temp = temp.substring(0, temp.indexOf(".g")) + temp.substring(temp.indexOf(".g") + 2, temp.length());
-			}
-			vect.setElementAt(temp, i);
-		}
-	}
-
-	class newGroupDialog extends JDialog {
-		JComboBox  group;
-		JTextField jtfield;
-
-		public newGroupDialog(JFrame frame) {
-			super(frame, true);
-			setBounds(0, 0, 300, 100);
-			setTitle(YAMM.getString("title.new.group"));
-
-			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			setLocation((screenSize.width - 300) / 2, (screenSize.height - 200) / 2);
-			getContentPane().setLayout(new GridLayout(3, 2));
-
-			getContentPane().add(new JLabel(YAMM.getString("options.group")));
-			Vector vect = new Vector();
-			createGroupList(vect, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
-
-			removeDotG(vect);
-			group = new JComboBox( vect );
-			getContentPane().add(group);
-
-			getContentPane().add(new JLabel(YAMM.getString("options.name")));
-			jtfield = new JTextField();
-			getContentPane().add(jtfield);
-
-			JButton b = new JButton(YAMM.getString("button.ok"));
-			b.addActionListener(BListener2);
-			getContentPane().add(b);
-
-			b = new JButton(YAMM.getString("button.cancel"));
-			b.addActionListener(BListener2);
-			getContentPane().add(b);
-
-			show();
-		}
-
-		ActionListener BListener2 = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String arg = ((JButton)e.getSource()).getText();
-				String sep = System.getProperty("file.separator");
-
-				if (arg.equals(YAMM.getString("button.ok"))) {
-					String gName = group.getSelectedItem().toString();
-					String temp = "";
-
-					if (!gName.equals(sep)) {
-						StringTokenizer tok = new StringTokenizer(gName, sep);
-
-						while (tok.hasMoreTokens()) {
-							temp +=  tok.nextToken() + ".g" + sep;
-						}
-						gName = temp;
-					}
-					File box = new File(System.getProperty("user.home") +
-								"/.yamm/boxes/" +
-								gName +
-								jtfield.getText() + ".g");
-
-					if (box.exists()) {
-						new MsgDialog(frame, YAMM.getString("msg.error"),
-							YAMM.getString("msg.file.exists"));
-					} else {
-						if (!box.mkdir()) {
-							Object[] args = { box.toString() };
-							new MsgDialog(frame, YAMM.getString("msg.error"),
-								YAMM.getString("msg.file.create-error",args));
-						}
-
-						top.removeAllChildren();
-						top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-							+ YAMM.getString("box.inbox"))));
-						top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-							+ YAMM.getString("box.outbox"))));
-
-						if (sentbox) {
-							top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-								+ YAMM.getString("box.sent"))));
-						}
-
-						createNodes(top, new File(YAMM.home + "/boxes/"));
-						top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-							+ YAMM.getString("box.trash"))));
-
-						updateUI();
-						dispose();
-					}
-				} else if (arg.equals(YAMM.getString("button.cancel"))) {
-					dispose();
-				}
-			}
-		};
-	}
-
-	class newBoxDialog extends JDialog {
-		JComboBox  group;
-		JTextField jtfield;
-  
-		public newBoxDialog(JFrame frame) {
-			super(frame, true);  
-			setBounds(0, 0, 300, 100);
-//      setResizable(false);      
-			setTitle(YAMM.getString("title.new.box"));
-
-			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			setLocation((screenSize.width - 300) / 2, (screenSize.height - 200) / 2);
-			getContentPane().setLayout(new GridLayout(3, 2));
-
-			getContentPane().add(new JLabel(YAMM.getString("options.group")));
-			Vector vect = new Vector();
-			createGroupList(vect, new File(YAMM.home + "/boxes/"));
-			removeDotG(vect);
-			group = new JComboBox(vect);
-			getContentPane().add(group);
-
-			getContentPane().add(new JLabel(YAMM.getString("options.name")));
-			jtfield = new JTextField();
-			getContentPane().add(jtfield);
-
-
-			JButton b = new JButton(YAMM.getString("button.ok"));
-			b.addActionListener(BListener2);
-			getContentPane().add(b);
-
-			b = new JButton(YAMM.getString("button.cancel"));
-			b.addActionListener(BListener2);
-			getContentPane().add(b);
-
-			show();
-		}
- 
-		ActionListener BListener2 = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String arg = ((JButton)e.getSource()).getText();
-				String sep = System.getProperty("file.separator");
-
-				if (arg.equals(YAMM.getString("button.ok"))) {
-					String gName = group.getSelectedItem().toString();
-					String temp = "";
-
-					if (!gName.equals(sep)) {
-						StringTokenizer tok = new StringTokenizer(gName, sep);
-
-						while (tok.hasMoreTokens()) {
-							temp +=  tok.nextToken() + ".g" + sep;
-						}
-						gName = temp;
-					}
-
-					File box = new File(YAMM.home +
-							"/boxes/" +
-							gName +
-							jtfield.getText());
-
-					if (box.exists()) {
-						new MsgDialog(frame, YAMM.getString("msg.error"),
-							YAMM.getString("msg.file.exists"));
-					} else {
-						try {
-							box.createNewFile();
-						} catch (IOException ioe) {
-							new ExceptionDialog(YAMM.getString("msg.error"),
-								ioe,
-								YAMM.exceptionNames);
-						}
-
-						top.removeAllChildren();
-						top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-							+ YAMM.getString("box.inbox"))));
-						top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-							+ YAMM.getString("box.outbox"))));
-
-						if (sentbox) {
-							top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-								+ YAMM.getString("box.sent"))));
-						}
-
-						createNodes(top, new File(YAMM.home + "/boxes/"));
-						top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-							+ YAMM.getString("box.trash"))));
-
-						updateUI();
-
-						((mainTable)frame.mailList).popup = new JPopupMenu();
-						((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
-						((mainTable)frame.mailList).createPopup(((mainTable)frame.mailList).popup);
-
-						dispose();
-					}
-				} else if (arg.equals(YAMM.getString("button.cancel"))) {
-					dispose();
-				}
-			}
-		};
-	}
 }
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.21  2000/03/15 13:42:30  fredde
+ * moved out newBoxDialog and newGroupDialog with methods
+ *
  * Revision 1.20  2000/02/28 13:46:21  fredde
  * added some javadoc tags and changelog. Cleaned up
  *
