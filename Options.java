@@ -42,7 +42,7 @@ public class Options extends JDialog {
   static protected Vector vect2;
 
   JTabbedPane    JTPane;
-  JTextField     JTField;
+//  JTextField     JTField;
   JTable         ServerList;
   JComboBox      JCBox, theme;
   JTextField     addrField, userField;
@@ -162,20 +162,20 @@ public class Options extends JDialog {
 
   protected void filterConf(Box vbox) {
     Box hori = Box.createHorizontalBox();
-    JTField = new JTextField(4);
-    JTField.setMaximumSize(new Dimension(35, 15));
-    JTField.setMinimumSize(new Dimension(35, 15));
-    JTField.setText(YAMM.getProperty("msgmaxsize", "0"));
+//    JTField = new JTextField(4);
+//    JTField.setMaximumSize(new Dimension(35, 15));
+//    JTField.setMinimumSize(new Dimension(35, 15));
+//    JTField.setText(YAMM.getProperty("msgmaxsize", "0"));
 
-    JLabel myLabel = new JLabel(YAMM.getString("msg.bigmsg"));
-    hori.add(Box.createRigidArea(new Dimension(10, 10)));
-    hori.add(myLabel);
-    hori.add(JTField);
-    myLabel = new JLabel(" kb");
-    hori.add(myLabel);
+//    JLabel myLabel = new JLabel(YAMM.getString("msg.bigmsg"));
+//    hori.add(Box.createRigidArea(new Dimension(10, 10)));
+//    hori.add(myLabel);
+//    hori.add(JTField);
+//    myLabel = new JLabel(" kb");
+//    hori.add(myLabel);
     
-    vbox.add(hori);
-    vbox.add(new JLabel(YAMM.getString("msg.bigmsg2")));
+//    vbox.add(hori);
+//    vbox.add(new JLabel(YAMM.getString("msg.bigmsg2")));
 
     final Vector list = new Vector();
 
@@ -298,7 +298,7 @@ public class Options extends JDialog {
         YAMM.setProperty("username",  name.getText());
         YAMM.setProperty("email",email.getText());
         YAMM.setProperty("signatur", signatur.getText());
-        YAMM.setProperty("msgmaxsize", JTField.getText());
+//        YAMM.setProperty("msgmaxsize", JTField.getText());
 
         dispose();
       }
