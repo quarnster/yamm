@@ -108,35 +108,11 @@ public class MessageBodyParser {
 			String temp = tok.nextToken();
 
 			if (temp.indexOf("://") != -1) {
-				String begin = "";
-				String end   = "";
+				String tmp[] = MessageParser.parseLink(temp);
 
-				if (temp.endsWith(".")) {
-					temp = temp.substring(0,
-							temp.length() - 1);
-					end = ".";
-				}
-
-				if (temp.startsWith("(") &&
-							temp.endsWith(")")) {
-
-					temp = temp.substring(1,
-							temp.length() - 1);
-					begin = "(";
-					end   = ")" + end;
-				}
-
-				if (temp.startsWith("<") &&
-							temp.endsWith(">")) {
-					temp = temp.substring(1,
-							temp.length() - 1);
-					begin = begin + "&lt;";
-					end   = "&gt;" + end;
-				}
-
-				temp = "<a href=\"" + temp + "\">" + temp +
+				temp = "<a href=\"" + tmp[1] + "\">" + tmp[1] +
 						"</a>";
-				link += begin + temp + end + " ";
+				link += tmp[0] + temp + tmp[2] + " ";
 			} else {
 				link += temp + " ";
 			}
@@ -154,36 +130,12 @@ public class MessageBodyParser {
 			String temp = tok.nextToken();
 
 			if (temp.indexOf("@") != -1) {
-				String begin = "";
-				String end = "";
+				String tmp[] = MessageParser.parseLink(temp);
 
-				if (temp.endsWith(".")) {
-					temp = temp.substring(0,
-							temp.length() - 1);
-					end = ".";
-				}
+				temp = "<a href=mailto:" + tmp[1] + ">" +
+								tmp[1] + "</a>";
 
-				if (temp.endsWith(",")) {
-					temp = temp.substring(0,
-							temp.length() - 1);
-					end = ",";
-				}
-				if (temp.startsWith("mailto:")) {
-					temp = temp.substring(7, temp.length());
-					begin = "mailto:";
-				}
-				if (temp.startsWith("<") &&
-							temp.endsWith(">")) {
-
-					temp = temp.substring(1,
-							temp.length() - 1);
-					begin = begin + "&lt;";
-					end   = "&gt;" + end;
-				}
-				temp = "<a href=mailto:" + temp + ">" +
-								temp + "</a>";
-
-				mail += begin + temp + end + " ";
+				mail += tmp[0] + temp + tmp[2] + " ";
 			} else {
 				mail += temp + " ";
 			}
