@@ -1,5 +1,5 @@
-/*  DateParser.java - Parses dates
- *  Copyright (C) 1999 Fredrik Ehnbom
+/*  $Id: DateParser.java,v 1.3 2003/03/09 14:04:20 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ import java.util.*;
 
 /**
  * Parses dates in common mail-dateformats.
+ * @author Fredrik Ehnbom <fredde@gjt.org>
+ * @version $Revision: 1.3 $
  */
 public class DateParser {
 
@@ -35,22 +37,37 @@ public class DateParser {
 	 * Parses the date
 	 * @param date The date to parse from
 	 */
-	public String parse(String date) throws ParseException {
+	public String parse(String date)
+		throws ParseException
+	{
+		Date d = getDate(date);
+		return parse(d);
+	}
+
+	public String parse(Date d)
+		throws ParseException
+	{
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DateFormat);
+		return dateFormat.format(d);
+	}
+
+	public Date getDate(String date)
+		throws ParseException
+	{
 		SimpleDateFormat dateParser = null;
 
 		if (date.charAt(2) == ' ' || date.charAt(1) == ' ') {
-			dateParser = new SimpleDateFormat("dd MMM yyyy"
-						+ " HH:mm:ss zzz", Locale.US);
+			dateParser = new SimpleDateFormat(
+				"dd MMM yyyy HH:mm:ss zzz",
+				Locale.US
+			);
 		} else {
-			dateParser = new SimpleDateFormat("EEE, dd MMM yyyy"
-						+ " HH:mm:ss zzz", Locale.US);
+			dateParser = new SimpleDateFormat(
+				"EEE, dd MMM yyyy HH:mm:ss zzz",
+				Locale.US
+			);
 		}
-
-		SimpleDateFormat dateFormat = new SimpleDateFormat(DateFormat);
-
-		date = dateFormat.format(dateParser.parse(date));
-
-		return date;
+		return dateParser.parse(date);
 	}
 
 	/**
