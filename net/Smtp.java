@@ -29,122 +29,178 @@ import java.io.*;
  * import java.io.*;
  * 
  * public class Test {
- *   public static void main(String args[]) {
- *     try {
- *       Smtp smtp = new Smtp("server.your.domain"); // use the server 'server.your.domain'
- *       smtp.from("you@your.domain");               // send from 'you@your.domain'
- *       smtp.to("your-friend@your.domain");         // send to 'your-friend@your.domain' and
- *       smtp.to("your-second-friend@your.domain");  // to 'your-second-friend@your.domain'
+ * 	public static void main(String args[]) {
+ * 		try {
+ *			// use the server 'server.your.domain'
+ * 			Smtp smtp = new Smtp("server.your.domain");
  *
- *       PrintWriter out = smtp.getOutputStream();   // Headers and message
- *       out.println("Subject: party!!!");           // The subject
- *       out.println();                              // blank line separates the headers from message
- *       out.println("I have a party next week!!!"); // the message
+ *			// send from 'you@your.domain'
+ * 			smtp.from("you@your.domain");
  *
- *       smtp.sendMessage();                         // sends the message
- *       smtp.close();                               // closes the connection
- *     }
- *     catch (IOException ioe) { System.err.println(ioe); }
- *   }
+ * 			// send to 'your-friend@your.domain'
+ * 			smtp.to("your-friend@your.domain");
+ *
+ * 			// also send to 'your-second-friend@your.domain'
+ *			smtp.to("your-second-friend@your.domain");
+ *
+ *			// OutputStream to server
+ * 			PrintWriter out = smtp.getOutputStream();
+ *
+ *			// The subject of this message
+ * 			out.println("Subject: party!!!");
+ *
+ *			// blank line separates the header from the message
+ * 			out.println();
+ *
+ *			// The message
+ *			out.println("I have a party next week!!!");
+ *
+ *			// sends the message
+ *			smtp.sendMessage();
+ *
+ *			// closes the connection
+ *			smtp.close();
+ *		} catch (IOException ioe) { 
+ *			System.err.println(ioe);
+ *		}
+ * 	}
  * }
  * </pre></code>
  */
 public class Smtp {
 
-  /** from the server */
-  protected BufferedReader in;
+	/** from the server */
+	protected BufferedReader in;
 
-  /** to the server */
-  protected PrintWriter    out;
+	/** to the server */
+	protected PrintWriter    out;
 
-  /** The socket to use for this connection */
-  protected Socket socket;
+	/** The socket to use for this connection */
+	protected Socket socket;
 
-  /**
-   * Connects to the specified server
-   * @param server The server to use
-   * @param file The file to get messages from
-   */
-  public Smtp(String server) throws IOException {
-    this(server, 25);
-  }
+	/** If the "conversation" between client and server should be showed */
+	protected boolean debug = false;
 
-  /**
-   * Connects to the specified server
-   * @param server The server to use
-   * @param file The file to get messages from
-   */
-  public Smtp(String server, int port) throws IOException {
-    socket = new Socket(server, port);
+	/**
+	 * Connects to the specified server
+	 * @param server The server to use
+	 * @param file The file to get messages from
+	 */
+	public Smtp(String server) throws IOException {
+		this(server, 25, false);
+	}
 
-    in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-    out = new PrintWriter(new BufferedWriter(
-                   new OutputStreamWriter(socket.getOutputStream())), true);
+	/**
+	 * Connects to the specified server
+	 * @param server The server to use
+	 * @param file The file to get messages from
+	 */
+	public Smtp(String server, int port) throws IOException {
+		this(server, 25, false);
+	}
 
-    in.readLine();
-    sendCommand("HELO " + InetAddress.getLocalHost().getHostName(), 250);
-  }
+	public Smtp(String server, int port, boolean debug) throws IOException {
+		this.debug = debug;
 
-  /**
-   * closes the connection
-   * @deprecated Replaced by <code>Smtp.close()</code>
-   */
-  public void closeConnection() throws IOException {
-    sendCommand("QUIT", 221);
-    in.close();
-    out.close();
-    socket.close();
-  }
+		Debug("Creating socket... (" + server + ", " + port + ")");
+		socket = new Socket(server, port);
 
-  /**
-   * closes the connection
-   */
-  public void close() throws IOException {
-    sendCommand("QUIT", 221);
-    in.close();
-    out.close();
-    socket.close();
-  }
+		Debug("Creating input stream...");
+		in = new BufferedReader(
+			new InputStreamReader(socket.getInputStream()));
 
-  /**
-   * Who is this message from? specify with this command.
-   */
-  public void from(String from) throws IOException {
-    sendCommand("MAIL FROM: <" + from + ">", 250);
-  }
+		Debug("Creating output stream...");
+		out = new PrintWriter(new BufferedWriter(
+			new OutputStreamWriter(
+				socket.getOutputStream())), true);
 
-  /**
-   * Who should this message go to? Specify with this command.
-   */
-  public void to(String to) throws IOException {
-    sendCommand("RCPT TO: <" + to + ">", 250);
-  }
+		Debug(in.readLine());
+		sendCommand("HELO " +
+			InetAddress.getLocalHost().getHostName(), 250);
+	}
 
-  /**
-   * gets the outputstream
-   */
-  public PrintWriter getOutputStream() throws IOException {
-    sendCommand("DATA", 354);
+	/**
+	 * closes the connection
+	 * @deprecated Replaced by <code>Smtp.close()</code>
+	 */
+	public void closeConnection() throws IOException {
+		sendCommand("QUIT", 221);
+		in.close();
+		out.close();
+		socket.close();
+	}
 
-    return out;
-  }
+	/**
+	 * closes the connection
+	 */
+	public void close() throws IOException {
+		sendCommand("QUIT", 221);
 
-  /**
-   * Sends current message.
-   */
-  public void sendMessage() throws IOException {
-    sendCommand(".", 250);
-  }
+		Debug("Closing input stream...");
+		in.close();                     
 
-  /**
-   * Sends a command to the server
-   * @param c The command to send
-   * @param reply The expected reply-code
-   */
-  protected void sendCommand(String c, int reply) throws IOException {
-    out.println(c);
+		Debug("Closing output stream...");
+		out.close();
+
+		Debug("Closing socket...");
+		socket.close();
+	}
+
+	/**
+	 * Who is this message from? specify with this command.
+	 */
+	public void from(String from) throws IOException {
+		sendCommand("MAIL FROM: <" + from + ">", 250);
+	}
+
+	/**
+ 	 * Who should this message go to? Specify with this command.
+ 	 */
+	public void to(String to) throws IOException {
+		sendCommand("RCPT TO: <" + to + ">", 250);
+	}
+
+	/**
+ 	 * gets the outputstream
+	 */
+	public PrintWriter getOutputStream() throws IOException {
+		sendCommand("DATA", 354);
+
+		return out;
+	}
+
+	/**
+	 * Sends current message.
+	 */
+	public void sendMessage() throws IOException {
+		sendCommand(".", 250);
+	}
+
+	/**
+	 * Sends a command to the server
+	 * @param c The command to send
+	 * @param reply The expected reply-code
+	 */
+	public void sendCommand(String c, int reply) throws IOException {
+		Debug("Sending: " + c);
+		out.println(c);
    
-    String temp = in.readLine();
-    if(!temp.startsWith("" + reply)) throw new IOException ("Expected " + reply + ", got " + temp);
-  }
+		String temp = in.readLine();
+		Debug("Reply: " + temp);
+
+		if (!temp.startsWith("" + reply)) {
+			throw new IOException ("Expected " + reply + 
+							", got " + temp);
+		}
+	}
+
+	/**
+	 * Prints out the debugging info
+	 * @param info The debuginfo to print out.
+	 */
+	protected void Debug(String info) {
+		if (debug) {
+			System.err.println(info);
+		}
+	}
 }
