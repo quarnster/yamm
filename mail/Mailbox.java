@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.54 2003/04/16 12:44:59 fredde Exp $
+/*  $Id: Mailbox.java,v 1.55 2003/04/19 11:55:41 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.54 $
+ * @version $Revision: 1.55 $
  */
 public class Mailbox {
 
@@ -94,25 +94,20 @@ public class Mailbox {
 	 * @param jtarea Which JTextArea to append the source to
 	 * @return The number of rows added to the JTextArea
 	 */
-	public static int viewSource(String whichBox, int whichmail, long skip,
-							JTextArea jtarea) {
+	public static int viewSource(String whichBox, int whichmail, JTextArea jtarea) {
 		BufferedReader in = null;
+		String boxpath = whichBox.substring(whichBox.indexOf("boxes") +	6, whichBox.length());
+		String file = YAMM.home + "/tmp/cache/" + boxpath + "/" + whichmail + ".raw";
+
 
 		try {
 			int ret = 0;
-			in = new BufferedReader(new InputStreamReader(
-						new FileInputStream(whichBox)));
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			String temp;
 
-			in.skip(skip);
-
 			while ((temp = in.readLine()) != null) {
-				if (!temp.equals(".")) {
-					jtarea.append(temp + "\n");
-					ret++;
-				} else  {
-					break;
-				}
+				jtarea.append(temp + "\n");
+				ret++;
 			}
 			return ret;
 		} catch (IOException ioe) {
@@ -313,6 +308,54 @@ public class Mailbox {
 		}
 	}
 
+	public static long getMessageSize(String box, int msg) {
+		long length = 0;
+		try {
+			Index index = new Index(box);
+			index.open();
+			long skip = index.getEntry(msg).skip;
+
+			if (msg+1 < index.messageNum) {
+				length = index.getEntry(msg+1).skip - skip;
+			} else {
+				length = new File(box).length() - skip;
+			}
+			index.close();
+		} catch (IOException e) {
+		}
+		return length;
+	}
+
+	public static void saveRaw(String box, String output, int msg, long skip) {
+		BufferedInputStream is = null;
+		BufferedOutputStream os = null;
+
+		try {
+			is = new BufferedInputStream(new FileInputStream(box));
+			os = new BufferedOutputStream(new FileOutputStream(output));
+
+			is.skip(skip);
+			long length = getMessageSize(box, msg);
+			byte[] buffer = new byte[BUFFERSIZE];
+
+
+			while (length > 0) {
+				int read = is.read(buffer, 0, (int)Math.min(BUFFERSIZE, length));
+				length -= read;
+				os.write(buffer, 0, read);
+			}
+		} catch (IOException ioe) {
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
+		} finally {
+			try {
+				if (is != null) is.close();
+				if (os != null) os.close();
+			} catch (IOException ioe) {}
+		}
+	}
+	
 	/**
 	 * Prints the mail to ~home/.yamm/tmp/cache/<whichBox>/<whichmail>.html
 	 * @param whichBox Which box the message is in
@@ -323,10 +366,11 @@ public class Mailbox {
 		String  temp = YAMM.home + File.separator;
 		int attaches = 0;
 
-		String tempdir = temp + "tmp/";
-		String boxpath = whichBox.substring(whichBox.indexOf("boxes") +	6, whichBox.length());
-		File   cache = new File(tempdir + "cache/" + boxpath + "/");
-		File   out   = new File(cache, whichmail + ".html");
+		String	tempdir = temp + "tmp/";
+		String	boxpath = whichBox.substring(whichBox.indexOf("boxes") +	6, whichBox.length());
+		File	cache = new File(tempdir + "cache/" + boxpath + "/");
+		File	out   = new File(cache, whichmail + ".html");
+		File	raw	= new File(cache, whichmail + ".raw");
 
 
 		if (out.exists()) return;
@@ -343,16 +387,16 @@ public class Mailbox {
 			return;
 		}
 
+		saveRaw(whichBox, raw.toString(), whichmail, skip);
+
 		BufferedReader in = null;
 		PrintWriter outFile = null;
 
 		try {
 			in = new BufferedReader(new InputStreamReader(
-						new FileInputStream(whichBox)));
+						new FileInputStream(raw)));
 			outFile = new PrintWriter(new BufferedOutputStream(
 						new FileOutputStream(out)));
-
-			in.skip(skip);
 
 			MessageParser mp = new MessageParser(in,
 						outFile, out.toString());
@@ -377,7 +421,6 @@ public class Mailbox {
 	 * Gets the from and subject field from specified message
 	 * @param whichBox Which box the message is in
 	 * @param whichmail Which mail to get the headers from
-	 * @deprecated Use getMailHeaders instead
 	 */
 	public static MessageHeaderParser getMailHeaders(String whichBox, long skip) {
 		BufferedReader in = null;
@@ -838,6 +881,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.55  2003/04/19 11:55:41  fredde
+ * saves messages to a .raw-file for getMail and viewSource
+ *
  * Revision 1.54  2003/04/16 12:44:59  fredde
  * replaced getMailForReplyHeaders with getMailHeaders
  *
