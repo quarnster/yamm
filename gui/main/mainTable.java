@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.52 2003/04/16 12:41:32 fredde Exp $
+/*  $Id: mainTable.java,v 1.53 2003/04/19 19:46:39 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.52 $
+ * @version $Revision: 1.53 $
  */
 public class mainTable
 	extends JTable
@@ -175,8 +175,16 @@ public class mainTable
 		addMouseListener(mouseListener);
 
 		registerKeyboardAction(
-			keyListener, "Del",
+			keyListener, "DEL",
 			KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), 0
+		);
+		registerKeyboardAction(
+			keyListener, "UP",
+			KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), 0
+		);
+		registerKeyboardAction(
+			keyListener, "DOWN",
+			KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), 0
 		);
 
 		popup = new JPopupMenu();
@@ -563,28 +571,55 @@ public class mainTable
 		load();
 	}
 
+	private void getMail() {
+		long skip = yamm.listOfMails[yamm.keyIndex[getSelectedRow()]].skip;
+		String box = yamm.getMailbox();
+
+		Mailbox.getMail(box, getSelectedMessage(), skip);
+		try {
+			String boxName = box.substring(
+				box.indexOf("boxes") + 6,
+				box.length()) + "/";
+
+			yamm.mailPage = new URL(yamm.mailPageString +	boxName + getSelectedMessage() + ".html");
+		} catch (MalformedURLException mue) {
+			new ExceptionDialog(YAMM.getString("msg.error"), mue, YAMM.exceptionNames);
+		}
+
+		try {
+			yamm.mail.setPage(yamm.mailPage);
+		} catch (IOException ioe) {
+			new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
+		}
+
+		yamm.createAttachList();
+		yamm.myList.updateUI();
+
+		String outbox = Utilities.replace(YAMM.home + "/boxes/outbox");
+		int row = getSelectedRow();
+		int msg = yamm.keyIndex[row];
+
+		if ((yamm.listOfMails[msg].status & IndexEntry.STATUS_READ) == 0/* && !yamm.selectedbox.equals(outbox)*/) {
+			yamm.listOfMails[msg].status |= IndexEntry.STATUS_READ;
+
+			Mailbox.setStatus(yamm, yamm.getMailbox(), getSelectedMessage(), yamm.listOfMails[msg], IndexEntry.STATUS_READ);
+
+			dataModel.fireTableRowsUpdated(row, row);
+			yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
+			yamm.tree.update();
+			yamm.status.setStatus("");
+		}
+		changeButtonMode(true);
+
+	}
+
 	private MouseListener mouseListener = new MouseAdapter() {
 		public void mouseReleased(MouseEvent me) {
 			if (me.isPopupTrigger()) {
 				popup.show(mainTable.this, me.getX(), me.getY());
 			} else if (getSelectedRow() != -1) {
-				get_mail();
+				getMail();
 
-				String outbox = Utilities.replace(YAMM.home + "/boxes/outbox");
-				int row = getSelectedRow();
-				int msg = yamm.keyIndex[row];
-
-				if ((yamm.listOfMails[msg].status & IndexEntry.STATUS_READ) == 0/* && !yamm.selectedbox.equals(outbox)*/) {
-					yamm.listOfMails[msg].status |= IndexEntry.STATUS_READ;
-
-					Mailbox.setStatus(yamm, yamm.getMailbox(), getSelectedMessage(), yamm.listOfMails[msg], IndexEntry.STATUS_READ);
-
-					dataModel.fireTableRowsUpdated(row, row);
-					yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
-					yamm.tree.update();
-					yamm.status.setStatus("");
-				}
-				changeButtonMode(true);
 				if (me.getClickCount() == 2) new MailReader(yamm.mailPage);
 			} else {
 				changeButtonMode(false);
@@ -595,38 +630,13 @@ public class mainTable
 				popup.show(mainTable.this, me.getX(), me.getY());
 			}
 		}
-
-		void get_mail() {
-			long skip = yamm.listOfMails[yamm.keyIndex[getSelectedRow()]].skip;
-			String box = yamm.getMailbox();
-
-			Mailbox.getMail(box, getSelectedMessage(), skip);
-			try {
-				String boxName = box.substring(
-					box.indexOf("boxes") + 6,
-					box.length()) + "/";
-
-				yamm.mailPage = new URL(yamm.mailPageString +	boxName + getSelectedMessage() + ".html");
-			} catch (MalformedURLException mue) {
-				new ExceptionDialog(YAMM.getString("msg.error"), mue, YAMM.exceptionNames);
-			}
-
-			try {
-				yamm.mail.setPage(yamm.mailPage);
-			} catch (IOException ioe) {
-				new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
-			}
-
-			yamm.createAttachList();
-			yamm.myList.updateUI();
-		}
 	};
 
 	private ActionListener keyListener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 			String text = ae.getActionCommand();
 
-			if (text.equals("Del")) {
+			if (text.equals("DEL")) {
 				if (getSelectedRow() == -1) {
 					return;
 				}
@@ -653,8 +663,19 @@ public class mainTable
 
 				changeButtonMode(false);
 				clearSelection();
+			} else if (text.equals("UP")) {
+				try {
+					int row = getSelectedRow() - 1;
+					setRowSelectionInterval(row, row);
+				} catch (Exception e) {}
+				getMail();
+			} else if (text.equals("DOWN")) {
+				try {
+					int row = getSelectedRow() + 1;
+					setRowSelectionInterval(row, row);
+				} catch (Exception e) {}
+				getMail();
 			}
-
 		}
 	};
 
@@ -755,6 +776,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.53  2003/04/19 19:46:39  fredde
+ * now changes mail when pressing up/down
+ *
  * Revision 1.52  2003/04/16 12:41:32  fredde
  * now uses YAMMWrite.reply()
  *
