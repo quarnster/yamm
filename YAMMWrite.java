@@ -17,21 +17,23 @@
  */
 package org.gjt.fredde.yamm;
 
-import javax.swing.*;
-import java.awt.event.*;
-import javax.swing.border.*;
 import java.awt.*;
-import java.util.*;
-import java.text.SimpleDateFormat;
+import java.awt.event.*;
 import java.io.*;
-import org.gjt.fredde.yamm.encode.UUEncode;
-import org.gjt.fredde.yamm.gui.AttachListRenderer;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import javax.swing.*;
+import javax.swing.border.*;
+
 import org.gjt.fredde.util.gui.*;
+import org.gjt.fredde.yamm.encode.*;
+import org.gjt.fredde.yamm.gui.AttachListRenderer;
 
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Id: YAMMWrite.java,v 1.22 2000/04/15 13:05:06 fredde Exp $
+ * @version $Id: YAMMWrite.java,v 1.23 2000/08/09 16:26:19 fredde Exp $
  */
 public class YAMMWrite extends JFrame {
 
@@ -82,14 +84,16 @@ public class YAMMWrite extends JFrame {
 			Integer.parseInt(YAMM.getProperty("writew", "500")),
 			Integer.parseInt(YAMM.getProperty("writeh", "300"))
 		);
-    
+
 		JMenuBar  Meny = new JMenuBar();
 		JMenu     arkiv = new JMenu(YAMM.getString("file"));
 		JMenuItem rad;
 		Meny.add(arkiv);
 
-		rad = new JMenuItem(YAMM.getString("button.cancel"),
-			new ImageIcon(getClass().getResource("/images/buttons/cancel.gif")));
+		rad = new JMenuItem(
+			YAMM.getString("button.cancel"),
+			new ImageIcon(getClass().getResource("/images/buttons/cancel.gif"))
+		);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		rad.addActionListener(MListener);
 		arkiv.add(rad);
@@ -102,12 +106,10 @@ public class YAMMWrite extends JFrame {
 		Box hori2 = Box.createHorizontalBox();
 
 		JButton myButton = new JButton();
-		if (YAMM.text) {
-			myButton.setText(YAMM.getString("button.send"));
-		}
-		if (YAMM.ico) {
-			myButton.setIcon(new ImageIcon(getClass().getResource("/images/buttons/send.gif")));
-		}
+		myButton.setToolTipText(YAMM.getString("button.send"));
+
+		if (YAMM.text) myButton.setText(YAMM.getString("button.send"));
+		if (YAMM.ico) myButton.setIcon(new ImageIcon(getClass().getResource("/images/buttons/send.gif")));
 
 		myButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		myButton.setHorizontalTextPosition(AbstractButton.CENTER);
@@ -117,12 +119,10 @@ public class YAMMWrite extends JFrame {
 		hori1.add(myButton);
 
 		myButton = new JButton();
-		if (YAMM.text) {
-			myButton.setText(YAMM.getString("button.cancel"));
-		}
-		if (YAMM.ico) {
-			myButton.setIcon(new ImageIcon(getClass().getResource("/images/buttons/cancel.gif")));
-		}
+		myButton.setToolTipText(YAMM.getString("button.cancel"));
+
+		if (YAMM.text) myButton.setText(YAMM.getString("button.cancel"));
+		if (YAMM.ico) myButton.setIcon(new ImageIcon(getClass().getResource("/images/buttons/cancel.gif")));
 
 		myButton.addActionListener(BListener);
 		myButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
@@ -179,14 +179,17 @@ public class YAMMWrite extends JFrame {
 		myLabel.setMinimumSize(size);
 		fields.add(myLabel);
 
-		subjectField.addKeyListener(new KeyAdapter(){
-			public void keyReleased(KeyEvent ke) {
-				setTitle(subjectField.getText());
+		subjectField.addKeyListener(
+			new KeyAdapter() {
+				public void keyReleased(KeyEvent ke) {
+					setTitle(subjectField.getText());
+				}
+
+				public void keyPressed(KeyEvent ke) {
+					setTitle(subjectField.getText());
+				}
 			}
-			public void keyPressed(KeyEvent ke) {
-				setTitle(subjectField.getText());
-			}
-		});
+		);
 		subjectField.setMaximumSize(new Dimension(1200, height));
 		subjectField.setMinimumSize(new Dimension(75, height));
 		subjectField.setText(subject);
@@ -208,15 +211,15 @@ public class YAMMWrite extends JFrame {
 		myTextArea = new JTextArea();
 		myTextArea.setText(body);
 
-		if (body.equals("")) {
-			sign();
-		}
+		if (body.equals("")) sign();
 
 		JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
 		JTPane.setFont(new Font("SansSerif", Font.PLAIN, 10));
-		JTPane.addTab(YAMM.getString("mail"),
+		JTPane.addTab(
+			YAMM.getString("mail"),
 			new ImageIcon(getClass().getResource("/images/buttons/mail.gif")),
-						new JScrollPane(myTextArea));
+			new JScrollPane(myTextArea)
+		);
 
 
 		JPanel myPanel = new JPanel(new BorderLayout());
@@ -224,23 +227,21 @@ public class YAMMWrite extends JFrame {
 		hori1 = Box.createHorizontalBox();
 
 		myButton = new JButton();
-		if (YAMM.text) {
-			myButton.setText(YAMM.getString("button.add"));
-		}
-		if (YAMM.ico) {
-			myButton.setIcon(new ImageIcon(getClass().getResource("/images/buttons/new.gif")));
-		}
+		myButton.setToolTipText(YAMM.getString("button.add"));
+
+		if (YAMM.text) myButton.setText(YAMM.getString("button.add"));
+		if (YAMM.ico) myButton.setIcon(new ImageIcon(getClass().getResource("/images/buttons/new.gif")));
+
 		myButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		myButton.addActionListener(BListener);
 		hori1.add(myButton);
 
 		myButton = new JButton();
-		if (YAMM.text) {
-			myButton.setText(YAMM.getString("button.delete"));
-		}
-		if (YAMM.ico) {
-			myButton.setIcon(new ImageIcon(getClass().getResource("/images/buttons/delete.gif")));
-		}
+		myButton.setToolTipText(YAMM.getString("button.delete"));
+
+		if (YAMM.text) myButton.setText(YAMM.getString("button.delete"));
+		if (YAMM.ico) myButton.setIcon(new ImageIcon(getClass().getResource("/images/buttons/delete.gif")));
+
 		myButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		myButton.addActionListener(BListener);
 		hori1.add(myButton);
@@ -264,8 +265,11 @@ public class YAMMWrite extends JFrame {
 		myList.setBorder(ram);
 
 
-		JTPane.addTab(YAMM.getString("mail.attachment"),
-			new ImageIcon(getClass().getResource("/images/buttons/attach.gif")), myPanel);
+		JTPane.addTab(
+			YAMM.getString("mail.attachment"),
+			new ImageIcon(getClass().getResource("/images/buttons/attach.gif")),
+			myPanel
+		);
 
 		vert3.add(JTPane);
 		getContentPane().add(vert3);
@@ -295,9 +299,11 @@ public class YAMMWrite extends JFrame {
 			myTextArea.append(new String(singb));  
 			in.close();
 		} catch (IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-						ioe,
-						YAMM.exceptionNames);
+			new ExceptionDialog(
+				YAMM.getString("msg.error"),
+				ioe,
+				YAMM.exceptionNames
+			);
 		} finally {
 			try {
 				if (in != null) {
@@ -308,13 +314,9 @@ public class YAMMWrite extends JFrame {
 	}
 
 	boolean isSendReady() {
-		String TF1 = toField.getText();
+		if (toField.getText().indexOf('@') != -1) return true;
 
-		if (TF1.indexOf('@') != -1) {
-			return true;
-		} else {
-			return false;
-		}
+		return false;
 	}
 
 	/**
@@ -330,10 +332,10 @@ public class YAMMWrite extends JFrame {
 					true
 				)
 			);
-			SimpleDateFormat df = new SimpleDateFormat(	
-					"EEE, dd MMM yyyy " +
-					"HH:mm:ss zzz",
-					Locale.US
+			SimpleDateFormat df = new SimpleDateFormat(
+				"EEE, dd MMM yyyy " +
+				"HH:mm:ss zzz",
+				Locale.US
 			);
 
 			String to   = toField.getText();
@@ -346,15 +348,10 @@ public class YAMMWrite extends JFrame {
 			while (tok.hasMoreTokens()) {
 				temp = tok.nextToken().trim();
 
-				if (to.equals("")) {
-					to = temp;
-				} else {
-					to += "      " + temp;
-				}
+				if (to.equals("")) to = temp;
+				else to += "      " + temp;
 
-				if (tok.hasMoreTokens()) {
-					to += ",\n";
-				}
+				if (tok.hasMoreTokens()) to += ",\n";
 			}
 			if (!cc.equals("")) {
 				tok = new StringTokenizer(cc, ",");
@@ -363,15 +360,10 @@ public class YAMMWrite extends JFrame {
 				while (tok.hasMoreTokens()) {
 					temp = tok.nextToken().trim();
 
-					if (cc.equals("")) {
-						cc = temp;
-					} else {
-						cc += "      " + temp;
-					}
+					if (cc.equals("")) cc = temp;
+					else cc += "      " + temp;
 
-					if (tok.hasMoreTokens()) {
-						cc += ",\n";
-					}
+					if (tok.hasMoreTokens()) cc += ",\n";
 				}
 				to += "\ncc: " + cc;
 			}
@@ -409,132 +401,31 @@ public class YAMMWrite extends JFrame {
 			}
 			outFile.close();
 			if (attach.size() > 0) {
-				new UUEncode(attach);
+				if (YAMM.base64enc) new Base64Encode(attach);
+				else new UUEncode(attach);
 			}
 		} catch (IOException ioe) {
 			new ExceptionDialog(
 				YAMM.getString("msg.error"),
-				ioe,
-				YAMM.exceptionNames);
+				ioe, YAMM.exceptionNames);
 		} finally {
 			if (outFile != null) {
 				outFile.close();
 			}
 		}
 	}
-	
+
 	ActionListener BListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			String arg = ((JButton)e.getSource()).getText();
+			String arg = ((JButton)e.getSource()).getToolTipText();
 
-			if (arg.equals(YAMM.getString("button.send")) &&
-								isSendReady()) {
-				send();
-/*
-				try {
-					PrintWriter outFile = new PrintWriter(
-						new FileOutputStream(
-						YAMM.home + "/boxes/" +
-						YAMM.getString("box.outbox"),
-						true)
-					);
-					SimpleDateFormat df =
-						new SimpleDateFormat(	
-							"EEE, dd MMM yyyy " +
-							"HH:mm:ss zzz",
-							Locale.US
-						);
-
-					String to = toField.getText();
-					String to2 = "";
-					String temp = null;
-					StringTokenizer tok =
-						new StringTokenizer(to, ",");
-
-					while (tok.hasMoreTokens()) {
-						temp = tok.nextToken().trim();
-
-						if (to2.equals("")) {
-							to2 = temp;
-						} else {
-							to2 += "      " + temp;
-						}
-
-						if (tok.hasMoreTokens()) {
-							to2 += ",\n";
-						}
-					}
-
-					if (attach.size() == 0) {
-						outFile.println("Date: " +
-						df.format(new Date()) +
-						"\nFrom: " +
-						YAMM.getProperty("username",
-							"Anonymous") +
-						" <" + YAMM.getProperty("email",
-							" ") + ">" +
-						"\nTo: " + to2 +
-						"\nSubject: " +
-						subjectField.getText() +
-						"\nX-Mailer: " +
-						"Yet Another Mail Manager " +
-						YAMM.version + "\n\n" +
-						myTextArea.getText() +
-						"\n\n.\n");
-					} else {
-						outFile.println("Date: " +
-						df.format(new Date()) +
-						"\nFrom: " +
-						YAMM.getProperty("username",
-								"Anonymous") +
-						" <" + YAMM.getProperty("email",
-								" ") + ">" +
-						"\nTo: " + to2 +
-						"\nSubject: " +
-						subjectField.getText() +
-						"\nX-Mailer: " +
-						"Yet Another Mail Manager " +
-						YAMM.version +
-						"\nMIME-Version: 1.0" +
-						"\nContent-Type: " +
-						"multipart/mixed; " +
-						"boundary=\"AttachThis\"" +
-						"\n" +
-						"\nThis is a multi-part " +
-						"message in MIME format." +
-						"\n" +
-						"\n--AttachThis" +
-						"\nContent-Type: text/plain; " +
-						"charset=us-ascii" +
-						"\nContent-Transfer-Encoding:" +
-						" 7bit" +
-						"\n\n" + myTextArea.getText() +
-						"\n\n");
-					}
-					outFile.close();
-					if (attach.size() > 0) {
-						new UUEncode(attach);
-					}
-				} catch (IOException ioe) {
-					new ExceptionDialog(
-						YAMM.getString("msg.error"),
-						ioe,
-						YAMM.exceptionNames);
+			if (arg.equals(YAMM.getString("button.send"))) {
+				if (isSendReady()) {
+					send();
+					quit();
+				} else {
+					new MsgDialog(YAMMWrite.this, YAMM.getString("msg.error"), "Missing \"@\" in address field!");
 				}
-*/
-				Rectangle rv = new Rectangle();
-				getBounds(rv);
-
-				YAMM.setProperty("writex",
-					new Integer(rv.x).toString());
-				YAMM.setProperty("writey",
-					new Integer(rv.y).toString());
-				YAMM.setProperty("writew",
-					new Integer(rv.width).toString());
-				YAMM.setProperty("writeh",
-					new Integer(rv.height).toString());
-
-				dispose();
 			} else if (arg.equals(YAMM.getString("button.add"))) {
 				addAttach();
 			} else if (arg.equals(YAMM.getString("button.delete"))) {
@@ -544,24 +435,8 @@ public class YAMMWrite extends JFrame {
 					attach.remove(rem);
 					myList.updateUI();
 				}
-			} else if (arg.equals(YAMM.getString("button.cancel"))) {
-				Rectangle rv = new Rectangle();
-				getBounds(rv);
-
-				YAMM.setProperty("writex",
-					new Integer(rv.x).toString());
-				YAMM.setProperty("writey",
-					new Integer(rv.y).toString());
-				YAMM.setProperty("writew",
-					new Integer(rv.width).toString());
-				YAMM.setProperty("writeh",
-					new Integer(rv.height).toString());
-
-				dispose();
 			} else {
-				new MsgDialog(YAMMWrite.this,
-					YAMM.getString("msg.error"),
-					"Missing \"@\" in address field!");
+				quit();
 			}
 		}
 	};
@@ -589,49 +464,42 @@ public class YAMMWrite extends JFrame {
 		}
 	}
 
+	private void quit() {
+		Rectangle rv = new Rectangle();
+		getBounds(rv);
+
+		YAMM.setProperty("writex", "" + rv.x);
+		YAMM.setProperty("writey", "" + rv.y);
+		YAMM.setProperty("writew", "" + rv.width);
+		YAMM.setProperty("writeh", "" + rv.height);
+
+		dispose();
+	}
+
 	ActionListener MListener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 			String kommando = ((JMenuItem)ae.getSource()).getText();
 
 			if (kommando.equals(YAMM.getString("button.cancel"))) {
-				Rectangle rv = new Rectangle();
-				getBounds(rv);
-
-				YAMM.setProperty("writex",
-					new Integer(rv.x).toString());
-				YAMM.setProperty("writey",
-					new Integer(rv.y).toString());
-				YAMM.setProperty("writew",
-					new Integer(rv.width).toString());
-				YAMM.setProperty("writeh",
-					new Integer(rv.height).toString());
-
-				dispose();
+				quit();
 			}
 		}
 	};
 
 	class FLyssnare extends WindowAdapter {
 		public void windowClosing(WindowEvent event) {
-			Rectangle rv = new Rectangle();
-			getBounds(rv);
-
-			YAMM.setProperty("writex",
-				new Integer(rv.x).toString());
-			YAMM.setProperty("writey",
-				new Integer(rv.y).toString());
-			YAMM.setProperty("writew",
-				new Integer(rv.width).toString());
-			YAMM.setProperty("writeh",
-				new Integer(rv.height).toString());
-
-			dispose();
+			quit();
 		}
 	}
 }
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.23  2000/08/09 16:26:19  fredde
+ * readability fixes, added support for base64 encoding
+ * also fixed alot of bugs when buttons where in
+ * icononly mode
+ *
  * Revision 1.22  2000/04/15 13:05:06  fredde
  * lots of fixes when there are no profiles
  *
