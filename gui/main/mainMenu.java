@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Id: mainMenu.java,v 1.23 2000/07/16 17:48:36 fredde Exp $
+ * @version $Id: mainMenu.java,v 1.24 2000/08/09 16:34:46 fredde Exp $
  */
 public class mainMenu extends JMenuBar {
 
@@ -137,14 +137,12 @@ public class mainMenu extends JMenuBar {
 
 			if (kommando.equals(YAMM.getString("file.exit"))) {
 				frame.Exit();
-			} else if (kommando.equals(YAMM.getString(
-							"help.about_you"))) {
+			} else if (kommando.equals(YAMM.getString("help.about_you"))) {
 				String host = null;
 				String ipaddress = null;
 
 				try {
-					InetAddress myInetaddr = InetAddress.
-								getLocalHost();
+					InetAddress myInetaddr = InetAddress.getLocalHost();
 
 					ipaddress = myInetaddr.getHostAddress();
 					host = myInetaddr.getHostName();
@@ -172,9 +170,9 @@ public class mainMenu extends JMenuBar {
 
 				new MsgDialog(null,
 					YAMM.getString("help.about_you"),
-					YAMM.getString("info.about.you", args));
-			} else if (kommando.equals(YAMM.getString(
-							"help.about"))) {
+					YAMM.getString("info.about.you", args)
+				);
+			} else if (kommando.equals(YAMM.getString("help.about"))) {
 
 				Object[] args = {
 					YAMM.version,
@@ -183,21 +181,19 @@ public class mainMenu extends JMenuBar {
 					"<fredde@gjt.org>"
 				};
 
-				new MsgDialog(null,
-						YAMM.getString("help.about"),
+				new MsgDialog(
+					null,
+					YAMM.getString("help.about"),
 					"Copyright (C) 1999, 2000 Fredrik Ehnbom\n" +
 					YAMM.getString("info.about", args)
 				);
-			} else if (kommando.equals(YAMM.getString(
-							"help.bug_report"))) {
-				YAMMWrite yw = new YAMMWrite("fredde@gjt.org",
-								"Bug report");
+			} else if (kommando.equals(YAMM.getString("help.bug_report"))) {
+				YAMMWrite yw = new YAMMWrite("fredde@gjt.org", "Bug report");
 				JTextArea jt = yw.myTextArea;
 				jt.append("What is the problem?\n\n");
 				jt.append("How did you make it happen?\n\n");
 				jt.append("Can you make it happen again?\n\n");
-				jt.append("\nAnd now some info about your " + 
-								"system:\n");
+				jt.append("\nAnd now some info about your system:\n");
 				p("java.version", jt);
 				p("java.vendor", jt);
 				p("java.vendor.url", jt);
@@ -218,24 +214,20 @@ public class mainMenu extends JMenuBar {
 				p("os.version", jt);
 				jt.append("YAMM.version: " + YAMM.version + "\n");
 				jt.append("YAMM.compDate: " + YAMM.compDate);
-			} else if (kommando.equals(YAMM.getString(
-							"help.license"))) {
+			} else if (kommando.equals(YAMM.getString("help.license"))) {
 				new MsgDialog(null,
 					YAMM.getString("help.license"), 
 					"Yet Another Mail Manager " +
 					YAMM.version + " E-Mail Client\n" +
-					"Copyright (C) 1999 Fredrik Ehnbom\n" +
+					"Copyright (C) 1999-2000 Fredrik Ehnbom\n" +
 					YAMM.getString("license"),
 					MsgDialog.OK, JLabel.LEFT
 				);
-			}  else if (kommando.equals(YAMM.getString(
-							"edit.settings"))) {
+			}  else if (kommando.equals(YAMM.getString("edit.settings"))) {
 				new ConfigurationWizard(frame);
-			} else if (kommando.equals(YAMM.getString(
-								"file.new"))) {
+			} else if (kommando.equals(YAMM.getString("file.new"))) {
 				new YAMMWrite();
-			} else if (kommando.equals(YAMM.getString(
-							"edit.view_source"))) {
+			} else if (kommando.equals(YAMM.getString("edit.view_source"))) {
 				JTable tmp = frame.mailList;
 				int test = tmp.getSelectedRow();
 
@@ -245,17 +237,11 @@ public class mainMenu extends JMenuBar {
 					int i = 0;
 
 					while (i < 4) {
-						if (tmp.getColumnName(i).
-								equals("#")) {
-							break;
-						}
+						if (tmp.getColumnName(i).equals("#")) break;
 						i++;
 					}
 
-					int msg = Integer.parseInt(
-							tmp.getValueAt(
-							tmp.getSelectedRow(),i).
-								toString());
+					int msg = Integer.parseInt(tmp.getValueAt(tmp.getSelectedRow(),i).toString());
 
 					long skip = Long.parseLong(
 						((Vector) frame.listOfMails.
@@ -263,8 +249,7 @@ public class mainMenu extends JMenuBar {
 						toString());
 
 					if (msg != -1) {
-						sourceViewer sv =
-							new sourceViewer();
+						sourceViewer sv = new sourceViewer();
 						int ret = Mailbox.viewSource(
 							frame.selectedbox, msg,
 							skip,
@@ -281,23 +266,17 @@ public class mainMenu extends JMenuBar {
 						}
 					}
 				}
-			} else if (kommando.equals(YAMM.getString(
-							"file.save_as"))) {
-				int test = ((JTable)frame.mailList).
-							getSelectedRow();
+			} else if (kommando.equals(YAMM.getString("file.save_as"))) {
+				int test = ((JTable)frame.mailList).getSelectedRow();
 
 				if (test != -1 &&
 					test <= frame.listOfMails.size()) {
 
 					JFileChooser jfs = new JFileChooser();
-					jfs.setFileSelectionMode(
-							JFileChooser.FILES_ONLY
-					);
+					jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
 					jfs.setMultiSelectionEnabled(false);
 					jfs.setFileFilter(new filter());
-					jfs.setSelectedFile(
-						new File("mail.html")
-					);
+					jfs.setSelectedFile(new File("mail.html"));
 					int ret = jfs.showSaveDialog(frame);
 
 					if (ret == JFileChooser.APPROVE_OPTION) {
@@ -341,10 +320,8 @@ public class mainMenu extends JMenuBar {
 			int i = s.lastIndexOf('.');
 
 			if (i > 0 &&  i < s.length() - 1) {
-				String extension = s.substring(i + 1).
-								toLowerCase();
-				if ("htm".equals(extension) ||
-						"html".equals(extension)) {
+				String extension = s.substring(i + 1).toLowerCase();
+				if ("htm".equals(extension) || "html".equals(extension)) {
 					return true;
 				} else {
 					return false;
@@ -362,6 +339,9 @@ public class mainMenu extends JMenuBar {
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.24  2000/08/09 16:34:46  fredde
+ * readability fixes and changed 1999 to 1999-2000
+ *
  * Revision 1.23  2000/07/16 17:48:36  fredde
  * lots of Windows compatiblity fixes
  *
