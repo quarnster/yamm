@@ -1,4 +1,4 @@
-/*  $Id: YammPop3.java,v 1.4 2003/04/19 11:56:52 fredde Exp $
+/*  $Id: YammPop3.java,v 1.5 2003/05/05 20:14:13 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -28,7 +28,7 @@ import org.gjt.fredde.yamm.mail.*;
  * This class gets mail from a server and prints out the debugging messages to
  * YAMM.debug.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class YammPop3
 	extends Pop3
@@ -83,7 +83,7 @@ public class YammPop3
 			String from = "someone";
 			SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", Locale.US);
 
-			while (!" ".equals(answer)) {
+			while (!"".equals(answer)) {
 				answer = in.readLine();
 				temp += answer + "\n";
 
@@ -114,6 +114,9 @@ public class YammPop3
 /*
  * Changes:
  * $Log: YammPop3.java,v $
+ * Revision 1.5  2003/05/05 20:14:13  fredde
+ * fixed parsing for the From-field in the headers
+ *
  * Revision 1.4  2003/04/19 11:56:52  fredde
  * updated to work with the new mbox-format
  *
