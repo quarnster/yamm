@@ -27,6 +27,8 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 
 /**
  * A class that handels messages and information about messages
+ * @author Fredrik Ehnbom
+ * @version $Id: Mailbox.java,v 1.29 2000/03/12 17:18:05 fredde Exp $
  */
 public class Mailbox {
 
@@ -62,10 +64,12 @@ public class Mailbox {
 	 * @param whichBox Which box the message to view is in
 	 * @param whichmail Which mail to view
 	 * @param jtarea Which JTextArea to append the source to
+	 * @return The number of rows added to the JTextArea
 	 */
-	public static void viewSource(String whichBox, int whichmail, long skip,
+	public static int viewSource(String whichBox, int whichmail, long skip,
 							JTextArea jtarea) {
 		try {
+			int ret = 0;
 			BufferedReader in = new BufferedReader(
 						new InputStreamReader(
 						new FileInputStream(whichBox)));
@@ -76,19 +80,23 @@ public class Mailbox {
 			while ((temp = in.readLine()) != null) {
 				if (!temp.equals(".")) {
 					jtarea.append(temp + "\n");
+					ret++;
 				} else  {
 					break;
 				}
 			}
 			in.close();
+			return ret;
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 					ioe,
 					YAMM.exceptionNames);
+			return -1;
 		}
 	}
 
 	private static String removeQuote(String quote) {
+//		System.out.println("quote: " + quote);
 		quote = quote.replace('\"', '|');
 
 		while (quote.indexOf("|") != -1) {
@@ -148,9 +156,13 @@ public class Mailbox {
 			date    = mhp.getHeaderField("Date");
 			status  = mhp.getHeaderField("YAMM-Status");
 
-			if (status == null) {
+			if (status == null)
 				status = "Unread";
-			}
+			if (from == null)
+				from = "";
+			if (subject == null)
+				subject = "";
+
 
 			subject = removeQuote(subject);
 			subject = unMime(subject);
@@ -195,6 +207,7 @@ public class Mailbox {
 					out.print("\"" + status + "\" ");
 
 					out.println(skipped);
+					out.flush();
 					i++;
 
 					skipped = skipnum;
@@ -209,9 +222,12 @@ public class Mailbox {
 					date    = mhp.getHeaderField("Date");
 					status  = mhp.getHeaderField("YAMM-" +
 								"Status");
-					if (status == null) {
+					if (status == null)
 						status = "Unread";
-					}
+					if (from == null)
+						from = "";
+					if (subject == null)
+						subject = "";
 
 					subject = removeQuote(subject);
 					subject = unMime(subject);
@@ -1270,3 +1286,10 @@ public class Mailbox {
 		return mail;
 	}
 }
+/*
+ * Changes:
+ * $Log: Mailbox.java,v $
+ * Revision 1.29  2000/03/12 17:18:05  fredde
+ * still creates index when there's no subject/from field
+ *
+ */
