@@ -57,6 +57,7 @@ pop3 and smtp servers).
 - doubleclick in attachlist to open attachment
 - make the cancel-button in the status field work or remove it
 - autocheck mail every X minutes
+- Selecting a debug-file should be done visually
 
 ******** Visual stuff ********
 
