@@ -21,7 +21,6 @@ package org.gjt.fredde.util.gui;
 import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.Font;
-import java.util.ResourceBundle;
 import javax.swing.border.*;
 
 public class statusRow extends JPanel {
@@ -29,18 +28,16 @@ public class statusRow extends JPanel {
   protected JLabel status;
   protected JProgressBar progress;
   public    JButton button;
-  protected ResourceBundle res;
 
-  public statusRow(ResourceBundle res) {
-    this("", 0, res);
+  public statusRow() {
+    this("", 0);
   }
 
-  public statusRow(String text, ResourceBundle res) {
-    this(text, 0, res);
+  public statusRow(String text) {
+    this(text, 0);
   }
 
-  public statusRow(String text, int prog, ResourceBundle res) {
-    this.res = res;
+  public statusRow(String text, int prog) {
     setLayout(new GridLayout(1, 2));
 
     status = new JLabel(text);
@@ -57,10 +54,9 @@ public class statusRow extends JPanel {
     progress.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
     p.add(progress);
 
-    button = new JButton(res.getString("button.cancel"));
+    button = new JButton();
     button.setFont(new Font("SansSerif", Font.PLAIN, 10));
     button.setEnabled(false);
-    button.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
     p.add(button);
   }
 
