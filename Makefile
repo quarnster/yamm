@@ -52,6 +52,19 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 
 all: YAMM
 
+jar: YAMM
+	jar cvf yamm.jar \
+	org/gjt/fredde/yamm/*.class \
+	org/gjt/fredde/yamm/gui/*.class \
+	org/gjt/fredde/yamm/gui/confwiz/*.class \
+	org/gjt/fredde/yamm/gui/main/*.class \
+	org/gjt/fredde/yamm/mail/*.class \
+	org/gjt/fredde/yamm/encode/*.class \
+	org/gjt/fredde/util/*.class \
+	org/gjt/fredde/util/gui/*.class \
+	org/gjt/fredde/util/net/*.class \
+	images/
+
 clean:
 	rm -f org/gjt/fredde/yamm/*.class
 	rm -f org/gjt/fredde/yamm/encode/*.class
