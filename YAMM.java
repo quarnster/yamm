@@ -64,7 +64,7 @@ public class YAMM extends JFrame implements HyperlinkListener
   public static    char[]                 encKey       = "myKey".toCharArray();
 
   /** The vector containing the attaced files. */
-  static protected Vector                 attach;
+  public Vector                 attach;
 
   /** To check if the user has sun.misc.Base64Decoder */
   static protected boolean                base64       = false;
@@ -85,18 +85,14 @@ public class YAMM extends JFrame implements HyperlinkListener
   /** The JEditorPane for this frame */
   public JEditorPane  mail;
 
+  public JList        myList;
+
+  public mainToolBar  tbar;
+
   JButton      b;
-  BorderLayout blayout;
-  JLabel       myLabel;
-  JTextField   myTextField;
-  JPopupMenu   myPopup;
-  JPopupMenu   treepop;
   JSplitPane   SPane, SPane2;
   JTree        tree;
-  mainToolBar  tbar;
-  JProgressBar pBar;
   JTabbedPane  JTPane;
-  JList        myList;
 
   int          mainx, mainy, mainw, mainh, hsplit, vsplit;
 
@@ -223,16 +219,7 @@ public class YAMM extends JFrame implements HyperlinkListener
       public String getColumnName(int column) {  return headername[column]; }
     };
 
-    mailList = new mainTable(dataModel, listOfMails);
-
-    mailList.addMouseListener(mouseListener);
-
-
-    myPopup = new JPopupMenu("Test");
-    myPopup.setInvoker(mailList);
-
-    // adds items to the myPopup JPopupMenu 
-    createMLPopup(myPopup);
+    mailList = new mainTable(this, res, dataModel, listOfMails);
 
     mail = new JEditorPane();
     mail.setContentType("text/html");
@@ -354,70 +341,6 @@ public class YAMM extends JFrame implements HyperlinkListener
     show();
   }
 
-/*
-  void SortFirst(int row) {
-    for(int i = 0; i<listOfMails.size();i++) {
-      Object temp = null;
-      for (int j=0; j<listOfMails.size(); j++) {
-        if (((Vector)listOfMails.elementAt(i)).elementAt(row).toString().compareTo(((Vector)listOfMails.elementAt(j)).elementAt(row)) > 0 ) {
-           temp = listOfMails.elementAt(j);
-           listOfMails.setElementAt(listOfMails.elementAt(i), j);
-           listOfMails.setElementAt(temp, i);
-        }
-      }
-    }
-    mailList.updateUI();
-  }
-
-  void SortLast(int row) {
-    for(int i = 0; i<listOfMails.size();i++) {
-      Object temp = null;
-      for (int j=0; j<listOfMails.size(); j++) {
-        if (((Vector)listOfMails.elementAt(i)).elementAt(row).toString().compareTo(((Vector)listOfMails.elementAt(j)).elementAt(row)) < 0 ) {
-           temp = listOfMails.elementAt(i);
-           listOfMails.setElementAt(listOfMails.elementAt(j), i);
-           listOfMails.setElementAt(temp, j);
-        }
-      }
-    }
-    mailList.updateUI();
-  }
-*/
-
-  void createMLPopup(JPopupMenu jpmenu) {
-    Vector list = new Vector();
-
-    fileList(list, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
-    StringTokenizer tok;
-
-    JMenu copy = new JMenu(res.getString("edit.copy")), move = new JMenu(res.getString("edit.move"));
-    JMenuItem row, delete = new JMenuItem(res.getString("button.delete")), reply = new JMenuItem(res.getString("button.reply"));
-
-    delete.addActionListener(OtherMListener);
-    reply.addActionListener(OtherMListener);
-
-    for(int i = 0;i<list.size();i++) {
-      if(!(list.get(i).toString()).equals(selectedbox) && !(list.get(i).toString()).endsWith(".config")) {
-        String temp = list.get(i).toString();
-
-        tok = new StringTokenizer(temp, System.getProperty("file.separator"));
-        String name = tok.nextToken();
-
-        row = new JMenuItem(list.get(i).toString());
-        row.addActionListener(KMListener);
-        copy.add(row);
-
-        row = new JMenuItem(list.get(i).toString());
-        row.addActionListener(FMListener);
-        move.add(row);
-      }
-    }
-    jpmenu.add(reply);
-    jpmenu.addSeparator();
-    jpmenu.add(copy);
-    jpmenu.add(move);
-    jpmenu.add(delete);
-  }
 
   /**
    * Checks if the link is a mailto:-link.
@@ -444,224 +367,6 @@ public class YAMM extends JFrame implements HyperlinkListener
       mail.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
   }
- 
-  private void fileList(Vector vect, File f) {
-    if((f.toString()).equals(System.getProperty("user.home") + "/.yamm/boxes")) {
-      String list[] = f.list();
-      for(int i = 0; i < list.length; i++)
-        fileList(vect, new File(f, list[i]));
-    }
-      
-    else if(f.isDirectory()) {
-      String list[] = f.list();
-      for(int i = 0; i < list.length; i++)
-        fileList(vect, new File(f, list[i]));
-    }
-    else {
-      vect.add(f.toString());
-    }
-  }
-
-  class newBoxDialog extends JDialog {
-    JButton    b;
-    JComboBox  inFolder;
-    JTextField jtfield;
-
-    public newBoxDialog(JFrame frame) {
-      super(frame, true);
-      setBounds(0, 0, 300, 100);
-      setResizable(false);
-
-      Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-      setLocation((screenSize.width - 300) / 2, (screenSize.height - 200) / 2);
-      getContentPane().setLayout(new GridLayout(3, 2, 2, 2));
-
-
-      File[] boxes = new File(System.getProperty("user.home") + "/.yamm/boxes/").listFiles();
-      Vector bvector = new Vector();
-      bvector.add("boxes");
-
-      for(int i=0;i<boxes.length;i++) {
-        String tmp = boxes[i].toString();
-        String box = tmp.substring(tmp.indexOf("boxes") -1, tmp.length());
-
-        if(boxes[i].isDirectory()) bvector.add(box);
-      }
-
-      getContentPane().add(new JLabel(res.getString("NAME")));
-
-      jtfield = new JTextField();
-      getContentPane().add(jtfield);
-
-      getContentPane().add(new JLabel(res.getString("CREATEIN")));
-
-      inFolder = new JComboBox(bvector);
-      getContentPane().add(inFolder);
-
-
-      b = new JButton(res.getString("OK"));
-      b.addActionListener(BListener2);
-      getContentPane().add(b);
-
-      b = new JButton(res.getString("CANCEL"));
-      b.addActionListener(BListener2);
-      getContentPane().add(b);
-
-      show();
-    }
-
-    ActionListener BListener2 = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        String arg = ((JButton)e.getSource()).getText();
-
-        File box = new File(System.getProperty("user.home") + "/.yamm/" + inFolder.getSelectedItem() + "/" + jtfield.getText());
-        if(arg.equals(res.getString("button.ok"))) {
-          if(box.exists()) System.out.println(box.toString() + " exists!");
-
-          else {
-            try {
-              box.createNewFile();
-            } catch (IOException ioe) { System.out.println(ioe); }
-/*
-            top.removeAllChildren();
-            createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
-            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
-            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash")));
-            tree.updateUI();
-*/
-            dispose();
-          }
-        }
-
-        else if(arg.equals(res.getString("button.cancel"))) {
-          dispose();
-        }
-      }
-    };
-  }
-
-  ActionListener KMListener = new ActionListener() {
-    public void actionPerformed(ActionEvent ae) {
-      String kommando = ((JMenuItem)ae.getSource()).getText();
-
-      int i = 0;
-
-      while(i<4) {
-        if(mailList.getColumnName(i).equals("#")) { break; }
-        i++;
-      }
-
-
-      int[] mlist = mailList.getSelectedRows();
-      int[] copyList = new int[mlist.length];
-
-      for(int j = 0;j < mlist.length;j++) {
-        copyList[j] = Integer.parseInt(mailList.getValueAt(mlist[j], i).toString());
-      }
-
-      for (int a=0; a<copyList.length; a++ ) {
-        Mailbox.copyMail(selectedbox, kommando, copyList[a]);
-      }
-          
-      tree.updateUI();
-    }
-  };
-
-  ActionListener FMListener = new ActionListener() {
-    public void actionPerformed(ActionEvent ae) {
-      String kommando = ((JMenuItem)ae.getSource()).getText();
-
-      int i = 0;
-
-      while(i<4) {
-        if(mailList.getColumnName(i).equals("#")) { break; }
-        i++;
-      }
-
-
-      int[] mlist = mailList.getSelectedRows();
-      int[] moveList = new int[mlist.length];
-
-      for(int j = 0;j < mlist.length;j++) {
-        moveList[j] = Integer.parseInt(mailList.getValueAt(mlist[j], i).toString());
-      }
-
-      for (int a=moveList.length -1; a>=0; a-- ) {
-        Mailbox.moveMail(selectedbox, kommando, moveList[a]);
-      }
-          
-      tree.updateUI();
-
-      Mailbox.createList(selectedbox, listOfMails);
-
-      mailList.updateUI();
-      attach = new Vector();
-
-      if(mailName) mailName = false;
-      else mailName = true;
-
-      Mailbox.getMail(selectedbox, mailList.getSelectedRow(), attach, mailName);
-
-      try { mailPage = new URL(mailPageString + mailName + ".html"); }
-      catch (MalformedURLException mue) { System.err.println(mue); }
-
-      try { mail.setPage(mailPage); }
-      catch (IOException ioe) { System.err.println(ioe); }    }
-  };
-
-  ActionListener OtherMListener = new ActionListener() {
-    public void actionPerformed(ActionEvent ae) {
-      String kommando = ((JMenuItem)ae.getSource()).getText();
-
-      int i = 0;
-
-      while(i<4) {
-        if(mailList.getColumnName(i).equals("#")) { break; }
-        i++;
-      }
-
-      if(kommando.equals(res.getString("button.delete"))) {
-
-        int[] mlist = mailList.getSelectedRows();
-        int[] deleteList = new int[mlist.length];
-
-        for(int j = 0;j < mlist.length;j++) {
-          deleteList[j] = Integer.parseInt(mailList.getValueAt(mlist[j], i).toString());
-        }
-
-        Arrays.sort(deleteList);
-
-        for (int a=deleteList.length -1; a>=0; a-- ) {
-          Mailbox.deleteMail(selectedbox, deleteList[a]);
-        }
-          
-        tree.updateUI();
-
-        Mailbox.createList(selectedbox, listOfMails);
-
-        mailList.updateUI();
-        attach = new Vector();
-
-        if(mailName) mailName = false;
-        else mailName = true;
-
-        Mailbox.getMail(selectedbox, mailList.getSelectedRow(), attach, mailName);
-
-        try { mailPage = new URL(mailPageString + mailName + ".html"); }
-        catch (MalformedURLException mue) { System.err.println(mue); }
-
-        try { mail.setPage(mailPage); }
-        catch (IOException ioe) { System.err.println(ioe); }
-      }
-      else if(kommando.equals(res.getString("button.reply"))) {
-                        
-        String[] mail = Mailbox.getMailForReplyHeaders(selectedbox, Integer.parseInt(mailList.getValueAt(mailList.getSelectedRow(), i).toString()));
-
-        YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[0] + " " + res.getString("WROTE") + "\n");
-        Mailbox.getMailForReply(selectedbox, Integer.parseInt(mailList.getValueAt(mailList.getSelectedRow(), i).toString()), yam.myTextArea);	
-      }
-    }
-  };
 
   ActionListener BListener = new ActionListener() {
     public void actionPerformed(ActionEvent e) {
@@ -731,79 +436,6 @@ public class YAMM extends JFrame implements HyperlinkListener
     }
   };
 
-
-  MouseListener mouseListener = new MouseAdapter() {
-    public void mouseReleased(MouseEvent me) {
-      if(me.isPopupTrigger()) myPopup.show(mailList, me.getX(), me.getY());
-      else if(mailList.getSelectedRow() != -1) get_mail();
-
-      if(mailList.getSelectedRow() != -1 && !(mailList.getSelectedRow() >= listOfMails.size())) { ((JButton)tbar.reply).setEnabled(true); ((JButton)tbar.print).setEnabled(true); ((JButton)tbar.forward).setEnabled(true);}
-      else { ((JButton)tbar.reply).setEnabled(false); ((JButton)tbar.forward).setEnabled(false); ((JButton)tbar.print).setEnabled(false); }
-    }
-    public void mousePressed(MouseEvent me) {
-      if(me.isPopupTrigger()) myPopup.show(mailList, me.getX(), me.getY());
-    }
-    
-    void get_mail() {
-      int i = 0;
-
-      while(i<4) {
-        if(mailList.getColumnName(i).equals("#")) { break; }
-        i++;
-      }
-      int whatMail = Integer.parseInt(mailList.getValueAt(mailList.getSelectedRow(), i).toString());
-
-      attach = new Vector();
-        if(mailName) mailName = false;
-        else mailName = true;
-
-        Mailbox.getMail(selectedbox,whatMail, attach, mailName);
-        try { mailPage = new URL(mailPageString + mailName + ".html"); }
-        catch (MalformedURLException mue) { System.err.println(mue); }
-
-        try { mail.setPage(mailPage); }
-        catch (IOException ioe) { System.err.println(ioe); }
-//        if(mailName) mailName = false;
-//        else mailName = true;
-//      mail.setText(mbox.getMail(selectedbox, whatMail, attach));
-      myList.updateUI();
-    }
-  };
-
-/*
-  void TMListener(JTable table) {
-    final JTable tableView = table;
-    tableView.setColumnSelectionAllowed(false);
-
-    MouseAdapter lmListener = new MouseAdapter() {
-      public void mouseClicked(MouseEvent e) {
-          TableColumnModel columnModel = tableView.getColumnModel();
-          int viewColumn = columnModel.getColumnIndexAtX(e.getX());
-          int column = tableView.convertColumnIndexToModel(viewColumn);
-
-          if(column != -1) {
-            if(column == sortedCol) {
-              if(firstSort) {
-                SortFirst(column);
-                firstSort = false;
-              }
-              else {
-                SortLast(column);
-                firstSort = true;
-              }
-            }
-            else {
-              SortFirst(column);
-              firstSort = false;
-              sortedCol = column;
-            }
-          }
-      }
-    };
-    JTableHeader th = tableView.getTableHeader();
-    th.addMouseListener(lmListener);
-  }
-*/
   class FLyssnare extends WindowAdapter {
     public void windowClosing(WindowEvent event) {
         Rectangle rv = new Rectangle();
@@ -865,8 +497,7 @@ public class YAMM extends JFrame implements HyperlinkListener
         out.println("Subject: Welcome to YAMM " + yammVersion);
         out.println("\n<html>\nWelcome " + user + "!");
         out.println("\nFeel free to <a href=\"mailto:fredde@gjt.org\">mail me</a> your questions, comments, suggestions or bug-reports.");
-        out.println("For the bug-report, try to send me as much info as possible. (regarding the");
-        out.println("bug, not what you had for breakfast that day! ;) )");
+        out.println("\nIf you want to report a bug, choose 'bug report' from the 'help'-menu.\n");
         out.println("\nBest regards,\n\nFredrik Ehnbom\n</html>\n.\n");
         out.close();
 
