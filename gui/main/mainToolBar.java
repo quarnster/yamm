@@ -1,4 +1,4 @@
-/*  $Id: mainToolBar.java,v 1.24 2003/03/08 16:56:27 fredde Exp $
+/*  $Id: mainToolBar.java,v 1.25 2003/03/08 18:11:41 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Revision: 1.24 $
+ * @version $Revision: 1.25 $
  */
 public class mainToolBar
 	extends JToolBar
@@ -183,7 +183,8 @@ public class mainToolBar
 			String arg = ((JButton)e.getSource()).getToolTipText();
 
 			if (arg.equals(YAMM.getString("button.new_mail.tooltip"))) {
-				new YAMMWrite();
+				YAMMWrite yam = new YAMMWrite();
+				yam.sign();
 			} else if (arg.equals(YAMM.getString("button.send_get.tooltip"))) {
 				new SHMail(frame, "mailthread",	(JButton)e.getSource()).start();
 			} else if (arg.equals(YAMM.getString("button.reply.tooltip"))) {
@@ -210,6 +211,7 @@ public class mainToolBar
 					selMail, skip,
 					yam.myTextArea
 				);
+				yam.sign();
 			} else if (arg.equals(YAMM.getString("button.forward.tooltip"))) {
 				int i = 0;
 
@@ -237,6 +239,7 @@ public class mainToolBar
 					selMail, skip,
 					yam.myTextArea
 				);
+				yam.sign();
 			} else if (arg.equals(YAMM.getString("button.print.tooltip"))) {
 				PrintJob pj = frame.getToolkit().getPrintJob(frame, "print", null);
 
@@ -259,6 +262,9 @@ public class mainToolBar
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.25  2003/03/08 18:11:41  fredde
+ * signs messages
+ *
  * Revision 1.24  2003/03/08 16:56:27  fredde
  * Updated for the new getMailForReplyHeaders
  *

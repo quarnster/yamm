@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.40 2003/03/08 16:56:03 fredde Exp $
+ * @version $Id: mainTable.java,v 1.41 2003/03/08 18:11:41 fredde Exp $
  */
 public class mainTable
 	extends JTable
@@ -621,6 +621,7 @@ public class mainTable
 				YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[2], mail[0] + YAMM.getString("mail.wrote") + "\n");
 
 				Mailbox.getMailForReply(frame.selectedbox, msgnum, skip, yam.myTextArea);
+				yam.sign();
 			}
 		}
 	};
@@ -684,6 +685,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.41  2003/03/08 18:11:41  fredde
+ * signs messages
+ *
  * Revision 1.40  2003/03/08 16:56:03  fredde
  * added support for the MailReader. Updated for the new getMailForReplyHeaders
  *
