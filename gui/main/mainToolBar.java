@@ -70,15 +70,7 @@ public class mainToolBar extends JToolBar {
       props.load(in);
       in.close();
     } catch (IOException propsioe) { System.err.println(propsioe); }
-/*
-    try {
-      res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault());
-    }
-    catch (MissingResourceException mre) {
-      mre.printStackTrace();
-      System.exit(1);
-    }
-*/
+
     /* send mails in outbox get mail to inbox */
     b = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/recycle.gif"));
     b.setBorderPainted(false);
@@ -151,9 +143,6 @@ public class mainToolBar extends JToolBar {
         }
 
         String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString()));
-//        String from = mail[0]; //.substring(0, mail.indexOf("\n", 0));
-//        String subject = res.getString("RE") + mail.substring(mail.indexOf("Subject:") + 8, mail.indexOf("\n", mail.indexOf("Subject:") + 8));
-//        String actualmail = from + " " + res.getString("WROTE") + "\n" + mail.substring(mail.indexOf("Begin:") + 8, mail.length());
 
         YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[0] + " " + res.getString("mail.wrote") + "\n");
         Mailbox.getMailForReply(frame.selectedbox, Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString()), yam.myTextArea);
@@ -197,8 +186,6 @@ public class mainToolBar extends JToolBar {
         props.setProperty("mainy", new Integer(rv.y).toString());
         props.setProperty("mainw", new Integer(rv.width).toString());
         props.setProperty("mainh", new Integer(rv.height).toString());
-//        props.setProperty("vsplit", new Integer(((JSplitPane)frame.SPane2).getDividerLocation()).toString());
-//        props.setProperty("hsplit", new Integer(((JSplitPane)frame.SPane).getDividerLocation()).toString());
 
         try {
           OutputStream out = new FileOutputStream(System.getProperty("user.home") + "/.yamm/.config");
@@ -211,5 +198,4 @@ public class mainToolBar extends JToolBar {
       }
     }
   };
-
 }
