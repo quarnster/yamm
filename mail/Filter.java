@@ -1,4 +1,4 @@
-/*  $Id: Filter.java,v 1.12 2003/03/10 10:14:27 fredde Exp $
+/*  $Id: Filter.java,v 1.13 2003/03/11 15:19:10 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -25,16 +25,18 @@ import org.gjt.fredde.yamm.Utilities;
 
 /**
  * A class that filters incoming messages
+ * @author Fredrik Ehnbom <fredde@gjt.org>
+ * @version $Revision: 1.13 $
  */
 public class Filter {
 
 	/**
 	 * Starts the filtering
 	 */
-	public Filter()
+	public Filter(YAMM yamm)
 		throws IOException
 	{
-		Hashtable changedBoxes = new Hashtable();
+		LinkedList changedList = new LinkedList();
 		int type = 0;
 		int cheat[] = new int[1];
 		Vector list = new Vector();
@@ -82,7 +84,7 @@ public class Filter {
 							cheat[0] = i;
 							String target = Utilities.replace(YAMM.home + "/boxes/" + exec);
 							Mailbox.moveMail(filterBox, target , cheat);
-							changedBoxes.put(target, target);
+							changedList.add(target);
 							i--;
 						}
 					}
@@ -98,7 +100,7 @@ public class Filter {
 							String target = Utilities.replace(YAMM.home + "/boxes/" + exec);
 
 							Mailbox.moveMail(filterBox, target, cheat);
-							changedBoxes.put(target, target);
+							changedList.add(target);
 							i--;
 						}
 					}
@@ -113,6 +115,14 @@ public class Filter {
 			int[] msg = new int[Mailbox.getUnread(filterBox)[0]];
 			for (int i = 0; i < msg.length; i++) msg[i] = i;
 			Mailbox.moveMail(filterBox, inBox, msg);
+
+			changedList.add(inBox);
 		}
+
+		for (int i = 0; i < changedList.size(); i++) {
+			String box = (String) changedList.get(i);
+			yamm.tree.unreadTable.put(box, Mailbox.getUnread(box));
+		}
+		yamm.tree.fullUpdate();
 	}
 }
