@@ -650,12 +650,17 @@ public class mainTable extends JTable implements DragGestureListener,
 				Mailbox.createList(frame.selectedbox,
 								listOfMails);
 
+				updateUI();
+
+				if (frame.listOfMails.size() <= 0) {
+					return;
+				}
+
 				if (getSelectedRow() >=
 					 frame.listOfMails.size()) {
 						changeButtonMode(false);
 				}
 
-				updateUI();
 				frame.attach = new Vector();
 
 				long skip = Long.parseLong(
