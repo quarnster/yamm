@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.Utilities;
 /**
  * Class used for creating new groups
  * @author Fredrik Ehnbom
- * @version $Id: NewGroupDialog.java,v 1.4 2001/05/24 08:08:55 fredde Exp $
+ * @version $Id: NewGroupDialog.java,v 1.5 2003/03/12 20:20:35 fredde Exp $
  */
 public class NewGroupDialog extends JDialog {
 	private JComboBox  group = null;
@@ -115,13 +115,21 @@ public class NewGroupDialog extends JDialog {
 				File box = new File(Utilities.replace(YAMM.home + "/boxes/" + gName + jtfield.getText() + ".g"));
 
 				if (box.exists()) {
-					new MsgDialog(yamm, YAMM.getString("msg.error"),
-						YAMM.getString("msg.file.exists"));
+					JOptionPane.showMessageDialog(
+						yamm,
+						YAMM.getString("msg.file.exists"),
+						YAMM.getString("msg.error"),
+						JOptionPane.ERROR_MESSAGE
+					);
 				} else {
 					if (!box.mkdir()) {
 						Object[] args = { box.toString() };
-						new MsgDialog(yamm, YAMM.getString("msg.error"),
-							YAMM.getString("msg.file.create-error",args));
+						JOptionPane.showMessageDialog(
+							yamm,
+							YAMM.getString("msg.file.create-error",args),
+							YAMM.getString("msg.error"),
+							JOptionPane.ERROR_MESSAGE
+						);
 					}
 
 					yamm.tree.updateNodes();
@@ -136,6 +144,9 @@ public class NewGroupDialog extends JDialog {
 /*
  * Changes:
  * $Log: NewGroupDialog.java,v $
+ * Revision 1.5  2003/03/12 20:20:35  fredde
+ * removed MsgDialog
+ *
  * Revision 1.4  2001/05/24 08:08:55  fredde
  * Changed some strings from YAMM.home + "/.yamm/..."
  * to just YAMM.home + "/...", thanks to wYRd

@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.36 2003/03/11 15:17:48 fredde Exp $
+/*  $Id: mainJTree.java,v 1.37 2003/03/12 20:20:54 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.36 $
+ * @version $Revision: 1.37 $
  */
 public class mainJTree
 	extends JTable
@@ -341,8 +341,12 @@ public class mainJTree
 				} else if(del.exists()) {
 					if (!del.delete()) {
 						Object[] args = {del.toString()};
-						new MsgDialog(yamm, YAMM.getString("msg.error"),
-							YAMM.getString("msg.file.delete-dir", args));
+						JOptionPane.showMessageDialog(
+							yamm,
+							YAMM.getString("msg.file.delete-dir", args),
+							YAMM.getString("msg.error"),
+							JOptionPane.ERROR_MESSAGE
+						);
 					} else {
 						yamm.selectedbox = "deleted";
 						updateNodes();
@@ -404,6 +408,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.37  2003/03/12 20:20:54  fredde
+ * removed MsgDialog
+ *
  * Revision 1.36  2003/03/11 15:17:48  fredde
  * added update methods. Also delete index when deleting a box
  *

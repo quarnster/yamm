@@ -29,7 +29,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * A dialog for creating new boxes
  * @author Fredrik Ehnbom
- * @version $Id: NewBoxDialog.java,v 1.2 2000/03/15 14:03:53 fredde Exp $
+ * @version $Id: NewBoxDialog.java,v 1.3 2003/03/12 20:20:35 fredde Exp $
  */
 public class NewBoxDialog extends JDialog {
 	private JComboBox  group;
@@ -109,8 +109,12 @@ public class NewBoxDialog extends JDialog {
 						jtfield.getText());
 
 				if (box.exists()) {
-					new MsgDialog(yamm, YAMM.getString("msg.error"),
-						YAMM.getString("msg.file.exists"));
+					JOptionPane.showMessageDialog(
+						yamm,
+						YAMM.getString("msg.file.exists"),
+						YAMM.getString("msg.error"),
+						JOptionPane.ERROR_MESSAGE
+					);
 				} else {
 					try {
 						box.createNewFile();
@@ -137,6 +141,9 @@ public class NewBoxDialog extends JDialog {
 /*
  * Changes:
  * $Log: NewBoxDialog.java,v $
+ * Revision 1.3  2003/03/12 20:20:35  fredde
+ * removed MsgDialog
+ *
  * Revision 1.2  2000/03/15 14:03:53  fredde
  * oops, forgot the log and id tags...
  *

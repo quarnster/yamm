@@ -1,4 +1,4 @@
-/*  $Id: YAMMWrite.java,v 1.29 2003/03/10 11:00:49 fredde Exp $
+/*  $Id: YAMMWrite.java,v 1.30 2003/03/12 20:19:37 fredde Exp $
  *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import org.gjt.fredde.yamm.mail.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Revision: 1.29 $
+ * @version $Revision: 1.30 $
  */
 public class YAMMWrite extends JFrame {
 
@@ -444,7 +444,12 @@ public class YAMMWrite extends JFrame {
 					send();
 					quit();
 				} else {
-					new MsgDialog(YAMMWrite.this, YAMM.getString("msg.error"), "Missing \"@\" in address field!");
+					JOptionPane.showMessageDialog(
+						YAMMWrite.this,
+						"Missing \"@\" in address field!",
+						YAMM.getString("msg.error"),
+						JOptionPane.ERROR_MESSAGE
+					);
 				}
 			} else if (arg.equals(YAMM.getString("button.add"))) {
 				addAttach();
@@ -511,6 +516,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.30  2003/03/12 20:19:37  fredde
+ * removed MsgDialog
+ *
  * Revision 1.29  2003/03/10 11:00:49  fredde
  * now uses the new index system
  *

@@ -9,7 +9,6 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/util/net/Pop3.class \
 	org/gjt/fredde/util/net/Smtp.class \
 	org/gjt/fredde/util/net/Browser.class \
-        org/gjt/fredde/util/gui/MsgDialog.class \
         org/gjt/fredde/util/gui/ExceptionDialog.class \
         org/gjt/fredde/util/gui/statusRow.class \
         org/gjt/fredde/util/gui/SplashScreen.class \
