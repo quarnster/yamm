@@ -105,6 +105,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	/** The mail/attach tabbedpane */
 	protected JTabbedPane JTPane;
 
+	/** The names for the exception dialogs buttons */
+	public static String[] exceptionNames = null;
+
 
 	/**
 	 * Returns the translated string.
@@ -635,6 +638,15 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		}
 
 		selectedbox += res.getString("box.inbox");
+
+		String[] tmp = {
+			res.getString("exception.ok"),
+			res.getString("exception.more"),
+			res.getString("exception.less")
+		};
+
+		exceptionNames = tmp;
+
 		if (!(new File(home + "/boxes")).exists()) {
 			try {
 				String user = System.getProperty("user.name");
@@ -676,9 +688,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 				(new File(home + "/.filters")).createNewFile();
 				(new File(home + "/tmp")).mkdirs();
 			} catch(IOException ioe) { 
-				new MsgDialog(nFrame,
-					YAMM.getString("msg.error"),
-					ioe.toString());
+				new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 			}
 		}
 
