@@ -28,7 +28,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.36 2000/12/26 11:24:42 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.37 2000/12/31 14:11:34 fredde Exp $
  */
 public class Mailbox {
 
@@ -310,6 +310,15 @@ public class Mailbox {
 	 * @param mailList The String array which will recieve the information
 	 */
 	public static void createList(String whichBox, YAMM yamm) {
+		yamm.listOfMails = createList(whichBox);
+	}
+
+	/**
+	 * Creates a list with the mails in this box.
+	 *
+	 * @param whichBox Which box to get messages from.
+	 */
+	public static String[][] createList(String whichBox) {
 		String subject = null;
 		String from = null;
 		String date = null;
@@ -319,9 +328,11 @@ public class Mailbox {
 
 		String box = whichBox.substring(0, sep + 1) + "." + whichBox.substring(sep + 1, whichBox.length()) + ".index";
 
+		String[][] listOfMails;
+
 		if (!hasMail(whichBox)) {
-			yamm.listOfMails = new String[0][6];
-			return;
+			listOfMails = new String[0][6];
+			return listOfMails;
 		}
 		File indexfile = new File(box);
 
@@ -332,7 +343,7 @@ public class Mailbox {
 			updateIndex(whichBox);
 		}
 
-		yamm.listOfMails = new String[getUnread(whichBox)[0]][6];
+		listOfMails = new String[getUnread(whichBox)[0]][6];
 
 		BufferedReader in = null;
 
@@ -347,23 +358,29 @@ public class Mailbox {
 					break;
 				}
 
+				// message number
 				int num = (int) tok.nval;
-				yamm.listOfMails[i][0] = Integer.toString(num);
+				listOfMails[i][0] = Integer.toString(num);
 
+				// subject
 				tok.nextToken();
-				yamm.listOfMails[i][1] = tok.sval;
+				listOfMails[i][1] = tok.sval;
 
+				// from
 				tok.nextToken();
-				yamm.listOfMails[i][2] = tok.sval;
+				listOfMails[i][2] = tok.sval;
 
+				// date
 				tok.nextToken();
-				yamm.listOfMails[i][3] = tok.sval;
+				listOfMails[i][3] = tok.sval;
 
+				// read
 				tok.nextToken();
-				yamm.listOfMails[i][4] = tok.sval;
+				listOfMails[i][4] = tok.sval;
 
+				// skip
 				tok.nextToken();
-				yamm.listOfMails[i][5] = "" + (long) tok.nval;
+				listOfMails[i][5] = "" + (long) tok.nval;
 			}
 		} catch(IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
@@ -372,6 +389,7 @@ public class Mailbox {
 				if (in != null) in.close();
 			} catch (IOException ioe) {}
 		}
+		return listOfMails;
 	}
 
 	/**
@@ -1395,6 +1413,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.37  2000/12/31 14:11:34  fredde
+ * added createList(box)
+ *
  * Revision 1.36  2000/12/26 11:24:42  fredde
  * YAMM.listOfMails is now of type String[][]
  *
