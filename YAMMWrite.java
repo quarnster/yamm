@@ -1,4 +1,4 @@
-/*  $Id: YAMMWrite.java,v 1.28 2003/03/10 09:41:38 fredde Exp $
+/*  $Id: YAMMWrite.java,v 1.29 2003/03/10 11:00:49 fredde Exp $
  *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -29,11 +29,12 @@ import javax.swing.border.*;
 import org.gjt.fredde.util.gui.*;
 import org.gjt.fredde.yamm.encode.*;
 import org.gjt.fredde.yamm.gui.*;
+import org.gjt.fredde.yamm.mail.*;
 
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 public class YAMMWrite extends JFrame {
 
@@ -327,9 +328,12 @@ public class YAMMWrite extends JFrame {
 	public void send() {
 		PrintWriter outFile = null;
 		try {
+			String outbox = Utilities.replace(YAMM.home + "/boxes/outbox");
+			long skip = new File(outbox).length();
+
 			outFile = new PrintWriter(
 				new FileOutputStream(
-					YAMM.home + "/boxes/outbox",
+					outbox,
 					true
 				)
 			);
@@ -344,6 +348,21 @@ public class YAMMWrite extends JFrame {
 			String cc   = ccField.getText();
 			String temp = null;
 			StringTokenizer tok = new StringTokenizer(to, ",");
+
+			Index idx = new Index(outbox);
+			idx.open();
+			idx.messageNum++;
+			idx.write();
+			idx.raf.seek(Index.HEADERSIZE + (idx.messageNum-1) * IndexEntry.SIZE);
+
+			IndexEntry e = new IndexEntry();
+			e.skip = skip;
+			e.date = System.currentTimeMillis();
+			e.from = from;
+			e.subject = subjectField.getText();
+			e.status = IndexEntry.STATUS_READ;
+			e.write(idx.raf);
+			idx.close();
 
 			to = "";
 			while (tok.hasMoreTokens()) {
@@ -492,6 +511,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.29  2003/03/10 11:00:49  fredde
+ * now uses the new index system
+ *
  * Revision 1.28  2003/03/10 09:41:38  fredde
  * non localized box filenames
  *
