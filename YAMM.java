@@ -549,6 +549,17 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
       in.close();    
     } catch (IOException propsioe) { System.err.println(propsioe); }
 
+	if (props.getProperty("plaf") != null) {
+		try {
+			UIManager.setLookAndFeel(props.getProperty("plaf"));
+		} catch (Exception e) {};
+	} else {
+		try {
+			UIManager.setLookAndFeel(
+				UIManager.getSystemLookAndFeelClassName()
+			);
+		} catch (Exception e) {};
+	}
 
     if (props.getProperty("splashscreen", "yes").equals("yes")) {
       splash = new SplashScreen("YAMM " + version + 
