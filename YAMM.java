@@ -212,8 +212,12 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 				return  listOfMails.size();
 			}
 			public Object getValueAt(int row, int col) {
-				return  ((Vector)listOfMails.elementAt(row)).
+				if (row >= listOfMails.size()) {
+					return null;
+				} else {
+					return  ((Vector)listOfMails.elementAt(row)).
 							elementAt(col);
+				}
 			}
 			public boolean isCellEditable(int col) {
 				return false;

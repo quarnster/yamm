@@ -652,13 +652,15 @@ public class mainTable extends JTable implements DragGestureListener,
 
 				updateUI();
 
-				if (frame.listOfMails.size() <= 0) {
+				if (frame.listOfMails.size() < 0) {
 					return;
 				}
 
 				if (getSelectedRow() >=
-					 frame.listOfMails.size()) {
-						changeButtonMode(false);
+					 	frame.listOfMails.size()) {
+					changeButtonMode(false);
+					clearSelection();
+					return;
 				}
 
 				frame.attach = new Vector();
@@ -745,12 +747,15 @@ public class mainTable extends JTable implements DragGestureListener,
 				Mailbox.createList(frame.selectedbox,
 								listOfMails);
 
+				updateUI();
+
 				if (getSelectedRow() >=
 						frame.listOfMails.size()) {
 					changeButtonMode(false);
+					clearSelection();
+					return;
 				}
 
-				updateUI();
 				frame.attach = new Vector();
 
 				long skip = Long.parseLong(
@@ -795,9 +800,7 @@ public class mainTable extends JTable implements DragGestureListener,
 						YAMM.getString("msg.exception",
 									args)); 
 				}
-			}
-
-			else if (kommando.equals(
+			} else if (kommando.equals(
 					YAMM.getString("button.reply"))) {
 
 				if (getSelectedRow() == -1) {
