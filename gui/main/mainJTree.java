@@ -111,6 +111,8 @@ public class mainJTree extends JTree implements DropTargetListener {
                                                 YAMM.getString("box.inbox"))));
     top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/" +
                                                 YAMM.getString("box.outbox"))));
+    top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/" +
+                                                YAMM.getString("box.sent"))));
     createNodes(top, new File(YAMM.home + sep + "boxes" + sep));
     top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/" +
                                                 YAMM.getString("box.trash")))); 
@@ -225,7 +227,8 @@ public class mainJTree extends JTree implements DropTargetListener {
       if(leaf && !thisbox.endsWith(".g")) {
         if(thisbox.equals(YAMM.getString("box.inbox")))
           setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/inbox.gif"));
-        else if(thisbox.equals(YAMM.getString("box.outbox")))
+        else if(thisbox.equals(YAMM.getString("box.outbox")) ||
+                thisbox.equals(YAMM.getString("box.sent")))
           setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/outbox.gif"));
         else if(thisbox.equals(YAMM.getString("box.trash")))
           setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/trash.gif"));
@@ -303,6 +306,8 @@ public class mainJTree extends JTree implements DropTargetListener {
             "boxes" + sep + YAMM.getString("box.trash")) &&
 	    !(f.toString()).equals(home + sep + 
             "boxes" + sep + YAMM.getString("box.inbox")) &&
+	    !(f.toString()).equals(home + sep + 
+            "boxes" + sep + YAMM.getString("box.sent")) &&
             (f.toString()).indexOf(sep + ".", (f.toString()).indexOf("boxes")) == -1) {
 
       box = new DefaultMutableTreeNode(f);
@@ -353,6 +358,7 @@ public class mainJTree extends JTree implements DropTargetListener {
  
             if(!file.endsWith(sep + YAMM.getString("box.inbox")) &&
                !file.endsWith(sep + YAMM.getString("box.outbox")) &&
+               !file.endsWith(sep + YAMM.getString("box.sent")) &&
                !file.endsWith(sep + YAMM.getString("box.trash"))) {
               frame.selectedbox = "deleted";
               top.removeAllChildren();
@@ -363,6 +369,8 @@ public class mainJTree extends JTree implements DropTargetListener {
                                                + YAMM.getString("box.inbox"))));
               top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
                                               + YAMM.getString("box.outbox"))));
+              top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
+                                              + YAMM.getString("box.sent"))));
               createNodes(top, new File(YAMM.home + "/boxes/"));
               top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
                                                + YAMM.getString("box.trash")))); 
@@ -388,6 +396,8 @@ public class mainJTree extends JTree implements DropTargetListener {
                                                + YAMM.getString("box.inbox"))));
               top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
                                               + YAMM.getString("box.outbox"))));
+              top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
+                                              + YAMM.getString("box.sent"))));
               createNodes(top, new File(YAMM.home + "/boxes/"));
               top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
                                                + YAMM.getString("box.trash"))));
@@ -504,6 +514,8 @@ public class mainJTree extends JTree implements DropTargetListener {
                                              + YAMM.getString("box.inbox"))));
             top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
                                              + YAMM.getString("box.outbox"))));
+            top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
+                                             + YAMM.getString("box.sent"))));
             createNodes(top, new File(YAMM.home + "/boxes/"));
             top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
                                              + YAMM.getString("box.trash"))));
@@ -601,6 +613,8 @@ public class mainJTree extends JTree implements DropTargetListener {
                                              + YAMM.getString("box.inbox"))));
             top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
                                              + YAMM.getString("box.outbox"))));
+            top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
+                                             + YAMM.getString("box.sent"))));
             createNodes(top, new File(YAMM.home + "/boxes/"));
             top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
                                              + YAMM.getString("box.trash"))));
