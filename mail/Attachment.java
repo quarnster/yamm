@@ -19,13 +19,15 @@
 package org.gjt.fredde.yamm.mail;
 
 import org.gjt.fredde.yamm.encode.*;
+import org.gjt.fredde.yamm.YAMM;
+import org.gjt.fredde.util.gui.*;
 
 import java.io.*;
 
 /**
  * This class parses attachments
  * @author Fredrik Ehnbom
- * @version $Id: Attachment.java,v 1.9 2003/03/06 20:14:32 fredde Exp $
+ * @version $Id: Attachment.java,v 1.10 2003/03/07 10:52:36 fredde Exp $
  */
 public class Attachment {
 
@@ -171,12 +173,40 @@ public class Attachment {
 			}
 		}
 
-		MessageParser.filter(contentType, encoding, fileName);
+		if (fileName.indexOf(".message.") != -1) {
+			MessageParser.filter(contentType, encoding, fileName);
+		} else {
+			// attachments are not needed to display the message
+			// so we can filter them in a thread
+			final String c = contentType;
+			final String e = encoding;
+			final String f = fileName;
+
+			Thread t = new Thread()
+			{
+				public void run() {
+					try {
+						MessageParser.filter(c, e, f);
+					} catch (IOException ioe) {
+						new ExceptionDialog(
+							YAMM.getString("msg.error"),
+							ioe,
+							YAMM.exceptionNames
+						);
+					}
+				}
+			};
+			t.setPriority(Thread.MIN_PRIORITY);
+			t.start();
+		}
 	}
 }
 /*
  * Changes:
  * $Log: Attachment.java,v $
+ * Revision 1.10  2003/03/07 10:52:36  fredde
+ * filter attachments in a thread
+ *
  * Revision 1.9  2003/03/06 20:14:32  fredde
  * rewrote mailparsing system
  *
