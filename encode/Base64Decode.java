@@ -1,4 +1,4 @@
-/*  Base64Decode.java - For base64 decoding 
+/*  Base64Decode.java - For base64 decoding
  *  Copyright (C) 1999 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -54,6 +54,8 @@ public class Base64Decode extends Thread {
 			if (end.equals(".gif") || end.equals(".jpg")) {
 				new imageViewer(target);
 			}
+
+			new File(target + ".tmp").delete();
 		} catch (IOException e) {
 			System.err.println(e);
 		}
@@ -86,5 +88,5 @@ public class Base64Decode extends Thread {
 		} catch (IOException ioe) {
 			System.err.println(ioe);
 		}
-	}   
+	}
 }
