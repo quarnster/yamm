@@ -443,11 +443,12 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
       for (;;) {
         temp = in.readLine();
 
-        if (temp.startsWith("Content-Transfer-Encoding: "))
-          encode = temp.substring(27, temp.length());
-        else if (temp.indexOf("name=\"") != -1)
+        if (temp.startsWith("Content-Transfer-Encoding: ")) {
+          encode = temp.substring(27, temp.length()).trim();
+	} else if (temp.indexOf("name=\"") != -1) {
           name = temp.substring(temp.indexOf("name=\"") + 6,
                  temp.lastIndexOf("\""));
+	}
 
         
         if (name != null && encode != null) { 
