@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom
- * @version $Id: SHMail.java,v 1.19 2000/03/12 17:20:28 fredde Exp $
+ * @version $Id: SHMail.java,v 1.20 2000/03/12 19:37:02 fredde Exp $
  */
 public class SHMail extends Thread {
 
@@ -162,6 +162,8 @@ public class SHMail extends Thread {
 							YAMM.getString("box.outbox"))));
 				PrintWriter out = null;
 
+				PrintWriter mail = null; // = smtp.getOutputStream();
+
 				if (sent) { 
 					out = new PrintWriter(
 					new BufferedOutputStream(
@@ -171,6 +173,8 @@ public class SHMail extends Thread {
 
 				String temp = null, from2 = null, to2 = null;
 				int i = 1;
+
+//				boolean msg = false;
 
 				for (;;) {
 					temp = in.readLine();
@@ -200,9 +204,11 @@ public class SHMail extends Thread {
 						}
 						if (sent) out.println(to2);
 					} else if (temp.startsWith("Subject:")) {
-						PrintWriter mail = smtp.getOutputStream();
+						mail = smtp.getOutputStream();
 						mail.println(from2 + "\n" + to2 + "\n" + temp);
 						if (sent) out.println(temp);
+
+//						msg = true;
 
 						for (;;) {
 							temp = in.readLine();
@@ -217,13 +223,19 @@ public class SHMail extends Thread {
 								frame.status.setStatus(YAMM.getString("server.send",
 														args));
 
+
+//								msg = false;
 								i++;
 								break;
 							}
 							mail.println(temp);
 						}
-					} else if (sent) {
-						out.println(temp);
+						mail = null;
+					} else {
+						if (sent)
+							out.println(temp);
+						if (mail != null)
+							mail.println(temp);
 					}
 				}
 				in.close();
@@ -264,6 +276,9 @@ public class SHMail extends Thread {
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.20  2000/03/12 19:37:02  fredde
+ * can now send attachments that other mail clients can view...
+ *
  * Revision 1.19  2000/03/12 17:20:28  fredde
  * now multiple receivers work... ARGH
  *
