@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.49 2003/03/16 11:03:39 fredde Exp $
+/*  $Id: mainTable.java,v 1.50 2003/04/04 15:39:23 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.49 $
+ * @version $Revision: 1.50 $
  */
 public class mainTable
 	extends JTable
@@ -685,7 +685,7 @@ public class mainTable
 					mail[2] = YAMM.getString("mail.re") + " " + mail[2];
 				}
 
-				YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[2], mail[0] + YAMM.getString("mail.wrote") + "\n");
+				YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[2], mail[0] + " " + YAMM.getString("mail.wrote") + "\n");
 
 				Mailbox.getMailForReply(yamm.selectedbox, msgnum, skip, yam.myTextArea);
 				yam.sign();
@@ -751,6 +751,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.50  2003/04/04 15:39:23  fredde
+ * added space before mail.wrote
+ *
  * Revision 1.49  2003/03/16 11:03:39  fredde
  * resizable false for imageicon columns
  *

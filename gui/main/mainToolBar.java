@@ -1,4 +1,4 @@
-/*  $Id: mainToolBar.java,v 1.27 2003/03/15 19:36:55 fredde Exp $
+/*  $Id: mainToolBar.java,v 1.28 2003/04/04 15:39:23 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 public class mainToolBar
 	extends JToolBar
@@ -202,7 +202,7 @@ public class mainToolBar
 
 				YAMMWrite yam = new YAMMWrite(
 					mail[0], mail[1],
-					mail[2], mail[0] + YAMM.getString("mail.wrote") + "\n"
+					mail[2], mail[0] + " " + YAMM.getString("mail.wrote") + "\n"
 				);
 				Mailbox.getMailForReply(
 					frame.selectedbox,
@@ -228,7 +228,7 @@ public class mainToolBar
 
 				YAMMWrite yam = new YAMMWrite(
 					mail[0], mail[1],
-					mail[2], mail[0] + YAMM.getString("mail.wrote") + "\n"
+					mail[2], mail[0] + " " + YAMM.getString("mail.wrote") + "\n"
 				);
 				Mailbox.getMailForReply(
 					frame.selectedbox,
@@ -258,6 +258,9 @@ public class mainToolBar
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.28  2003/04/04 15:39:23  fredde
+ * added space before mail.wrote
+ *
  * Revision 1.27  2003/03/15 19:36:55  fredde
  * .gif -> .png
  *
