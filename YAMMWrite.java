@@ -236,7 +236,7 @@ public class YAMMWrite extends JFrame {
                             + "To: " + to2 +"\n"
                             + "Subject: " + myTextField2.getText() + "\n"
                             + "X-Mailer: Yet Another Mail Manager " + YAMM.version + "\n" 
-                            + "Mime-Version: 1.0\n"
+                            + "MIME-Version: 1.0\n"
                             + "Content-Type: multipart/mixed; boundary=\"AttachThis\"\n"
                             + "\n"
                             + "This is a multi-part message in MIME format.\n"
