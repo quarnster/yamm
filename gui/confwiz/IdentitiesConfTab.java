@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * The configurationtab for the profiles
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: IdentitiesConfTab.java,v 1.6 2000/04/15 13:08:05 fredde Exp $
+ * @version $Id: IdentitiesConfTab.java,v 1.7 2003/03/15 19:34:48 fredde Exp $
  */
 public class IdentitiesConfTab extends JPanel {
 
@@ -65,17 +65,17 @@ public class IdentitiesConfTab extends JPanel {
 		this.frame = frame;
 		Box vert = Box.createVerticalBox();
     
-		JButton b = new JButton(YAMM.getString("button.add"), new ImageIcon(getClass().getResource("/images/buttons/new.gif")));
+		JButton b = new JButton(YAMM.getString("button.add"), new ImageIcon(getClass().getResource("/images/buttons/new.png")));
 		b.addActionListener(BListener);
 		vert.add(b);
 		vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-		b = new JButton(YAMM.getString("edit"), new ImageIcon(getClass().getResource("/images/buttons/edit.gif")));
+		b = new JButton(YAMM.getString("edit"), new ImageIcon(getClass().getResource("/images/buttons/edit.png")));
 		b.addActionListener(BListener);
 		vert.add(b);
 		vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-		b = new JButton(YAMM.getString("button.delete"), new ImageIcon(getClass().getResource("/images/buttons/delete.gif")));
+		b = new JButton(YAMM.getString("button.delete"), new ImageIcon(getClass().getResource("/images/buttons/delete.png")));
 		b.addActionListener(BListener);
 		vert.add(b);
 		vert.add(Box.createRigidArea(new Dimension(10, 10)));
@@ -198,6 +198,9 @@ public class IdentitiesConfTab extends JPanel {
 /*
  * ChangeLog:
  * $Log: IdentitiesConfTab.java,v $
+ * Revision 1.7  2003/03/15 19:34:48  fredde
+ * .gif -> .png
+ *
  * Revision 1.6  2000/04/15 13:08:05  fredde
  * now compiles with javac
  *

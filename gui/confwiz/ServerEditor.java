@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Editor for the serversettings
  * @author Fredrik Ehnbom
- * @version $Id: ServerEditor.java,v 1.2 2000/03/18 14:55:56 fredde Exp $
+ * @version $Id: ServerEditor.java,v 1.3 2003/03/15 19:34:48 fredde Exp $
  */
 public class ServerEditor extends JDialog {
 
@@ -136,11 +136,11 @@ public class ServerEditor extends JDialog {
 
 		getContentPane().add(JPField);
 
-		JButton b = new JButton(YAMM.getString("button.ok"), new ImageIcon(getClass().getResource("/images/buttons/ok.gif")));
+		JButton b = new JButton(YAMM.getString("button.ok"), new ImageIcon(getClass().getResource("/images/buttons/ok.png")));
 		b.addActionListener(BListener);
 		getContentPane().add(b);
 
-		b = new JButton(YAMM.getString("button.cancel"), new ImageIcon(getClass().getResource("/images/buttons/cancel.gif")));
+		b = new JButton(YAMM.getString("button.cancel"), new ImageIcon(getClass().getResource("/images/buttons/cancel.png")));
 		b.addActionListener(BListener);
 		getContentPane().add(b);
 
@@ -239,6 +239,9 @@ public class ServerEditor extends JDialog {
 /*
  * Changes:
  * $Log: ServerEditor.java,v $
+ * Revision 1.3  2003/03/15 19:34:48  fredde
+ * .gif -> .png
+ *
  * Revision 1.2  2000/03/18 14:55:56  fredde
  * the server editor now works
  *

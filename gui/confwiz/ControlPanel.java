@@ -26,7 +26,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * The ControlPanel contains buttons to control the ConfigurationWizard
  * @author Fredrik Ehnbom
- * @version $Id: ControlPanel.java,v 1.2 2000/03/18 17:07:27 fredde Exp $
+ * @version $Id: ControlPanel.java,v 1.3 2003/03/15 19:34:48 fredde Exp $
  */
 public class ControlPanel extends JPanel {
 
@@ -46,7 +46,7 @@ public class ControlPanel extends JPanel {
 		setLayout(new BorderLayout());
 
 		JButton b = new JButton(YAMM.getString("button.ok"),
-				new ImageIcon(getClass().getResource("/images/buttons/ok.gif")));
+				new ImageIcon(getClass().getResource("/images/buttons/ok.png")));
 		b.addActionListener(listener);
 		add("East", b);
 	}
@@ -63,6 +63,9 @@ public class ControlPanel extends JPanel {
 /*
  * Changes:
  * $Log: ControlPanel.java,v $
+ * Revision 1.3  2003/03/15 19:34:48  fredde
+ * .gif -> .png
+ *
  * Revision 1.2  2000/03/18 17:07:27  fredde
  * now have a button
  *

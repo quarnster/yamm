@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The configurationtab for the filters
  *
  * @author Fredrik Ehnbom
- * @version $Id: FiltersConfTab.java,v 1.1 2000/12/31 14:07:38 fredde Exp $
+ * @version $Id: FiltersConfTab.java,v 1.2 2003/03/15 19:34:48 fredde Exp $
  */
 public class FiltersConfTab
 	extends JPanel
@@ -66,17 +66,17 @@ public class FiltersConfTab
 		this.frame = frame;
 		Box vert = Box.createVerticalBox();
 
-		JButton b = new JButton(YAMM.getString("button.add"), new ImageIcon(getClass().getResource("/images/buttons/new.gif")));
+		JButton b = new JButton(YAMM.getString("button.add"), new ImageIcon(getClass().getResource("/images/buttons/new.png")));
 		b.addActionListener(BListener);
 		vert.add(b);
 		vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-		b = new JButton(YAMM.getString("edit"), new ImageIcon(getClass().getResource("/images/buttons/edit.gif")));
+		b = new JButton(YAMM.getString("edit"), new ImageIcon(getClass().getResource("/images/buttons/edit.png")));
 		b.addActionListener(BListener);
 		vert.add(b);
 		vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-		b = new JButton(YAMM.getString("button.delete"), new ImageIcon(getClass().getResource("/images/buttons/delete.gif")));
+		b = new JButton(YAMM.getString("button.delete"), new ImageIcon(getClass().getResource("/images/buttons/delete.png")));
 		b.addActionListener(BListener);
 		vert.add(b);
 		vert.add(Box.createRigidArea(new Dimension(10, 10)));
@@ -191,6 +191,9 @@ public class FiltersConfTab
 /*
  * ChangeLog:
  * $Log: FiltersConfTab.java,v $
+ * Revision 1.2  2003/03/15 19:34:48  fredde
+ * .gif -> .png
+ *
  * Revision 1.1  2000/12/31 14:07:38  fredde
  * files for configurating filters
  *

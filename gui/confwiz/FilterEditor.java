@@ -35,7 +35,7 @@ import org.gjt.fredde.yamm.*;
  * Editor for filters
  *
  * @author Fredrik Ehnbom
- * @version $Id: FilterEditor.java,v 1.3 2003/03/10 09:44:35 fredde Exp $
+ * @version $Id: FilterEditor.java,v 1.4 2003/03/15 19:34:48 fredde Exp $
  */
 public class FilterEditor
 	extends JDialog
@@ -115,16 +115,16 @@ public class FilterEditor
 
 		hori = Box.createHorizontalBox();
 		hori.add(target);
-		JButton b = new JButton(YAMM.getString("button.browse"), new ImageIcon(getClass().getResource("/images/buttons/search.gif")));
+		JButton b = new JButton(YAMM.getString("button.browse"), new ImageIcon(getClass().getResource("/images/buttons/search.png")));
 		b.addActionListener(BListener);
 		hori.add(b);
 		getContentPane().add(hori);
 
 		hori = Box.createHorizontalBox();
-		b = new JButton(YAMM.getString("button.ok"), new ImageIcon(getClass().getResource("/images/buttons/ok.gif")));
+		b = new JButton(YAMM.getString("button.ok"), new ImageIcon(getClass().getResource("/images/buttons/ok.png")));
 		b.addActionListener(BListener);
 		hori.add(b);
-		b = new JButton(YAMM.getString("button.cancel"), new ImageIcon(getClass().getResource("/images/buttons/cancel.gif")));
+		b = new JButton(YAMM.getString("button.cancel"), new ImageIcon(getClass().getResource("/images/buttons/cancel.png")));
 		b.addActionListener(BListener);
 		hori.add(b);
 		getContentPane().add(hori);
@@ -235,6 +235,9 @@ public class FilterEditor
 /*
  * ChangeLog:
  * $Log: FilterEditor.java,v $
+ * Revision 1.4  2003/03/15 19:34:48  fredde
+ * .gif -> .png
+ *
  * Revision 1.3  2003/03/10 09:44:35  fredde
  * non localized box filenames
  *

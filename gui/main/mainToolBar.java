@@ -1,4 +1,4 @@
-/*  $Id: mainToolBar.java,v 1.26 2003/03/09 17:50:50 fredde Exp $
+/*  $Id: mainToolBar.java,v 1.27 2003/03/15 19:36:55 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public class mainToolBar
 	extends JToolBar
@@ -63,7 +63,7 @@ public class mainToolBar
 		/* send mails in outbox get mail to inbox */
 		JButton b = new JButton();
 		if (frame.ico) {
-			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/recycle.gif")));
+			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/recycle.png")));
 		}
 		if (frame.text) {
 			b.setText(YAMM.getString("button.send_get"));
@@ -80,7 +80,7 @@ public class mainToolBar
 		/* button to write a new mail */
 		b = new JButton();
 		if (frame.ico) {
-			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/new_mail.gif")));
+			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/new_mail.png")));
 		}
 		if (frame.text) {
 			b.setText(YAMM.getString("button.new_mail"));
@@ -95,7 +95,7 @@ public class mainToolBar
 		/* reply button */
 		reply = new JButton();
 		if (frame.ico) {
-			reply.setIcon(new ImageIcon(getClass().getResource("/images/buttons/reply.gif")));
+			reply.setIcon(new ImageIcon(getClass().getResource("/images/buttons/reply.png")));
 		}
 		if (frame.text) {
 			reply.setText(YAMM.getString("button.reply"));
@@ -111,7 +111,7 @@ public class mainToolBar
 		/* forward button */
 		forward = new JButton();
 		if (frame.ico) {
-			forward.setIcon(new ImageIcon(getClass().getResource("/images/buttons/forward.gif")));
+			forward.setIcon(new ImageIcon(getClass().getResource("/images/buttons/forward.png")));
 		}
 		if (frame.text) {
 			forward.setText(YAMM.getString("button.forward"));
@@ -131,7 +131,7 @@ public class mainToolBar
 		print = new JButton();
 		if (frame.ico) {
 			print.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
-						"images/buttons/print.gif"));
+						"images/buttons/print.png"));
 		}
 		if (frame.text) {
 			print.setText(YAMM.getString("button.print"));
@@ -147,7 +147,7 @@ public class mainToolBar
 		/* button to exit from program */
 		b = new JButton();
 		if (frame.ico) {
-			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/exit.gif")));
+			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/exit.png")));
 		}
 		if (frame.text) {
 			b.setText(YAMM.getString("button.exit"));
@@ -258,6 +258,9 @@ public class mainToolBar
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.27  2003/03/15 19:36:55  fredde
+ * .gif -> .png
+ *
  * Revision 1.26  2003/03/09 17:50:50  fredde
  * now uses the new index system
  *

@@ -1,4 +1,4 @@
-/*  $Id: ProfileEditor.java,v 1.2 2003/03/08 18:10:47 fredde Exp $
+/*  $Id: ProfileEditor.java,v 1.3 2003/03/15 19:34:48 fredde Exp $
  *  Copyright (C) 2000-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Editor for profilesettings
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ProfileEditor
 	extends JDialog
@@ -119,7 +119,7 @@ public class ProfileEditor
 
 		hori.add(Box.createRigidArea(new Dimension(5, 5)));
 
-		JButton b = new JButton(YAMM.getString("button.browse"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
+		JButton b = new JButton(YAMM.getString("button.browse"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.png"));
 		b.setMaximumSize(new Dimension(230, 1000)); 
 		b.setMinimumSize(new Dimension(50, 1000));
 		b.setPreferredSize(b.getMinimumSize());
@@ -130,11 +130,11 @@ public class ProfileEditor
 		hori = Box.createHorizontalBox();
 
 
-		b = new JButton(YAMM.getString("button.ok"), new ImageIcon(getClass().getResource("/images/buttons/ok.gif")));
+		b = new JButton(YAMM.getString("button.ok"), new ImageIcon(getClass().getResource("/images/buttons/ok.png")));
 		b.addActionListener(BListener);
 		hori.add(b);
 
-		b = new JButton(YAMM.getString("button.cancel"), new ImageIcon(getClass().getResource("/images/buttons/cancel.gif")));
+		b = new JButton(YAMM.getString("button.cancel"), new ImageIcon(getClass().getResource("/images/buttons/cancel.png")));
 		b.addActionListener(BListener);
 		hori.add(b);
 		getContentPane().add(hori);
@@ -212,6 +212,9 @@ public class ProfileEditor
 /*
  * ChangeLog:
  * $Log: ProfileEditor.java,v $
+ * Revision 1.3  2003/03/15 19:34:48  fredde
+ * .gif -> .png
+ *
  * Revision 1.2  2003/03/08 18:10:47  fredde
  * now the browse button actually does something :)
  *
