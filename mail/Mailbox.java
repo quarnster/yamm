@@ -28,9 +28,11 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.37 2000/12/31 14:11:34 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.38 2003/03/05 15:08:21 fredde Exp $
  */
 public class Mailbox {
+
+	public static int BUFFERSIZE = 65536;
 
 	/**
 	 * removes mime from the subject
@@ -310,7 +312,80 @@ public class Mailbox {
 	 * @param mailList The String array which will recieve the information
 	 */
 	public static void createList(String whichBox, YAMM yamm) {
-		yamm.listOfMails = createList(whichBox);
+		String subject = null;
+		String from = null;
+		String date = null;
+		String status = null;
+
+		int sep = whichBox.lastIndexOf(File.separator);
+
+		String box = whichBox.substring(0, sep + 1) + "." + whichBox.substring(sep + 1, whichBox.length()) + ".index";
+
+
+		if (!hasMail(whichBox)) {
+			yamm.listOfMails = new String[0][6];
+			yamm.keyIndex = new int[0];
+			return;
+		}
+		File indexfile = new File(box);
+
+		Date boxdate = new Date(new File(whichBox).lastModified());
+		Date indexdate = new Date(indexfile.lastModified());
+
+		if (!indexfile.exists() || boxdate.after(indexdate)) {
+			updateIndex(whichBox);
+		}
+
+		int num = getUnread(whichBox)[0];
+		yamm.listOfMails = new String[num][6];
+		yamm.keyIndex = new int[num];
+
+		BufferedReader in = null;
+
+		try {
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(box)));
+
+			in.readLine(); // skip messages, unread messages header
+			StreamTokenizer tok = new StreamTokenizer(in);
+
+			for (int i = 0;; i++) {
+				if (tok.nextToken() == StreamTokenizer.TT_EOF) {
+					break;
+				}
+
+				// message number
+				num = (int) tok.nval;
+				yamm.listOfMails[i][0] = Integer.toString(num);
+
+				// subject
+				tok.nextToken();
+				yamm.listOfMails[i][1] = tok.sval;
+
+				// from
+				tok.nextToken();
+				yamm.listOfMails[i][2] = tok.sval;
+
+				// date
+				tok.nextToken();
+				yamm.listOfMails[i][3] = tok.sval;
+
+				// read
+				tok.nextToken();
+				yamm.listOfMails[i][4] = tok.sval;
+
+				// skip
+				tok.nextToken();
+				yamm.listOfMails[i][5] = "" + (long) tok.nval;
+
+				yamm.keyIndex[i] = i;
+			}
+		} catch(IOException ioe) {
+			new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException ioe) {}
+		}
 	}
 
 	/**
@@ -318,6 +393,7 @@ public class Mailbox {
 	 *
 	 * @param whichBox Which box to get messages from.
 	 */
+/*
 	public static String[][] createList(String whichBox) {
 		String subject = null;
 		String from = null;
@@ -391,7 +467,7 @@ public class Mailbox {
 		}
 		return listOfMails;
 	}
-
+*/
 	/**
 	 * Creates a list with the mails in the filter box.
 	 * @param mailList The vector that should contain the information
@@ -485,9 +561,7 @@ public class Mailbox {
 		}
 	}
 
-	private static void setIndexStatus(String whichBox, int whichmail,
-								String status) {
-
+	private static void setIndexStatus(YAMM yamm, String whichBox, int whichmail, String status, int addLength) {
 		int sep = whichBox.lastIndexOf(File.separator);
 		String box = whichBox.substring(0, sep + 1) +
 				"." +
@@ -501,6 +575,7 @@ public class Mailbox {
 
 		BufferedReader in = null;
 		PrintWriter out = null;
+		int i;
 
 		int[] unread = getUnread(whichBox);
 		unread[1]--;
@@ -515,7 +590,8 @@ public class Mailbox {
 			out.println(unread[0] + ", " + unread[1]);
 			StreamTokenizer tok = new StreamTokenizer(in);
 
-			for (int i = 0; i < whichmail; i++) {
+			// skip to the mail we are changing status for
+			for (i = 0; i < whichmail; i++) {
 				out.println(in.readLine());
 			}
 
@@ -533,9 +609,10 @@ public class Mailbox {
 
 			tok.nextToken();
 			out.print("\"" + status + "\" ");
-			if (tok.sval.equals("Unread")) {
+			if (tok.sval.equals("Unread") || addLength != 0) {
 				add = true;
 			}
+			yamm.listOfMails[i][4] = status;
 
 			tok.nextToken();
 			out.println((long) tok.nval + "");
@@ -549,17 +626,16 @@ public class Mailbox {
 				}
 			} else {
 				while ((tmp = in.readLine()) != null) {
+					i++;
 					if (tmp.equals("")) continue;
 
 					long skip = Long.parseLong(
 						tmp.substring(
 						tmp.lastIndexOf(" ") + 1,
-						tmp.length()));
+						tmp.length())) + addLength;
 
 
-					skip += status.length() + 13 +
-						System.getProperty
-						("line.separator").length();
+					yamm.listOfMails[i][5] = "" + skip;
 
 					tmp = tmp.substring(0,
 						tmp.lastIndexOf(" ") + 1);
@@ -594,7 +670,7 @@ public class Mailbox {
 	 * @param whichmail The mail to set the status for.
 	 * @param status The status string.
 	 */
-	public static void setStatus(String whichBox, int whichmail, long skip,
+	public static void setStatus(YAMM yamm, String whichBox, int whichmail, long skip,
 								String status) {
 		File source = new File(whichBox);
 		File target = new File(whichBox + ".tmp");
@@ -602,13 +678,29 @@ public class Mailbox {
 
 		BufferedReader in = null;
 		PrintWriter out = null;
+		int addLength = 0; // how many bytes that was added
+		long size = 0;
+		if (whichmail + 1 < yamm.listOfMails.length) {
+			size = source.length() - 
+				Long.parseLong(yamm.listOfMails[whichmail+1][YAMM.INDEX_SKIP]);
+		}
+
+		char[] buffer = new char[BUFFERSIZE];
 
 		try {
 			in = new BufferedReader(new InputStreamReader(
 						new FileInputStream(source)));
 			out   = new PrintWriter(new BufferedOutputStream(
 						new FileOutputStream(target)));
-			int i = 0;
+
+			// just copy all data before the message
+			while (skip > 0) {
+				int read = in.read(buffer, 0, (int)Math.min(BUFFERSIZE, skip));
+				skip -= read;
+				out.write(buffer, 0, read);
+			}
+
+			boolean header = true;
 
 			for (;;) {
 				temp = in.readLine();
@@ -616,39 +708,33 @@ public class Mailbox {
 				if (temp == null) {
 					break;
 				} else if (temp.equals(".")) {
-					 i++;
+					out.println(temp);
+					break;
 				}
 
-				if (i == whichmail) {
-					out.println(temp);
-					boolean header = false;
+				if (header) {
+					if (temp.equals("")) {
+						header = false;
+					}
 
-					for (;;) {
-						temp = in.readLine();
-
-						if (temp == null) {
-							break;
-						}
-
-						if (temp.startsWith("YAMM-" +
-								"Status:")) {
-							i++;
-							temp = "YAMM-Status: " +
-									status;
-							break;
-						} else if (temp.equals("") &&
-								header) {
-							i++;
-							temp = "YAMM-Status: " +
-								status + "\n";
-							break;
-						} else if (!temp.equals("")) {
-							header = true;
-						}
-						out.println(temp);
+					if (temp.startsWith("YAMM-Status:")) {
+						String temp2 = "YAMM-Status: " + status;
+						addLength = temp2.length() - temp.length();
+						temp = temp2;
+					} else if (temp.equals("")) {
+						// this message didn't have a YAMM-Status header before this..
+						temp = "YAMM-Status: " + status + "\n";
+						addLength = temp.length();
 					}
 				}
 				out.println(temp);
+			}
+
+			// just copy all data after the message
+			while (size > 0) {
+				int read = in.read(buffer, 0, (int) Math.min(BUFFERSIZE, size));
+				size -= read;
+				out.write(buffer, 0, read);
 			}
 
 			in.close();
@@ -666,7 +752,9 @@ public class Mailbox {
 				if (out != null) out.close();
 			} catch (IOException ioe) {}
 		}
-		setIndexStatus(whichBox, whichmail, status);
+		addLength += System.getProperty("line.separator").length();
+
+		setIndexStatus(yamm, whichBox, whichmail, status, addLength);
 	}
 
 	/**
@@ -1413,6 +1501,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.38  2003/03/05 15:08:21  fredde
+ * Setting status for messages should be much faster now
+ *
  * Revision 1.37  2000/12/31 14:11:34  fredde
  * added createList(box)
  *
