@@ -279,13 +279,14 @@ public class Mailbox {
     String boxpath = whichBox.substring(whichBox.indexOf("boxes") + 6, whichBox.length());
     File   cache = new File(tempdir + "cache/" + boxpath + "/");
 
-    if(!cache.exists()) {
-      if(!cache.mkdirs()) {
-        System.err.println("Couldn't create dir: " + cache.toString()); //new MsgDialog();
-      }
-    }
 
-    else if(!new File(cache, whichmail + ".html").exists()) {
+    if(!new File(cache, whichmail + ".html").exists()) {
+      if(!cache.exists()) {
+        if(!cache.mkdirs()) {
+          System.err.println("Couldn't create dir: " + cache.toString());
+        }
+      }
+
       try {
         res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault());
       }
@@ -845,11 +846,12 @@ public class Mailbox {
    * @param whichBox The box the message is in
    * @param whichmail The mail to delete
    */ 
-  public static boolean deleteMail(String whichBox, int whichmail) {
+  public static boolean deleteMail(String whichBox, int[] whichmail) {
     String temp = null;
     boolean firstmail = true;
     String home = System.getProperty("user.home");
     String sep = System.getProperty("file.separator");
+    int next = 0;
 
     if(!whichBox.equals(home + sep + ".yamm" + sep + "boxes" + sep + "trash")) {
       try {
@@ -867,7 +869,7 @@ public class Mailbox {
           if(temp == null) break;
 
           else if(firstmail) {
-            if(i != whichmail) {
+            if(i != whichmail[next]) {
               for(;;) {
                 outFile.println(temp);
                 temp = in.readLine();
@@ -879,7 +881,7 @@ public class Mailbox {
                 }
               } 
             }
-            else if(i == whichmail) {
+            else if(i == whichmail[next]) {
               for(;;) {
                 outFile2.println(temp);
                 temp = in.readLine();
@@ -890,13 +892,14 @@ public class Mailbox {
                   break;
                 }
               }
+              if(!(next++ < whichmail.length-1)) break;
             }
             firstmail = false;
           }
           else if(!firstmail) {
             i++;
        
-            if(i != whichmail) {
+            if(i != whichmail[next]) {
               for(;;) {
                 outFile.println(temp);
                 temp = in.readLine();
@@ -908,7 +911,7 @@ public class Mailbox {
                 }
               }
             }
-            else if(i == whichmail) {
+            else if(i == whichmail[next]) {
               for(;;) {
                 outFile2.println(temp);
                 temp = in.readLine();
@@ -919,8 +922,14 @@ public class Mailbox {
                   break;
                 }
               }
+              if(!(next++ < whichmail.length-1)) break;
             }
           }
+        }
+        for(;;) {
+          temp = in.readLine();
+          if(temp == null) break;
+          else outFile.println(temp);
         }
         in.close();
         outFile.close();
@@ -950,7 +959,7 @@ public class Mailbox {
 
           if(temp == null) break;
           else if(firstmail) {
-            if(i != whichmail) {
+            if(i != whichmail[next]) {
               for(;;) {
                 outFile.println(temp);
                 temp = in.readLine();
@@ -962,20 +971,22 @@ public class Mailbox {
                 }
               } 
             }
-            else if(i == whichmail) {
+            else if(i == whichmail[next]) {
+
               for(;;) {
                 temp = in.readLine();
 
                 if(temp == null) break;
                 else if(temp.equals(".")) break;
               }
+              if(!(next++ < whichmail.length-1)) break;
             }
             firstmail = false;
           }
           else if(!firstmail) {
             i++;
        
-            if(i != whichmail) {
+            if(i != whichmail[next]) {
               for(;;) {
                 outFile.println(temp);
                 temp = in.readLine();
@@ -987,15 +998,21 @@ public class Mailbox {
                 }
               }
             }
-            else if(i == whichmail) {
+            else if(i == whichmail[next]) {
               for(;;) {
                 temp = in.readLine();
 
                 if(temp == null) break;
                 else if(temp.equals(".")) break;
               }
+              if(!(next++ < whichmail.length-1)) break;
             }
           }
+        }
+        for(;;) {
+          temp = in.readLine();
+          if(temp == null) break;
+          else outFile.println(temp);
         }
 
         in.close();
@@ -1020,10 +1037,11 @@ public class Mailbox {
    * @param toBox To which box
    * @param whichmail The mail to copy from fromBox to toBox
    */
-  public static boolean copyMail(String fromBox, String toBox, int whichmail) {
+  public static boolean copyMail(String fromBox, String toBox, int[] whichmail) {
 
     String  temp = null;
     boolean firstmail = true;
+    int next = 0;
 
     try {
       BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(fromBox)));
@@ -1038,7 +1056,7 @@ public class Mailbox {
         if(temp == null) break;
 
         else if(firstmail) {
-          if(i != whichmail) {
+          if(i != whichmail[next]) {
             for(;;) {
               temp = in.readLine();
         
@@ -1047,7 +1065,7 @@ public class Mailbox {
             } 
           }
 
-          else if(i == whichmail) {
+          else if(i == whichmail[next]) {
             for(;;) {
               outFile2.println(temp);
               temp = in.readLine();
@@ -1058,6 +1076,7 @@ public class Mailbox {
                 break;
               }
             }
+            if(!(next++ < whichmail.length-1)) break;
           }
           firstmail = false;
         }
@@ -1065,7 +1084,7 @@ public class Mailbox {
         else if(!firstmail) {
           i++;
        
-          if(i != whichmail) {
+          if(i != whichmail[next]) {
             for(;;) {
               temp = in.readLine();
 
@@ -1074,7 +1093,7 @@ public class Mailbox {
             }
           }
 
-          else if(i == whichmail) {
+          else if(i == whichmail[next]) {
             for(;;) {
               outFile2.println(temp);
               temp = in.readLine();
@@ -1085,8 +1104,14 @@ public class Mailbox {
                 break;
               }
             }
+            if(!(next++ < whichmail.length-1)) break;
           }
         }
+      }
+      for(;;) {
+        temp = in.readLine();
+        if(temp == null) break;
+        else outFile2.println(temp);
       }
 
       in.close();
@@ -1105,9 +1130,13 @@ public class Mailbox {
    * @param toBox The box to move the mail to
    * @param whichmail The mail to move
    */
-  public static boolean moveMail(String fromBox, String toBox, int whichmail) {
+  public static boolean moveMail(String fromBox, String toBox, int[] whichmail) {
     String temp = null;
     boolean firstmail = true;
+    int next = 0;
+
+
+    if(fromBox.equals(toBox)) return false;
 
     try {
       File inputFile = new File(fromBox);
@@ -1125,7 +1154,7 @@ public class Mailbox {
         if(temp == null) break;
 
         else if(firstmail) {
-          if(i != whichmail) {
+          if(i != whichmail[next]) {
             for(;;) {
               outFile.println(temp);
               temp = in.readLine();
@@ -1138,7 +1167,7 @@ public class Mailbox {
             } 
           }
 
-          else if(i == whichmail) {
+          else if(i == whichmail[next]) {
             for(;;) {
               outFile2.println(temp);
               temp = in.readLine();
@@ -1149,6 +1178,7 @@ public class Mailbox {
                 break;
               }
             }
+            if(!(next++ < whichmail.length-1)) break;
           }
           firstmail = false;
         }
@@ -1156,7 +1186,7 @@ public class Mailbox {
         else if(!firstmail) {
           i++;
        
-          if(i != whichmail) {
+          if(i != whichmail[next]) {
             for(;;) {
               outFile.println(temp);
               temp = in.readLine();
@@ -1169,7 +1199,7 @@ public class Mailbox {
             }
           }
 
-          else if(i == whichmail) {
+          else if(i == whichmail[next]) {
             for(;;) {
               outFile2.println(temp);
               temp = in.readLine();
@@ -1180,9 +1210,16 @@ public class Mailbox {
                 break;
               }
             }
+            if(!(next++ < whichmail.length-1)) break;
           }
         }
       }
+      for(;;) {
+        temp = in.readLine();
+        if(temp == null) break;
+        else outFile.println(temp);
+      }
+
       in.close();
       outFile.close();
       outFile2.close();
