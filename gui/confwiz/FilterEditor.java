@@ -35,7 +35,7 @@ import org.gjt.fredde.yamm.*;
  * Editor for filters
  *
  * @author Fredrik Ehnbom
- * @version $Id: FilterEditor.java,v 1.1 2000/12/31 14:07:38 fredde Exp $
+ * @version $Id: FilterEditor.java,v 1.2 2001/04/21 09:32:36 fredde Exp $
  */
 public class FilterEditor
 	extends JDialog
@@ -223,7 +223,7 @@ public class FilterEditor
 				return sf.endsWith(".g");
 			}
 
-			return sf.startsWith(Utilities.replace(YAMM.home + "/boxes/"));
+			return sf.indexOf(".index") == -1 && !sf.endsWith(".filter");
 		}
 
 		// The description of this filter
@@ -235,6 +235,9 @@ public class FilterEditor
 /*
  * ChangeLog:
  * $Log: FilterEditor.java,v $
+ * Revision 1.2  2001/04/21 09:32:36  fredde
+ * don't show .index-files or the .filter-file
+ *
  * Revision 1.1  2000/12/31 14:07:38  fredde
  * files for configurating filters
  *
