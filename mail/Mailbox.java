@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.57 2003/04/27 07:59:13 fredde Exp $
+/*  $Id: Mailbox.java,v 1.58 2003/06/06 10:51:18 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.57 $
+ * @version $Revision: 1.58 $
  */
 public class Mailbox {
 
@@ -46,7 +46,7 @@ public class Mailbox {
 			return null;
 		}
 
-		if (subject.indexOf("=?") == -1) {
+		if (subject.indexOf("=?") == -1 || subject.indexOf("?=") == -1) {
 			return subject;
 		}
 
@@ -285,7 +285,6 @@ public class Mailbox {
 			idx.open();
 			if ((statusChange & IndexEntry.STATUS_READ) != 0) {
 				idx.unreadNum--;
-				idx.unreadNum += idx.newNum;
 				idx.newNum = 0;
 				idx.write();
 			}
@@ -664,6 +663,7 @@ public class Mailbox {
 
 				if ((entry.status & IndexEntry.STATUS_READ) == 0) {
 					tgtIndex.newNum++;
+					tgtIndex.unreadNum++;
 				}
 
 				while (skipLen > 0) {
@@ -775,6 +775,7 @@ public class Mailbox {
 
 				if ((entry.status & IndexEntry.STATUS_READ) == 0) {
 					tgtIndex.newNum++;
+					tgtIndex.unreadNum++;
 					srcIndex.unreadNum--;
 					srcIndex.newNum = 0;
 				}
@@ -878,6 +879,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.58  2003/06/06 10:51:18  fredde
+ * unread is now the total number of unread messages
+ *
  * Revision 1.57  2003/04/27 07:59:13  fredde
  * updated getFilterList to work with the new mbox format
  *

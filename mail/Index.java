@@ -1,4 +1,4 @@
-/*  $Id: Index.java,v 1.6 2003/04/19 11:54:51 fredde Exp $
+/*  $Id: Index.java,v 1.7 2003/06/06 10:51:18 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -199,8 +199,10 @@ public class Index {
 						e.id = messageNum++;
 						if (attachment)
 							e.status |= IndexEntry.STATUS_ATTACHMENT;
-						if ((e.status & IndexEntry.STATUS_READ) == 0)
+						if ((e.status & IndexEntry.STATUS_READ) == 0) {
 							newNum++;
+							unreadNum++;
+						}
 						e.write(raf);
 
 						skip = skipnum;
