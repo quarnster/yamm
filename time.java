@@ -40,9 +40,9 @@ import java.text.SimpleDateFormat;
  * <a href="http://www.swatch.com">http://www.swatch.com</a>.
  * <br><br>
  * This package is uses code from Martin Dahl's
- * <a href="http://bohemians.org/~iznogood/xbeats/">xbeats</a> program.
+ * <a href="http://xbeats.sourceforge.net">xbeats</a> program.
  * @author Fredrik Ehnbom
- * @version $Id: time.java,v 1.3 2000/03/26 11:32:23 fredde Exp $
+ * @version $Id: time.java,v 1.4 2000/03/27 12:46:55 fredde Exp $
  */
 public abstract class time {
 
@@ -124,6 +124,9 @@ public abstract class time {
 /*
  * Changes:
  * $Log: time.java,v $
+ * Revision 1.4  2000/03/27 12:46:55  fredde
+ * changed xbeats homepage to xbeats.sourceforge.net
+ *
  * Revision 1.3  2000/03/26 11:32:23  fredde
  * gave Martin Dahl the credits he deserves, now should work correctly...
  *
