@@ -1,5 +1,5 @@
 /*  YAMMWrite.java - Writing mail
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ import org.gjt.fredde.util.gui.*;
 
 /**
  * The class for writing mails
+ * @author Fredrik Ehnbom
+ * @version $Id: YAMMWrite.java,v 1.18 2000/03/05 18:06:08 fredde Exp $
  */
 public class YAMMWrite extends JFrame {
 
@@ -85,8 +87,7 @@ public class YAMMWrite extends JFrame {
 		Meny.add(arkiv);
 
 		rad = new JMenuItem(YAMM.getString("button.cancel"),
-			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
-								"cancel.gif"));
+			new ImageIcon(getClass().getResource("/images/buttons/cancel.gif")));
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		rad.addActionListener(MListener);
 		arkiv.add(rad);
@@ -104,8 +105,7 @@ public class YAMMWrite extends JFrame {
 			myButton.setText(YAMM.getString("button.send"));
 		}
 		if (YAMM.ico) {
-			myButton.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
-						"images/buttons/send.gif"));
+			myButton.setIcon(new ImageIcon(getClass().getResource("/images/buttons/send.gif")));
 		}
 
 		myButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
@@ -120,8 +120,7 @@ public class YAMMWrite extends JFrame {
 			myButton.setText(YAMM.getString("button.cancel"));
 		}
 		if (YAMM.ico) {
-			myButton.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
-						"images/buttons/cancel.gif"));
+			myButton.setIcon(new ImageIcon(getClass().getResource("/images/buttons/cancel.gif")));
 		}
 
 		myButton.addActionListener(BListener);
@@ -186,8 +185,7 @@ public class YAMMWrite extends JFrame {
 		JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
 		JTPane.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		JTPane.addTab(YAMM.getString("mail"),
-			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
-								"mail.gif"),
+			new ImageIcon(getClass().getResource("/images/buttons/mail.gif")),
 						new JScrollPane(myTextArea));
 
 
@@ -200,8 +198,7 @@ public class YAMMWrite extends JFrame {
 			myButton.setText(YAMM.getString("button.add"));
 		}
 		if (YAMM.ico) {
-			myButton.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
-						"images/buttons/new.gif"));
+			myButton.setIcon(new ImageIcon(getClass().getResource("/images/buttons/new.gif")));
 		}
 		myButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		myButton.addActionListener(BListener);
@@ -212,8 +209,7 @@ public class YAMMWrite extends JFrame {
 			myButton.setText(YAMM.getString("button.delete"));
 		}
 		if (YAMM.ico) {
-			myButton.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
-						"images/buttons/delete.gif"));
+			myButton.setIcon(new ImageIcon(getClass().getResource("/images/buttons/delete.gif")));
 		}
 		myButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		myButton.addActionListener(BListener);
@@ -239,8 +235,7 @@ public class YAMMWrite extends JFrame {
 
 
 		JTPane.addTab(YAMM.getString("mail.attachment"),
-			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
-							"attach.gif"), myPanel);
+			new ImageIcon(getClass().getResource("/images/buttons/attach.gif")), myPanel);
 
 		vert3.add(JTPane);
 		getContentPane().add(vert3);
@@ -375,7 +370,7 @@ public class YAMMWrite extends JFrame {
 							"button.delete"))) {
 				int rem = myList.getSelectedIndex();
 
-				if (rem != -1) {
+				if (rem != -1 && rem < attach.size()) {
 					attach.remove(rem);
 					myList.updateUI();
 				}
@@ -465,3 +460,10 @@ public class YAMMWrite extends JFrame {
 		}
 	}
 }
+/*
+ * Changes:
+ * $Log: YAMMWrite.java,v $
+ * Revision 1.18  2000/03/05 18:06:08  fredde
+ * gets it's images for the jar file. Also fixed a nullpointer in the attachment list.
+ *
+ */
