@@ -1,4 +1,4 @@
-/*  $Id: IndexEntry.java,v 1.4 2003/03/10 20:01:56 fredde Exp $
+/*  $Id: IndexEntry.java,v 1.5 2003/03/15 19:27:59 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,7 @@ public class IndexEntry {
 
 	public static final int STATUS_READ = 1;
 	public static final int STATUS_REPLIED = 2;
+	public static final int STATUS_ATTACHMENT = 128;
 
 	public static final int SUBJECTLENGTH = 127;
 	public static final int FROMLENGTH = 128;
@@ -55,6 +56,12 @@ public class IndexEntry {
 
 		subject = Mailbox.unMime(subject);
 		from = Mailbox.unMime(from);
+
+		String temp = mhp.getHeaderField("Yamm-Status");
+		if (temp != null) {
+			if (temp.indexOf("Read") != -1)
+				status |= STATUS_READ;
+		}
 	}
 
 	public IndexEntry() {
