@@ -35,7 +35,7 @@ import org.gjt.fredde.yamm.*;
  * Editor for filters
  *
  * @author Fredrik Ehnbom
- * @version $Id: FilterEditor.java,v 1.2 2001/04/21 09:32:36 fredde Exp $
+ * @version $Id: FilterEditor.java,v 1.3 2003/03/10 09:44:35 fredde Exp $
  */
 public class FilterEditor
 	extends JDialog
@@ -202,7 +202,7 @@ public class FilterEditor
 				jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				jfs.setMultiSelectionEnabled(false);
 				jfs.setFileFilter(new BoxFilter());
-				jfs.setSelectedFile(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox"))));
+				jfs.setSelectedFile(new File(Utilities.replace(YAMM.home + "/boxes/inbox")));
 
 				int ret = jfs.showOpenDialog(owner);
 				if (ret == JFileChooser.APPROVE_OPTION) {
@@ -235,6 +235,9 @@ public class FilterEditor
 /*
  * ChangeLog:
  * $Log: FilterEditor.java,v $
+ * Revision 1.3  2003/03/10 09:44:35  fredde
+ * non localized box filenames
+ *
  * Revision 1.2  2001/04/21 09:32:36  fredde
  * don't show .index-files or the .filter-file
  *

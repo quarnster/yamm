@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.47 2003/03/09 18:04:56 fredde Exp $
+/*  $Id: Mailbox.java,v 1.48 2003/03/10 09:42:45 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.47 $
+ * @version $Revision: 1.48 $
  */
 public class Mailbox {
 
@@ -460,7 +460,7 @@ public class Mailbox {
 		boolean firstmail = true;
 		String home = System.getProperty("user.home");
 		String sep = System.getProperty("file.separator");
-		String trash = YAMM.home + sep + "boxes" + sep + YAMM.getString("box.trash");
+		String trash = YAMM.home + sep + "boxes" + sep + "trash";
 		int next = 0;
 
 		if (!whichBox.equals(trash)) {
@@ -661,6 +661,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.48  2003/03/10 09:42:45  fredde
+ * non localized box filenames
+ *
  * Revision 1.47  2003/03/09 18:04:56  fredde
  * removeQuote not needed anymore
  *

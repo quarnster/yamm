@@ -40,7 +40,7 @@ public class Base64Encode {
 	 */
 	public Base64Encode(Vector attach) {
 		try {
-			out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"), true)));
+			out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(YAMM.home + "/boxes/outbox", true)));
 
 			out.writeBytes("--AttachThis");
 			for (int i = 0; i < attach.size(); i++) {

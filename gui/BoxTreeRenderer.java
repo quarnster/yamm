@@ -1,4 +1,4 @@
-/*  $Id: BoxTreeRenderer.java,v 1.8 2003/03/08 13:55:04 fredde Exp $
+/*  $Id: BoxTreeRenderer.java,v 1.9 2003/03/10 09:43:48 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -28,7 +28,7 @@ import org.gjt.fredde.yamm.mail.Mailbox;
 /**
  * The renderer for the mailbox tree
  * @author Fredrik Ehnbom
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class BoxTreeRenderer
 	extends JLabel
@@ -71,12 +71,18 @@ public class BoxTreeRenderer
 		}
 
 		if (leaf && !thisbox.endsWith(".g")) {
-			if (thisbox.equals(YAMM.getString("box.inbox"))) {
+			if (thisbox.equals("inbox")) {
 				setIcon(inbox);
-			} else if (thisbox.equals(YAMM.getString("box.outbox"))	|| thisbox.equals(YAMM.getString("box.sent"))) {
+				thisbox = YAMM.getString("box.inbox");
+			} else if (thisbox.equals("outbox")) {
 				setIcon(outbox);
-			} else if (thisbox.equals(YAMM.getString("box.trash"))) {
+				thisbox = YAMM.getString("box.outbox");
+			} else if (thisbox.equals("sent")) {
+				setIcon(outbox);
+				thisbox = YAMM.getString("box.sent");
+			} else if (thisbox.equals("trash")) {
 				setIcon(trash);
+				thisbox = YAMM.getString("box.trash");
 			} else setIcon(box);
 		} else if (!leaf) {
 			if(expanded) {
@@ -91,6 +97,7 @@ public class BoxTreeRenderer
 		}
 
 		setForeground(Color.black);
+
 		this.selected = selected;
 		return this;
 	}
@@ -98,6 +105,9 @@ public class BoxTreeRenderer
 /*
  * Changes:
  * $Log: BoxTreeRenderer.java,v $
+ * Revision 1.9  2003/03/10 09:43:48  fredde
+ * non localized box filenames
+ *
  * Revision 1.8  2003/03/08 13:55:04  fredde
  * updated for the new TreeTable stuff
  *

@@ -1,4 +1,4 @@
-/*  $Id: YAMMWrite.java,v 1.27 2003/03/08 18:09:03 fredde Exp $
+/*  $Id: YAMMWrite.java,v 1.28 2003/03/10 09:41:38 fredde Exp $
  *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ import org.gjt.fredde.yamm.gui.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 public class YAMMWrite extends JFrame {
 
@@ -329,8 +329,7 @@ public class YAMMWrite extends JFrame {
 		try {
 			outFile = new PrintWriter(
 				new FileOutputStream(
-					YAMM.home + "/boxes/" +
-					YAMM.getString("box.outbox"),
+					YAMM.home + "/boxes/outbox",
 					true
 				)
 			);
@@ -493,6 +492,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.28  2003/03/10 09:41:38  fredde
+ * non localized box filenames
+ *
  * Revision 1.27  2003/03/08 18:09:03  fredde
  * getSelectedFiles works now. signing done elsewhere
  *

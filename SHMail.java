@@ -1,4 +1,4 @@
-/*  $Id: SHMail.java,v 1.32 2003/03/09 17:45:04 fredde Exp $
+/*  $Id: SHMail.java,v 1.33 2003/03/10 09:41:00 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Revision: 1.32 $
+ * @version $Revision: 1.33 $
  */
 public class SHMail
 	extends Thread
@@ -148,7 +148,7 @@ public class SHMail
 
 		if (
 			YAMM.getProperty("smtpserver") != null &&
-			Mailbox.hasMail(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"))
+			Mailbox.hasMail(YAMM.home + "/boxes/outbox")
 		) {
 			Smtp smtp = null;
 			BufferedReader in = null;
@@ -156,7 +156,7 @@ public class SHMail
 			PrintWriter mail = null;
 
 			try {
-				File boxFile = new File(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
+				File boxFile = new File(YAMM.home + "/boxes/outbox");
 				smtp = new YammSmtp(YAMM.getProperty("smtpserver"), 25, smtpdebug);
 				in = new BufferedReader(
 					new InputStreamReader(
@@ -167,7 +167,7 @@ public class SHMail
 				if (sent) {
 					out = new PrintWriter(
 						new BufferedOutputStream(
-	        					new FileOutputStream(YAMM.home + "/boxes/" + YAMM.getString("box.sent"), true)
+	        					new FileOutputStream(YAMM.home + "/boxes/sent", true)
 						)
 					);
 				}
@@ -274,7 +274,7 @@ public class SHMail
 				}
 				in.close();
 
-				File file = new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox")));
+				File file = new File(Utilities.replace(YAMM.home + "/boxes/outbox"));
 				file.delete();
 				file.createNewFile();
 			} catch (IOException ioe) {
@@ -288,7 +288,7 @@ public class SHMail
 				} catch (IOException ioe) {}
 			}
 			if (sent) {
-				String box = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.sent"));
+				String box = Utilities.replace(YAMM.home + "/boxes/sent");
 				yamm.tree.unreadTable.put(box, Mailbox.getUnread(box));
 				yamm.tree.dataModel.fireTableDataChanged();
 			}
@@ -327,6 +327,9 @@ public class SHMail
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.33  2003/03/10 09:41:00  fredde
+ * non localized box filenames
+ *
  * Revision 1.32  2003/03/09 17:45:04  fredde
  * now uses the new index system
  *

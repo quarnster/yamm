@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.32 2003/03/09 17:50:34 fredde Exp $
+/*  $Id: mainJTree.java,v 1.33 2003/03/10 09:45:11 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.32 $
+ * @version $Revision: 1.33 $
  */
 public class mainJTree
 	extends JTable
@@ -185,15 +185,15 @@ public class mainJTree
 	public void updateNodes() {
 		unreadTable.clear();
 		top.removeAllChildren();
-		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox")))));
-		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox")))));
+		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/inbox"))));
+		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/outbox"))));
 
 		if (sentbox) {
-			top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.sent")))));
+			top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/sent"))));
 		}
 
 		createNodes(top, new File(Utilities.replace(YAMM.home + "/boxes/")));
-		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")))));
+		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/trash"))));
 
 		tree.expandRow(0);
 		((DefaultTreeModel) tree.getModel()).reload();
@@ -283,10 +283,10 @@ public class mainJTree
 				createNodes(dir, new File(f, list[i]));
 			}
 		} else {
-			if (	!(f.toString()).equals(Utilities.replace(home + "/boxes/" + YAMM.getString("box.outbox"))) &&
-				!(f.toString()).equals(Utilities.replace(home +	"/boxes/" + YAMM.getString("box.trash"))) &&
-				!(f.toString()).equals(Utilities.replace(home + "/boxes/" + YAMM.getString("box.inbox"))) &&
-				!(f.toString()).equals(Utilities.replace(home + "/boxes/" + YAMM.getString("box.sent"))) &&
+			if (	!(f.toString()).equals(Utilities.replace(home + "/boxes/outbox")) &&
+				!(f.toString()).equals(Utilities.replace(home +	"/boxes/trash")) &&
+				!(f.toString()).equals(Utilities.replace(home + "/boxes/inbox")) &&
+				!(f.toString()).equals(Utilities.replace(home + "/boxes/sent")) &&
 				 (f.toString()).indexOf(File.separator + ".", (f.toString()).indexOf("boxes")) == -1)
 			{
 				box = new DefaultMutableTreeNode(f);
@@ -312,10 +312,10 @@ public class mainJTree
 				if (!del.isDirectory() && del.exists()) {
 					String file = del.toString();
 
-					if (		!file.endsWith(Utilities.replace("/" + YAMM.getString("box.inbox"))) &&
-							!file.endsWith(Utilities.replace("/" + YAMM.getString("box.outbox"))) &&
-							!file.endsWith(Utilities.replace("/" + YAMM.getString("box.sent"))) &&
-							!file.endsWith(Utilities.replace("/" + YAMM.getString("box.trash")))) {
+					if (		!file.endsWith(Utilities.replace("/inbox")) &&
+							!file.endsWith(Utilities.replace("/outbox")) &&
+							!file.endsWith(Utilities.replace("/sent")) &&
+							!file.endsWith(Utilities.replace("/trash"))) {
 
 						yamm.selectedbox = "deleted";
 						del.delete();
@@ -349,7 +349,7 @@ public class mainJTree
 					File box = new File(node.toString());
 
 					if (node.toString().equals("deleted") || !box.exists()) {
-						yamm.selectedbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox"));
+						yamm.selectedbox = Utilities.replace(YAMM.home + "/boxes/inbox");
 						Mailbox.createList(yamm.selectedbox, yamm);
 						yamm.mailList.clearSelection();
 						yamm.mailList.update();
@@ -391,6 +391,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.33  2003/03/10 09:45:11  fredde
+ * non localized box filenames
+ *
  * Revision 1.32  2003/03/09 17:50:34  fredde
  * no need for Mailbox.updateIndex with the new index system
  *

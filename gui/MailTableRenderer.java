@@ -29,7 +29,7 @@ import org.gjt.fredde.yamm.Utilities;
 /**
  * The renderer for the mailtable
  * @author Fredrik Ehnbom
- * @version $Id: MailTableRenderer.java,v 1.5 2003/03/09 17:47:59 fredde Exp $
+ * @version $Id: MailTableRenderer.java,v 1.6 2003/03/10 09:44:06 fredde Exp $
  */
 public class MailTableRenderer
 	extends DefaultTableCellRenderer
@@ -57,7 +57,7 @@ public class MailTableRenderer
 	) {
 		setValue(value);
 
-		String outbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
+		String outbox = Utilities.replace(YAMM.home + "/boxes/outbox");
 
 		if ((yamm.listOfMails[yamm.keyIndex[row]].status & IndexEntry.STATUS_READ) != 0 || outbox.equals(yamm.selectedbox)) {
 			setForeground(Color.black);
@@ -77,6 +77,9 @@ public class MailTableRenderer
 /*
  * Changes:
  * $Log: MailTableRenderer.java,v $
+ * Revision 1.6  2003/03/10 09:44:06  fredde
+ * non localized box filenames
+ *
  * Revision 1.5  2003/03/09 17:47:59  fredde
  * now uses the new index system
  *

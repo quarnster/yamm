@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.61 2003/03/09 17:46:47 fredde Exp $
+/*  $Id: YAMM.java,v 1.62 2003/03/10 09:41:21 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.61 $
+ * @version $Revision: 1.62 $
  */
 public class YAMM
 	extends JFrame
@@ -65,7 +65,7 @@ public class YAMM
 	public static String selectedbox = Utilities.replace(home + "/boxes/");
 
 	/** The version of YAMM */
-	public static String version  = "0.8 $Date: 2003/03/09 17:46:47 $";
+	public static String version  = "0.8 $Date: 2003/03/10 09:41:21 $";
 
 	/** The compileDate of YAMM */
 	public static String compDate = Utilities.getCompileDate();
@@ -178,7 +178,7 @@ public class YAMM
 	 */
 	public YAMM() {
 		try {
-			mailPage=new URL(mailPageString + res.getString("box.inbox") + "/0.html");
+			mailPage=new URL(mailPageString + "inbox" + "/0.html");
 		} catch (MalformedURLException mue) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 					mue, YAMM.exceptionNames);
@@ -549,8 +549,7 @@ public class YAMM
 
 			PrintWriter out = new PrintWriter(
 				new BufferedOutputStream(
-				new FileOutputStream(home + "/boxes/" +
-				YAMM.getString("box.inbox")))
+				new FileOutputStream(home + "/boxes/inbox"))
 			);
 
 			out.println("Date: " + dateFormat.format(new Date()));
@@ -563,9 +562,9 @@ public class YAMM
 			out.println(YAMM.getString("msg.welcome", args));
 			out.close();
 
-			new File(home + "/boxes/" + getString("box.outbox")).createNewFile();
-			new File(home + "/boxes/" + getString("box.trash")).createNewFile();
-			new File(home + "/boxes/" + getString("box.sent")).createNewFile();
+			new File(home + "/boxes/outbox").createNewFile();
+			new File(home + "/boxes/trash").createNewFile();
+			new File(home + "/boxes/sent").createNewFile();
 		} catch(IOException ioe) {
 			new ExceptionDialog(
 				YAMM.getString("msg.error"),
@@ -656,7 +655,7 @@ public class YAMM
 				props.getClass().getResource("/images/logo.gif"));
 		}
 
-		selectedbox += "/" + res.getString("box.inbox");
+		selectedbox += "/inbox";
 		selectedbox = Utilities.replace(selectedbox);
 
 		String[] tmp = {
@@ -687,6 +686,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.62  2003/03/10 09:41:21  fredde
+ * non localized box filenames
+ *
  * Revision 1.61  2003/03/09 17:46:47  fredde
  * now uses the new index system. viewports gets their background colors from their parents
  *
