@@ -30,6 +30,7 @@ import javax.swing.tree.*;
 import javax.swing.event.*;
 import org.gjt.fredde.yamm.YAMM;
 import org.gjt.fredde.yamm.mail.Mailbox;
+import org.gjt.fredde.util.gui.MsgDialog;
 
 /**
  * The tree for the main window
@@ -86,7 +87,15 @@ public class mainJTree extends JTree {
 
 
         if(!(node.toString()).equals("Mail Boxes")) {
-          if(!(new File(node.toString())).isDirectory()) {
+           File box = new File(node.toString());
+
+          if(node.toString().equals("deleted") || !box.exists()) {
+            frame.selectedbox = System.getProperty("user.home") + "/.yamm/boxes/inbox";
+            Mailbox.createList(frame.selectedbox, frame.listOfMails);
+            ((JTable)frame.mailList).updateUI();
+          }
+
+          else if(!box.isDirectory()) {
             frame.selectedbox = node.toString();
             Mailbox.createList(frame.selectedbox, frame.listOfMails);
             ((JTable)frame.mailList).updateUI();
@@ -206,7 +215,6 @@ public class mainJTree extends JTree {
       dir = new DefaultMutableTreeNode(f);
 
       top.add(dir);
-      System.out.println("f: " + f.toString());
 
       String list[] = f.list();
       for(int i = 0; i < list.length; i++)
@@ -227,23 +235,32 @@ public class mainJTree extends JTree {
       String kommando = ((JMenuItem)ae.getSource()).getText();
       
       if(kommando.equals(res.getString("file.new"))) {
-//        new newBoxDialog(null);
+        new newBoxDialog(frame);
       }
       else {
+        if(tree.getLastSelectedPathComponent() != null) {
 
-        File del = new File((tree.getLastSelectedPathComponent()).toString());
+          File del = new File(tree.getLastSelectedPathComponent().toString());
 
-        if(!del.isDirectory()) {
-          top.removeAllChildren();
 
-          del.delete();
+          if(!del.isDirectory() && del.exists()) {
+            String file = tree.getLastSelectedPathComponent().toString();
+            String sep  = System.getProperty("file.separator");
+ 
+            if(!file.endsWith(sep + "inbox") && !file.endsWith(sep + "outbox") && !file.endsWith(sep + "trash")) {
+              frame.selectedbox = "deleted";
+              top.removeAllChildren();
 
-          top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/inbox")));
-          top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
-          createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
-          top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash"))); 
-          tree.updateUI();
-          tree.expandRow(0);
+              del.delete();
+
+              top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/inbox")));
+              top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
+              createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
+              top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash"))); 
+              tree.updateUI();
+              tree.expandRow(0);
+            }
+          }
         }
       }
     }
@@ -258,4 +275,68 @@ public class mainJTree extends JTree {
     }
 
   };
+
+  class newBoxDialog extends JDialog {
+    JButton    b;
+    JComboBox  inFolder;
+    JTextField jtfield;
+  
+    public newBoxDialog(JFrame frame) {
+      super(frame, true);  
+      setBounds(0, 0, 300, 100);
+      setResizable(false);      
+      setTitle(res.getString("title.newbox"));
+ 
+      Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+      setLocation((screenSize.width - 300) / 2, (screenSize.height - 200) / 2);
+      getContentPane().setLayout(new GridLayout(2, 2));
+ 
+      getContentPane().add(new JLabel(res.getString("options.name")));
+ 
+      jtfield = new JTextField();
+      getContentPane().add(jtfield);
+ 
+
+      b = new JButton(res.getString("button.ok"));
+      b.addActionListener(BListener2);
+      getContentPane().add(b);
+ 
+      b = new JButton(res.getString("button.cancel"));
+      b.addActionListener(BListener2);
+      getContentPane().add(b);
+ 
+      show();
+    }
+ 
+    ActionListener BListener2 = new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        String arg = ((JButton)e.getSource()).getText();
+ 
+        if(arg.equals(res.getString("button.ok"))) {
+          File box = new File(System.getProperty("user.home") + "/.yamm/boxes/" + jtfield.getText());
+
+          if(box.exists()) new MsgDialog(frame, res.getString("msg.error"), res.getString("msg.file.exists"));
+          else {
+            try {
+              box.createNewFile();
+            } catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
+
+            top.removeAllChildren();
+            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/inbox")));
+            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
+            createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
+            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash")));
+            tree.updateUI();
+
+
+            dispose();
+          }
+        }
+
+        else if(arg.equals(res.getString("button.cancel"))) {
+          dispose();
+        }
+      }
+    };
+  }
 }
