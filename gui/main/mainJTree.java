@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.41 2003/04/27 08:01:25 fredde Exp $
+/*  $Id: mainJTree.java,v 1.42 2003/06/06 10:48:40 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.41 $
+ * @version $Revision: 1.42 $
  */
 public class mainJTree
 	extends JTable
@@ -79,9 +79,7 @@ public class mainJTree
 			if (column == 1) {
 				int[] s = (int[]) unreadTable.get(node.toString());
 				if (s == null) return "";
-				if (s[2] > 0)
-					return s[1] + "+" + s[2];
-				return "" + s[1];
+				return s[2] + "/" + s[1];
 			} else return node;
 		}
 
@@ -116,11 +114,15 @@ public class mainJTree
 		setShowVerticalLines(false);
 		setIntercellSpacing(new Dimension(0, 0));
 
-		TableColumn column = getColumnModel().getColumn(1);
-		column.setIdentifier("num");
+		TableColumn column = getColumnModel().getColumn(0);
+		column.setIdentifier("boxes");
 		column.setMinWidth(5);
-		column.setMaxWidth(100);
-		column.setPreferredWidth(50);
+		column.setPreferredWidth(Integer.parseInt(YAMM.getProperty("main.tree.boxes.width", "50")));
+
+		column = getColumnModel().getColumn(1);
+		column.setIdentifier("unread");
+		column.setMinWidth(5);
+		column.setPreferredWidth(Integer.parseInt(YAMM.getProperty("main.tree.unread.width", "30")));
 
 		tree = new TreeTableCellRenderer(this);
 		tree.setModel(new DefaultTreeModel(top));
@@ -262,7 +264,13 @@ public class mainJTree
 	}
 
 	public void save() {
-		YAMM.setProperty("main.tree.switch", "" + getColumnModel().getColumn(0).getIdentifier().equals("num"));
+		YAMM.setProperty("main.tree.switch", "" + getColumnModel().getColumn(0).getIdentifier().equals("unread"));
+		for (int i = 0; i < 2; i++) {
+			TableColumn c = getColumnModel().getColumn(i);
+			String id = c.getIdentifier().toString();
+			YAMM.setProperty("main.tree." + id + ".width", c.getWidth()+"");
+		}
+
 	}
 
 	/**
@@ -485,6 +493,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.42  2003/06/06 10:48:40  fredde
+ * unread messages now in format new/unread. now saves column widths.
+ *
  * Revision 1.41  2003/04/27 08:01:25  fredde
  * black on new-mail now works correctly
  *
