@@ -371,7 +371,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 //    SPane.setOpaque(true);  // makes it look nicer/uglier
 
 
-    top = new DefaultMutableTreeNode("Mail Boxes");
+    top = new DefaultMutableTreeNode(YAMM.getString("box.boxes"));
     tree = new mainJTree(this, top, tbar);
 
     SPane2 = new JSplitPane(1, tree, SPane);

@@ -153,7 +153,7 @@ public class mainMenu extends JMenuBar {
                       "Copyright (C) 1999 Fredrik Ehnbom\n"
                     + "YAMM-version: " + YAMM.yammVersion + "\n"
                     + "Compiledate: " + YAMM.compDate + "\n"
-                    + "Homepage: http://www.gjt.org/~fredde/\n"
+                    + "Homepage: http://www.gjt.org/~fredde/yamm/\n"
                     + "E-mail: <fredde@gjt.org>\n"
                     + "\n"
                     + "This program is part of the Giant Java Tree.\n"
