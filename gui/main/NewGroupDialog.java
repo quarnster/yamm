@@ -29,6 +29,8 @@ import org.gjt.fredde.yamm.YAMM;
 
 /**
  * Class used for creating new groups
+ * @author Fredrik Ehnbom
+ * @version $Id: NewGroupDialog.java,v 1.2 2000/03/15 14:03:54 fredde Exp $
  */
 public class NewGroupDialog extends JDialog {
 	private JComboBox  group = null;
@@ -133,3 +135,10 @@ public class NewGroupDialog extends JDialog {
 		}
 	};
 }
+/*
+ * Changes:
+ * $Log: NewGroupDialog.java,v $
+ * Revision 1.2  2000/03/15 14:03:54  fredde
+ * oops, forgot the log and id tags...
+ *
+ */

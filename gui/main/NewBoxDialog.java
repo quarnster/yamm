@@ -26,6 +26,11 @@ import javax.swing.*;
 import org.gjt.fredde.util.gui.*;
 import org.gjt.fredde.yamm.YAMM;
 
+/**
+ * A dialog for creating new boxes
+ * @author Fredrik Ehnbom
+ * @version $Id: NewBoxDialog.java,v 1.2 2000/03/15 14:03:53 fredde Exp $
+ */
 public class NewBoxDialog extends JDialog {
 	private JComboBox  group;
 	private JTextField jtfield;
@@ -129,3 +134,10 @@ public class NewBoxDialog extends JDialog {
 		}
 	};
 }
+/*
+ * Changes:
+ * $Log: NewBoxDialog.java,v $
+ * Revision 1.2  2000/03/15 14:03:53  fredde
+ * oops, forgot the log and id tags...
+ *
+ */
