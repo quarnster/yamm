@@ -25,7 +25,7 @@ import org.gjt.fredde.yamm.mail.MessageParser;
 /**
  * A class for managing profiles
  * @author Fredrik Ehnbom
- * @version $Id: Profiler.java,v 1.5 2003/03/06 23:50:21 fredde Exp $
+ * @version $Id: Profiler.java,v 1.6 2003/03/16 11:01:47 fredde Exp $
  */
 public class Profiler {
 
@@ -212,7 +212,11 @@ public class Profiler {
 	 * @return The default profile
 	 */
 	public Profile getDefaultProfile() {
-		return profiles[getDefault()];
+		int def = getDefault();
+
+		if (def < profiles.length)
+			return profiles[def];
+		return null;
 	}
 
 	/**
@@ -259,12 +263,16 @@ public class Profiler {
 	public String getProfileString(String profString) {
 		Profile p = getProfileFor(profString);
 
+		if (p == null) return null;
 		return p.name + " <" + p.email + ">";
 	}
 }
 /*
  * Changes:
  * $Log: Profiler.java,v $
+ * Revision 1.6  2003/03/16 11:01:47  fredde
+ * fixed some exceptions
+ *
  * Revision 1.5  2003/03/06 23:50:21  fredde
  * if no email was specified in the to-field, return the defaultProfile
  *
