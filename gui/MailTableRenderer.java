@@ -29,7 +29,7 @@ import org.gjt.fredde.yamm.Utilities;
 /**
  * The renderer for the mailtable
  * @author Fredrik Ehnbom
- * @version $Id: MailTableRenderer.java,v 1.8 2003/03/15 20:38:37 fredde Exp $
+ * @version $Id: MailTableRenderer.java,v 1.9 2003/04/13 16:37:05 fredde Exp $
  */
 public class MailTableRenderer
 	extends DefaultTableCellRenderer
@@ -59,7 +59,7 @@ public class MailTableRenderer
 
 		String outbox = Utilities.replace(YAMM.home + "/boxes/outbox");
 
-		if ((yamm.listOfMails[yamm.keyIndex[row]].status & IndexEntry.STATUS_READ) != 0 || outbox.equals(yamm.selectedbox)) {
+		if ((yamm.listOfMails[yamm.keyIndex[row]].status & IndexEntry.STATUS_READ) != 0) {
 			setFont(getFont().deriveFont(Font.PLAIN));
 		} else {
 			setFont(getFont().deriveFont(Font.BOLD));
@@ -79,6 +79,9 @@ public class MailTableRenderer
 /*
  * Changes:
  * $Log: MailTableRenderer.java,v $
+ * Revision 1.9  2003/04/13 16:37:05  fredde
+ * removed check for outbox
+ *
  * Revision 1.8  2003/03/15 20:38:37  fredde
  * fixed plaf stuff
  *
