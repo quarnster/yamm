@@ -1,4 +1,4 @@
-/*  $Id: YAMMWrite.java,v 1.26 2003/03/08 17:44:06 fredde Exp $
+/*  $Id: YAMMWrite.java,v 1.27 2003/03/08 18:09:03 fredde Exp $
  *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ import org.gjt.fredde.yamm.gui.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public class YAMMWrite extends JFrame {
 
@@ -210,8 +210,6 @@ public class YAMMWrite extends JFrame {
 		myTextArea = new JTextArea();
 		myTextArea.setText(body);
 
-		if (body.equals("")) sign();
-
 		JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
 		JTPane.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		JTPane.addTab(
@@ -300,7 +298,7 @@ public class YAMMWrite extends JFrame {
 			byte[] singb = new byte[in.available()];
 
 			in.read(singb);
-			myTextArea.append(new String(singb));  
+			myTextArea.append(new String(singb));
 			in.close();
 		} catch (IOException ioe) {
 			new ExceptionDialog(
@@ -452,11 +450,7 @@ public class YAMMWrite extends JFrame {
 		int ret = jfs.showOpenDialog(this);
 
 		if (ret == JFileChooser.APPROVE_OPTION) {
-			// Why can't I get getSelectedFiles() to work?!
-			// File[] file = jfs.getSelectedFiles();
-			File[] file = {
-				jfs.getSelectedFile()
-			};
+			File[] file = jfs.getSelectedFiles();
 
 			if (file != null) {
 
@@ -499,6 +493,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.27  2003/03/08 18:09:03  fredde
+ * getSelectedFiles works now. signing done elsewhere
+ *
  * Revision 1.26  2003/03/08 17:44:06  fredde
  * Much nicer layout
  *
