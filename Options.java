@@ -31,10 +31,7 @@ import org.gjt.fredde.util.gui.MsgDialog;
  */
 public class Options extends JDialog {
 
-  /** To get language strings */
-  static protected ResourceBundle res;
-
-  /** To load/save properties */
+  /** configurartion */
   static protected Properties props = new Properties();
 
   /** a vector to add items to */
@@ -62,12 +59,7 @@ public class Options extends JDialog {
     setBounds((screen.width - 450)/2, (screen.height - 250)/2, 450, 250);
 //    setResizable(false);
 
-    try { res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault()); }
-    catch (MissingResourceException mre) {
-      mre.printStackTrace();
-      System.exit(1);
-    }
-    setTitle(res.getString("edit.settings"));
+    setTitle(YAMM.getString("edit.settings"));
 
     JTPane = new JTabbedPane(JTabbedPane.LEFT);
 
@@ -75,17 +67,17 @@ public class Options extends JDialog {
     Box hori = Box.createHorizontalBox();
     Box vert2 = Box.createVerticalBox();
     
-    JButton b = new JButton(res.getString("button.add"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/new.gif") );
+    JButton b = new JButton(YAMM.getString("button.add"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/new.gif") );
     b.addActionListener(BListener);
     vert.add(b);
     vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-    b = new JButton(res.getString("edit"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/edit.gif"));
+    b = new JButton(YAMM.getString("edit"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/edit.gif"));
     b.addActionListener(BListener);
     vert.add(b);
     vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-    b = new JButton(res.getString("button.delete"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/delete.gif"));
+    b = new JButton(YAMM.getString("button.delete"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/delete.gif"));
     b.addActionListener(BListener);
     vert.add(b);
     vert.add(Box.createRigidArea(new Dimension(10, 10)));
@@ -109,21 +101,14 @@ public class Options extends JDialog {
       vect1 = new Vector();
     }
 
-    try {
-      InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-      props = new Properties();
-      props.load(in);
-      in.close();
-    } catch (IOException propsioe) { System.err.println(propsioe); }
-
 
     vect1.add(new String("SMTP"));
-    vect1.add(props.getProperty("smtpserver"));
+    vect1.add(YAMM.getProperty("smtpserver"));
     vect1.add(new String(System.getProperty("user.home") + "/.yamm/.config"));
     vect2.add(vect1);
 
     TableModel dataModel = new AbstractTableModel() {
-      String temp[] = { res.getString("options.type"), res.getString("options.address")};
+      String temp[] = { YAMM.getString("options.type"), YAMM.getString("options.address")};
       public int getColumnCount() { return 2; }
       public int getRowCount() { return ((Vector)vect2).size(); }
       public Object getValueAt(int row, int col) { return ((Vector)vect2.elementAt(row)).elementAt(col); }
@@ -147,19 +132,19 @@ public class Options extends JDialog {
     hori.add(JSPane);
     hori.add(Box.createRigidArea(new Dimension(10, 10)));
     hori.add(vert);
-    JTPane.add(res.getString("options.servers"), hori);
+    JTPane.add(YAMM.getString("options.servers"), hori);
 
     vert = Box.createVerticalBox();
     filterConf(vert);   
-    JTPane.add(res.getString("options.filters"), vert);
+    JTPane.add(YAMM.getString("options.filters"), vert);
 
     hori = Box.createVerticalBox();
     identitetConfig(hori);
-    JTPane.add(res.getString("options.identity"), hori);
+    JTPane.add(YAMM.getString("options.identity"), hori);
 
     hori = Box.createHorizontalBox();
 
-    b = new JButton(res.getString("button.ok"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/ok.gif"));
+    b = new JButton(YAMM.getString("button.ok"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/ok.gif"));
     b.addActionListener(BListener);
     hori.add(b);
     hori.add(Box.createRigidArea(new Dimension(10, 10)));
@@ -179,9 +164,9 @@ public class Options extends JDialog {
     JTField = new JTextField(4);
     JTField.setMaximumSize(new Dimension(35, 15));
     JTField.setMinimumSize(new Dimension(35, 15));
-    JTField.setText(props.getProperty("msgmaxsize", "0"));
+    JTField.setText(YAMM.getProperty("msgmaxsize", "0"));
 
-    JLabel myLabel = new JLabel(res.getString("msg.bigmsg"));
+    JLabel myLabel = new JLabel(YAMM.getString("msg.bigmsg"));
     hori.add(Box.createRigidArea(new Dimension(10, 10)));
     hori.add(myLabel);
     hori.add(JTField);
@@ -189,7 +174,7 @@ public class Options extends JDialog {
     hori.add(myLabel);
     
     vbox.add(hori);
-    vbox.add(new JLabel(res.getString("msg.bigmsg2")));
+    vbox.add(new JLabel(YAMM.getString("msg.bigmsg2")));
 
     final Vector list = new Vector();
 
@@ -220,17 +205,17 @@ public class Options extends JDialog {
     JSPane.setMinimumSize(new Dimension(200,100));    
 
 /*
-    JButton b = new JButton(res.getString("ADD"), new ImageIcon("images/default/buttons/new.gif") );
+    JButton b = new JButton(YAMM.getString("ADD"), new ImageIcon("images/default/buttons/new.gif") );
     b.addActionListener(BListener2);
     vert.add(b);
     vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-    b = new JButton(res.getString("EDIT"), new ImageIcon("images/default/buttons/edit.gif"));
+    b = new JButton(YAMM.getString("EDIT"), new ImageIcon("images/default/buttons/edit.gif"));
     b.addActionListener(BListener2);
     vert.add(b);
     vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-    b = new JButton(res.getString("DELETE"), new ImageIcon("images/default/buttons/delete.gif"));
+    b = new JButton(YAMM.getString("DELETE"), new ImageIcon("images/default/buttons/delete.gif"));
     b.addActionListener(BListener2);
     vert.add(b);
 */
@@ -243,19 +228,12 @@ public class Options extends JDialog {
   }
 
   protected void identitetConfig(Box vbox) {
-    try {
-      InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-      props = new Properties();
-      props.load(in);
-      in.close();
-    } catch (IOException propsioe) { System.err.println(propsioe); }
-
     JPanel panel = new JPanel(new GridLayout(6, 1, 2, 2));
     panel.setMaximumSize(new Dimension(600, 100));
     panel.setMinimumSize(new Dimension(300, 100));
-    panel.add(new JLabel(res.getString("options.name") + ":"));
+    panel.add(new JLabel(YAMM.getString("options.name") + ":"));
 
-    name = new JTextField(props.getProperty("username", System.getProperty("user.name")));
+    name = new JTextField(YAMM.getProperty("username", System.getProperty("user.name")));
     name.setMaximumSize(new Dimension(400, 20));
     name.setMinimumSize(new Dimension(200, 20));
     panel.add(name);
@@ -268,7 +246,7 @@ public class Options extends JDialog {
 
     panel.add(new JLabel("Email:"));
 
-    email = new JTextField(props.getProperty("email", System.getProperty("user.name") + "@" + host));
+    email = new JTextField(YAMM.getProperty("email", System.getProperty("user.name") + "@" + host));
 
     email.setMaximumSize(new Dimension(400, 20));
     email.setMinimumSize(new Dimension(200, 20));
@@ -276,17 +254,17 @@ public class Options extends JDialog {
 
     Box hori = Box.createHorizontalBox();
 
-    panel.add(new JLabel(res.getString("options.signatur") + ":"));
+    panel.add(new JLabel(YAMM.getString("options.signatur") + ":"));
     signatur = new JTextField();
     signatur.setMaximumSize(new Dimension(400, 90));
     signatur.setMinimumSize(new Dimension(190, 90));
-    signatur.setText(props.getProperty("signatur"));
+    signatur.setText(YAMM.getProperty("signatur"));
 
     hori.add(signatur);
 
     hori.add(Box.createRigidArea(new Dimension(5, 5)));
 
-    JButton b = new JButton(res.getString("button.browse"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
+    JButton b = new JButton(YAMM.getString("button.browse"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
     b.setMaximumSize(new Dimension(230, 1000)); 
     b.setMinimumSize(new Dimension(115, 1000));
     b.addActionListener(BListener);                                    
@@ -299,44 +277,29 @@ public class Options extends JDialog {
     public void actionPerformed(ActionEvent e) {
       String arg = ((JButton)e.getSource()).getText();
 
-      if(arg.equals(res.getString("button.add"))) {
+      if(arg.equals(YAMM.getString("button.add"))) {
         EDIT(true);
       }
 
-      else if(arg.equals(res.getString("edit"))) {
+      else if(arg.equals(YAMM.getString("edit"))) {
         EDIT(false);
       }
 
-      else if(arg.equals(res.getString("button.delete"))) {
+      else if(arg.equals(YAMM.getString("button.delete"))) {
         DELETE();
       }
 
-      else if(arg.equals(res.getString("button.browse"))) {
+      else if(arg.equals(YAMM.getString("button.browse"))) {
         browse();
       }
 
-      else if(arg.equals(res.getString("button.ok"))) {
-        try {
-          InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props = new Properties();
-          props.load(in);
-          in.close();
-        } catch (IOException propsioe) { System.err.println(propsioe); }
-
-        props.setProperty("username",  name.getText());
-        props.setProperty("email",email.getText());
-        props.setProperty("signatur", signatur.getText());
-//        props.setProperty("theme", theme.getSelectedItem().toString());
-        props.setProperty("msgmaxsize", JTField.getText());
-
-        try{
-          OutputStream out = new FileOutputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props.store(out, "Yamm configuration file");
-          out.close();
-        } catch(IOException propsioe) { System.err.println(propsioe); }
+      else if(arg.equals(YAMM.getString("button.ok"))) {
+        YAMM.setProperty("username",  name.getText());
+        YAMM.setProperty("email",email.getText());
+        YAMM.setProperty("signatur", signatur.getText());
+        YAMM.setProperty("msgmaxsize", JTField.getText());
 
         dispose();
-
       }
     }
   };
@@ -345,13 +308,13 @@ public class Options extends JDialog {
     public void actionPerformed(ActionEvent e) {
       String arg = ((JButton)e.getSource()).getText();
 
-      if(arg.equals(res.getString("button.add"))) {
+      if(arg.equals(YAMM.getString("button.add"))) {
       }
 
-      else if(arg.equals(res.getString("edit"))) {
+      else if(arg.equals(YAMM.getString("edit"))) {
       }
 
-      else if(arg.equals(res.getString("button.delete"))) {
+      else if(arg.equals(YAMM.getString("button.delete"))) {
       }
     }
   };
@@ -406,7 +369,7 @@ public class Options extends JDialog {
         } catch (IOException propsioe) { System.err.println(propsioe); }
       }
 
-      JLabel myLabel = new JLabel(res.getString("options.type"));
+      JLabel myLabel = new JLabel(YAMM.getString("options.type"));
       getContentPane().add(myLabel);           
 
       String[] items = {"Pop3"};
@@ -416,7 +379,7 @@ public class Options extends JDialog {
 
       if(config.equals(System.getProperty("user.home") + "/.yamm/.config")) jcbox.setEnabled(false);
 
-      myLabel = new JLabel(res.getString("options.address") + ":");
+      myLabel = new JLabel(YAMM.getString("options.address") + ":");
       getContentPane().add(myLabel);           
 
       addrField = new JTextField();
@@ -429,7 +392,7 @@ public class Options extends JDialog {
       else if(!config.equals("new")) addrField.setText(props.getProperty("smtpserver"));
       getContentPane().add(addrField);
     
-      myLabel = new JLabel(res.getString("options.username") + ": ");
+      myLabel = new JLabel(YAMM.getString("options.username") + ": ");
       getContentPane().add(myLabel);
 
       userField = new JTextField();
@@ -440,7 +403,7 @@ public class Options extends JDialog {
       else if(!config.equals("new")) userField.setText(props.getProperty("username"));
       getContentPane().add(userField);
 
-      myLabel = new JLabel(res.getString("options.password") + ":");
+      myLabel = new JLabel(YAMM.getString("options.password") + ":");
       getContentPane().add(myLabel);
 
       JPField = new JPasswordField();
@@ -451,11 +414,11 @@ public class Options extends JDialog {
       else if(!config.equals("new")) JPField.setText(YAMM.decrypt(props.getProperty("password")));
       getContentPane().add(JPField);
 
-      JButton b = new JButton(res.getString("button.ok"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/ok.gif"));
+      JButton b = new JButton(YAMM.getString("button.ok"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/ok.gif"));
       b.addActionListener(BListener2);
       getContentPane().add(b);
 
-      b = new JButton(res.getString("button.cancel"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
+      b = new JButton(YAMM.getString("button.cancel"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
       b.addActionListener(BListener2);
       getContentPane().add(b);
 
@@ -520,13 +483,8 @@ public class Options extends JDialog {
         }
 
         else {
-          try {
-            OutputStream out = new FileOutputStream(System.getProperty("user.home") + "/.yamm/.config");
-            props.setProperty("smtpserver", addrField.getText());
-            props.store(out, "YAMM configuration file");
+          YAMM.setProperty("smtpserver", addrField.getText());
 
-            out.close();
-          } catch (IOException propsioe) { System.err.println(propsioe); }
 
           int j = 0;
 
@@ -539,14 +497,6 @@ public class Options extends JDialog {
         }
         ServerList.updateUI();
 
-        try {
-          InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props = new Properties();
-          props.load(in);
-          in.close();
-        } catch (IOException propsioe) { System.err.println(propsioe); }
-
-
         return true;
     }
 
@@ -554,10 +504,10 @@ public class Options extends JDialog {
       public void actionPerformed(ActionEvent e) {
         String arg = ((JButton)e.getSource()).getText();
 
-        if(arg.equals(res.getString("button.ok"))) {
+        if(arg.equals(YAMM.getString("button.ok"))) {
           if(saveServerConf()) dispose();
         }
-        else if(arg.equals(res.getString("button.cancel"))) {
+        else if(arg.equals(YAMM.getString("button.cancel"))) {
           dispose();
         }
       }
