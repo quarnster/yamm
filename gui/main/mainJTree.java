@@ -97,11 +97,11 @@ public class mainJTree extends JTree implements DropTargetListener {
 						!(((JTable)frame.mailList).getSelectedRow() >= frame.listOfMails.size())) {
 					((JButton)tbar.reply).setEnabled(true);
 					((JButton)tbar.forward).setEnabled(true);
-					((JButton)tbar.print).setEnabled(true);
+					//((JButton)tbar.print).setEnabled(true);
 				} else {
 					((JButton)tbar.reply).setEnabled(false);
 					((JButton)tbar.forward).setEnabled(false);
-					((JButton)tbar.print).setEnabled(false);
+					//((JButton)tbar.print).setEnabled(false);
 				}
 			}
 		});

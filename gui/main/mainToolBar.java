@@ -21,7 +21,7 @@ package org.gjt.fredde.yamm.gui.main;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
-import java.awt.print.PrinterJob;
+// import java.awt.print.PrinterJob;
 import java.io.*;
 import java.util.*;
 import org.gjt.fredde.yamm.YAMM;
@@ -41,7 +41,7 @@ public class mainToolBar extends JToolBar {
 	public JButton reply;
 
 	/** The print button */
-	public JButton print;
+//	public JButton print;
 
 	protected static String content = YAMM.getProperty("button.content",
 								"South");
@@ -123,8 +123,10 @@ public class mainToolBar extends JToolBar {
 				YAMM.getString("button.forward.tooltip"));
 		forward.setEnabled(false);
 		add(forward);
+		addSeparator();
 
 		/* button to print page */
+/*
 		print = new JButton();
 		if (frame.ico) {
 			print.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
@@ -139,9 +141,8 @@ public class mainToolBar extends JToolBar {
 		print.setToolTipText(YAMM.getString("button.print.tooltip"));
 		print.addActionListener(BListener);
 		print.setEnabled(false);
-		addSeparator();
 		add(print);
-
+*/
 		/* button to exit from program */
 		b = new JButton();
 		if (frame.ico) {
@@ -271,15 +272,19 @@ public class mainToolBar extends JToolBar {
 								yam.myTextArea);
 			} else if (arg.equals(YAMM.getString(
 						"button.print.tooltip"))) {
-				PrinterJob pj=PrinterJob.getPrinterJob();
 
-				pj.setPrintable(frame);
-				if (pj.printDialog()) {
-					try{
-						pj.print();
-					} catch (Exception pe) {
-						System.err.println(pe);
+				PrintJob pj = frame.getToolkit().
+					getPrintJob(frame, "print", null);
+
+				if (pj != null) {
+					Graphics g = pj.getGraphics();
+
+					if (g != null) {
+						frame.mail.setDoubleBuffered(false);
+						frame.mail.paint(g);
+						g.dispose();
 					}
+					pj.end();
 				}
 			}
 			else if(arg.equals(YAMM.getString(

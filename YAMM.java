@@ -42,112 +42,112 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * The big Main-class of YAMM
  */
-public class YAMM extends JFrame implements HyperlinkListener, Printable
-{
-  /** The file separator */
-  public static String sep = File.separator;
+public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
-  /** The home of yamm */
-  public static String home = System.getProperty("user.home") + sep + ".yamm";
+	/** The file separator */
+	public static String sep = File.separator;
 
-  /** To get the Language strings for buttons, menus, etc... */
-  static protected ResourceBundle         res;
+	/** The home of yamm */
+	public static String home = System.getProperty("user.home") + sep + ".yamm";
 
-  /** The box the user has selected. */
-  public static String                 selectedbox = home + sep + "boxes" + sep;
+	/** To get the Language strings for buttons, menus, etc... */
+	static protected ResourceBundle         res;
 
-  /** The version of YAMM */
-  public static    String                 version  = "0.7.4";
+	/** The box the user has selected. */
+	public static String selectedbox = home + sep + "boxes" + sep;
 
-  /** The compileDate of YAMM */
-  public static    String                 compDate     = "2000-01-11";
+	/** The version of YAMM */
+	public static String version  = "0.7.4";
 
-  /** the file that contains the current mail */
-  public String		  mailPageString   = "file:///" + home + "/tmp/cache/";
-  public URL	          mailPage;
+	/** The compileDate of YAMM */
+	public static    String                 compDate     = "2000-02-01";
 
-  /** The vector containing the attaced files. */
-  public Vector                 attach;
+	/** the file that contains the current mail */
+	public String mailPageString = "file:///" + home + "/tmp/cache/";
+	public URL mailPage;
 
-  /** To check if the user has sun.misc.Base64Decoder */
-  static protected boolean                base64       = false;
+	/** The vector containing the attaced files. */
+	public Vector attach;
 
-  /** The vector containing the mails of a box */
-  public Vector                 listOfMails  = new Vector();
+	/** To check if the user has sun.misc.Base64Decoder */
+	static protected boolean base64 = false;
 
-  /** The properties to get configuration stuff from */
-  static protected Properties             props        = new Properties();
+	/** The vector containing the mails of a box */
+	public Vector listOfMails = new Vector();
 
-  /** What's in the tree */
-  static protected DefaultMutableTreeNode top;
+	/** The properties to get configuration stuff from */
+	static protected Properties props = new Properties();
 
-  /** The Table that lists the mails in listOfMails */
-  public mainTable      mailList;
+	/** What's in the tree */
+	static protected DefaultMutableTreeNode top;
 
-  /** If the buttons should be painted with icons, text or both */
-  public static boolean ico = true, text = true;
+	/** The Table that lists the mails in listOfMails */
+	public mainTable mailList;
 
-  /** The JEditorPane for this frame */
-  public JEditorPane  mail;
+	/** If the buttons should be painted with icons, text or both */
+	public static boolean ico = true, text = true;
 
-  /** Attachment list */
-  public JList        myList;
+	/** The JEditorPane for this frame */
+	public JEditorPane mail;
 
-  /** The toolbar */
-  public mainToolBar  tbar;
+	/** Attachment list */
+	public JList myList;
 
-  /** The splitpanes */
-  protected JSplitPane   SPane, SPane2;
+	/** The toolbar */
+	public mainToolBar tbar;
 
-  /** The statusrow */
-  public statusRow status;
+	/** The splitpanes */
+	protected JSplitPane   SPane, SPane2;
 
-  /** The mail/attach tabbedpane */
-  protected JTabbedPane JTPane;
+	/** The statusrow */
+	public statusRow status;
+
+	/** The mail/attach tabbedpane */
+	protected JTabbedPane JTPane;
 
 
-  /**
-   * Returns the translated string.
-   * @param s The string to get translation for.
-   */
-  public static final String getString(String s) {
-    return res.getString(s);
-  }
+	/**
+	 * Returns the translated string.
+	 * @param s The string to get translation for.
+	 */
+	public static final String getString(String s) {
+		return res.getString(s);
+	}
 
-  /**
-   * Returns the translated string
-   * @param s The string to get translation for.
-   * @param args The arguments to send to MessageFormat.format
-   */
-  public static final String getString(String s, Object[] args) {
-    return MessageFormat.format(res.getString(s), args);
-  }
+	/**
+	 * Returns the translated string
+	 * @param s The string to get translation for.
+	 * @param args The arguments to send to MessageFormat.format
+	 */
+	public static final String getString(String s, Object[] args) {
+		return MessageFormat.format(res.getString(s), args);
+	}
 
-  /**
-   * Returns the property
-   * @param property The property to get.
-   */
-  public static String getProperty(String property) {
-    return props.getProperty(property);
-  }
+	/**
+	 * Returns the property
+	 * @param property The property to get.
+	 */
+	public static String getProperty(String property) {
+		return props.getProperty(property);
+	}
 
-  /** 
-   * Returns the property
-   * @param prop The property to get.
-   * @param def The default string to return if prop is null.
-   */
-  public static String getProperty(String prop, String def) {
-    return props.getProperty(prop, def);
-  }
+	/** 
+	 * Returns the property
+	 * @param prop The property to get.
+	 * @param def The default string to return if prop is null.
+	 */
+	public static String getProperty(String prop, String def) {
+		return props.getProperty(prop, def);
+	}
 
-  /**
-   * Sets a property
-   * @param property The property to set.
-   * @param value The value of the property.
-   */
-  public static void setProperty(String property, String value) {
-    props.setProperty(property, value);
-  }
+	/**
+	 * Sets a property
+	 * @param property The property to set.
+	 * @param value The value of the property.
+	 */
+	public static void setProperty(String property, String value) {
+		props.setProperty(property, value);
+	}
 
 	/**
 	 * Creates the main-window and adds all the components in it.
@@ -335,41 +335,44 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 	}
 
 
-  /**
-   * Checks if the link is a mailto:-link.
-   * If it is, it starts a write-window with the specified mailto:-address,
-   * if not, it starts the webbrowser for that platform.
-   */
-  public void hyperlinkUpdate(HyperlinkEvent e) {
-    if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+	/**
+	 * Checks if the link is a mailto:-link. If it is, it starts a
+	 * write-window with the specified mailto:-address,
+	 * if it isn't, it starts the webbrowser for that platform.
+	 */
+	public void hyperlinkUpdate(HyperlinkEvent e) {
+		if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+			String link = e.getURL().toString();
 
-      String link = e.getURL().toString();
-      if ((e.getURL().toString()).startsWith("mailto:")) {
-        link = link.substring(link.indexOf("mailto:") + 7, link.length());
-        new YAMMWrite(link);
-      }
-      else {
-        try {
-          new Browser(link);
-        }
-        catch (InterruptedException ie) { 
-          Object[] args = {ie.toString()};
-          new MsgDialog(this, YAMM.getString("msg.error"), 
-                              YAMM.getString("msg.exception", args));
-        } catch(IOException ioe) { 
-          Object[] args = {ioe.toString()};
-          new MsgDialog(this, YAMM.getString("msg.error"), 
-                              YAMM.getString("msg.exception", args)); 
-        }
-      }
-    }
-    else if(e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-      mail.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    }
-    else if(e.getEventType() == HyperlinkEvent.EventType.EXITED) {
-      mail.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-    }
-  }
+			if ((e.getURL().toString()).startsWith("mailto:")) {
+				link = link.substring(link.indexOf("mailto:") +
+							7, link.length());
+				new YAMMWrite(link);
+			} else {
+				try {
+					new Browser(link);
+				} catch (InterruptedException ie) { 
+					Object[] args = {ie.toString()};
+					new MsgDialog(this,
+						YAMM.getString("msg.error"), 
+						YAMM.getString("msg.exception",
+								args));
+				} catch(IOException ioe) { 
+					Object[] args = {ioe.toString()};
+					new MsgDialog(this,
+						YAMM.getString("msg.error"), 
+						YAMM.getString("msg.exception",
+								args)); 
+				}
+			}
+		} else if (e.getEventType() ==
+					HyperlinkEvent.EventType.ENTERED) {
+			mail.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		} else if (e.getEventType() ==
+					HyperlinkEvent.EventType.EXITED) {
+			mail.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
+	}
 
   ActionListener BListener = new ActionListener() {
     public void actionPerformed(ActionEvent e) {
@@ -483,14 +486,14 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 		tmp.add(where);
 		attach.add(tmp);
 	}
-
+/*
   public int print(Graphics g, PageFormat pageFormat,
                         int pageIndex) throws PrinterException {
     mail.paint(g);
 
     return Printable.PAGE_EXISTS;
   }
-
+*/
 
   public void Exit() {
     Rectangle rv = new Rectangle();

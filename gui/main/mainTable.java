@@ -831,7 +831,7 @@ public class mainTable extends JTable implements DragGestureListener,
 
 	public void changeButtonMode(boolean b) {
 		((JButton)frame.tbar.reply).setEnabled(b);
-		((JButton)frame.tbar.print).setEnabled(b);
+		//((JButton)frame.tbar.print).setEnabled(b);
 		((JButton)frame.tbar.forward).setEnabled(b); 
 	}
 
