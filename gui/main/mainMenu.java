@@ -133,17 +133,19 @@ public class mainMenu extends JMenuBar {
         catch (UnknownHostException uhe) {};
         if (ipaddress == null) ipaddress = "unknown";
         if (host == null) host = "unknown";
+        Object[] args = {System.getProperty("os.name"),
+                         System.getProperty("os.version"),
+                         System.getProperty("os.arch"),
+                         ipaddress,
+                         host,
+                         System.getProperty("java.version"),
+                         System.getProperty("java.vendor"),
+                         System.getProperty("java.vendor.url"),
+                         System.getProperty("user.name"),
+                         System.getProperty("user.home")};
 
         new MsgDialog(null, YAMM.getString("help.about_you"),
-                      YAMM.getString("info.os") + " : " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "\n"
-                    + YAMM.getString("info.cpu") + " : " + System.getProperty("os.arch") + "\n"
-                    + YAMM.getString("info.ipaddress") + " : " + ipaddress + "\n"
-                    + YAMM.getString("info.host") + " : " + host + "\n"
-                    + YAMM.getString("info.java.version") + " : " + System.getProperty("java.version") + "\n"
-                    + YAMM.getString("info.java.vendor") + " : " + System.getProperty("java.vendor") + "\n"
-                    + YAMM.getString("info.java.vendor.url") + " : " + System.getProperty("java.vendor.url") + "\n"
-                    + YAMM.getString("info.username") + " : " + System.getProperty("user.name") + "\n"
-                    + YAMM.getString("info.user.home") + " : " + System.getProperty("user.home"));
+                      YAMM.getString("info.about.you", args));
       }
 
       else if(kommando.equals(YAMM.getString("help.about"))) {
