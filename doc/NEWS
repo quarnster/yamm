@@ -1,3 +1,9 @@
+0.7.7:
+	Fixed:
+		-Now works in Windows 9x/NT
+		-You can now access the ConfigurationDialog and the WriteDialog when no
+		 profiles have been configured.
+
 0.7.6:
 	Added:
 		-Multiple identities (school, work... autoselect when answering)
