@@ -28,16 +28,18 @@ import org.gjt.fredde.yamm.mail.Mailbox;
 /**
  * The renderer for the mailbox tree
  * @author Fredrik Ehnbom
- * @version $Id: BoxTreeRenderer.java,v 1.6 2000/08/09 16:29:44 fredde Exp $
+ * @version $Id: BoxTreeRenderer.java,v 1.7 2000/12/26 11:22:00 fredde Exp $
  */
-public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
-                                                                   
+public class BoxTreeRenderer
+	extends JLabel
+	implements TreeCellRenderer
+{
 	/** Whether or not the item that was last configured is selected. */
 	protected boolean selected;
 
 	/** The icon for the inbox */
 	public final ImageIcon inbox = new ImageIcon(getClass().getResource("/images/boxes/inbox.gif"));
-                               
+
 	/** The icon for the outbox */
 	public final ImageIcon outbox = new ImageIcon(getClass().getResource("/images/boxes/outbox.gif"));
 
@@ -54,13 +56,14 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 	public final ImageIcon dir2 = new ImageIcon(getClass().getResource("/images/boxes/dir2.gif"));
 
 	public Component getTreeCellRendererComponent(
-				JTree   tree,
-				Object  value,
-				boolean selected,
-				boolean expanded,
-				boolean leaf,
-				int     row,
-				boolean hasFocus) {
+		JTree   tree,
+		Object  value,
+		boolean selected,
+		boolean expanded,
+		boolean leaf,
+		int     row,
+		boolean hasFocus
+	) {
 		String s = value.toString();
 		StringTokenizer tok = new StringTokenizer(s, System.getProperty("file.separator"));
 		String thisbox = null;
@@ -72,8 +75,7 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 		if (leaf && !thisbox.endsWith(".g")) {
 			if (thisbox.equals(YAMM.getString("box.inbox"))) {
 				setIcon(inbox);
-			} else if (thisbox.equals(YAMM.getString("box.outbox"))
-					|| thisbox.equals(YAMM.getString("box.sent"))) {
+			} else if (thisbox.equals(YAMM.getString("box.outbox"))	|| thisbox.equals(YAMM.getString("box.sent"))) {
 				setIcon(outbox);
 			} else if (thisbox.equals(YAMM.getString("box.trash"))) {
 				setIcon(trash);
@@ -135,6 +137,9 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 /*
  * Changes:
  * $Log: BoxTreeRenderer.java,v $
+ * Revision 1.7  2000/12/26 11:22:00  fredde
+ * cleaned up a little
+ *
  * Revision 1.6  2000/08/09 16:29:44  fredde
  * don't show unread messages for the outbox
  *
