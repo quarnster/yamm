@@ -35,6 +35,42 @@ public class MessageParser {
 		return MessageBodyParser.makeEmailLink(click);
 	}
 
+	public static String[] parseLink(String link) {
+		String begin = "";
+		String end   = "";
+		String temp = link;
+
+		if (temp.endsWith(".")) {
+			temp = temp.substring(0, temp.length() - 1);
+			end = ".";
+		}
+
+		if (temp.endsWith(",")) {
+			temp = temp.substring(0, temp.length() - 1);
+			end = "," + end;
+		}
+
+		if (temp.startsWith("mailto:")) {
+			temp = temp.substring(7, temp.length());
+			begin = "mailto:";
+		}
+
+		if (temp.startsWith("(") && temp.endsWith(")")) {
+			temp = temp.substring(1, temp.length() - 1);
+			begin = begin + "(";
+			end = ")" + end;
+		}
+
+		if (temp.startsWith("<") && temp.endsWith(">")) {
+			temp = temp.substring(1, temp.length() - 1);
+			begin = begin + "&lt;";
+			end = "&gt;" + end;
+		}
+
+		String[] tmp = { begin, temp, end };
+		return tmp;
+	}
+
 	public MessageParser(BufferedReader in, PrintWriter out, String file)
 							throws IOException,
 							MessageParseException {
