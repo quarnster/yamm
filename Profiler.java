@@ -25,7 +25,7 @@ import org.gjt.fredde.yamm.mail.MessageParser;
 /**
  * A class for managing profiles
  * @author Fredrik Ehnbom
- * @version $Id: Profiler.java,v 1.2 2000/04/01 20:50:09 fredde Exp $
+ * @version $Id: Profiler.java,v 1.3 2000/04/01 21:26:14 fredde Exp $
  */
 public class Profiler {
 
@@ -239,7 +239,7 @@ public class Profiler {
 	 * @param profString The profile string which we will get the profile for
 	 */
 	public Profile getProfileFor(String profString) {
-		String mail = MessageParser.parseLink(profString)[1];
+		String mail = MessageParser.getEmail(profString);
 
 		Object profNum = phash.get(mail);
 
@@ -264,6 +264,9 @@ public class Profiler {
 /*
  * Changes:
  * $Log: Profiler.java,v $
+ * Revision 1.3  2000/04/01 21:26:14  fredde
+ * email parsing fixed...
+ *
  * Revision 1.2  2000/04/01 20:50:09  fredde
  * fixed to make the profiling system work
  *
