@@ -18,14 +18,10 @@
 
 package org.gjt.fredde.yamm.mail;
 
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
-import java.awt.Graphics;
 import java.io.*;
-import java.awt.print.Book;
 import java.util.*;
 import javax.swing.JTextArea;
-import org.gjt.fredde.util.gui.MsgDialog;
 import org.gjt.fredde.yamm.YAMM;
 
 /**
@@ -88,6 +84,10 @@ public class Mailbox {
 		int makeItem = 0;
 
 		int i = 0;
+
+		if (!hasMail(whichBox)) {
+			return;
+		}
 
 		try {
 			BufferedReader in = new BufferedReader(
@@ -565,9 +565,7 @@ public class Mailbox {
 					if (temp == null) {
 						break;
 					} else if (firstmail &&
-						i != whichmail[next]) {
-
-	//					if (i != whichmail[next]) {
+							i != whichmail[next]) {
 						for (;;) {
 							outFile.println(temp);
 							temp = in.readLine();
@@ -604,8 +602,6 @@ public class Mailbox {
 						firstmail = false;
 					} else if (!firstmail &&
 							i != whichmail[next]) {
-						i++;
-
 						for (;;) {
 							outFile.println(temp);
 							temp = in.readLine();
@@ -621,7 +617,6 @@ public class Mailbox {
 						}
 					} else if(!firstmail &&
 							i == whichmail[next]) {
-						i++;
 
 						for (;;) {
 							outFile2.println(temp);
@@ -641,6 +636,7 @@ public class Mailbox {
 							break;
 						}
 					}
+					i++;
 				}
 				for (;;) {
 					temp = in.readLine();
@@ -724,7 +720,6 @@ public class Mailbox {
 						firstmail = false;
 					} else if (!firstmail &&
 							i != whichmail[next]) {
-						i++;
 						for (;;) {
 							outFile.println(temp);
 							temp = in.readLine();
@@ -740,7 +735,6 @@ public class Mailbox {
 						}
 					} else if (!firstmail &&
 							i == whichmail[next]) {
-						i++;
 						for (;;) {
 							temp = in.readLine();
 
@@ -756,6 +750,7 @@ public class Mailbox {
 							break;
 						}
 					}
+					i++;
 				}
 				for (;;) {
 					temp = in.readLine();
@@ -841,8 +836,6 @@ public class Mailbox {
 					}
 					firstmail = false;
 				} else if(!firstmail && i != whichmail[next]) {
-					i++;
-
 					for (;;) {
 						temp = in.readLine();
 
@@ -853,8 +846,6 @@ public class Mailbox {
 						}
 					}
 				} else if(!firstmail && i == whichmail[next]) {
-					i++;
-
 					for (;;) {
 						outFile2.println(temp);
 						temp = in.readLine();
@@ -870,6 +861,7 @@ public class Mailbox {
 						break;
 					}
 				}
+				i++;
 			}
 			in.close();
 			outFile2.close();
@@ -880,117 +872,132 @@ public class Mailbox {
 		return true;
 	}
 
-  /**
-   * Moves a mail from one box to another.
-   * @param fromBox The box to move the mail from
-   * @param toBox The box to move the mail to
-   * @param whichmail The mail to move
-   */
-  public static boolean moveMail(String fromBox, String toBox, int[] whichmail) {
-    String temp = null;
-    boolean firstmail = true;
-    int next = 0;
+	/**
+	 * Moves a mail from one box to another.
+	 * @param fromBox The box to move the mail from
+	 * @param toBox The box to move the mail to
+	 * @param whichmail The mail to move
+	 */
+	public static boolean moveMail(String fromBox, String toBox,
+							int[] whichmail) {
+		String temp = null;
+		boolean firstmail = true;
+		int next = 0;
 
 
-    if(fromBox.equals(toBox)) return false;
+		if (fromBox.equals(toBox)) {
+			return false;
+		}
 
-    try {
-      File inputFile = new File(fromBox);
-      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
-      File outputFile = new File(fromBox + ".tmp");
-      PrintWriter outFile = new PrintWriter(new BufferedOutputStream(new FileOutputStream(outputFile)));
-      PrintWriter outFile2 = new PrintWriter(new BufferedOutputStream(new FileOutputStream(toBox, true)));
+		try {
+			File inputFile = new File(fromBox);
 
-      int i = 0;
+			BufferedReader in = new BufferedReader(
+					new InputStreamReader(
+					new FileInputStream(inputFile)));
 
-      for(;;) {
-        temp = in.readLine();
+			File outputFile = new File(fromBox + ".tmp");
+
+			PrintWriter outFile = new PrintWriter(
+					new BufferedOutputStream(
+					new FileOutputStream(outputFile)));
+
+			PrintWriter outFile2 = new PrintWriter(
+					new BufferedOutputStream(
+					new FileOutputStream(toBox, true)));
+
+			int i = 0;
+
+			for (;;) {
+				temp = in.readLine();
+
+				if (temp == null) {
+					break;
+				} else if (firstmail && i != whichmail[next]) {
+					for (;;) {
+						outFile.println(temp);
+						temp = in.readLine();
         
+						if (temp == null) {
+							break;
+						} else if (temp.equals(".")) {
+							outFile.println(temp);
+							break;
+						}
+					} 
+					firstmail = false;
+				} else if (firstmail && i == whichmail[next]) {
+					for (;;) {
+						outFile2.println(temp);
+						temp = in.readLine();
 
-        if(temp == null) break;
+						if (temp == null) {
+							break;
+						} else if (temp.equals(".")) {
+							outFile2.println(temp);
+							break;
+						}
+					}
+					if (!(next++ < whichmail.length - 1)) {
+						break;
+					}
+					firstmail = false;
+				} else if (!firstmail && i != whichmail[next]) {
+					for (;;) {
+						outFile.println(temp);
+						temp = in.readLine();
 
-        else if(firstmail) {
-          if(i != whichmail[next]) {
-            for(;;) {
-              outFile.println(temp);
-              temp = in.readLine();
-        
-              if(temp == null) break;
-              else if(temp.equals(".")) {
-                outFile.println(temp);
-                break;
-              }
-            } 
-          }
+						if (temp == null) {
+							break;
+						} else if (temp.equals(".")) {
+							outFile.println(temp);
+							break;
+						}
+					}
+				} else if (i == whichmail[next]) {
+					for (;;) {
+						outFile2.println(temp);
+						temp = in.readLine();
 
-          else if(i == whichmail[next]) {
-            for(;;) {
-              outFile2.println(temp);
-              temp = in.readLine();
+						if (temp == null) {
+							break;
+						} else if (temp.equals(".")) {
+							outFile2.println(temp);
+							break;
+						}
+					}
+					if (!(next++ < whichmail.length - 1)) {
+						break;
+					}
+				}
+				i++;
+			}
+			for (;;) {
+				temp = in.readLine();
+				if (temp == null) {
+					break;
+				} else {
+					outFile.println(temp);
+				}
+			}
 
-              if(temp == null) break;
-              else if(temp.equals(".")) {
-                outFile2.println(temp);
-                break;
-              }
-            }
-            if(!(next++ < whichmail.length-1)) break;
-          }
-          firstmail = false;
-        }
+			in.close();
+			outFile.close();
+			outFile2.close();
 
-        else if(!firstmail) {
-          i++;
-       
-          if(i != whichmail[next]) {
-            for(;;) {
-              outFile.println(temp);
-              temp = in.readLine();
+			inputFile.delete();
 
-              if(temp == null) break;
-              else if(temp.equals(".")) {
-                outFile.println(temp);
-                break;
-              }
-            }
-          }
-
-          else if(i == whichmail[next]) {
-            for(;;) {
-              outFile2.println(temp);
-              temp = in.readLine();
-
-              if(temp == null) break;
-              else if(temp.equals(".")) {
-                outFile2.println(temp);
-                break;
-              }
-            }
-            if(!(next++ < whichmail.length-1)) break;
-          }
-        }
-      }
-      for(;;) {
-        temp = in.readLine();
-        if(temp == null) break;
-        else outFile.println(temp);
-      }
-
-      in.close();
-      outFile.close();
-      outFile2.close();
-
-      inputFile.delete();
-      if(!outputFile.renameTo(inputFile)) {
-        System.err.println("ERROR: Couldn't rename " + fromBox + ".tmp to " + fromBox);
-      }
-    }
-    catch(IOException ioe) {
-      System.out.println("Error: " + ioe);
-      return false;
-    }
-    return true;
-  }
+			if (!outputFile.renameTo(inputFile)) {
+				System.err.println("Couldn't rename " +
+							fromBox + ".tmp to " +
+								fromBox);
+			}
+		} catch (IOException ioe) {
+			System.out.println(ioe);
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * Counts how many mails the box have.
