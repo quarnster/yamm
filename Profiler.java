@@ -25,7 +25,7 @@ import org.gjt.fredde.yamm.mail.MessageParser;
 /**
  * A class for managing profiles
  * @author Fredrik Ehnbom
- * @version $Id: Profiler.java,v 1.3 2000/04/01 21:26:14 fredde Exp $
+ * @version $Id: Profiler.java,v 1.4 2000/04/15 13:10:45 fredde Exp $
  */
 public class Profiler {
 
@@ -151,7 +151,7 @@ public class Profiler {
 		OutputStream out = null;
 		try {             
 			out = new FileOutputStream(YAMM.home + "/.profiles");
-			props.save(out, "YAMM profiles");
+			props.store(out, "YAMM profiles");
 			out.close();
 		} catch (IOException propsioe) {
 			propsioe.printStackTrace();
@@ -264,6 +264,10 @@ public class Profiler {
 /*
  * Changes:
  * $Log: Profiler.java,v $
+ * Revision 1.4  2000/04/15 13:10:45  fredde
+ * nolonger uses the deprecationen method "save" for
+ * saving proterties, it uses store instead
+ *
  * Revision 1.3  2000/04/01 21:26:14  fredde
  * email parsing fixed...
  *
