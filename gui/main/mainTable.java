@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * The Table for listing the mails subject, date and sender.
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.26 2000/03/15 11:13:45 fredde Exp $
+ * @version $Id: mainTable.java,v 1.27 2000/03/18 14:54:46 fredde Exp $
  */
 public class mainTable extends JTable implements DragGestureListener,
 							DragSourceListener {
@@ -648,12 +648,13 @@ public class mainTable extends JTable implements DragGestureListener,
 				}
          
 				Arrays.sort(deleteList);
-				Mailbox.deleteMail(frame.selectedbox,
-								deleteList);
-				Mailbox.createList(frame.selectedbox,
-								listOfMails);
+				Mailbox.deleteMail(frame.selectedbox, deleteList);
+				Mailbox.createList(frame.selectedbox, listOfMails);
 
 				updateUI();
+				Mailbox.updateIndex(frame.selectedbox);
+				Mailbox.updateIndex(YAMM.home + YAMM.sep + "boxes" + YAMM.sep + YAMM.getString("box.trash"));
+				frame.tree.updateUI();
 
 				if (frame.listOfMails.size() < 0) {
 					return;
@@ -696,12 +697,13 @@ public class mainTable extends JTable implements DragGestureListener,
 
 				Arrays.sort(deleteList);
 
-				Mailbox.deleteMail(frame.selectedbox,
-								deleteList);
-				Mailbox.createList(frame.selectedbox,
-								listOfMails);
+				Mailbox.deleteMail(frame.selectedbox, deleteList);
+				Mailbox.createList(frame.selectedbox, listOfMails);
 
 				updateUI();
+				Mailbox.updateIndex(frame.selectedbox);
+				Mailbox.updateIndex(YAMM.home + YAMM.sep + "boxes" + YAMM.sep + YAMM.getString("box.trash"));
+				frame.tree.updateUI();
 
 				changeButtonMode(false);
 				clearSelection();
@@ -768,6 +770,8 @@ public class mainTable extends JTable implements DragGestureListener,
 			}
 			Arrays.sort(copyList);
 			Mailbox.copyMail(frame.selectedbox, name, copyList);
+			Mailbox.updateIndex(name);
+			frame.tree.updateUI();
 		}
 	};
 
@@ -799,48 +803,19 @@ public class mainTable extends JTable implements DragGestureListener,
 
 			Arrays.sort(moveList);
 			Mailbox.moveMail(frame.selectedbox, name, moveList);
-			Mailbox.createList(frame.selectedbox,
-							frame.listOfMails);
+			Mailbox.createList(frame.selectedbox, frame.listOfMails);
+			Mailbox.updateIndex(name);
 			mainTable.this.updateUI();
-			long skip = Long.parseLong(
-				((Vector) listOfMails.elementAt(
-						getSelectedRow())).
-						elementAt(5).toString());
-
-			Mailbox.getMail(frame.selectedbox, getSelectedRow(),
-									skip);
-
-			try { 
-				String boxName = frame.selectedbox.substring(
-						frame.selectedbox.indexOf(
-							"boxes") + 6,
-						frame.selectedbox.length()) +
-							"/"; 
-
-				frame.mailPage = new URL(
-							frame.mailPageString +
-							boxName +
-							getSelectedRow() +
-							".html"); 
-			} catch (MalformedURLException mue) { 
-				new ExceptionDialog(YAMM.getString("msg.error"), 
-						mue,
-						YAMM.exceptionNames);
-			}
-
-			try {
-				frame.mail.setPage(frame.mailPage);
-			} catch (IOException ioe) { 
-				new ExceptionDialog(YAMM.getString("msg.error"),
-						ioe,
-						YAMM.exceptionNames);
-			}
+			frame.tree.updateUI();
 		}
 	};
 }
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.27  2000/03/18 14:54:46  fredde
+ * updates the tree and mailindex on mail- move/copy/delete
+ *
  * Revision 1.26  2000/03/15 11:13:45  fredde
  * boxes now show if and how many unread messages they have
  *
