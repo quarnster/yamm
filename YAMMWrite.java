@@ -1,4 +1,4 @@
-/*  $Id: YAMMWrite.java,v 1.32 2003/03/16 11:02:50 fredde Exp $
+/*  $Id: YAMMWrite.java,v 1.33 2003/04/13 16:35:18 fredde Exp $
  *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import org.gjt.fredde.yamm.mail.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Revision: 1.32 $
+ * @version $Revision: 1.33 $
  */
 public class YAMMWrite extends JFrame {
 
@@ -368,7 +368,7 @@ public class YAMMWrite extends JFrame {
 			IndexEntry e = new IndexEntry();
 			e.skip = skip;
 			e.date = System.currentTimeMillis();
-			e.from = from;
+			e.from = to.indexOf(",") != -1 ? to.substring(0, to.indexOf(",")) : to;
 			e.subject = subjectField.getText();
 			e.status = IndexEntry.STATUS_READ;
 			if (attach.size() > 0)
@@ -528,6 +528,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.33  2003/04/13 16:35:18  fredde
+ * sets index.from to recipient
+ *
  * Revision 1.32  2003/03/16 11:02:50  fredde
  * fixed bugs when no prefiles have been added
  *
