@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.*;
  * A list for attachments
  *
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: AttachList.java,v 1.1 2001/04/21 09:33:00 fredde Exp $
+ * @version $Id: AttachList.java,v 1.2 2003/03/07 14:07:50 fredde Exp $
  */
 public class AttachList
 	extends JList
@@ -127,7 +127,7 @@ public class AttachList
 
 		for (int i = 0; i < flavors.length; i++) {
 			if (flavors[i].equals(DataFlavor.javaFileListFlavor)) return true;
-		}       
+		}
 		return false;
 	}
 
@@ -160,11 +160,8 @@ public class AttachList
 		Vector data = new Vector(model.getSize());
 
 		for (int i = 0; i < model.getSize(); i++) {
-			String filename	= ((Vector) this.data.elementAt(i)).elementAt(0).toString();
-			filename = YAMM.home + "/tmp/" + filename;
+			String filename	= ((Vector) this.data.elementAt(i)).elementAt(1).toString();
 
-			if (!new File(filename).exists())
-				yamm.extract(i, filename);
 			data.add(filename);
 		}
 
