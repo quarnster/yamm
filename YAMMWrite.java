@@ -1,4 +1,4 @@
-/*  $Id: YAMMWrite.java,v 1.35 2003/04/19 11:53:28 fredde Exp $
+/*  $Id: YAMMWrite.java,v 1.36 2003/06/07 09:06:42 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import org.gjt.fredde.yamm.mail.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Revision: 1.35 $
+ * @version $Revision: 1.36 $
  */
 public class YAMMWrite
 	extends JFrame
@@ -117,7 +117,7 @@ public class YAMMWrite
 		Box vert3 = Box.createVerticalBox();
 		Box hori1 = Box.createHorizontalBox();
 
-		JButton myButton = new JButton();
+		JButton myButton = new BorderButton();
 		myButton.setToolTipText(YAMM.getString("button.send"));
 
 		if (YAMM.text) myButton.setText(YAMM.getString("button.send"));
@@ -130,7 +130,7 @@ public class YAMMWrite
 		myButton.addActionListener(BListener);
 		hori1.add(myButton);
 
-		myButton = new JButton();
+		myButton = new BorderButton();
 		myButton.setToolTipText(YAMM.getString("button.cancel"));
 
 		if (YAMM.text) myButton.setText(YAMM.getString("button.cancel"));
@@ -613,6 +613,9 @@ public class YAMMWrite
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.36  2003/06/07 09:06:42  fredde
+ * BorderButton
+ *
  * Revision 1.35  2003/04/19 11:53:28  fredde
  * updated to work with the new mbox-format
  *
