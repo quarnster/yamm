@@ -165,8 +165,9 @@ public class MessageParser {
 		String boundary = null;
 
 		String temp = mhp.getHeaderField("Content-Type");
-		String contentType = temp.toLowerCase();
+		String contentType = "";
 		if (temp != null) {
+			contentType = temp.toLowerCase();
 			if (temp.indexOf("boundary=\"") != -1) {
 				boundary = temp.substring(
 					temp.indexOf("boundary=\"") + 10,
