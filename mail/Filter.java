@@ -33,6 +33,7 @@ public class Filter {
   StringTokenizer tok;
   BufferedReader in;
   int type;
+  int cheat[] = new int[1];
   Vector list = new Vector();
 
   /**
@@ -66,7 +67,8 @@ public class Filter {
             temp2 = ((Vector)list.elementAt(i)).elementAt(type).toString();
             if(temp2.equalsIgnoreCase(con3)) {
               list.remove(i);
-              Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" + exec, i);
+              cheat[0] = i;
+              Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" + exec, cheat);
               i--;
             }
           }
@@ -76,15 +78,18 @@ public class Filter {
             temp2 = ((Vector)list.elementAt(i)).elementAt(type).toString();
             if(temp2.toLowerCase().indexOf(con3.toLowerCase()) != -1) {
               list.remove(i);
-              Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" + exec, i);
+              cheat[0] = i;
+              Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" + exec, cheat);
               i--;
             }
           }
         }
       }
     } finally { in.close(); }
+
+    cheat[0] = 0;
     while(Mailbox.hasMail(confHome + "boxes/.filter")) {
-      Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/inbox", 0);
+      Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/inbox", cheat);
     }
   }
 }
