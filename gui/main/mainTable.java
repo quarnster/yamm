@@ -73,8 +73,8 @@ public class mainTable extends JTable implements DragGestureListener,
     this.frame = frame;
     setModel(tm);
 
-    TableColumn column = null;
-    column = getColumnModel().getColumn(3);
+/*
+    TableColumn column = getColumnModel().getColumn(3);
     column.setPreferredWidth(125);
     column.setMaxWidth(140);
     column.setMinWidth(10);
@@ -82,6 +82,31 @@ public class mainTable extends JTable implements DragGestureListener,
     column.setPreferredWidth(20);
     column.setMinWidth(10);
     column.setMaxWidth(50);
+*/
+    TableColumn column = getColumnModel().getColumn(0);
+    column.setIdentifier("num");
+    column.setMinWidth(5);
+    column.setMaxWidth(1024);
+    column.setPreferredWidth(Integer.parseInt(YAMM.getProperty("num.width", "20")));
+
+    column = getColumnModel().getColumn(1);
+    column.setIdentifier("subject");
+    column.setMinWidth(5);
+    column.setMaxWidth(1024);
+    column.setPreferredWidth(Integer.parseInt(YAMM.getProperty("subject.width", "200")));
+
+    column = getColumnModel().getColumn(2);
+    column.setIdentifier("from");
+    column.setMinWidth(5);
+    column.setMaxWidth(1024);
+    column.setPreferredWidth(Integer.parseInt(YAMM.getProperty("from.width", "200")));
+
+    column = getColumnModel().getColumn(3);
+    column.setIdentifier("date");
+    column.setMinWidth(5);
+    column.setMaxWidth(1024);
+    column.setPreferredWidth(Integer.parseInt(YAMM.getProperty("date.width", "125")));
+
 
     setRowHeight(12);
     setSelectionMode(2);
@@ -101,6 +126,17 @@ public class mainTable extends JTable implements DragGestureListener,
     popup.setInvoker(this);
 
     createPopup(popup);
+  }
+
+  public void save() {
+    TableColumn c = getColumnModel().getColumn(0);
+    YAMM.setProperty(c.getIdentifier().toString() + ".width", c.getWidth()+"");
+    c = getColumnModel().getColumn(1);
+    YAMM.setProperty(c.getIdentifier().toString() + ".width", c.getWidth()+"");
+    c = getColumnModel().getColumn(2);
+    YAMM.setProperty(c.getIdentifier().toString() + ".width", c.getWidth()+"");
+    c = getColumnModel().getColumn(3);
+    YAMM.setProperty(c.getIdentifier().toString() + ".width", c.getWidth()+"");
   }
 
   protected String getSelected() {
