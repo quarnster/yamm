@@ -28,7 +28,7 @@ import org.gjt.fredde.yamm.Utilities;
 /**
  * The renderer for the mailtable
  * @author Fredrik Ehnbom
- * @version $Id: MailTableRenderer.java,v 1.3 2000/12/26 11:22:17 fredde Exp $
+ * @version $Id: MailTableRenderer.java,v 1.4 2003/03/05 15:03:53 fredde Exp $
  */
 public class MailTableRenderer
 	extends DefaultTableCellRenderer
@@ -58,7 +58,7 @@ public class MailTableRenderer
 
 		String outbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
 
-		if (!yamm.listOfMails[row][4].equals("Unread") || outbox.equals(yamm.selectedbox)) {
+		if (!yamm.listOfMails[yamm.keyIndex[row]][4].equals("Unread") || outbox.equals(yamm.selectedbox)) {
 			setForeground(Color.black);
 		} else {
 			setForeground(Color.blue);
@@ -76,6 +76,9 @@ public class MailTableRenderer
 /*
  * Changes:
  * $Log: MailTableRenderer.java,v $
+ * Revision 1.4  2003/03/05 15:03:53  fredde
+ * now uses yamm.keyIndex
+ *
  * Revision 1.3  2000/12/26 11:22:17  fredde
  * YAMM.listOfMails is now of type String[][]
  *
