@@ -1,5 +1,5 @@
-/*  SplashScreen.java - a splashscreen
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+/*  $Id: SplashScreen.java,v 1.3 2003/03/16 11:04:07 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,10 +27,11 @@ import java.net.URL;
 /**
  * A splashscreen to display while YAMM loads
  * @author Fredrik Ehnbom
- * @version $Id: SplashScreen.java,v 1.2 2000/03/05 17:57:17 fredde Exp $
+ * @version $Revision: 1.3 $
  */
-public class SplashScreen extends JWindow {
-
+public class SplashScreen
+	extends JWindow
+{
 	/** Creates and show the splashscreen */
 	public SplashScreen(String text, URL pic) {
 		getContentPane().setLayout(new BorderLayout());
@@ -42,15 +43,20 @@ public class SplashScreen extends JWindow {
 
 		getContentPane().add("Center", logo);
 		getContentPane().add("South",new JLabel(text, SwingConstants.CENTER));
-		Dimension screen = getToolkit().getScreenSize();
+
 		pack();
-		setLocation((screen.width - getSize().width) / 2, (screen.height - getSize().height) / 2);
 		show();
+
+		// center screen
+		setLocationRelativeTo(null);
 	}
 }
 /*
  * Changes:
  * $Log: SplashScreen.java,v $
+ * Revision 1.3  2003/03/16 11:04:07  fredde
+ * updated
+ *
  * Revision 1.2  2000/03/05 17:57:17  fredde
  * cleaned up and now uses urls instead of strings for the image
  *
