@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.51 2003/04/13 16:40:09 fredde Exp $
+/*  $Id: mainTable.java,v 1.52 2003/04/16 12:41:32 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.51 $
+ * @version $Revision: 1.52 $
  */
 public class mainTable
 	extends JTable
@@ -691,20 +691,8 @@ public class mainTable
 					return;
 				}
 
-				int msgnum = yamm.keyIndex[getSelectedRow()];
-				long skip = yamm.listOfMails[msgnum].skip;
-
-				String[] mail = Mailbox.getMailForReplyHeaders(yamm.getMailbox(), skip);
-
-
- 				if (!mail[2].startsWith(YAMM.getString("mail.re")) && !mail[2].startsWith("Re:")) {
-					mail[2] = YAMM.getString("mail.re") + " " + mail[2];
-				}
-
-				YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[2], mail[0] + " " + YAMM.getString("mail.wrote") + "\n");
-
-				Mailbox.getMailForReply(yamm.getMailbox(), msgnum, skip, yam.myTextArea);
-				yam.sign();
+				YAMMWrite yam = new YAMMWrite();
+				yam.reply();
 			}
 		}
 	};
@@ -767,6 +755,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.52  2003/04/16 12:41:32  fredde
+ * now uses YAMMWrite.reply()
+ *
  * Revision 1.51  2003/04/13 16:40:09  fredde
  * now uses yamm.set/getMailbox. sets tableheader name to To for outbox and sent
  *
