@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.37 2003/03/12 20:20:54 fredde Exp $
+/*  $Id: mainJTree.java,v 1.38 2003/03/15 19:49:15 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.37 $
+ * @version $Revision: 1.38 $
  */
 public class mainJTree
 	extends JTable
@@ -87,7 +87,9 @@ public class mainJTree
 			} else return node;
 		}
 
-		public final boolean isCellEditable(int col) {
+		public final boolean isCellEditable(int row, int col) {
+			if (col == 0)
+				return true;
 			return false;
 		}
 
@@ -131,6 +133,9 @@ public class mainJTree
 		tree.setCellRenderer(brend);
 		updateNodes();
 		setDefaultRenderer(TreeTableCellRenderer.class, tree);
+		setDefaultEditor(TreeTableCellRenderer.class, new TreeTableCellEditor());  
+
+
 		DefaultTableCellRenderer rend = new DefaultTableCellRenderer();
 		rend.setHorizontalAlignment(JLabel.RIGHT);
 		setDefaultRenderer(int.class, rend);
@@ -159,7 +164,6 @@ public class mainJTree
 		mi.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		mi.addActionListener(treepoplistener);
 		treepop.add(mi);
-		tree.setRowHeight(getRowHeight());
 
 		if (YAMM.getProperty("main.tree.switch", "false").equals("true"))
 			getColumnModel().moveColumn(1, 0);
@@ -169,12 +173,96 @@ public class mainJTree
 			DnDConstants.ACTION_COPY_OR_MOVE, // actions
 			this //DropTargetListener
 		);
-		tree.setSelectionModel(new DefaultTreeSelectionModel() {
-			{
-				setSelectionModel(mainJTree.this.getSelectionModel());
+		TreeTableSelectionModel model = new TreeTableSelectionModel(tree);
+		tree.setSelectionModel(model);
+		setSelectionModel(model.getListSelectionModel());
+		setRowHeight(16);
+		tree.setRowHeight(getRowHeight());
+		tree.addTreeExpansionListener(new TreeExpansionListener() {
+			public void treeExpanded(TreeExpansionEvent event) {  
+				dataModel.fireTableDataChanged(); 
+			}
+			public void treeCollapsed(TreeExpansionEvent event) {  
+				dataModel.fireTableDataChanged(); 
 			}
 		});
+	}
+	public class TreeTableCellEditor
+		implements CellEditor, TableCellEditor
+	{
+		protected EventListenerList listenerList = new EventListenerList();
 
+		public Object getCellEditorValue() { return null; }
+		public boolean shouldSelectCell(EventObject e) { return false; }
+		public boolean stopCellEditing() { return true; }
+		public void cancelCellEditing() {}
+
+		public void addCellEditorListener(CellEditorListener l) {
+			listenerList.add(CellEditorListener.class, l);
+		}
+
+		public void removeCellEditorListener(CellEditorListener l) {
+			listenerList.remove(CellEditorListener.class, l);
+		}
+
+		/*
+		* Notify all listeners that have registered interest for
+		* notification on this event type.
+		* @see EventListenerList
+		*/
+		protected void fireEditingStopped() {
+			// Guaranteed to return a non-null array
+			Object[] listeners = listenerList.getListenerList();
+			// Process the listeners last to first, notifying
+			// those that are interested in this event
+			for (int i = listeners.length-2; i>=0; i-=2) {
+				if (listeners[i]==CellEditorListener.class) {
+					((CellEditorListener)listeners[i+1]).editingStopped(new ChangeEvent(this));
+				}
+			}
+		}
+
+		/*
+		* Notify all listeners that have registered interest for
+		* notification on this event type.  
+		* @see EventListenerList
+		*/
+		protected void fireEditingCanceled() {
+			// Guaranteed to return a non-null array
+			Object[] listeners = listenerList.getListenerList();
+			// Process the listeners last to first, notifying
+			// those that are interested in this event
+			for (int i = listeners.length-2; i>=0; i-=2) {
+				if (listeners[i]==CellEditorListener.class) {
+					((CellEditorListener)listeners[i+1]).editingCanceled(new ChangeEvent(this));
+				}
+			}
+		}
+
+		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int r, int c) {
+			return tree;
+		}
+		public boolean isCellEditable(EventObject e) {
+			if (e instanceof MouseEvent) {
+				for (int counter = getColumnCount() - 1; counter >= 0; counter--) {
+					if (getColumnClass(counter) == TreeTableCellRenderer.class) {
+						MouseEvent me = (MouseEvent)e;
+						MouseEvent newME = new MouseEvent(tree, me.getID(),
+						me.getWhen(), me.getModifiers(),
+						me.getX() - getCellRect(0, counter, true).x,
+						me.getY(), me.getClickCount(),
+						me.isPopupTrigger());
+						tree.dispatchEvent(newME);
+						break;
+					}
+				}
+			}
+			return false;
+		}
+	}
+
+	public int getEditingRow() {
+		return (getColumnClass(editingColumn) == TreeTableCellRenderer.class) ? -1 : editingRow;  
 	}
 
 	public void save() {
@@ -282,6 +370,7 @@ public class mainJTree
 
 		if ((f.toString()).equals(Utilities.replace(home + "/boxes"))) {
 			String list[] = f.list();
+			Arrays.sort(list);
 			for (int i = 0; i < list.length; i++) {
 				createNodes(top, new File(f, list[i]));
 			}
@@ -291,6 +380,7 @@ public class mainJTree
 			top.add(dir);
 
 			String list[] = f.list();
+			Arrays.sort(list);
 			for (int i = 0; i < list.length; i++) {
 				createNodes(dir, new File(f, list[i]));
 			}
@@ -376,15 +466,6 @@ public class mainJTree
 						yamm.mailList.clearSelection();
 						yamm.mailList.update();
 					}
-
-					if (box.isDirectory()) {
-						int row = getSelectedRow();
-						if (tree.isCollapsed(row))
-							tree.expandRow(row);
-						else
-							tree.collapseRow(row);
-						dataModel.fireTableDataChanged();
-					}
 				}
 
 				if ( ((mainTable)yamm.mailList).getSelectedRow() != -1 &&
@@ -408,6 +489,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.38  2003/03/15 19:49:15  fredde
+ * sorts boxlist. works properly as a treetable now
+ *
  * Revision 1.37  2003/03/12 20:20:54  fredde
  * removed MsgDialog
  *
