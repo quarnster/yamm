@@ -1,5 +1,5 @@
 /*  Utilities.java - Some useful utilities
- *  Copyright (C) 2000 Fredrik Ehnbom
+ *  Copyright (C) 2000-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,16 +17,37 @@
  */
 package org.gjt.fredde.yamm;
 
-import java.io.File;
-import java.util.Vector;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.text.*;
+import java.util.*;
+import java.util.jar.*;
 
 /**
  * This Class provides some useful utilities
  * @author Fredrik Ehnbom
- * @version $Id: Utilities.java,v 1.5 2000/08/10 21:56:05 fredde Exp $
+ * @version $Id: Utilities.java,v 1.6 2001/03/18 17:04:44 fredde Exp $
  */
 public final class Utilities {
+
+	/**
+	 * Gets the compiledate of this archive
+	 */
+	public static String getCompileDate() {
+		String date = null;
+		try {
+			JarFile jf = new JarFile("yamm.jar");
+			JarEntry je = jf.getJarEntry("org/gjt/fredde/yamm/YAMM.class");
+
+			Date d = new Date(je.getTime());
+			SimpleDateFormat dateFormat = new SimpleDateFormat("EEEEEEE, MMMMMMMM dd yyyy HH:mm:ss");
+			date = dateFormat.format(d);
+			
+			jf.close();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		return date;
+	}
 
 	/**
 	 * Replaces the /'s with this systems file separator
@@ -145,6 +166,9 @@ public final class Utilities {
 /*
  * Changes:
  * $Log: Utilities.java,v $
+ * Revision 1.6  2001/03/18 17:04:44  fredde
+ * added getCompileDate-method
+ *
  * Revision 1.5  2000/08/10 21:56:05  fredde
  * works in unix
  *
