@@ -23,9 +23,18 @@ import java.util.Vector;
 /**
  * This Class provides some useful utilities
  * @author Fredrik Ehnbom
- * @version $Id: Utilities.java,v 1.1 2000/02/28 13:51:24 fredde Exp $
+ * @version $Id: Utilities.java,v 1.2 2000/03/05 18:02:11 fredde Exp $
  */
 public class Utilities {
+
+	/**
+	 * Prints a debug message to YAMM.debug and the flushes
+	 * @param msg The message to print out
+	 */
+	public static void printDebug(String msg) {
+		YAMM.debug.println(msg);
+		YAMM.debug.flush();
+	}
 
 	/**
 	 * Deletes the unneededfiles in the cache directory
@@ -35,14 +44,14 @@ public class Utilities {
 		
 		if (YAMM.getProperty("debug.cachedel", "false").equals("true"))
 			debug = true;
-			
+
 		Vector delFile = new Vector(), delDir = new Vector();
 
 		if (debug)
-			YAMM.debug.println("Creating list of unneeded files...");
+			printDebug("delfiles: Creating list of unneeded files...");
 		createDelList(delFile, delDir, new File(YAMM.home + "/tmp/"), debug);
 		if (debug)
-			YAMM.debug.println("\nDeleting unneeded files...");
+			printDebug("delfiles: Deleting unneeded files...");
 
 		delFiles(delFile, debug);
 		delFiles(delDir, debug);
@@ -57,7 +66,7 @@ public class Utilities {
 
 		for (int i = 0; i < files.length; i++) {
 			if (debug)
-				YAMM.debug.println("added \"" + files[i]);
+				printDebug("delfiles: added \"" + files[i]);
 
 			File dir2 = new File(dir, files[i]);
 
@@ -80,7 +89,7 @@ public class Utilities {
 			String file = delFile.elementAt(i).toString();
 
 			if (!new File(file).delete() && debug) {
-				YAMM.debug.println("Couldn't delete \"" + file + "\"");
+				printDebug("delfiles: Couldn't delete \"" + file + "\"");
 			}
 		}
 	}
@@ -117,6 +126,9 @@ public class Utilities {
 /*
  * Changes:
  * $Log: Utilities.java,v $
+ * Revision 1.2  2000/03/05 18:02:11  fredde
+ * added the printDebug command
+ *
  * Revision 1.1  2000/02/28 13:51:24  fredde
  * initial commit
  *
