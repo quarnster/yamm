@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.60 2003/03/08 21:43:15 fredde Exp $
+/*  $Id: YAMM.java,v 1.61 2003/03/09 17:46:47 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.60 $
+ * @version $Revision: 1.61 $
  */
 public class YAMM
 	extends JFrame
@@ -65,7 +65,7 @@ public class YAMM
 	public static String selectedbox = Utilities.replace(home + "/boxes/");
 
 	/** The version of YAMM */
-	public static String version  = "0.8 $Date: 2003/03/08 21:43:15 $";
+	public static String version  = "0.8 $Date: 2003/03/09 17:46:47 $";
 
 	/** The compileDate of YAMM */
 	public static String compDate = Utilities.getCompileDate();
@@ -82,7 +82,7 @@ public class YAMM
 	public static boolean base64enc = false;
 
 	/** The vector containing the mails of a box */
-	public String[][] listOfMails;
+	public IndexEntry[] listOfMails;
 	public int[] keyIndex;
 
 	/** The properties to get configuration stuff from */
@@ -305,7 +305,7 @@ public class YAMM
 
 		JScrollPane spane = new JScrollPane(mailList);
 		spane.getViewport().setOpaque(true);
-		spane.getViewport().setBackground(Color.white);
+		spane.getViewport().setBackground(mailList.getBackground());
 
 		SPane = new JSplitPane(0, spane, JTPane);
 		SPane.setDividerLocation(hsplit);
@@ -317,7 +317,7 @@ public class YAMM
 
 		spane = new JScrollPane(tree);
 		spane.getViewport().setOpaque(true);
-		spane.getViewport().setBackground(Color.white);
+		spane.getViewport().setBackground(tree.getBackground());
 		SPane2 = new JSplitPane(1, spane, SPane);
 		SPane2.setDividerLocation(vsplit);
 		SPane2.setOneTouchExpandable(true);
@@ -687,6 +687,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.61  2003/03/09 17:46:47  fredde
+ * now uses the new index system. viewports gets their background colors from their parents
+ *
  * Revision 1.60  2003/03/08 21:43:15  fredde
  * added tree.save()
  *
