@@ -429,39 +429,27 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     }
   }
 
-  protected void addinfo(String where, Vector attach) {
-    Vector tmp = new Vector();
-    String temp = null;
+	protected void addinfo(String where, Vector attach) {
+		Vector tmp = new Vector();
 
-    try {
-      BufferedReader in = new BufferedReader(
-                          new InputStreamReader(
-                          new FileInputStream(where)));
+		try {
+			BufferedReader in = new BufferedReader(
+				new InputStreamReader(
+				new FileInputStream(where)));
 
-      String name = null, encode = null;
 
-      for (;;) {
-        temp = in.readLine();
-
-        if (temp.startsWith("Content-Transfer-Encoding: ")) {
-          encode = temp.substring(27, temp.length()).trim();
-	} else if (temp.indexOf("name=\"") != -1) {
-          name = temp.substring(temp.indexOf("name=\"") + 6,
-                 temp.lastIndexOf("\""));
-	}
+			tmp.add(in.readLine()); // Name of the attachment
+			tmp.add(in.readLine()); // The attachments encoding
 
         
-        if (name != null && encode != null) { 
-          tmp.add(name); tmp.add(encode); break;
-        }
-      }
-      in.close();
-    }
-    catch (IOException ioe) { System.err.println(ioe); }
+			in.close();
+		} catch (IOException ioe) {
+			System.err.println(ioe);
+		}
 
-    tmp.add(where);
-    attach.add(tmp);
-  }
+		tmp.add(where);
+		attach.add(tmp);
+	}
 
   public int print(Graphics g, PageFormat pageFormat,
                         int pageIndex) throws PrinterException {

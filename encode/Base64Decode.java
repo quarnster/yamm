@@ -24,64 +24,67 @@ import org.gjt.fredde.yamm.gui.imageViewer;
 
 public class Base64Decode extends Thread {
 
-  String filename, target;
+	String filename, target;
 
-  public Base64Decode(String name, String filename, String target) {
-    super(name);
-    this.filename = filename;
-    this.target = target;
-    System.out.println("filename: " + filename + " target: " + target);
-  }
+	public Base64Decode(String name, String filename, String target) {
+		super(name);
+		this.filename = filename;
+		this.target = target;
+	}
 
-  public void start() {
-    super.start();
-  }
+	public void start() {
+		super.start();
+	}
 
-  public void run() {
-    makeBase64(target);
-    try{
-      InputStream is = new BufferedInputStream(new FileInputStream(target + ".tmp"));
-      OutputStream os = new BufferedOutputStream(new FileOutputStream(target));
-      BASE64Decoder b64dc = new BASE64Decoder();
-      b64dc.decodeBuffer(is, os);
-      String end = target.substring(target.lastIndexOf("."), target.length()).toLowerCase();
-      is.close();
-      os.close();
+	public void run() {
+		makeBase64(target);
 
-      if(end.equals(".gif") || end.equals(".jpg")) {
-        new imageViewer(filename);
-      }
-    }
-    catch (IOException e) {
-      System.err.println(e);
-    }
-  }
-  protected void makeBase64(String t) {
-    String temp;
-    try {
-      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
-      PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(target + ".tmp")));
+		try {
+			InputStream is = new BufferedInputStream(
+					new FileInputStream(target + ".tmp"));
+			OutputStream os = new BufferedOutputStream(
+					new FileOutputStream(target));
+			BASE64Decoder b64dc = new BASE64Decoder();
+			b64dc.decodeBuffer(is, os);
+			String end = target.substring(target.lastIndexOf("."),
+						target.length()).toLowerCase();
+			is.close();
+			os.close();
 
-      for(;;) {
-        temp = in.readLine();
-      
-        if(temp.equals("")) break;
-      }
+			if (end.equals(".gif") || end.equals(".jpg")) {
+				new imageViewer(filename);
+			}
+		} catch (IOException e) {
+			System.err.println(e);
+		}
+	}
 
-      for(;;) {
-        temp = in.readLine();
+	protected void makeBase64(String t) {
+		String temp;
+		 try {
+			BufferedReader in = new BufferedReader(
+					new InputStreamReader(
+					new FileInputStream(filename)));
+			PrintWriter out = new PrintWriter(
+					new BufferedOutputStream(
+					new FileOutputStream(target + ".tmp")));
 
-        if(temp == null) break;
+			in.readLine(); // Name of attachment
+			in.readLine(); // The attachment encoding
 
-        out.println(temp);
-      }
-      in.close();
-      out.close();
-    }
-    catch(IOException ioe) {
-      System.err.println(ioe);
-    }
-  }   
+			for (;;) {
+				temp = in.readLine();
+
+				if (temp == null) {
+					break;
+				}
+
+				out.println(temp);
+			}
+			in.close();
+			out.close();
+		} catch (IOException ioe) {
+			System.err.println(ioe);
+		}
+	}   
 }
-
-

@@ -60,14 +60,9 @@ public class UUDecode extends Thread{
 						new BufferedOutputStream(
 						new FileOutputStream(target)));
 
-			for(;;) {
-				String temp = in.readLine();
 
-				if (temp.equals("")) {
-					in.readLine();
-					break;
-				}
-			}
+			in.readLine();
+			in.readLine();
 
 			new UUDecoder(in, out);
 
