@@ -23,7 +23,7 @@ import java.io.IOException;
  * This class is used for launching the current platforms default browser.
  *
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: Browser.java,v 1.4 2001/02/04 11:03:19 fredde Exp $
+ * @version $Id: Browser.java,v 1.5 2003/03/08 21:46:24 fredde Exp $
  */
 public class Browser {
 
@@ -56,14 +56,14 @@ public class Browser {
 			cmd = ("rundll32 url.dll,FileProtocolHandler " + maybeFixupURLForWindows(url));
 			Runtime.getRuntime().exec(cmd);
 		} else {
-			cmd = "netscape -remote openURL(" + url + ")";
+			cmd = "mozilla -remote openURL(" + url + ")";
 
 			Process p = Runtime.getRuntime().exec(cmd);
 
 			int exitcode = p.waitFor();
 
 			if (exitcode != 0) {
-				cmd = "netscape " + url;
+				cmd = "mozilla " + url;
 
 				Runtime.getRuntime().exec(cmd);
 			}
@@ -132,6 +132,9 @@ public class Browser {
 /*
  * ChangeLog:
  * $Log: Browser.java,v $
+ * Revision 1.5  2003/03/08 21:46:24  fredde
+ * netscape -> mozilla
+ *
  * Revision 1.4  2001/02/04 11:03:19  fredde
  * updated and applied "open IE"-patch from David Tuma
  *
