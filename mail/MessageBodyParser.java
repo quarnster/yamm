@@ -1,5 +1,5 @@
 /*  MessageBodyParser.java - Parses the body of a message
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@ import java.util.*;
 
 /**
  * Parses the body of a message
+ * @author Fredrik Ehnbom
+ * @version $Id: MessageBodyParser.java,v 1.8 2000/02/28 13:42:56 fredde Exp $
  */
 public class MessageBodyParser {
 
@@ -246,3 +248,10 @@ public class MessageBodyParser {
 //		return ERROR;
 	}
 }
+/*
+ * Changes:
+ * $Log: MessageBodyParser.java,v $
+ * Revision 1.8  2000/02/28 13:42:56  fredde
+ * added changelog and soem javadoc tags
+ *
+ */
