@@ -25,7 +25,7 @@ public class Print {
 
     // Set up a book
     Book bk = new Book();
-    Mailbox.getMailForPrint(frame.selectedbox, mail, bk);
+ //   Mailbox.getMailForPrint(frame.selectedbox, mail, bk);
 //    bk.append(new PaintCover(), job.defaultPage());
 
     // Pass the book to the PrinterJob
