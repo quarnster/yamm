@@ -188,6 +188,7 @@ public class mainMenu extends JMenuBar {
          p("os.name", jt);
          p("os.arch", jt);
          p("os.version", jt);
+         jt.append("YAMM.yammVersion: " + YAMM.yammVersion);
       }
       else if(kommando.equals(YAMM.getString("help.license"))) {
         new MsgDialog(null, YAMM.getString("help.license"), 
