@@ -53,7 +53,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   static protected ResourceBundle         res;
 
   /** The box the user has selected. */
-  public static String                 selectedbox  = home + "/boxes/inbox";
+  public static String                 selectedbox  = home + "/boxes/"; //+ res.getString("box.inbox");
 
   /** The version of YAMM */
   public static    String                 yammVersion  = "0.7.2";
@@ -160,6 +160,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
    * Creates the main-window and adds all the components in it.
    */
   public YAMM() {
+/*
     try {
       res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", 
                                      Locale.getDefault());
@@ -168,10 +169,11 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
       mre.printStackTrace();
       System.exit(1);
     }
+*/
 
     Mailbox.getMail(selectedbox, 0);
     try { 
-      mailPage = new URL(mailPageString + "/inbox/" + "0.html"); 
+      mailPage= new URL(mailPageString + res.getString("box.inbox") + "/0.html");
     }
     catch (MalformedURLException mue) { System.err.println(mue); }
 
@@ -219,7 +221,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
     // handles some stuff for the table
     TableModel dataModel = new AbstractTableModel() {
-      final String headername[] = { "#", res.getString("mail.subject"), res.getString("mail.from"), res.getString("mail.date") };
+      final String headername[] = { "#", res.getString("table.subject"), res.getString("table.from"), res.getString("table.date") };
 
       public int getColumnCount() { return 4; }
       public int getRowCount() {  return  listOfMails.size(); }
@@ -639,6 +641,16 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     SplashScreen splash = new SplashScreen("YAMM " + yammVersion + " Copyright (c) 1999 Fredrik Ehnbom", "org/gjt/fredde/yamm/images/logo.gif");
     YAMM nFrame = null;
 
+    try {        
+      res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM",
+                                     Locale.getDefault());
+    }
+    catch (MissingResourceException mre) {
+      mre.printStackTrace();
+      System.exit(1);
+    }
+
+    selectedbox += res.getString("box.inbox");
     if(!(new File(System.getProperty("user.home") + "/.yamm/boxes")).exists()) {
       try {
         String user = System.getProperty("user.name");
@@ -650,24 +662,23 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
         (new File(home + "/servers")).mkdirs();
         (new File(home + "/boxes")).mkdirs();
-        PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(home + "/boxes/inbox")));
+        PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(home + "/boxes/" + YAMM.getString("box.inbox"))));
 
         out.println("Date: " + dateFormat.format(new Date()));
         out.println("From: Fredrik Ehnbom <fredde@gjt.org>");
         out.println("To: " + user + "@" + host);
-        out.println("Subject: Welcome to YAMM " + yammVersion);
-        out.println("\n<html>\nWelcome " + user + "!");
-        out.println("\nFeel free to <a href=\"mailto:fredde@gjt.org\">mail me</a> your questions, comments, suggestions or bug-reports.");
-        out.println("\nIf you want to report a bug, choose 'bug report' from the 'help'-menu.\n");
-        out.println("\nBest regards,\n\nFredrik Ehnbom\n</html>\n.\n");
+        Object[] args = {YAMM.yammVersion, user}; 
+        out.println(YAMM.getString("msg.welcome", args));
+
         out.close();
 
-        (new File(home + "/boxes/outbox")).createNewFile();
-        (new File(home + "/boxes/trash")).createNewFile();
+        (new File(home + "/boxes/" + YAMM.getString("box.outbox"))).createNewFile();
+        (new File(home + "/boxes/" + YAMM.getString("box.trash"))).createNewFile();
         (new File(home + "/.config")).createNewFile();
         (new File(home + "/.filters")).createNewFile();
         (new File(home + "/tmp")).mkdirs();
-      } catch(IOException ioe) { new MsgDialog(nFrame, "Error!", ioe.toString()); }
+      } catch(IOException ioe) { 
+        new MsgDialog(nFrame, YAMM.getString("msg.error"), ioe.toString()); }
     }
     String result;
 

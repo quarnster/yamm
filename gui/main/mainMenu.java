@@ -227,8 +227,13 @@ public class mainMenu extends JMenuBar {
           int ret = jfs.showSaveDialog(frame);
 
           if(ret == JFileChooser.APPROVE_OPTION) {
-            String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes/") + 6, frame.selectedbox.length());
-            new File(frame.mailPageString + boxName + frame.mailList.getSelectedRow() + ".html").renameTo(jfs.getSelectedFile());
+            String tmp = frame.selectedbox;
+            String boxName = tmp.substring(tmp.indexOf("boxes")+6,tmp.length());
+            tmp = frame.mailPageString;
+            boxName = tmp.substring(8, tmp.length()) + boxName + YAMM.sep + 
+                      frame.mailList.getSelectedRow() + ".html";
+
+            new File(boxName).renameTo(jfs.getSelectedFile());
           }
         }
       }

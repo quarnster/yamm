@@ -23,6 +23,7 @@ import java.util.Vector;
 import java.util.StringTokenizer;
 import java.net.URL;
 import java.net.URLConnection;
+import org.gjt.fredde.yamm.YAMM;
 
 /**
  * Encodes file in the uuencode format
@@ -42,7 +43,7 @@ public class UUEncode {
    */
   public UUEncode(Vector attach) {
     try {
-      out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(System.getProperty("user.home") + "/.yamm/boxes/outbox", true)));
+      out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(System.getProperty("user.home") + "/.yamm/boxes/" + YAMM.getString("box.outbox"), true)));
 
       out.writeBytes("--AttachThis");
       for(int i = 0; i < attach.size();i++) {

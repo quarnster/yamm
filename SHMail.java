@@ -117,13 +117,13 @@ public class SHMail extends Thread {
      in.close();
     } catch (IOException propsioe) { System.err.println(propsioe); }
 
-    if(props.getProperty("smtpserver") != null && Mailbox.hasMail(YAMM.home + "/boxes/outbox")) {
+    if(props.getProperty("smtpserver") != null && Mailbox.hasMail(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"))) {
       Object[] argstmp = {""};
       frame.status.setStatus(YAMM.getString("server.send", argstmp));
       frame.status.progress(0);
       try { 
         Smtp smtp = new Smtp(props.getProperty("smtpserver"));
-        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(YAMM.home + "/boxes/outbox")));
+        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"))));
         String temp = null, from2 = null, to2 = null;
         int i = 1;
 
@@ -177,7 +177,7 @@ public class SHMail extends Thread {
           }
         }
         in.close();
-        File file = new File(YAMM.home + "/boxes/outbox");
+        File file = new File(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
         file.delete();
         file.createNewFile();
         smtp.closeConnection();

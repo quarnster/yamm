@@ -221,7 +221,7 @@ public class Mailbox {
         BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(whichBox)));
         PrintWriter outFile = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(cache, whichmail + ".html"))));
         int i = 0;
-        outFile.println("<html>\n<body>");
+        outFile.println("<html>\n<body>\n<table>");
 
         for(;;) {
           temp = in.readLine();
@@ -239,7 +239,8 @@ public class Mailbox {
 
                 date = dateFormat3.format(nisse);
               } catch (ParseException pe) { System.err.println(pe); date = " ";}
-	      outFile.println("<b>" + YAMM.getString("mail.date") + "</b> " + date + "<br>");
+	      outFile.println("<tr><td>" + YAMM.getString("mail.date") + 
+                              "</td><td> " + date + "</td></tr>");
             }
           }
 
@@ -248,14 +249,23 @@ public class Mailbox {
           else if(temp.startsWith("From:")) {
 
             if (i == whichmail) {
-              String from = "test";
+              String from = "", name = "";
               if(temp.indexOf("<") != -1 && temp.indexOf(">") != -1) {
-                from = temp.substring(temp.lastIndexOf("<") + 1, temp.lastIndexOf(">"));
-                outFile.println("<b>" + YAMM.getString("mail.from") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
+                from = temp.substring(temp.lastIndexOf("<") + 1, 
+                       temp.lastIndexOf(">"));
+                name = temp.substring(6, temp.indexOf("<")).trim();
+
+                outFile.println("<tr><td>" + YAMM.getString("mail.from") + 
+                                "</td><td>" + name + "&lt;" +
+                                "<a href=\"mailto:" + from + "\">" +
+                                from + "</a>&gt;</td></tr>");
               }
               else {
                 from = temp.substring(6, temp.length());
-                outFile.println("<b>" + YAMM.getString("mail.from") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
+                outFile.println("<tr><td>" + YAMM.getString("mail.from") + 
+                                "</td><td> <a href=\"mailto:" + from + "\">" + 
+                                temp.substring(6, temp.length()) + 
+                                "</a></td></tr>");
               }
               wait = false;
             }
@@ -275,42 +285,51 @@ public class Mailbox {
                 temp += temp2;
               }
 
-              if(temp.indexOf("<br>") == -1) temp += "<br>";
-              outFile.println("<b>" + YAMM.getString("mail.to") + "</b> " + temp);
+              outFile.println("<tr><td>" + YAMM.getString("mail.to") + 
+                              "</td><td> " + temp + "</td></tr>");
             }
           }
 
           else if(temp.startsWith("Reply-To:") && i == whichmail) {
-            String reply = "test";
+            String reply = "", name = "";
             if(temp.indexOf("<") != -1 && temp.indexOf(">") != -1) {
-              reply = temp.substring(temp.lastIndexOf("<") + 1, temp.lastIndexOf(">"));
-              outFile.println("<b>" + YAMM.getString("mail.reply_to") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
+              reply = temp.substring(temp.lastIndexOf("<") + 1, 
+                                     temp.lastIndexOf(">"));
+              name = temp.substring(10, temp.indexOf("<")).trim();
+
+              outFile.println("<tr><td>" + YAMM.getString("mail.reply_to") + 
+                              "</td><td>" + name +
+                              " &lt;<a href=\"mailto:" + reply + "\">" + 
+                              reply + "</a>&gt;</td></tr>");
             }
             else {
-              reply = temp.substring(6, temp.length());
-              outFile.println("<b>" + YAMM.getString("mail.reply_to") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
+              reply = temp.substring(10, temp.length());
+              outFile.println("<tr><td>" + YAMM.getString("mail.reply_to") + 
+                              "</td><td> <a href=\"mailto:" + reply + "\">" + 
+                              temp.substring(10, temp.length()) + 
+                              "</a></td></tr>");
             }
           }
 
           else if(temp.indexOf("boundary=\"") != -1) {
             if(i == whichmail) {
               boundary = temp.substring(temp.indexOf("boundary=\"") + 10, temp.indexOf("\"", temp.indexOf("boundary=\"") + 11));
-              System.out.println("boundary: " + boundary);
             }
           }
 
 
           else if(temp.startsWith("Subject:")) {
             if(i == whichmail) {
-              if(temp.indexOf("<br>") == -1) temp += "<br>";
-              outFile.println("<b>" + YAMM.getString("mail.subject") + "</b> " + temp.substring(8, temp.length()));
+              outFile.println("<tr></td>" + YAMM.getString("mail.subject") + 
+                              "</td><td> " + temp.substring(8, temp.length()) +
+                              "</td></tr>");
             }
           }
 
           else if(temp.equals("")) {
             if(i == whichmail && wait == false) {
 
-	      outFile.println("<pre>");
+	      outFile.println("</table>\n<pre>");
               for(;;) {
                 outFile.println(temp);
                 outFile.flush();
@@ -677,12 +696,12 @@ public class Mailbox {
     String sep = System.getProperty("file.separator");
     int next = 0;
 
-    if(!whichBox.equals(home + sep + ".yamm" + sep + "boxes" + sep + "trash")) {
+    if(!whichBox.equals(home + sep + ".yamm" + sep + "boxes" + sep + YAMM.getString("box.trash"))) {
       try {
 	File inputFile = new File(whichBox);
 	File outputFile = new File(whichBox + ".tmp");
         PrintWriter outFile = new PrintWriter(new BufferedOutputStream(new FileOutputStream(outputFile)));
-        PrintWriter outFile2 = new PrintWriter(new BufferedOutputStream(new FileOutputStream(System.getProperty("user.home") + "/.yamm/boxes/trash", true)));
+        PrintWriter outFile2 = new PrintWriter(new BufferedOutputStream(new FileOutputStream(System.getProperty("user.home") + "/.yamm/boxes/" + YAMM.getString("box.trash"), true)));
         BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
 
         int i = 0;
@@ -769,10 +788,12 @@ public class Mailbox {
         return false;
       }
     }
-    else if(whichBox.equals(home + sep + ".yamm" + sep + "boxes" + sep + "trash")) {
+    else if(whichBox.equals(home + sep + ".yamm" + sep + "boxes" + sep + YAMM.getString("box.trash"))) {
       try {
-        File inputFile = new File(home + "/.yamm/boxes/trash");
-	File outputFile = new File(home + "/.yamm/boxes/trash.tmp");
+        File inputFile = new File(home + "/.yamm/boxes/" +
+                                  YAMM.getString("box.trash"));
+	File outputFile = new File(home + "/.yamm/boxes/" +
+                                   YAMM.getString("box.trash") + ".tmp");
         BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
         PrintWriter outFile = new PrintWriter(new BufferedOutputStream(new FileOutputStream(outputFile)));
 

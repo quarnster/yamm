@@ -299,7 +299,7 @@ public class YAMMWrite extends JFrame {
       if(arg.equals(res.getString("button.send"))) {
         if(isSendReady()) {
           try {
-            PrintWriter outFile = new PrintWriter(new FileOutputStream(System.getProperty("user.home") + "/.yamm/boxes/outbox", true));
+            PrintWriter outFile = new PrintWriter(new FileOutputStream(System.getProperty("user.home") + "/.yamm/boxes/" + YAMM.getString("box.outbox"), true));
             SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
 
             String to = myTextField1.getText(), to2 = "", temp = null;
@@ -404,12 +404,14 @@ public class YAMMWrite extends JFrame {
   void addAttach() {
     JFileChooser jfs = new JFileChooser();
     jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    jfs.setMultiSelectionEnabled(false);
+    jfs.setMultiSelectionEnabled(true);
     int ret = jfs.showOpenDialog(this);
 
     if(ret == JFileChooser.APPROVE_OPTION) {
-      // well, jfs.getSelectedFiles() don't work...
+      // Why can't I get getSelectedFiles() to work?!
+      // File[] file = jfs.getSelectedFiles();
       File[] file = {jfs.getSelectedFile()};
+
       if(file != null) {
 
         for(int i = 0; i < file.length;i++) {

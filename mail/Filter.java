@@ -21,6 +21,7 @@ package org.gjt.fredde.yamm.mail;
 import java.io.*;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import org.gjt.fredde.yamm.YAMM;
 
 /**
  * A class that filters incoming messages
@@ -89,7 +90,8 @@ public class Filter {
 
     cheat[0] = 0;
     while(Mailbox.hasMail(confHome + "boxes/.filter")) {
-      Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/inbox", cheat);
+      Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" +
+                       YAMM.getString("box.inbox"), cheat);
     }
   }
 }
