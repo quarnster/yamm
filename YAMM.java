@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.55 2001/05/27 08:56:33 fredde Exp $
+/*  $Id: YAMM.java,v 1.56 2003/03/05 14:59:29 fredde Exp $
  *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,12 +42,19 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.55 2001/05/27 08:56:33 fredde Exp $
+ * @version $Id: YAMM.java,v 1.56 2003/03/05 14:59:29 fredde Exp $
  */
 public class YAMM
 	extends JFrame
 	implements HyperlinkListener
 {
+	public static int INDEX_NUM = 0;
+	public static int INDEX_SUBJECT = 1;
+	public static int INDEX_FROM = 2;
+	public static int INDEX_DATE = 3;
+	public static int INDEX_STATUS = 4;
+	public static int INDEX_SKIP = 5;
+
 	/** The home of yamm */
 	public static String home = Utilities.replace(System.getProperty("user.home") + "/.yamm");
 
@@ -76,6 +83,7 @@ public class YAMM
 
 	/** The vector containing the mails of a box */
 	public String[][] listOfMails;
+	public int[] keyIndex;
 
 	/** The properties to get configuration stuff from */
 	static protected Properties props = new Properties();
@@ -648,7 +656,7 @@ public class YAMM
 
 		if (props.getProperty("splashscreen", "yes").equals("yes")) {
 			splash = new SplashScreen("YAMM " + version +
-				" Copyright (c) 1999-2001 Fredrik Ehnbom",
+				" Copyright (c) 1999-2003 Fredrik Ehnbom",
 				props.getClass().getResource("/images/logo.gif"));
 		}
 
@@ -683,6 +691,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.56  2003/03/05 14:59:29  fredde
+ * Added INDEX_* constants. Added keyIndex variable. Updated Copyright info
+ *
  * Revision 1.55  2001/05/27 08:56:33  fredde
  * replaced deprecationed code thanks to wYRd
  *
