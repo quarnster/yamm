@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.33 2003/03/10 09:45:11 fredde Exp $
+/*  $Id: mainJTree.java,v 1.34 2003/03/10 12:31:01 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.33 $
+ * @version $Revision: 1.34 $
  */
 public class mainJTree
 	extends JTable
@@ -81,7 +81,9 @@ public class mainJTree
 			if (column == 1) {
 				int[] s = (int[]) unreadTable.get(node.toString());
 				if (s == null) return "";
-				return s[1] + " ";
+				if (s[2] > 0)
+					return s[1] + "+" + s[2];
+				return "" + s[1];
 			} else return node;
 		}
 
@@ -391,6 +393,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.34  2003/03/10 12:31:01  fredde
+ * show number of new messages
+ *
  * Revision 1.33  2003/03/10 09:45:11  fredde
  * non localized box filenames
  *
