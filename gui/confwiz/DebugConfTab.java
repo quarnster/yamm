@@ -25,7 +25,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * DebugConfTab is used for configuration debugsettings
  * @author Fredrik Ehnbom
- * @version $Id: DebugConfTab.java,v 1.1 2000/02/28 13:49:33 fredde Exp $
+ * @version $Id: DebugConfTab.java,v 1.2 2000/03/05 18:05:24 fredde Exp $
  */
 public class DebugConfTab extends JPanel {
 
@@ -44,13 +44,17 @@ public class DebugConfTab extends JPanel {
 		cb.addActionListener(listener);
 		b.add(cb);
 
+		cb = new JCheckBox(YAMM.getString("confwiz.debug.cachedel"), YAMM.getProperty("debug.cachedel", "false").equals("true"));
+		cb.addActionListener(listener);
+		b.add(cb);
+
 		Box b2 = Box.createHorizontalBox();
 		b2.add(new JLabel(YAMM.getString("confwiz.debug.file")));
 
 		final JTextField jt = new JTextField(YAMM.getProperty("debug.file", ""));
 		jt.setMaximumSize(new Dimension(1024, 20));
 		jt.setMinimumSize(new Dimension(50, 20));
-		jt.setPreferredSize(new Dimension(400, 20));
+		jt.setPreferredSize(new Dimension(300, 20));
 		jt.addFocusListener(new FocusAdapter() {
 			public void focusLost(FocusEvent e) {
 				YAMM.setProperty("debug.file", jt.getText());
@@ -80,6 +84,11 @@ public class DebugConfTab extends JPanel {
 					YAMM.setProperty("debug.pop", "true");
 				else
 					YAMM.setProperty("debug.pop", "false");
+			} else if (msg.equals(YAMM.getString("confwiz.debug.cachedel"))) {
+				if (src.isSelected())
+					YAMM.setProperty("debug.cachedel", "true");
+				else
+					YAMM.setProperty("deubg.cachedel", "false");
 			}
 		}
 	};
@@ -87,6 +96,9 @@ public class DebugConfTab extends JPanel {
 /*
  * Changes:
  * $Log: DebugConfTab.java,v $
+ * Revision 1.2  2000/03/05 18:05:24  fredde
+ * added checkbox for deletion of cached files
+ *
  * Revision 1.1  2000/02/28 13:49:33  fredde
  * files for the configuration wizard
  *
