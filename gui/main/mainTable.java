@@ -132,12 +132,16 @@ public class mainTable extends JTable {
 
   public void createPopup(JPopupMenu jpmenu) {
     Vector list = new Vector(), list2 = new Vector();          
-    String boxHome = System.getProperty("user.home") + "/.yamm/boxes";
+//    String sep  = File.separator;
+    String boxHome = System.getProperty("user.home") + YAMM.sep +
+                     ".yamm" + YAMM.sep + "boxes";
     
-    fileList(list, new File(System.getProperty("user.home") + 
-                                                  "/.yamm/boxes/"));
+    fileList(list, new File(System.getProperty("user.home") +
+                            YAMM.sep +  ".yamm" + YAMM.sep +
+                            "boxes" + YAMM.sep));
     fileList(list2, new File(System.getProperty("user.home") + 
-                                                  "/.yamm/boxes/"));
+                             YAMM.sep + ".yamm" + YAMM.sep +
+                             "boxes" + YAMM.sep));
     
     JMenuItem row, delete = new JMenuItem(res.getString("button.delete")),
               reply = new JMenuItem(res.getString("button.reply")); 
@@ -340,8 +344,9 @@ public class mainTable extends JTable {
  
       Mailbox.getMail(frame.selectedbox,whatMail /* , frame.attach, frame.mailName */);
       try {
-        String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes/") + 6, frame.selectedbox.length()) + "/"; 
-        frame.mailPage = new URL(frame.mailPageString + boxName + whatMail + ".html"); 
+        String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes") + 6, frame.selectedbox.length()) + "/"; 
+        System.out.println("boxName: " + boxName);
+        frame.mailPage = new URL(frame.mailPageString + boxName + whatMail + ".html");
       }
       catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
  
