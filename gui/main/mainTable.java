@@ -1,5 +1,5 @@
 /*  mainTable.java - The JTable for the main-window
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.MalformedURLException;
+import org.gjt.fredde.yamm.Utilities;
 import org.gjt.fredde.yamm.YAMM;
 import org.gjt.fredde.yamm.YAMMWrite;
 import org.gjt.fredde.yamm.mail.Mailbox;
@@ -36,6 +37,8 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 
 /**
  * The Table for listing the mails subject, date and sender.
+ * @author Fredrik Ehnbom
+ * @version $Id: mainTable.java,v 1.24 2000/02/28 13:47:35 fredde Exp $
  */
 public class mainTable extends JTable implements DragGestureListener,
 							DragSourceListener {
@@ -632,7 +635,7 @@ public class mainTable extends JTable implements DragGestureListener,
 					return;
 				}
 
-				frame.delUnNeededFiles();
+				Utilities.delUnNeededFiles();
 				int[] mlist = getSelectedRows();
 				int[] deleteList = new int[mlist.length];
 
@@ -720,7 +723,7 @@ public class mainTable extends JTable implements DragGestureListener,
 					return;
 				}
 
-				frame.delUnNeededFiles();
+				Utilities.delUnNeededFiles();
 				int[] mlist = getSelectedRows();
 				int[] deleteList = new int[mlist.length];
 
@@ -915,3 +918,10 @@ public class mainTable extends JTable implements DragGestureListener,
 		}
 	};
 }
+/*
+ * Changes:
+ * $Log: mainTable.java,v $
+ * Revision 1.24  2000/02/28 13:47:35  fredde
+ * Added changelog and some javadoc tags. Now uses the Utilities class for removing unneeded files
+ *
+ */
