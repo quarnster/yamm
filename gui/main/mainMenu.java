@@ -1,4 +1,4 @@
-/*  $Id: mainMenu.java,v 1.42 2003/06/07 11:30:49 fredde Exp $
+/*  $Id: mainMenu.java,v 1.43 2004/02/19 22:59:42 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@ import org.gjt.fredde.util.gui.*;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.42 $
+ * @version $Revision: 1.43 $
  */
 public class mainMenu
 	extends JMenuBar
@@ -240,7 +240,8 @@ public class mainMenu
 					"Ricardo A Mattar\n" + 
 					"Daniel Johnson\n" +
 					"Pablo Rodriguez\n" +
-					"Ilane Marie Walberg",
+					"Ilane Marie Walberg\n" +
+					"Dirk Neumann",
 					YAMM.getString("help.about"),
 					JOptionPane.INFORMATION_MESSAGE
 				);
@@ -404,6 +405,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.43  2004/02/19 22:59:42  fredde
+ * added Dirk Neumann
+ *
  * Revision 1.42  2003/06/07 11:30:49  fredde
  * fixed save as-function
  *
