@@ -1,5 +1,5 @@
 /*  MessageParser.java - Parses messages
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,11 +25,12 @@ import org.gjt.fredde.yamm.YAMM;
 
 /**
  * Parses messages
+ * @author Fredrik Ehnbom
+ * @version $Id: MessageParser.java,v 1.10 2000/02/28 13:43:14 fredde Exp $
  */
 public class MessageParser {
 
-
-	protected int attachments = 0;
+	private int attachments = 0;
 
 	public String makeClickable(String click) {
 		return MessageBodyParser.makeEmailLink(click);
@@ -219,11 +220,10 @@ public class MessageParser {
 
 		MessageBodyParser mbp = new MessageBodyParser(true);
 
-		boolean parseMore = true;
+		bigLoop:
 		for (;;) {
 			int test = mbp.parse(in, out, boundary);
 
-			if (!parseMore) break;
 			if (test == MessageBodyParser.ATTACHMENT &&
 							contentType.indexOf("multipart/alternative") == -1) {
 				Attachment a = new Attachment();
@@ -253,8 +253,7 @@ public class MessageParser {
 								attachments)));
 						continue;
 					} else /* if (test == Attachment.END) */{
-						parseMore = false;
-						break;
+						break bigLoop;
 					}
 				}
 			} else if (test == MessageBodyParser.END) {
@@ -269,3 +268,7 @@ public class MessageParser {
 		out.println("</html>");
 	}
 }
+/*
+ * Changes:
+ * $log
+ */
