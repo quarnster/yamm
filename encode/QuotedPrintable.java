@@ -1,4 +1,4 @@
-/*  $Id: Mime.java,v 1.1 2003/03/06 20:18:46 fredde Exp $
+/*  $Id: QuotedPrintable.java,v 1.1 2003/04/04 15:35:48 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -23,11 +23,11 @@ import org.gjt.fredde.yamm.mail.*;
 import java.io.*;
 import java.util.*;
 
-public class Mime
+public class QuotedPrintable
 	implements Decoder
 {
 
-	public static String unMime(String m, boolean html) {
+	public static String decodeLine(String m, boolean html) {
 		char[] check = "0123456789ABCDEF".toCharArray();
 		StringTokenizer tok = new StringTokenizer(m, " ", true);
 		String mime2 = "";
@@ -110,7 +110,7 @@ public class Mime
 				}
 
 				if (temp.indexOf("=") != -1) {
-					temp = unMime(temp, false);
+					temp = decodeLine(temp, false);
 				}
 
 				out.println(temp);

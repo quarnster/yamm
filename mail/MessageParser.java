@@ -1,4 +1,4 @@
-/*  $Id: MessageParser.java,v 1.23 2003/03/07 20:22:47 fredde Exp $
+/*  $Id: MessageParser.java,v 1.24 2003/04/04 15:36:18 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * Parses messages
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: MessageParser.java,v 1.23 2003/03/07 20:22:47 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.24 2003/04/04 15:36:18 fredde Exp $
  */
 public class MessageParser {
 
@@ -304,7 +304,7 @@ public class MessageParser {
 		}
 
 		if (encoding.equalsIgnoreCase("quoted-printable")/*fileName.indexOf(".message.") != -1*/) {
-			new Mime().decode(
+			new QuotedPrintable().decode(
 				new BufferedInputStream(new FileInputStream(source)),
 				new BufferedOutputStream(new FileOutputStream(target))
 			);
@@ -323,6 +323,9 @@ public class MessageParser {
 /*
  * ChangeLog:
  * $Log: MessageParser.java,v $
+ * Revision 1.24  2003/04/04 15:36:18  fredde
+ * renamed Mime.java to QuotedPrintable.java
+ *
  * Revision 1.23  2003/03/07 20:22:47  fredde
  * added \\t to the start link list
  *

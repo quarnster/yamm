@@ -42,7 +42,7 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/encode/Base64Encode.class \
 	org/gjt/fredde/yamm/encode/Encoder.class \
 	org/gjt/fredde/yamm/encode/Decoder.class \
-	org/gjt/fredde/yamm/encode/Mime.class \
+	org/gjt/fredde/yamm/encode/QuotedPrintable.class \
 	org/gjt/fredde/yamm/encode/Html.class \
 	org/gjt/fredde/yamm/encode/Base64sun.class \
 	org/gjt/fredde/yamm/encode/UUDecode.class \
