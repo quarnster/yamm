@@ -63,7 +63,7 @@ public class SHMail extends Thread {
     frame.status.progress(0);
     frame.status.setStatus("");
 
-    File files[] = new File(System.getProperty("user.home") + "/.yamm/servers/").listFiles();
+    File files[] = new File(YAMM.home + "/servers/").listFiles();
 
     for(int i=0;i<files.length;i++) {
       /* load the config */
@@ -86,39 +86,44 @@ public class SHMail extends Thread {
           frame.status.setStatus(res.getString("server.contact") + server);
 
           try { 
-            Pop3 pop = new Pop3(username, password, server, System.getProperty("user.home") + "/.yamm/boxes/.filter");
+            Pop3 pop = new Pop3(username, password, server, YAMM.home + "/boxes/.filter");
             int messages = pop.getMessageCount();
 
             for(int j = 1; j<=messages;j++) {
               frame.status.setStatus(res.getString("server.get") + j + 
                                      res.getString("server.get2") + messages);
 
-              frame.status.progress(100 - ( ( 100 * messages - 100 * j ) / messages ) );
+              frame.status.progress(100-((100*messages-100*(j-1))/messages));
               pop.getMessage(j);
               if(del) pop.deleteMessage(j);
             }
+            frame.status.setStatus(res.getString("msg.done"));
+            frame.status.progress(100);
             pop.closeConnection();
           }
-          catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
+          catch (IOException ioe) { 
+            new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); 
+          }
         }
-        else new MsgDialog(frame, res.getString("msg.error"), res.getString("server.bad"));
+        else new MsgDialog(frame, res.getString("msg.error"), 
+                                  res.getString("server.bad"));
       }
     }
 
    /* load the config */
    try {
-     InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
+     InputStream in = new FileInputStream(YAMM.home + "/.config");
      props = new Properties();
      props.load(in);
      in.close();
     } catch (IOException propsioe) { System.err.println(propsioe); }
 
-    if(props.getProperty("smtpserver") != null && Mailbox.hasMail(System.getProperty("user.home") + "/.yamm/boxes/outbox")) {
+    if(props.getProperty("smtpserver") != null && Mailbox.hasMail(YAMM.home + "/boxes/outbox")) {
       frame.status.setStatus(res.getString("server.send"));
       frame.status.progress(0);
       try { 
         Smtp smtp = new Smtp(props.getProperty("smtpserver"));
-        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
+        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(YAMM.home + "/boxes/outbox")));
         String temp = null, from2 = null, to2 = null;
         int i = 1;
 
@@ -171,7 +176,7 @@ public class SHMail extends Thread {
           }
         }
         in.close();
-        File file = new File(System.getProperty("user.home") + "/.yamm/boxes/outbox");
+        File file = new File(YAMM.home + "/boxes/outbox");
         file.delete();
         file.createNewFile();
         smtp.closeConnection();
@@ -182,7 +187,7 @@ public class SHMail extends Thread {
     frame.status.setStatus(res.getString("msg.done"));
     frame.status.progress(100);
 
-    if(Mailbox.hasMail(System.getProperty("user.home") + "/.yamm/boxes/.filter")) {
+    if(Mailbox.hasMail(YAMM.home + "/boxes/.filter")) {
       frame.status.setStatus(res.getString("server.filter"));
       frame.status.progress(0);
 
@@ -192,7 +197,8 @@ public class SHMail extends Thread {
       frame.status.setStatus(res.getString("msg.done"));
       frame.status.progress(100);
     }
-    
+    frame.status.setStatus("");
+    frame.status.progress(0); 
     knappen.setEnabled(true);
   }
 }
