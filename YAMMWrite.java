@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.io.*;
 import org.gjt.fredde.yamm.encode.UUEncode;
 import org.gjt.fredde.yamm.gui.AttachListRenderer;
+import org.gjt.fredde.util.gui.MsgDialog;
 
 /**
  * The class for writing mails
@@ -191,13 +192,8 @@ public class YAMMWrite extends JFrame {
   boolean isSendReady() {
     
     String TF1 = myTextField1.getText();
-    String TF2 = myTextField2.getText();
-    String TA  = myTextArea.getText();
 
     if(TF1.indexOf('@') != -1) {
-      if(TF2.length() == 0) myTextField2.setText("(no subject)");
-      if(TA.length() == 0) myTextArea.setText("(no body)");
-
       return true;
     }
     else return false;
@@ -265,7 +261,10 @@ public class YAMMWrite extends JFrame {
           YAMM.setProperty("writeh", new Integer(rv.height).toString());
 
           dispose();
-        }
+        } else {
+            new MsgDialog(YAMMWrite.this, YAMM.getString("msg.error"),
+				"Missing \"@\" in address field!");
+	}
       }
 
       else if(arg.equals(YAMM.getString("button.add"))) {
