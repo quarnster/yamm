@@ -19,7 +19,7 @@ TODO list for YAMM
 
   - Resend mails that is in the 'sent'-box
 
-  - Multiple identities (personal, work, school... autoselect when answering...)
+  - Some kind of PGP/GnuPG support
 
 ********* Protocols **********
 

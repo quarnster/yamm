@@ -1,3 +1,15 @@
+0.7.6:
+	Added:
+		-Multiple identities (school, work... autoselect when answering)
+		-Added cc and from field to the mail writing dialog
+		-When replying/forwarding the first row says "<name> wrote" instead of
+		 "<email> wrote".
+		-New splashscreen
+
+	Fixed/changed:
+		-The servertab now uses the same layout as the identitiestab
+		-NullpointerException fixed when selecting an unread mail
+
 0.7.5:
 	Added:
 		-ExceptionDialog
@@ -24,63 +36,63 @@
 		 locale.language and locale.country (both must be set)
 
 0.7.3:
-    Added:
-      -button modes: text, icon or both
-      -More dateformats supported
-      -You can delete mails by clicking the "Delete"-key when in the mailList
-      -You can now choose if you want to display the splashscreen at startup
-      -Unread messages are displayed in blue
+	Added:
+		-button modes: text, icon or both
+		-More dateformats supported
+		-You can delete mails by clicking the "Delete"-key when in the mailList
+		-You can now choose if you want to display the splashscreen at startup
+		-Unread messages are displayed in blue
 
-    Fixed/changed:
-      -"Re:" or "Fwd:" is added to the mails subject when replying or forwarding
-      -the mailList's background is now white even if there's no mail in the box
-      -Sorting now sorts 0, 1, ..., 9, 10, 11 instead of 0, 1, 10, 11, ..., 2, 3
-      -Mailhandling system rewrite
-      -Plus lots of bugfixes and code cleanups.
+	Fixed/changed:
+		-"Re:" or "Fwd:" is added to the mails subject when replying or forwarding
+		-the mailList's background is now white even if there's no mail in the box
+		-Sorting now sorts 0, 1, ..., 9, 10, 11 instead of 0, 1, 10, 11, ..., 2, 3
+		-Mailhandling system rewrite
+		-Plus lots of bugfixes and code cleanups.
 
 0.7.2:
-    Added:
-      -some javadoc things to sourcecode
-      -sourceViewer
-      -Print button
-      -You can now save your messages
-      -Filters
-      -made email addresses clickable
-      -more mime support. (no more =<2 digit hexcode>!)
-      -Drag and Drop to copy/move mails
+	Added:
+		-some javadoc things to sourcecode
+		-sourceViewer
+		-Print button
+		-You can now save your messages
+		-Filters
+		-made email addresses clickable
+		-more mime support. (no more =<2 digit hexcode>!)
+		-Drag and Drop to copy/move mails
 
-    Fixed/changed:
-      -merged the inboxes into one
-      -Splitted YAMM.java
-      -YAMMWrite's title is now set to what's typed in the subject field
-      -Huge code cleanup
-      -Made the mailhandling as it was supposed to be from the beginning
-      -Trash bug fixed
-      -some home stuff bugs fixed
-      -Speed of base64 decoding fixed (forgot to buffer the in- and outputstreams...)
-      -package changing to suit the gjt
-      -rewrite of Pop3.java
-      -rewrite of Smtp.java
-      -the content-type for a file is now what it should be instead of application/octet-stream
+	Fixed/changed:
+		-merged the inboxes into one
+		-Splitted YAMM.java
+		-YAMMWrite's title is now set to what's typed in the subject field
+		-Huge code cleanup
+		-Made the mailhandling as it was supposed to be from the beginning
+		-Trash bug fixed
+		-some home stuff bugs fixed
+		-Speed of base64 decoding fixed (forgot to buffer the in- and outputstreams...)
+		-package changing to suit the gjt
+		-rewrite of Pop3.java
+		-rewrite of Smtp.java
+		-the content-type for a file is now what it should be instead of application/octet-stream
 
 0.7.1:
-    Added:
-      -All links are now displayed as links
-      -imageviewer
-      -Config files and boxes are now stored in users home
-      -Passwords are now encrypted
-      -Reply button
-      -Forward button
-      -Progress dialog
-      -Made Tuomas Kuosmanens icons the default icons
-      -Multiple receivers!
+	Added:
+		-All links are now displayed as links
+		-imageviewer
+		-Config files and boxes are now stored in users home
+		-Passwords are now encrypted
+		-Reply button
+		-Forward button
+		-Progress dialog
+		-Made Tuomas Kuosmanens icons the default icons
+		-Multiple receivers!
 
-    Fixed:
-      -Options not showing changes until it was restarted
-      -Config save bug (saved servers config in boxes\<server>\.config AND in .config)
-      -Created attached files sometimes got the wrong name
-      -Attached files in the list in the write window still there from old letters
-      -changed dateformat in the maillist from 'yyMMdd' to 'yyyy-MM-dd'. (y2k-bug)
-      -lots of visual stuff
+	Fixed:
+		-Options not showing changes until it was restarted
+		-Config save bug (saved servers config in boxes\<server>\.config AND in .config)
+		-Created attached files sometimes got the wrong name
+		-Attached files in the list in the write window still there from old letters
+		-changed dateformat in the maillist from 'yyMMdd' to 'yyyy-MM-dd'. (y2k-bug)
+		-lots of visual stuff
 
-    plus much, much more that I have forgot to put here!
+plus much, much more that I have forgot to put here!
