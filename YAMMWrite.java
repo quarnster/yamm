@@ -28,12 +28,12 @@ import javax.swing.border.*;
 
 import org.gjt.fredde.util.gui.*;
 import org.gjt.fredde.yamm.encode.*;
-import org.gjt.fredde.yamm.gui.AttachListRenderer;
+import org.gjt.fredde.yamm.gui.*;
 
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Id: YAMMWrite.java,v 1.23 2000/08/09 16:26:19 fredde Exp $
+ * @version $Id: YAMMWrite.java,v 1.24 2001/04/21 09:31:26 fredde Exp $
  */
 public class YAMMWrite extends JFrame {
 
@@ -47,7 +47,7 @@ public class YAMMWrite extends JFrame {
 	private JTextField  subjectField = new JTextField();
 	private JTextField  ccField      = new JTextField();
 	private JComboBox   fromField; // new JComboBox();
-	private JList       myList;
+	private AttachList	myList;
 
 
 	/**
@@ -256,8 +256,7 @@ public class YAMMWrite extends JFrame {
 			}
 		};
 
-		myList = new JList(dataModel);
-		myList.setCellRenderer(new AttachListRenderer());
+		myList = new AttachList(dataModel, attach, AttachList.DROPMODE);
 		myPanel.add("Center", myList);
 		myPanel.add("South", hori1);
 
@@ -495,6 +494,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.24  2001/04/21 09:31:26  fredde
+ * drag and drop from attachlist
+ *
  * Revision 1.23  2000/08/09 16:26:19  fredde
  * readability fixes, added support for base64 encoding
  * also fixed alot of bugs when buttons where in

@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.53 2001/03/18 17:05:46 fredde Exp $
+ * @version $Id: YAMM.java,v 1.54 2001/04/21 09:31:20 fredde Exp $
  */
 public class YAMM
 	extends JFrame
@@ -93,7 +93,7 @@ public class YAMM
 	public JEditorPane mail;
 
 	/** Attachment list */
-	public JList myList;
+	public AttachList myList;
 
 	/** The toolbar */
 	public mainToolBar tbar;
@@ -214,6 +214,9 @@ public class YAMM
 
 		mail = new JEditorPane();
 		mail.setContentType("text/html");
+		mail.setEditable(false);
+		mail.addHyperlinkListener(this);
+
 		Mailbox.getMail(selectedbox, 0, 0);
 		try {
 			mail.setPage(mailPage);
@@ -224,8 +227,6 @@ public class YAMM
 				YAMM.exceptionNames
 			);
 		}
-		mail.setEditable(false);
-		mail.addHyperlinkListener(this);
 
 		JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
 		JTPane.setFont(new Font("SansSerif", Font.PLAIN, 10));
@@ -267,8 +268,7 @@ public class YAMM
 			}
 		};
 
-		myList = new JList(attachModel);
-		myList.setCellRenderer(new AttachListRenderer());
+		myList = new AttachList(this, attachModel, attach, AttachList.DRAGMODE);
 		myPanel.add("Center", myList);
 		myPanel.add("South", hori1);
 
@@ -368,52 +368,35 @@ public class YAMM
 
 			if (whichAtt != -1) {
 				String filename	= ((Vector)attach.elementAt(whichAtt)).elementAt(0).toString();
-				String encode	= ((Vector)attach.elementAt(whichAtt)).elementAt(1).toString();
-				String file	= ((Vector)attach.elementAt(whichAtt)).elementAt(2).toString();
-				String target	= home  + "/tmp/" + filename;
 
-				if (filename.toLowerCase().endsWith(".jpg") ||
-					filename.toLowerCase().endsWith(".gif")) {
-					if (encode.equalsIgnoreCase("base64")) {
-						if (base64)
-							new Base64Decode("B64Decode " + filename, file, target).start();
-						else new MsgDialog("No Support for base64 encoded files...");
-					} else if (encode.equalsIgnoreCase("x-uuencode")) {
-						new UUDecode(null, "UUDecode " + filename, file,
-							target, true).start();
-					}
-				} else if (encode.equalsIgnoreCase("base64")) {
-					if (base64) {
-						JFileChooser jfs = new JFileChooser();
-						jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
-						jfs.setMultiSelectionEnabled(false);
-						jfs.setSelectedFile(new File(filename));
-						int ret = jfs.showSaveDialog(null);
+				JFileChooser jfs = new JFileChooser();
+				jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				jfs.setMultiSelectionEnabled(false);
+				jfs.setSelectedFile(new File(filename));
+				int ret = jfs.showSaveDialog(null);
 
-						if (ret == JFileChooser.APPROVE_OPTION) {
-							if (jfs.getSelectedFile() != null) {
-								new Base64Decode("B64Decode " + filename, file,
-								jfs.getSelectedFile().toString()).start();
-							}
-						}
-					} else System.out.println("No support for base64 encoded files...");
-				} else if(encode.equalsIgnoreCase("x-uuencode")) {
-					JFileChooser jfs = new JFileChooser();
-					jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
-					jfs.setMultiSelectionEnabled(false);
-					jfs.setSelectedFile(new File(filename));
-					int ret = jfs.showSaveDialog(null);
-
-					if (ret == JFileChooser.APPROVE_OPTION) {
-						if (jfs.getSelectedFile() != null) {
-							new UUDecode(null, "UUDecode " + filename, file,
-								jfs.getSelectedFile().toString(), false).start();
-						}
+				if (ret == JFileChooser.APPROVE_OPTION) {
+					if (jfs.getSelectedFile() != null) {
+						extract(whichAtt, jfs.getSelectedFile().toString());
 					}
 				}
 			}
 		}
 	};
+
+	public void extract(int whichAtt, String target) {
+		String filename	= ((Vector)attach.elementAt(whichAtt)).elementAt(0).toString();
+		String encode	= ((Vector)attach.elementAt(whichAtt)).elementAt(1).toString();
+		String file		= ((Vector)attach.elementAt(whichAtt)).elementAt(2).toString();
+
+		if (encode.equalsIgnoreCase("base64")) {
+			if (base64) {
+				new Base64Decode("B64Decode " + filename, file, target).start();
+			} else System.out.println("No support for base64 encoded files...");
+		} else if(encode.equalsIgnoreCase("x-uuencode")) {
+			new UUDecode(null, "UUDecode " + filename, file, target, false).start();
+		}
+	}
 
 	public void createAttachList() {
 		attach.clear();
@@ -434,10 +417,9 @@ public class YAMM
 		String[] test = new File(base).list();
 
 		for(int i = 0; i < test.length; i++ ) {
-			if (test[i].indexOf(msgNum + ".attach.") != -1)	addinfo(base + test[i], attach);
+			if (test[i].indexOf(msgNum + ".attach.") != -1) addinfo(base + test[i], attach);
 		}
-		if (attach.size() == 0) JTPane.setEnabledAt(1, false);
-		else JTPane.setEnabledAt(1, true);
+		JTPane.setEnabledAt(1, attach.size() != 0);
 	}
 
 	private void addinfo(String where, Vector attach) {
@@ -448,7 +430,6 @@ public class YAMM
 				new InputStreamReader(
 				new FileInputStream(where))
 			);
-
 
 			tmp.add(in.readLine()); // Name of the attachment
 			tmp.add(in.readLine()); // The attachments encoding
@@ -702,6 +683,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.54  2001/04/21 09:31:20  fredde
+ * drag and drop from attachlist
+ *
  * Revision 1.53  2001/03/18 17:05:46  fredde
  * better init
  *
