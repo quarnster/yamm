@@ -77,7 +77,9 @@ public class mainJTree extends JTree {
     }
 
     setModel(new DefaultTreeModel(top));
-    setCellRenderer(new myTreeRenderer());
+    myTreeRenderer rend = new myTreeRenderer();
+    rend.setFont(new Font("SansSerif", Font.PLAIN, 12));
+    setCellRenderer(rend); //new myTreeRenderer());
     getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     addMouseListener(mouseListener2);
 
@@ -117,14 +119,20 @@ public class mainJTree extends JTree {
     expandRow(0);
 
     // adds items to the myPopup JPopupMenu
-    JMenuItem NEW = new JMenuItem(res.getString("file.new")), delete = new JMenuItem(res.getString("button.delete"));
+    JMenuItem mi = new JMenuItem(res.getString("tree.new.box")); //, delete = new JMenuItem(res.getString("button.delete"));
 
-    NEW.addActionListener(treepoplistener);
-    delete.addActionListener(treepoplistener);
-
-    treepop.add(NEW);
+    mi.addActionListener(treepoplistener);
+//    delete.addActionListener(treepoplistener);
+    treepop.add(mi);
+ 
+    mi = new JMenuItem(res.getString("tree.new.group"));
+    mi.addActionListener(treepoplistener);
+    treepop.add(mi);
     treepop.addSeparator();
-    treepop.add(delete);
+
+    mi = new JMenuItem(res.getString("button.delete"));
+    mi.addActionListener(treepoplistener);
+    treepop.add(mi);
   }
 
   /**
@@ -150,9 +158,8 @@ public class mainJTree extends JTree {
 
       while(tok.hasMoreTokens()) thisbox = tok.nextToken();
 
-      setText(thisbox);
 
-      if(!s.equals("Mail Boxes") && leaf) {
+      if(leaf && !thisbox.endsWith(".g")) {
           if(thisbox.equals("inbox")) setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/inbox.gif"));
           else if(thisbox.equals("outbox")) setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/outbox.gif"));
           else if(thisbox.equals("trash")) setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/trash.gif"));
@@ -162,8 +169,10 @@ public class mainJTree extends JTree {
         if(expanded) setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/dir2.gif"));
         else setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/dir.gif"));
       }
-      else setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/mailbox.gif"));
+      else setIcon(new ImageIcon("org/gjt/fredde/yamm/images/boxes/dir.gif"));
 
+      if(thisbox.endsWith(".g")) setText(thisbox.substring(0, thisbox.length() -2));
+      else setText(thisbox);
       setForeground(Color.black);
       this.selected = selected;
       return this;
@@ -230,12 +239,36 @@ public class mainJTree extends JTree {
     }
   }
 
+  public void createGroupList(Vector vect, File f) {
+    String sep = System.getProperty("file.separator");
+    String home = System.getProperty("user.home");
+
+    if((f.toString()).equals(home + sep + ".yamm" + sep + "boxes")) {
+      vect.add(sep);
+      String list[] = f.list();                                      
+      for(int i = 0; i < list.length; i++)
+        createGroupList(vect, new File(f, list[i]));
+    }                                          
+    else if(f.isDirectory() && f.toString().endsWith(".g")) {
+      String dir = f.toString();
+      dir = dir.substring((home + sep + ".yamm" + sep + "boxes").length(), dir.length() -2);
+      vect.add(dir);                       
+                   
+      String list[] = f.list();
+      for(int i = 0; i < list.length; i++)
+        createGroupList(vect, new File(f, list[i]));
+    }                                          
+  }  
+
   ActionListener treepoplistener = new ActionListener() {
     public void actionPerformed(ActionEvent ae) {
       String kommando = ((JMenuItem)ae.getSource()).getText();
       
-      if(kommando.equals(res.getString("file.new"))) {
+      if(kommando.equals(res.getString("tree.new.box"))) {
         new newBoxDialog(frame);
+      }
+      else if(kommando.equals(res.getString("tree.new.group"))) {
+        new newGroupDialog(frame);
       }
       else {
         if(tree.getLastSelectedPathComponent() != null) {
@@ -259,6 +292,30 @@ public class mainJTree extends JTree {
               top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash"))); 
               tree.updateUI();
               tree.expandRow(0);
+
+              ((mainTable)frame.mailList).popup = new JPopupMenu();
+              ((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
+              ((mainTable)frame.mailList).createPopup(((mainTable)frame.mailList).popup);
+            }
+          }
+          else if(del.exists()) {
+            if(!del.delete()) 
+              new MsgDialog(frame, res.getString("msg.error"), res.getString("msg.file.delete-dir") + del.toString() + res.getString("msg.file.delete-dir2"));
+            else {
+              frame.selectedbox = "deleted";
+              top.removeAllChildren();
+
+              top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/inbox")));
+              top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
+              createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
+              top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash")));
+              tree.updateUI();
+              tree.expandRow(0);
+
+              ((mainTable)frame.mailList).popup = new JPopupMenu();
+              ((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
+              ((mainTable)frame.mailList).createPopup(((mainTable)frame.mailList).popup);
+
             }
           }
         }
@@ -276,23 +333,105 @@ public class mainJTree extends JTree {
 
   };
 
+  class newGroupDialog extends JDialog {
+    JButton    b;
+    JComboBox  group;
+    JTextField jtfield;
+
+    public newGroupDialog(JFrame frame) {
+      super(frame, true);
+      setBounds(0, 0, 300, 100);
+      setResizable(false);
+      setTitle(res.getString("title.new.group"));
+
+      Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+      setLocation((screenSize.width - 300) / 2, (screenSize.height - 200) / 2);
+      getContentPane().setLayout(new GridLayout(3, 2));
+
+      getContentPane().add(new JLabel(res.getString("options.group")));
+      Vector vect = new Vector();
+      createGroupList(vect, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
+      group = new JComboBox( vect );
+      getContentPane().add(group);
+
+      getContentPane().add(new JLabel(res.getString("options.name")));
+      jtfield = new JTextField();
+      getContentPane().add(jtfield);
+
+
+      b = new JButton(res.getString("button.ok"));
+      b.addActionListener(BListener2);
+      getContentPane().add(b);
+
+      b = new JButton(res.getString("button.cancel"));
+      b.addActionListener(BListener2);
+      getContentPane().add(b);
+
+      show();
+    }
+
+    ActionListener BListener2 = new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        String arg = ((JButton)e.getSource()).getText();
+        String sep = System.getProperty("file.separator");
+        if(!group.getSelectedItem().equals(sep)) sep = ".g" + sep;
+
+        if(arg.equals(res.getString("button.ok"))) {
+          File box = new File(System.getProperty("user.home") + 
+                              "/.yamm/boxes" + 
+                              group.getSelectedItem() + 
+                              sep + jtfield.getText() + ".g");
+
+          if(box.exists()) new MsgDialog(frame, res.getString("msg.error"), res.getString("msg.file.exists"));
+          else {
+            if(!box.mkdir()) 
+              new MsgDialog(frame, res.getString("msg.error"), res.getString("msg.file.create-error") + box.toString());
+
+            top.removeAllChildren();
+            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/inbox")));
+            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
+            createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
+            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash")));
+            tree.updateUI();
+
+            ((mainTable)frame.mailList).popup = new JPopupMenu();
+            ((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
+            ((mainTable)frame.mailList).createPopup(((mainTable)frame.mailList).popup);
+
+            dispose();
+          }
+        }
+
+        else if(arg.equals(res.getString("button.cancel"))) {
+          dispose();
+        }
+      }  
+    }; 
+  }
+
+
   class newBoxDialog extends JDialog {
     JButton    b;
-    JComboBox  inFolder;
+    JComboBox  group;
     JTextField jtfield;
   
     public newBoxDialog(JFrame frame) {
       super(frame, true);  
       setBounds(0, 0, 300, 100);
       setResizable(false);      
-      setTitle(res.getString("title.newbox"));
+      setTitle(res.getString("title.new.box"));
  
       Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
       setLocation((screenSize.width - 300) / 2, (screenSize.height - 200) / 2);
-      getContentPane().setLayout(new GridLayout(2, 2));
+      getContentPane().setLayout(new GridLayout(3, 2));
  
+      getContentPane().add(new JLabel(res.getString("options.group")));
+      Vector vect = new Vector();
+      createGroupList(vect, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
+      group = new JComboBox(vect);
+      getContentPane().add(group);
+
       getContentPane().add(new JLabel(res.getString("options.name")));
- 
       jtfield = new JTextField();
       getContentPane().add(jtfield);
  
@@ -311,9 +450,11 @@ public class mainJTree extends JTree {
     ActionListener BListener2 = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         String arg = ((JButton)e.getSource()).getText();
+        String sep = System.getProperty("file.separator");
+        if(!group.getSelectedItem().equals(sep)) sep = ".g" + sep;
  
         if(arg.equals(res.getString("button.ok"))) {
-          File box = new File(System.getProperty("user.home") + "/.yamm/boxes/" + jtfield.getText());
+          File box = new File(System.getProperty("user.home") + "/.yamm/boxes/" + group.getSelectedItem() + sep + jtfield.getText());
 
           if(box.exists()) new MsgDialog(frame, res.getString("msg.error"), res.getString("msg.file.exists"));
           else {
@@ -328,6 +469,9 @@ public class mainJTree extends JTree {
             top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash")));
             tree.updateUI();
 
+            ((mainTable)frame.mailList).popup = new JPopupMenu();
+            ((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
+            ((mainTable)frame.mailList).createPopup(((mainTable)frame.mailList).popup);
 
             dispose();
           }
