@@ -170,17 +170,13 @@ public class mainJTree extends JTree implements DropTargetListener {
 
   protected void doAction(String mails, Point p, int act) {
     String action = (act == DnDConstants.ACTION_MOVE ? "move" : "copy");
-    System.out.println("Wanted to " + action + ": " + mails);
-    System.out.println("from " + frame.selectedbox);
 
     TreePath tp = getPathForLocation(p.x, p.y);
     String box = null; // = tp.getLastPathComponent().toString();
     if(tp != null) {
       box = tp.getLastPathComponent().toString();
-      System.out.println("to " + box);
     }
     else {
-      System.out.println("to box was null ");
       box = null;
     }
 
@@ -353,7 +349,6 @@ public class mainJTree extends JTree implements DropTargetListener {
       while(temp.indexOf(".g") != -1) {
         temp = temp.substring(0, temp.indexOf(".g")) + temp.substring(temp.indexOf(".g") + 2, temp.length());
       }
-      System.out.println("temp: " + temp);
       vect.setElementAt(temp, i);
     }
   }
@@ -414,7 +409,6 @@ public class mainJTree extends JTree implements DropTargetListener {
             gName = temp;
  
           }
-          System.out.println("gName: "  + gName);
 
           File box = new File(System.getProperty("user.home") + 
                               "/.yamm/boxes/" + 
@@ -511,7 +505,6 @@ public class mainJTree extends JTree implements DropTargetListener {
 
           }
 
-          System.out.println("gName: "  + gName);
           File box = new File(YAMM.home + 
                               "/boxes/" + 
                               gName + 

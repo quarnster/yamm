@@ -169,7 +169,6 @@ public class mainTable extends JTable implements DragGestureListener,
 	}
 
 	public void dragGestureRecognized(DragGestureEvent e) {
-		System.out.println("wanted to drag...");
 		StringSelection text = new StringSelection(getSelected());
 
 		try {
@@ -182,19 +181,14 @@ public class mainTable extends JTable implements DragGestureListener,
 	}
 
 	public void dragDropEnd(DragSourceDropEvent e) {
-		System.out.println("end");
 	}
 	public void dragEnter(DragSourceDragEvent e) {
-		System.out.println("enter");
 	}
 	public void dragExit(DragSourceEvent e) {
-		System.out.println("exit");
 	}
 	public void dragOver(DragSourceDragEvent e) {
-		System.out.println("over");
 	}
 	public void dropActionChanged(DragSourceDragEvent e) {
-		System.out.println("changed");
 	}
 
 
