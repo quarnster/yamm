@@ -25,6 +25,7 @@ import java.io.*;
 import java.awt.print.Book;
 import java.util.*;
 import javax.swing.JTextArea;
+import org.gjt.fredde.util.gui.MsgDialog;
 
 /**
  * A class that handels messages and information about messages
@@ -263,7 +264,7 @@ public class Mailbox {
    * @param whichmail Whichmail to export
    * @param attach Which vector to add attachments to
    */
-  public static void getMail(String whichBox, int whichmail, Vector attach, boolean mailName) {
+  public static void getMail(String whichBox, int whichmail) {
 
     String  boundary = null;
     String  temp = null;
@@ -271,237 +272,249 @@ public class Mailbox {
     boolean html = false;
     ResourceBundle res = null;
 
-    String yammhome = System.getProperty("user.home") + "/.yamm";
+    temp = System.getProperty("user.home") + "/.yamm/";
+    String tempdir = temp + "tmp/";
+    String boxpath = whichBox.substring(whichBox.indexOf("boxes") + 6, whichBox.length());
+    File   cache = new File(tempdir + "cache/" + boxpath + "/");
 
-    try {
-      res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault());
+    if(!cache.exists()) {
+      if(!cache.mkdirs()) {
+        System.err.println("Couldn't create dir: " + cache.toString()); //new MsgDialog();
+      }
     }
-    catch (MissingResourceException mre) {
-      mre.printStackTrace();
-      System.exit(1);
-    }
-    try {
-      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(whichBox)));
-      PrintWriter outFile = new PrintWriter(new BufferedOutputStream(new FileOutputStream(yammhome + "/tmp/" + mailName + ".html")));
-      int i = 0;
-      outFile.println("<html>\n<body>");
 
-      for(;;) {
-        temp = in.readLine();
+    else if(!new File(cache, whichmail + ".html").exists()) {
+      try {
+        res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault());
+      }
+      catch (MissingResourceException mre) {
+        mre.printStackTrace();
+        System.exit(1);
+      }
+      try {
+        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(whichBox)));
+        PrintWriter outFile = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(cache, whichmail + ".html"))));
+        int i = 0;
+        outFile.println("<html>\n<body>");
+
+        for(;;) {
+          temp = in.readLine();
       
-        if(temp == null)
-          break;
+          if(temp == null)
+            break;
 
-        else if(temp.startsWith("Date: ")) {
-          if(i == whichmail) {
-            String date = temp.substring(6, temp.lastIndexOf(":") + 2);
-            SimpleDateFormat dateFormat2 = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss", Locale.US);
-            SimpleDateFormat dateFormat3 = new SimpleDateFormat("EEEEEEEE, dd MMMMMMMM yyyy HH:mm:ss", Locale.getDefault());
-            try {
-              Date nisse = dateFormat2.parse(date);
+          else if(temp.startsWith("Date: ")) {
+            if(i == whichmail) {
+              String date = temp.substring(6, temp.lastIndexOf(":") + 2);
+              SimpleDateFormat dateFormat2 = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss", Locale.US);
+              SimpleDateFormat dateFormat3 = new SimpleDateFormat("EEEEEEEE, dd MMMMMMMM yyyy HH:mm:ss", Locale.getDefault());
+              try {
+                Date nisse = dateFormat2.parse(date);
 
-              date = dateFormat3.format(nisse);
-            } catch (ParseException pe) { System.err.println(pe); date = " ";}
-	    outFile.println("<b>" + res.getString("mail.date") + "</b> " + date + "<br>");
+                date = dateFormat3.format(nisse);
+              } catch (ParseException pe) { System.err.println(pe); date = " ";}
+	      outFile.println("<b>" + res.getString("mail.date") + "</b> " + date + "<br>");
+            }
           }
-        }
 
-        else if(temp.equals(".")) i++;
+          else if(temp.equals(".")) i++;
 
-        else if(temp.startsWith("From:")) {
+          else if(temp.startsWith("From:")) {
 
-          if (i == whichmail) {
-            String from = "test";
+            if (i == whichmail) {
+              String from = "test";
+              if(temp.indexOf("<") != -1 && temp.indexOf(">") != -1) {
+                from = temp.substring(temp.lastIndexOf("<") + 1, temp.lastIndexOf(">"));
+                outFile.println("<b>" + res.getString("mail.from") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
+              }
+              else {
+                from = temp.substring(6, temp.length());
+                outFile.println("<b>" + res.getString("mail.from") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
+              }
+              wait = false;
+            }
+          }
+
+          else if(temp.startsWith("To:")) {
+            if(i == whichmail) {
+            
+              if(temp.indexOf("<") != -1) temp = temp.substring(temp.indexOf("<")  +1, temp.lastIndexOf(">"));
+              else temp = temp.substring(3, temp.length());
+
+              while(temp.indexOf(",", temp.length() - 5) != -1) {
+                String temp2 = in.readLine();
+
+                if(temp2.indexOf("<") != -1) temp2 = temp2.substring(temp2.indexOf("<")  +1, temp2.lastIndexOf(">"));
+
+                temp += temp2;
+              }
+
+              if(temp.indexOf("<br>") == -1) temp += "<br>";
+              outFile.println("<b>" + res.getString("mail.to") + "</b> " + temp);
+            }
+          }
+
+          else if(temp.startsWith("Reply-To:") && i == whichmail) {
+            String reply = "test";
             if(temp.indexOf("<") != -1 && temp.indexOf(">") != -1) {
-              from = temp.substring(temp.lastIndexOf("<") + 1, temp.lastIndexOf(">"));
-		outFile.println("<b>" + res.getString("mail.from") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
+              reply = temp.substring(temp.lastIndexOf("<") + 1, temp.lastIndexOf(">"));
+              outFile.println("<b>" + res.getString("mail.reply_to") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
             }
             else {
-              from = temp.substring(6, temp.length());
-              outFile.println("<b>" + res.getString("mail.from") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
+              reply = temp.substring(6, temp.length());
+              outFile.println("<b>" + res.getString("mail.reply_to") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
             }
-            wait = false;
           }
-        }
 
-        else if(temp.startsWith("To:")) {
-          if(i == whichmail) {
-            
-            if(temp.indexOf("<") != -1) temp = temp.substring(temp.indexOf("<")  +1, temp.lastIndexOf(">"));
-            else temp = temp.substring(3, temp.length());
-
-            while(temp.indexOf(",", temp.length() - 5) != -1) {
-              String temp2 = in.readLine();
-
-              if(temp2.indexOf("<") != -1) temp2 = temp2.substring(temp2.indexOf("<")  +1, temp2.lastIndexOf(">"));
-
-              temp += temp2;
+          else if(temp.indexOf("boundary=\"") != -1) {
+            if(i == whichmail) {
+              boundary = temp.substring(temp.indexOf("boundary=\"") + 10, temp.indexOf("\"", temp.indexOf("boundary=\"") + 11));
             }
-
-            if(temp.indexOf("<br>") == -1) temp += "<br>";
-            outFile.println("<b>" + res.getString("mail.to") + "</b> " + temp);
           }
-        }
 
-        else if(temp.startsWith("Reply-To:") && i == whichmail) {
-          String reply = "test";
-          if(temp.indexOf("<") != -1 && temp.indexOf(">") != -1) {
-            reply = temp.substring(temp.lastIndexOf("<") + 1, temp.lastIndexOf(">"));
-            outFile.println("<b>" + res.getString("mail.reply_to") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
+
+          else if(temp.startsWith("Subject:")) {
+            if(i == whichmail) {
+              if(temp.indexOf("<br>") == -1) temp += "<br>";
+              outFile.println("<b>" + res.getString("mail.subject") + "</b> " + temp.substring(8, temp.length()));
+            }
           }
-          else {
-            reply = temp.substring(6, temp.length());
-            outFile.println("<b>" + res.getString("mail.reply_to") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
-          }
-        }
 
-        else if(temp.indexOf("boundary=\"") != -1) {
-          if(i == whichmail) {
-            boundary = temp.substring(temp.indexOf("boundary=\"") + 10, temp.indexOf("\"", temp.indexOf("boundary=\"") + 11));
-          }
-        }
+          else if(temp.equals("")) {
+            if(i == whichmail && wait == false) {
 
+	      outFile.println("<pre>");
+              for(;;) {
+                outFile.println(temp);
+                outFile.flush();
 
-        else if(temp.startsWith("Subject:")) {
-          if(i == whichmail) {
-            if(temp.indexOf("<br>") == -1) temp += "<br>";
-            outFile.println("<b>" + res.getString("mail.subject") + "</b> " + temp.substring(8, temp.length()));
-          }
-        }
+                temp = in.readLine();
 
-        else if(temp.equals("")) {
-          if(i == whichmail && wait == false) {
-
-	    outFile.println("<pre>");
-            for(;;) {
-              outFile.println(temp);
-              outFile.flush();
-
-              temp = in.readLine();
-
-              if(temp == null) break;
+                if(temp == null) break;
 
 
-              else if(temp.startsWith("<!doctype")) temp = in.readLine();
-              else if(temp.toLowerCase().indexOf("</html>") != -1) { html = false; temp = in.readLine(); }
+                else if(temp.startsWith("<!doctype")) temp = in.readLine();
+                else if(temp.toLowerCase().indexOf("</html>") != -1) { html = false; temp = in.readLine(); }
 
-              else if(temp.toLowerCase().indexOf("<html>") != -1) { html = true; temp = in.readLine(); }
+                else if(temp.toLowerCase().indexOf("<html>") != -1) { html = true; temp = in.readLine(); }
               
-              else if(temp.indexOf("MIME") != -1 || temp.indexOf("mime") != -1) {
-                temp = in.readLine();
-                temp = in.readLine();
+                else if(temp.indexOf("MIME") != -1 || temp.indexOf("mime") != -1) {
+                  temp = in.readLine();
+                  temp = in.readLine();
 
-                if(temp.startsWith("--" + boundary)) {
-                  for(;;) {
-                    temp = in.readLine();
-                    if(temp == null) break;
+                  if(temp.startsWith("--" + boundary)) {
+                    for(;;) {
+                      temp = in.readLine();
+                      if(temp == null) break;
 
-                    else if(temp.equals("")) break;
+                      else if(temp.equals("")) break;
+                    }
                   }
                 }
-              }
 
-              if(!html && (temp.indexOf("<") != -1 || temp.indexOf(">") != -1 || temp.indexOf("=") != -1)) temp = removeTags(temp);
+                if(!html && (temp.indexOf("<") != -1 || temp.indexOf(">") != -1 || temp.indexOf("=") != -1)) temp = removeTags(temp);
 
-              if(!html && temp.indexOf("://") != -1 && temp.indexOf("href=") == -1 && temp.indexOf("HREF=") == -1) {
-                int    protBegin = temp.indexOf("://");
-                int    space     = temp.indexOf(" ", protBegin + 3);
-                String prot      = temp.substring( (((protBegin - 4) != -1) ? protBegin - 4 : 0), protBegin + 3).trim();
-                String link      = temp.substring(protBegin + 3, ((space == -1) ? temp.length() : space));
-                if(link.endsWith(".")) link = link.substring(0, link.length() -1);
-                int    dot       = temp.indexOf(".", protBegin + 3 + link.length());
-                int    tag       = temp.indexOf("&gt;", protBegin +3);
+                if(!html && temp.indexOf("://") != -1 && temp.indexOf("href=") == -1 && temp.indexOf("HREF=") == -1) {
+                  int    protBegin = temp.indexOf("://");
+                  int    space     = temp.indexOf(" ", protBegin + 3);
+                  String prot      = temp.substring( (((protBegin - 4) != -1) ? protBegin - 4 : 0), protBegin + 3).trim();
+                  String link      = temp.substring(protBegin + 3, ((space == -1) ? temp.length() : space));
+                  if(link.endsWith(".")) link = link.substring(0, link.length() -1);
+                  int    dot       = temp.indexOf(".", protBegin + 3 + link.length());
+                  int    tag       = temp.indexOf("&gt;", protBegin +3);
 
-                if(tag != -1) link = temp.substring(protBegin +3, tag);
-                String begin = temp.substring(0, temp.indexOf(prot));
-                String end   = "";
-
-                if(space != -1) {
-                  if(dot < space && dot != -1) end = temp.substring(dot, temp.length());
-                  else end = temp.substring(space, temp.length());
-                }
-                if(link.endsWith(">")) {
-                  link = link.substring(0, link.length()-1);
-                }
-                else if(dot != -1) end = temp.substring(dot, temp.length());
-                else if(tag != -1) end = temp.substring(tag, temp.length());
-                
-
-                temp = begin + "<a href=\"" + prot + link + "\">" + prot + link + "</a>" + end;
-              }
-
-              else if(!html && temp.indexOf("@") != -1 && temp.indexOf("href=") == -1 && temp.indexOf("HREF=") == -1) {
-                String temp2 = null;
-
-                StringTokenizer tok = new StringTokenizer(temp);
-                for(;tok.hasMoreTokens();) {
-                  temp2 = tok.nextToken();
-                  if(temp2.indexOf("@") != -1) break;
-                }
-                
-                String begin = temp.substring(0, temp.indexOf(temp2));
-                String end = temp.substring(temp.indexOf(temp2) + temp2.length(), temp.length());
-                if(temp2.endsWith("&gt;")) temp2 = temp2.substring(0, temp2.length()-4);
-                if(temp2.startsWith("&lt;")) temp = temp2.substring(4, temp2.length());
-
-                temp = begin + "<a href=\"mailto:" + temp2 + "\">" + temp2 + "</a>" + end;
-              }
-
-              else if(temp.startsWith("--" + boundary)) {
-                String encode = null, filename = null;
-                temp = in.readLine();
-
-                if(!temp.equals("") && temp.indexOf("message") == -1) {
-                  for(;;) {
-                    if(temp == null) break;
-
-                    if(temp.equals(".")) break;
-
-                    if (temp.startsWith("Content-Transfer-Encoding: ")) {
-                      encode = temp.substring(27, temp.length());
-                    }
-
-                    if(temp.indexOf("name=") != -1) {
-                      filename = temp.substring(temp.indexOf("=\"") + 2, temp.indexOf("\"", temp.indexOf("=")+ 2));
-                    }
-                    if(encode != null && filename != null) {
-                      Vector vect1 = new Vector();
-                      vect1.add(encode);
-                      vect1.add(filename);
-
-                      attach.add(vect1);
-                      encode = null;
-                      filename = null;
-                    }
-                    temp = in.readLine();
+                  if(tag != -1) link = temp.substring(protBegin +3, tag);
+                  String begin = temp.substring(0, temp.indexOf(prot));
+                  String end   = "";
+  
+                  if(space != -1) {
+                    if(dot < space && dot != -1) end = temp.substring(dot, temp.length());
+                    else end = temp.substring(space, temp.length());
                   }
+                  if(link.endsWith(">")) {
+                    link = link.substring(0, link.length()-1);
+                  }
+                  else if(dot != -1) end = temp.substring(dot, temp.length());
+                  else if(tag != -1) end = temp.substring(tag, temp.length());
+                
+
+                  temp = begin + "<a href=\"" + prot + link + "\">" + prot + link + "</a>" + end;
+                }
+
+                else if(!html && temp.indexOf("@") != -1 && temp.indexOf("href=") == -1 && temp.indexOf("HREF=") == -1) {
+                  String temp2 = null;
+ 
+                  StringTokenizer tok = new StringTokenizer(temp);
+                  for(;tok.hasMoreTokens();) {
+                    temp2 = tok.nextToken();
+                    if(temp2.indexOf("@") != -1) break;
+                  }
+                
+                  String begin = temp.substring(0, temp.indexOf(temp2));
+                  String end = temp.substring(temp.indexOf(temp2) + temp2.length(), temp.length());
+                  if(temp2.endsWith("&gt;")) temp2 = temp2.substring(0, temp2.length()-4);
+                  if(temp2.startsWith("&lt;")) temp = temp2.substring(4, temp2.length());
+
+                  temp = begin + "<a href=\"mailto:" + temp2 + "\">" + temp2 + "</a>" + end;
+                }
+
+/* 
+                else if(temp.startsWith("--" + boundary)) {
+                  String encode = null, filename = null;
+                  temp = in.readLine();
+ 
+                  if(!temp.equals("") && temp.indexOf("message") == -1) {
+                    for(;;) {
+                      if(temp == null) break;
+
+                      if(temp.equals(".")) break;
+
+                      if (temp.startsWith("Content-Transfer-Encoding: ")) {
+                        encode = temp.substring(27, temp.length());
+                      }
+
+                      if(temp.indexOf("name=") != -1) {
+                        filename = temp.substring(temp.indexOf("=\"") + 2, temp.indexOf("\"", temp.indexOf("=")+ 2));
+                      }
+                      if(encode != null && filename != null) {
+                        Vector vect1 = new Vector();
+                        vect1.add(encode);
+                        vect1.add(filename);
+
+                        attach.add(vect1);
+                        encode = null;
+                        filename = null;
+                      }
+                      temp = in.readLine();
+                    }
+                    wait = true;
+                    break;
+                  }
+                  for(;;) {
+                    temp = in.readLine();
+ 
+                    if(temp.equals("")) break;
+                    else if(temp.equals(".")) break;
+                    else if(temp == null) break;
+                  }
+                }
+*/
+                else if(temp.equals(".")) {
                   wait = true;
                   break;
                 }
-                for(;;) {
-                  temp = in.readLine();
-
-                  if(temp.equals("")) break;
-                  else if(temp.equals(".")) break;
-                  else if(temp == null) break;
-                }
               }
-
-              else if(temp.equals(".")) {
-                wait = true;
-                break;
-              }
+              break;
             }
-            break;
           }
         }
+        outFile.println("</pre></body></html>");
+        in.close();
+        outFile.close();
       }
-      outFile.println("</pre></body></html>");
-      in.close();
-      outFile.close();
-    }
-    catch(IOException ioe) {
-      System.out.println("Error: " + ioe);
+      catch(IOException ioe) {
+        System.err.println("Error: " + ioe);
+      }
     }
   }
 
