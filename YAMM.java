@@ -344,7 +344,8 @@ public class YAMM extends JFrame implements HyperlinkListener
     SPane2.setDividerLocation(vsplit);
     getContentPane().add("Center", SPane2);
 
-    status = new statusRow(res);
+    status = new statusRow();
+    status.button.setText(res.getString("button.cancel"));
     getContentPane().add("South", status);
     addWindowListener(new FLyssnare());
     show();
