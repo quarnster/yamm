@@ -1,4 +1,4 @@
-/*  $Id: SHMail.java,v 1.36 2003/03/12 20:19:22 fredde Exp $
+/*  $Id: SHMail.java,v 1.37 2003/03/15 19:50:20 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Revision: 1.36 $
+ * @version $Revision: 1.37 $
  */
 public class SHMail
 	extends Thread
@@ -308,7 +308,7 @@ public class SHMail
 			yamm.status.progress(100);
 
 			yamm.tree.repaint();
-			yamm.status.setStatus("You have new mail!");
+			yamm.status.setStatus(YAMM.getString("msg.new"));
 			yamm.status.progress(0);
 		}
 
@@ -322,6 +322,9 @@ public class SHMail
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.37  2003/03/15 19:50:20  fredde
+ * localized 'you have new mail!'-string
+ *
  * Revision 1.36  2003/03/12 20:19:22  fredde
  * added sent/received stats
  *
