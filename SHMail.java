@@ -1,4 +1,4 @@
-/*  $Id: SHMail.java,v 1.35 2003/03/11 15:16:34 fredde Exp $
+/*  $Id: SHMail.java,v 1.36 2003/03/12 20:19:22 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Revision: 1.35 $
+ * @version $Revision: 1.36 $
  */
 public class SHMail
 	extends Thread
@@ -49,6 +49,10 @@ public class SHMail
 	static private boolean del = false;
 
 
+	private int sentnum;
+	private int receivednum;
+	private int sentbytes;
+	private int receivedbytes;
 
 	JButton knappen;
 	YAMM yamm;
@@ -75,6 +79,11 @@ public class SHMail
 	 * and connects to the servers with a config-file.
 	 */
 	public void run() {
+		try { sentnum = Integer.parseInt(YAMM.getProperty("stat.sentnum", "0")); } catch (Exception e) { sentnum = 0; }
+		try { receivednum = Integer.parseInt(YAMM.getProperty("stat.receivednum", "0")); } catch (Exception e) { receivednum = 0; }
+		try { sentbytes = Integer.parseInt(YAMM.getProperty("stat.sentbytes", "0")); } catch (Exception e) { sentbytes = 0; }
+		try { receivedbytes = Integer.parseInt(YAMM.getProperty("stat.receivedbytes", "0")); } catch (Exception e) { receivedbytes = 0; }
+
 		String outbox = Utilities.replace(YAMM.home + "/boxes/outbox");
 		yamm.status.progress(0);
 		yamm.status.setStatus("");
@@ -123,6 +132,8 @@ public class SHMail
 
 							if (del) pop.deleteMessage(j);
 						}
+						receivednum += messages;
+
 						yamm.status.setStatus(YAMM.getString("msg.done"));
 						yamm.status.progress(100);
 					} catch (IOException ioe) {
@@ -138,6 +149,7 @@ public class SHMail
 				}
 			}
 		}
+		receivedbytes += new File(Utilities.replace(YAMM.home + "/boxes/.filter")).length();
 
 
 		if (
@@ -268,6 +280,8 @@ public class SHMail
 			}
 
 			String sent = Utilities.replace(YAMM.home + "/boxes/sent");
+			sentbytes += new File(outbox).length();
+			sentnum += move.length;
 			Mailbox.moveMail(outbox, sent, move);
 		}
 		yamm.status.setStatus(YAMM.getString("msg.done"));
@@ -299,11 +313,18 @@ public class SHMail
 		}
 
 		knappen.setEnabled(true);
+		YAMM.setProperty("stat.sentnum", "" + sentnum);
+		YAMM.setProperty("stat.receivednum", "" + receivednum);
+		YAMM.setProperty("stat.sentbytes", "" + sentbytes);
+		YAMM.setProperty("stat.receivedbytes", "" + receivedbytes);
 	}
 }
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.36  2003/03/12 20:19:22  fredde
+ * added sent/received stats
+ *
  * Revision 1.35  2003/03/11 15:16:34  fredde
  * Filter needs yamm reference in its constructor
  *
