@@ -138,7 +138,8 @@ public class SHMail extends Thread {
         if(sent) { 
           out = new PrintWriter(
                 new BufferedOutputStream(
-                new FileOutputStream(YAMM.getString("box.sent"), true)));
+                new FileOutputStream(YAMM.home + YAMM.sep + "boxes" + YAMM.sep +
+                                     YAMM.getString("box.sent"), true)));
         }
 
         String temp = null, from2 = null, to2 = null;
