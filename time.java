@@ -1,5 +1,5 @@
 /*  time.java - methods for converting from/to internet time
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,64 +38,88 @@ import java.text.SimpleDateFormat;
  * <br><br>
  * For more information, please visit 
  * <a href="http://www.swatch.com">http://www.swatch.com</a>.
+ * @author Fredrik Ehnbom
+ * @version $Id: time.java,v 1.2 2000/03/20 19:19:44 fredde Exp $
  */
 public abstract class time {
 
-  /**
-   * Converts a time into Swatch beats.
-   * @param time The number of milliseconds since January 1, 1970, 00:00:00 GMT
-   * that you'd like to convert to Swatch beats.
-   * @return The number of Swatch beats since that time.
-   */
-  public static int toInternetTime(long time) {
-    Calendar c = new GregorianCalendar();
-    Date d = new Date(c.get(Calendar.ZONE_OFFSET));
+	/**
+	 * The calendar to use for the various convertions
+	 */
+	private static Calendar c = new GregorianCalendar();
 
-    SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-    String time1 = df.format(d);
 
-    d = new Date(time);
-    String time2 = df.format(d);
+	/**
+	 * Converts a time into Swatch beats.
+	 * @param time The number of milliseconds since January 1, 1970, 00:00:00 GMT
+	 * that you'd like to convert to Swatch beats.
+	 * @return The number of Swatch beats since that time.
+	 */
+	public static int toInternetTime(long time) {
+		SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
 
-    int hour = Integer.parseInt(time2.substring(0, 2)) - 
-               Integer.parseInt(time1.substring(0, 2));
-    int min  = Integer.parseInt(time2.substring(3, 5)) - 
-               Integer.parseInt(time1.substring(3, 5));
-    int sec  = Integer.parseInt(time2.substring(6, 8));   
+		Date d = new Date(time);
+		String time2 = df.format(d);
 
-    long it = (((hour*3600 + min * 60 + sec) + 3600)*1000)/86400;
+		int hour = Integer.parseInt(time2.substring(0, 2));
+		int min  = Integer.parseInt(time2.substring(3, 5));
+		int sec  = Integer.parseInt(time2.substring(6, 8));   
 
-    if(it >= 1000)
-      it -= 1000;
-    else if(it < 0)
-      it += 1000;
+		long it = (hour * 3600 + min * 60 + sec);
+		it -= c.get(Calendar.DST_OFFSET);
+		it = (it*1000)/86400;
 
-    return (int)it;
-  }
+		if(it >= 1000) {
+			it -= 1000;
+		} else if(it < 0) {
+			it += 1000;
+		}
 
-  /**
-   * Converts Swatch beats into regular time
-   * @param it The swatch beats to convert
-   * @return The converted time.
-   */ 
-  public static long toRegularTime(int it) {
-    Calendar c = new GregorianCalendar();
-    int mo = c.get(Calendar.ZONE_OFFSET);
-    long millis1 = it * 86400  + ( (mo/(60*60*1000)))  * 60000;
+		return (int) it;
+	}
 
-    return millis1;
-  }
+	/**
+	 * Returns the number of Swatch beats at the specified clock beat
+	 * @param hour An hour between 1-24
+	 */
+	public static int timeAt(int hour) {
 
-  /**
-   * Prints out the current time, converted into internet time and then 
-   * converted back to regular time. Works as an example.
-   */
-  public static void main(String args[]) {
-    SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+		long time = (long) ( (hour * 3600000) - c.get(Calendar.ZONE_OFFSET));
+		
+		return toInternetTime(time);
+	}
 
-    System.out.println("    Local time: " + df.format(new Date()));
-    System.out.println(" Internet time: @" + time.toInternetTime(new Date().getTime())); 
-    
-    System.out.println("Converted time: " + df.format(new Date(time.toRegularTime(time.toInternetTime(new Date().getTime())))));
-  }
-} 
+	/**
+	 * Converts Swatch beats into regular time
+	 * @param it The swatch beats to convert
+	 * @return The converted time.
+	 */ 
+	public static long toRegularTime(int it) {
+		int mo = c.get(Calendar.ZONE_OFFSET);
+		long millis1 = it * 86400  + (mo / 3600000) * 60000 - mo;
+
+		return millis1;
+	}
+
+	/**
+	 * Prints out the current time, converted into internet time and then 
+	 * converted back to regular time. Works as an example.
+	 */
+	public static void main(String args[]) {
+		SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+
+		System.out.println("    Local time: " + df.format(new Date()));
+		System.out.println(" Internet time: @" + time.toInternetTime(new Date().getTime())); 
+		System.out.println("Converted time: " + df.format(new Date(time.toRegularTime(time.toInternetTime(new Date().getTime())))));
+		if (args.length > 0) {
+			System.out.println("    Time at " + args[0] + ": @" + timeAt(Integer.parseInt(args[0])));
+		}
+	}
+}
+/*
+ * Changes:
+ * $Log: time.java,v $
+ * Revision 1.2  2000/03/20 19:19:44  fredde
+ * cleaned up and fixed
+ *
+ */
