@@ -79,15 +79,15 @@ public class imageViewer extends JFrame {
 		int width = im.width;
 		int height = im.height;
 
-		if (width > screen.width + 15) {
-			width = screen.width - 215;
+		while (width + 15 > screen.width - 100) {
+			width -= 100;
 		}
-		if (height > screen.height + 55) {
-			height = screen.height - 255;
+		while (height + 55 > screen.height - 75) {
+			height -= 75;
 		}
 
-		setBounds((screen.width - width + 15)/2, 
-				(screen.height - height + 55)/2, 
+		setBounds((screen.width - width - 15)/2, 
+				(screen.height - height - 55)/2, 
 							width + 15, 
 								height + 55);
 
