@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Id: mainMenu.java,v 1.20 2000/02/28 13:46:42 fredde Exp $
+ * @version $Id: mainMenu.java,v 1.21 2000/03/05 18:02:53 fredde Exp $
  */
 public class mainMenu extends JMenuBar {
 
@@ -63,15 +63,13 @@ public class mainMenu extends JMenuBar {
 
 		// the file menu
 		rad = new JMenuItem(YAMM.getString("file.new"),
-				new ImageIcon("org/gjt/fredde/yamm/images/" +
-						"buttons/new_mail.gif"));
+				new ImageIcon(getClass().getResource("/images/buttons/new_mail.gif")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		file.add(rad);
 
 		rad = new JMenuItem(YAMM.getString("file.save_as"),
-				new ImageIcon("org/gjt/fredde/yamm/images/" +
-						"buttons/save_as.gif"));
+				new ImageIcon(getClass().getResource("/images/buttons/save_as.gif")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		file.add(rad);
@@ -79,8 +77,7 @@ public class mainMenu extends JMenuBar {
 		file.addSeparator();
 
 		rad = new JMenuItem(YAMM.getString("file.exit"),
-				new ImageIcon("org/gjt/fredde/yamm/images/" +
-						"buttons/exit.gif"));
+				new ImageIcon(getClass().getResource("/images/buttons/exit.gif")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		file.add(rad);
@@ -91,15 +88,13 @@ public class mainMenu extends JMenuBar {
 		add(edit);
 
 		rad = new JMenuItem(YAMM.getString("edit.settings"),
-				new ImageIcon("org/gjt/fredde/yamm/images/" +
-						"buttons/prefs.gif"));
+				new ImageIcon(getClass().getResource("/images/buttons/prefs.gif")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		edit.add(rad);
 
 		rad = new JMenuItem(YAMM.getString("edit.view_source"),
-				new ImageIcon("org/gjt/fredde/yamm/images/" +
-						"buttons/search.gif"));
+				new ImageIcon(getClass().getResource("/images/buttons/search.gif")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		edit.add(rad);
@@ -110,22 +105,19 @@ public class mainMenu extends JMenuBar {
 		add(help);
 
 		rad = new JMenuItem(YAMM.getString("help.about_you"),
-				new ImageIcon("org/gjt/fredde/yamm/images/" +
-						"buttons/help.gif"));
+				new ImageIcon(getClass().getResource("/images/buttons/help.gif")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		help.add(rad);
 
 		rad = new JMenuItem(YAMM.getString("help.about"),
-				new ImageIcon("org/gjt/fredde/yamm/images/" +
-						"buttons/help.gif"));
+				new ImageIcon(getClass().getResource("/images/buttons/help.gif")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		help.add(rad);
 
 		rad = new JMenuItem(YAMM.getString("help.license"),
-				new ImageIcon("org/gjt/fredde/yamm/images/" +
-						"types/text.gif"));
+				new ImageIcon(getClass().getResource("/images/types/text.gif")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		help.add(rad);
@@ -133,8 +125,7 @@ public class mainMenu extends JMenuBar {
 		help.addSeparator();
 
 		rad = new JMenuItem(YAMM.getString("help.bug_report"),
-				new ImageIcon("org/gjt/fredde/yamm/images/" +
-						"buttons/bug.gif"));
+				new ImageIcon(getClass().getResource("/images/buttons/bug.gif")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		help.add(rad);
@@ -194,7 +185,7 @@ public class mainMenu extends JMenuBar {
 
 				new MsgDialog(null,
 						YAMM.getString("help.about"),
-					"Copyright (C) 1999 Fredrik Ehnbom\n" +
+					"Copyright (C) 1999, 2000 Fredrik Ehnbom\n" +
 					YAMM.getString("info.about", args)
 				);
 			} else if (kommando.equals(YAMM.getString(
@@ -273,11 +264,20 @@ public class mainMenu extends JMenuBar {
 					if (msg != -1) {
 						sourceViewer sv =
 							new sourceViewer();
-						Mailbox.viewSource(
+						int ret = Mailbox.viewSource(
 							frame.selectedbox, msg,
 							skip,
 							sv.jtarea
 						);
+						if (ret != -1) {
+							JScrollBar jsb = sv.jsp.getVerticalScrollBar();
+							jsb.updateUI();
+
+							jsb.setValue(0);
+						} else {
+							sv.dispose();
+							sv = null;
+						}
 					}
 				}
 			} else if (kommando.equals(YAMM.getString(
@@ -361,6 +361,9 @@ public class mainMenu extends JMenuBar {
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.21  2000/03/05 18:02:53  fredde
+ * now gets the images used for the jar-file
+ *
  * Revision 1.20  2000/02/28 13:46:42  fredde
  * added some javadoc tags and changelog. Cleaned up
  *

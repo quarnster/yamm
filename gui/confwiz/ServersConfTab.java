@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * The configurationtab for the serversettings
  * @author Fredrik Ehnbom
- * @version $Id: ServersConfTab.java,v 1.1 2000/02/28 13:49:33 fredde Exp $
+ * @version $Id: ServersConfTab.java,v 1.2 2000/03/05 18:02:53 fredde Exp $
  */
 public class ServersConfTab extends JPanel {
 
@@ -53,17 +53,17 @@ public class ServersConfTab extends JPanel {
 		Box hori = Box.createHorizontalBox();
 		Box vert2 = Box.createVerticalBox();
     
-		JButton b = new JButton(YAMM.getString("button.add"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/new.gif") );
+		JButton b = new JButton(YAMM.getString("button.add"), new ImageIcon(getClass().getResource("/images/buttons/new.gif")));
 		b.addActionListener(BListener);
 		vert.add(b);
 		vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-		b = new JButton(YAMM.getString("edit"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/edit.gif"));
+		b = new JButton(YAMM.getString("edit"), new ImageIcon(getClass().getResource("/images/buttons/edit.gif")));
 		b.addActionListener(BListener);
 		vert.add(b);
 		vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-		b = new JButton(YAMM.getString("button.delete"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/delete.gif"));
+		b = new JButton(YAMM.getString("button.delete"), new ImageIcon(getClass().getResource("/images/buttons/delete.gif")));
 		b.addActionListener(BListener);
 		vert.add(b);
 		vert.add(Box.createRigidArea(new Dimension(10, 10)));
@@ -157,6 +157,9 @@ public class ServersConfTab extends JPanel {
 /*
  * Changes:
  * $Log: ServersConfTab.java,v $
+ * Revision 1.2  2000/03/05 18:02:53  fredde
+ * now gets the images used for the jar-file
+ *
  * Revision 1.1  2000/02/28 13:49:33  fredde
  * files for the configuration wizard
  *

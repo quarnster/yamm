@@ -1,5 +1,5 @@
 /*  BoxTreeRenderer.java - The renderer for the boxtree
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,35 +24,33 @@ import javax.swing.*;
 import javax.swing.tree.*;
 import org.gjt.fredde.yamm.YAMM;
 
+/**
+ * The renderer for the mailbox tree
+ * @author Fredrik Ehnbom
+ * @version $Id: BoxTreeRenderer.java,v 1.3 2000/03/05 18:02:53 fredde Exp $
+ */
 public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
                                                                    
 	/** Whether or not the item that was last configured is selected. */
 	protected boolean selected;
 
 	/** The icon for the inbox */
-	public final static ImageIcon inbox = new ImageIcon("org/gjt/fredde/" +
-						"yamm/images/boxes/inbox.gif");
+	public final ImageIcon inbox = new ImageIcon(getClass().getResource("/images/boxes/inbox.gif"));
                                
 	/** The icon for the outbox */
-	public final static ImageIcon outbox = new ImageIcon("org/gjt/fredde/" +
-					"yamm/images/boxes/outbox.gif");
+	public final ImageIcon outbox = new ImageIcon(getClass().getResource("/images/boxes/outbox.gif"));
 
 	/** The icon for the trashcan */
-	public final static ImageIcon trash = new ImageIcon("org/gjt/fredde/" +
-						"yamm/images/boxes/trash.gif");
+	public final ImageIcon trash = new ImageIcon(getClass().getResource("/images/boxes/trash.gif"));
 
 	/** The icon for other boxes */
-	public final static ImageIcon box = new ImageIcon("org/gjt/fredde/" +
-						"yamm/images/boxes/box.gif");
-
+	public final ImageIcon box = new ImageIcon(getClass().getResource("/images/boxes/box.gif"));
 
 	/** The icon for closed dirs */
-	public final static ImageIcon dir = new ImageIcon("org/gjt/fredde/" +
-						"yamm/images/boxes/dir.gif");
+	public final ImageIcon dir = new ImageIcon(getClass().getResource("/images/boxes/dir.gif"));
 
 	/** The icon for open dirs */
-	public final static ImageIcon dir2 = new ImageIcon("org/gjt/fredde/" +
-						"yamm/images/boxes/dir2.gif");
+	public final ImageIcon dir2 = new ImageIcon(getClass().getResource("/images/boxes/dir2.gif"));
 
 	public Component getTreeCellRendererComponent(
 				JTree   tree,
@@ -129,3 +127,10 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 		super.paint(g);
 	}
 }
+/*
+ * Changes:
+ * $Log: BoxTreeRenderer.java,v $
+ * Revision 1.3  2000/03/05 18:02:53  fredde
+ * now gets the images used for the jar-file
+ *
+ */

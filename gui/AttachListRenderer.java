@@ -1,5 +1,5 @@
 /*  AttachListRenderer.java - The renderer for Attachment lists
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@ import javax.swing.*;
 /**
  * This is the renderer for the Attach list.
  * It gives text files a text icon, sound files a sound icon etc. etc.
+ * @author Fredrik Ehnbom
+ * @version $Id: AttachListRenderer.java,v 1.2 2000/03/05 18:02:53 fredde Exp $
  */
 public class AttachListRenderer extends JLabel implements ListCellRenderer {
 
@@ -31,25 +33,19 @@ public class AttachListRenderer extends JLabel implements ListCellRenderer {
 	protected boolean selected;
 
 	/** Images */
-	public final static ImageIcon image = new ImageIcon("org/gjt/fredde/" +
-						"yamm/images/types/image.gif");
+	public final ImageIcon image = new ImageIcon(getClass().getResource("/images/types/image.gif"));
 
 	/** Text */
-	public final static ImageIcon text = new ImageIcon("org/gjt/fredde/" +
-						"yamm/images/types/text.gif");
+	public final ImageIcon text = new ImageIcon(getClass().getResource("/images/types/text.gif"));
                                  
 	/** Sound */
-	public final static ImageIcon sound = new ImageIcon("org/gjt/fredde/" +
-						"yamm/images/types/sound.gif");
+	public final ImageIcon sound = new ImageIcon(getClass().getResource("/images/types/sound.gif"));
 
 	/** Packed */
-	public final static ImageIcon packed = new ImageIcon("org/gjt/fredde/" +
-						"yamm/images/types/packed.gif");
+	public final ImageIcon packed = new ImageIcon(getClass().getResource("/images/types/packed.gif"));
 
 	/** Unknown */
-	public final static ImageIcon unknown = new ImageIcon("org/gjt/fredde" +
-						"/yamm/images/types/" +
-								"unknown.gif");
+	public final ImageIcon unknown = new ImageIcon(getClass().getResource("/images/types/unknown.gif"));
 
 	/**
 	 * The Renderer
@@ -149,4 +145,10 @@ public class AttachListRenderer extends JLabel implements ListCellRenderer {
 		super.paint(g);
 	}
 }
-
+/*
+ * Changes:
+ * $Log: AttachListRenderer.java,v $
+ * Revision 1.2  2000/03/05 18:02:53  fredde
+ * now gets the images used for the jar-file
+ *
+ */

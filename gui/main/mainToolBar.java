@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Id: mainToolBar.java,v 1.16 2000/02/28 13:47:51 fredde Exp $
+ * @version $Id: mainToolBar.java,v 1.17 2000/03/05 18:02:53 fredde Exp $
  */
 public class mainToolBar extends JToolBar {
 
@@ -60,8 +60,7 @@ public class mainToolBar extends JToolBar {
 		/* send mails in outbox get mail to inbox */
 		JButton b = new JButton();
 		if (frame.ico) {
-			b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/" +
-							"buttons/recycle.gif"));
+			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/recycle.gif")));
 		}
 		if (frame.text) {
 			b.setText(YAMM.getString("button.send_get"));
@@ -78,8 +77,7 @@ public class mainToolBar extends JToolBar {
 		/* button to write a new mail */
 		b = new JButton();
 		if (frame.ico) {
-			b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/" +
-						"buttons/new_mail.gif"));
+			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/new_mail.gif")));
 		}
 		if (frame.text) {
 			b.setText(YAMM.getString("button.new_mail"));
@@ -94,8 +92,7 @@ public class mainToolBar extends JToolBar {
 		/* reply button */
 		reply = new JButton();
 		if (frame.ico) {
-			reply.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
-						"images/buttons/reply.gif"));
+			reply.setIcon(new ImageIcon(getClass().getResource("/images/buttons/reply.gif")));
 		}
 		if (frame.text) {
 			reply.setText(YAMM.getString("button.reply"));
@@ -111,8 +108,7 @@ public class mainToolBar extends JToolBar {
 		/* forward button */
 		forward = new JButton();
 		if (frame.ico) {
-			forward.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
-						"images/buttons/forward.gif"));
+			forward.setIcon(new ImageIcon(getClass().getResource("/images/buttons/forward.gif")));
 		}
 		if (frame.text) {
 			forward.setText(YAMM.getString("button.forward"));
@@ -148,8 +144,7 @@ public class mainToolBar extends JToolBar {
 		/* button to exit from program */
 		b = new JButton();
 		if (frame.ico) {
-			b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/" +
-							"buttons/exit.gif"));
+			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/exit.gif")));
 		}
 		if (frame.text) {
 			b.setText(YAMM.getString("button.exit"));
@@ -299,6 +294,9 @@ public class mainToolBar extends JToolBar {
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.17  2000/03/05 18:02:53  fredde
+ * now gets the images used for the jar-file
+ *
  * Revision 1.16  2000/02/28 13:47:51  fredde
  * little cleanup and added changelog and some javadoc tags
  *

@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * The big Main-class of YAMM
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.41 2000/02/28 13:45:44 fredde Exp $
+ * @version $Id: YAMM.java,v 1.42 2000/03/05 18:02:53 fredde Exp $
  */
 public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
@@ -62,7 +62,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	public static String version  = Utilities.cvsToVersion("$Name:  $");
 
 	/** The compileDate of YAMM */
-	public static String compDate = Utilities.cvsToDate("$Date: 2000/02/28 13:45:44 $");
+	public static String compDate = Utilities.cvsToDate("$Date: 2000/03/05 18:02:53 $");
 
 	/** the file that contains the current mail */
 	public String mailPageString = "file:///" + home + "/tmp/cache/";
@@ -255,13 +255,11 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 					new JScrollPane(mail));
 		} else if (ico && !text) {
 			JTPane.addTab("", 
-			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
-								"mail.gif"), 
+			new ImageIcon(getClass().getResource("/images/buttons/mail.gif")), 
 			new JScrollPane(mail));
 		} else {
 			JTPane.addTab(res.getString("mail"),
-			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
-								"mail.gif"),
+			new ImageIcon(getClass().getResource("/images/buttons/mail.gif")),
 			new JScrollPane(mail));
 		}
 
@@ -275,8 +273,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			b.setText(res.getString("button.view_extract"));
 		}
 		if (ico) {
-			b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/" +
-							"buttons/search.gif"));
+			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/search.gif")));
 		}
 		b.setToolTipText(res.getString("button.view_extract"));
 		b.addActionListener(BListener);
@@ -304,15 +301,13 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		myList.setBorder(ram);
 
 		if (ico && !text) {
-			JTPane.addTab("", new ImageIcon("org/gjt/fredde/yamm/" +
-						"images/buttons/attach.gif"),
+			JTPane.addTab("", new ImageIcon(getClass().getResource("/images/buttons/attach.gif")),
 			myPanel);
 		} else if (text && !ico) {
 			JTPane.addTab(res.getString("mail.attachment"),myPanel);
 		} else {
 			JTPane.addTab(res.getString("mail.attachment"),
-				new ImageIcon("org/gjt/fredde/yamm/images/" +
-							"buttons/attach.gif"),
+				new ImageIcon(getClass().getResource("/images/buttons/attach.gif")),
 				myPanel);
 		}
 
@@ -527,13 +522,12 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 					propsioe,
 					YAMM.exceptionNames);
 		}
-
+		Utilities.delUnNeededFiles();
 		if (debug != System.err) {
 			debug.flush();
 			debug.close();
 		}
 		dispose();
-		Utilities.delUnNeededFiles();
 		System.exit(0);
 	}
 
@@ -596,8 +590,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		Locale.setDefault(l);
 		
 		try {
-			res = ResourceBundle.getBundle("org.gjt.fredde.yamm." +
-						"resources.YAMM", l);
+			res = ResourceBundle.getBundle("YAMM", l);
 		} catch (MissingResourceException mre) {
 			mre.printStackTrace();
 			System.exit(1);
@@ -628,7 +621,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		if (props.getProperty("splashscreen", "yes").equals("yes")) {
 			splash = new SplashScreen("YAMM " + version + 
 				" Copyright (c) 1999 Fredrik Ehnbom",
-				"org/gjt/fredde/yamm/images/logo.gif");
+				props.getClass().getResource("/images/logo.gif"));
 		}
 
 		selectedbox += res.getString("box.inbox");
@@ -699,6 +692,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.42  2000/03/05 18:02:53  fredde
+ * now gets the images used for the jar-file
+ *
  * Revision 1.41  2000/02/28 13:45:44  fredde
  * added changelog and some javadoc tags. Moved some functions to Utilities. Added a debug PrintStream and smart version control. fixed some startup bugs. cleaned up a little
  *
