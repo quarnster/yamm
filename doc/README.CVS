@@ -1,4 +1,5 @@
-This guide is for linux users.
+This guide requires the command tools "cvs" and "make". Also
+you will need a java sdk.
 
 Some cvs-information:
 
@@ -10,17 +11,17 @@ Username   : anoncvs
 Password   : anoncvs
 
 
-To get the latest cvs version you first need to "checkout" it: (hmm, bad grammar...)
+To get the latest cvs version you first need to do a "checkout":
 
-cvs -d:pserver:anoncvs@cvs.gjt.org:/gjt/cvsroot login
-cvs -d:pserver:anoncvs@cvs.gjt.org:/gjt/cvsroot co java/org/gjt/fredde/yamm
-cvs -d:pserver:anoncvs@cvs.gjt.org:/gjt/cvsroot co java/org/gjt/fredde/util
+$ cvs -d:pserver:anoncvs@cvs.gjt.org:/gjt/cvsroot login
+$ cvs -d:pserver:anoncvs@cvs.gjt.org:/gjt/cvsroot co java/org/gjt/fredde/yamm
+$ cvs -d:pserver:anoncvs@cvs.gjt.org:/gjt/cvsroot co java/org/gjt/fredde/util
 
 when asked for a password, enter anoncvs.
 You should now have all the sources needed to compile YAMM.
 
 Now enter the directory "java" that was created when you did the checkout.
-Copy the files/directories
+You will need to copy the following directories to the current directory ("java"):
 
 org/gjt/fredde/yamm/MANIFEST.MF
 org/gjt/fredde/yamm/resources/YAMM*.properties
@@ -40,6 +41,6 @@ org
 
 Type "make jar". This should build all the files and create a file
 called yamm.jar. If you have come this far you have just built your own
-cvs version of YAMM. Congratiolations!
+cvs version of YAMM. Congratulations!
 
 Type "java -jar yamm.jar" to run it.

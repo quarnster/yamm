@@ -1,10 +1,10 @@
 YAMM - Yet Another Mail Manager
 
-Copyright (C) 1999-2001 Fredrik Ehnbom
+Copyright (C) 1999-2003 Fredrik Ehnbom
 See 'COPYING' for licence information.
 
-Please make sure you have jre or jdk 1.3 installed.
-If you do not have one of these, goto http://java.sun.com:80/products/jdk/1.3
+Please make sure you have jre or jdk 1.4 installed.
+If you do not have one of these, goto http://java.sun.com/j2se/1.4/
 
 Once you have the jdk (or jre) up and running untar the file with for example:
 
@@ -13,13 +13,18 @@ Once you have the jdk (or jre) up and running untar the file with for example:
 Windows users can untar it with winzip (http://www.winzip.com).
 Then change directory to 'yamm-<version>' and type:
 
-'java -jar yamm.jar'
+$ java -jar yamm.jar
 
-to run it or change directory to 'yamm-<version>/source' and type:
+Windows users can simply double click yamm.jar to start the program.
 
-'make'
 
-to rebuild it. (Rebuilding requires jdk and make)
+
+If you wish to rebuild the sourcecode 
+change directory to 'yamm-<version>/source' and type:
+
+$ make jar
+
+(Rebuilding requires jdk and make)
 
 
 Have fun!

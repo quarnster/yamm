@@ -1,17 +1,27 @@
-since 0.8:
-	Added:
+0.9:
+	Adds/fixes/changes:
 		-Nicer looking "message-info" panel
 		-You can drop files in the write attachment list from your desktop
 		-You can drag files from the mail attachment list to your desktop
-
-	Fixed:
+		-The boxtree is now a "TreeTable"
+		-Doubleclick on messages (in the message list) to read them in a new window
 		-Shows name of textfile-attachments that are inlined
 		-The *.index files are no longer shown when choosing browse
 		 in the filter configuration dialog
 		-Major speedup fixes when browsing your mailboxes. Especially when
-		 reading previously unread mail.
+		 reading previously unread mail. Also moving/deleting and other mailbox
+		 operations is much, much faster now. All thanks to the new index system.
 		-Better linkparsing system.
 		-Better handling of html-mails
+		-Layout fixes
+		-Mergesort used for mailtable sorting
+		-Added some stats in "about me" dialog
+		-Now saves/restores column index
+		-the boxtree is now sorted
+		-added status and attachment columns in mailllist
+		-All images are now png-images
+		-Added new splashscreen by Daniel Johnson! Thanks mate! :)
+		-Better LookAndFeel handling/compatibility
 
 0.8:
 	Added:
