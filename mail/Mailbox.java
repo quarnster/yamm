@@ -455,8 +455,14 @@ public class Mailbox {
                 
                   String begin = temp.substring(0, temp.indexOf(temp2));
                   String end = temp.substring(temp.indexOf(temp2) + temp2.length(), temp.length());
-                  if(temp2.endsWith("&gt;")) temp2 = temp2.substring(0, temp2.length()-4);
-                  if(temp2.startsWith("&lt;")) temp = temp2.substring(4, temp2.length());
+                  if(temp2.endsWith("&gt;")) {
+                    end = temp2.substring(temp2.length()-4, temp2.length()) + end;
+                    temp2 = temp2.substring(0, temp2.length()-4);
+                  }
+                  if(temp2.startsWith("&lt;")) {
+                    begin += temp2.substring(0, 4);
+                    temp2 = temp2.substring(4, temp2.length());
+                  }
 
                   temp = begin + "<a href=\"mailto:" + temp2 + "\">" + temp2 + "</a>" + end;
                 }
