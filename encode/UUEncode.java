@@ -81,7 +81,7 @@ public class UUEncode {
 	 */
 	protected void encodeFile(String file) {
 		try {
-			DataInputStream in = new DataInputStream(new FileInputStream(file));
+			DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
 
 			UUEncoder uuenc = new UUEncoder(filename);
 			uuenc.encode(in, out);
