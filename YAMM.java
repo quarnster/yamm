@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.70 2003/04/27 07:58:26 fredde Exp $
+/*  $Id: YAMM.java,v 1.71 2003/06/08 18:48:59 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.70 $
+ * @version $Revision: 1.71 $
  */
 public class YAMM
 	extends JFrame
@@ -100,7 +100,7 @@ public class YAMM
 	public AttachList myList;
 
 	/** The toolbar */
-	public mainToolBar tbar;
+	public mainToolBar toolbar;
 
 	/** The splitpanes */
 	protected JSplitPane   SPane, SPane2;
@@ -218,8 +218,8 @@ public class YAMM
 		setJMenuBar(new mainMenu());
 
 		// the toolbar
-		tbar = new mainToolBar();
-		getContentPane().add("North", tbar);
+		toolbar = new mainToolBar();
+		getContentPane().add("North", toolbar);
 
 		// create a list of mails in the selected box
 		Mailbox.createList(currentMailbox, this);
@@ -806,6 +806,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.71  2003/06/08 18:48:59  fredde
+ * tbar -> toolbar
+ *
  * Revision 1.70  2003/04/27 07:58:26  fredde
  * fixed yamm2Mbox
  *
