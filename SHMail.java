@@ -1,4 +1,4 @@
-/*  $Id: SHMail.java,v 1.37 2003/03/15 19:50:20 fredde Exp $
+/*  $Id: SHMail.java,v 1.38 2003/04/16 12:37:35 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Revision: 1.37 $
+ * @version $Revision: 1.38 $
  */
 public class SHMail
 	extends Thread
@@ -44,10 +44,6 @@ public class SHMail
 
 	/** If smtp-debugging info should be printed */
 	static private boolean smtpdebug = false;
-
-	/** If messages should be deleted after getting them */
-	static private boolean del = false;
-
 
 	private int sentnum;
 	private int receivednum;
@@ -71,7 +67,6 @@ public class SHMail
 
 		popdebug	= YAMM.getProperty("debug.pop",  "false").equals("true");
 		smtpdebug	= YAMM.getProperty("debug.smtp", "false").equals("true");
-		del		= YAMM.getProperty("delete", "true").equals("true");
 	}
 
 	/**
@@ -104,10 +99,12 @@ public class SHMail
 			}
 
 			String type     = props.getProperty("type");
+			if (!type.equals("pop3")) continue;
+
 			String server   = props.getProperty("server");
 			String username = props.getProperty("username");
-			String password = new SimpleCrypt("myKey").decrypt(
-						props.getProperty("password"));
+			String password = new SimpleCrypt("myKey").decrypt(props.getProperty("password"));
+			boolean del	= props.getProperty("delete", "true").equals("true");
 
 			int port = 110;
 			try {
@@ -205,7 +202,6 @@ public class SHMail
 
 					if (temp.startsWith("From:")) {
 						String from = MessageParser.getEmail(temp);
-						System.out.println("form: " + from);
 						smtp.from(from);
 						from2 = temp;
 					} else if (temp.startsWith("To:")) {
@@ -322,6 +318,9 @@ public class SHMail
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.38  2003/04/16 12:37:35  fredde
+ * gets delete-property from server configuration
+ *
  * Revision 1.37  2003/03/15 19:50:20  fredde
  * localized 'you have new mail!'-string
  *
