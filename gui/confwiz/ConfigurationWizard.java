@@ -1,0 +1,59 @@
+/*  ConfigurationWizard.java - The configuration wizard for YAMM
+ *  Copyright (C) 2000 Fredrik Ehnbom
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+package org.gjt.fredde.yamm.gui.confwiz;
+
+import java.awt.BorderLayout;
+import javax.swing.*;
+import org.gjt.fredde.yamm.YAMM;
+
+/**
+ * The ConfigurationWizard is used to configure the settings in YAMM
+ * @author Fredrik Ehnbom
+ * @version $Id: ConfigurationWizard.java,v 1.1 2000/02/28 13:49:33 fredde Exp $
+ */
+public class ConfigurationWizard extends JDialog {
+
+	/**
+	 * Creates a new ConfigurationWizard
+	 */
+	public ConfigurationWizard(JFrame f) {
+		super(f, true);
+		getContentPane().setLayout(new BorderLayout());
+		setSize(600, 400);
+
+		JTabbedPane jtpane = new JTabbedPane();
+		jtpane.addTab(YAMM.getString("confwiz.welcometab"), new JLabel(YAMM.getString("confwiz.welcome.message")));
+		jtpane.addTab(YAMM.getString("confwiz.generaltab"), new GeneralConfTab());
+		jtpane.addTab(YAMM.getString("confwiz.identitiestab"), new IdentitiesConfTab());
+		jtpane.addTab(YAMM.getString("confwiz.serverstab"), new ServersConfTab());
+		jtpane.addTab(YAMM.getString("confwiz.debugtab"), new DebugConfTab());
+		
+		getContentPane().add("Center", jtpane);		
+
+		getContentPane().add("South", new ControlPanel(jtpane));
+		show();
+	}
+}
+
+/*
+ * Changes:
+ * $Log: ConfigurationWizard.java,v $
+ * Revision 1.1  2000/02/28 13:49:33  fredde
+ * files for the configuration wizard
+ *
+ */
