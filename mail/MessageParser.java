@@ -219,9 +219,11 @@ public class MessageParser {
 
 		MessageBodyParser mbp = new MessageBodyParser(true);
 
+		boolean parseMore = true;
 		for (;;) {
 			int test = mbp.parse(in, out, boundary);
 
+			if (!parseMore) break;
 			if (test == MessageBodyParser.ATTACHMENT &&
 							contentType.indexOf("multipart/alternative") == -1) {
 				Attachment a = new Attachment();
@@ -251,7 +253,8 @@ public class MessageParser {
 								attachments)));
 						continue;
 					} else /* if (test == Attachment.END) */{
-						return;
+						parseMore = false;
+						break;
 					}
 				}
 			} else if (test == MessageBodyParser.END) {
