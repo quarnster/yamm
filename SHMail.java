@@ -1,4 +1,4 @@
-/*  $Id: SHMail.java,v 1.34 2003/03/10 11:00:09 fredde Exp $
+/*  $Id: SHMail.java,v 1.35 2003/03/11 15:16:34 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Revision: 1.34 $
+ * @version $Revision: 1.35 $
  */
 public class SHMail
 	extends Thread
@@ -281,7 +281,7 @@ public class SHMail
 			yamm.status.progress(0);
 
 			try {
-				new Filter();
+				new Filter(yamm);
 			} catch (IOException ioe) {
 				new ExceptionDialog(
 					YAMM.getString("msg.error"),
@@ -304,6 +304,9 @@ public class SHMail
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.35  2003/03/11 15:16:34  fredde
+ * Filter needs yamm reference in its constructor
+ *
  * Revision 1.34  2003/03/10 11:00:09  fredde
  * now uses the new index system better. removed sent-check
  *
