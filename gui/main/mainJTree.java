@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.40 2003/04/13 16:37:43 fredde Exp $
+/*  $Id: mainJTree.java,v 1.41 2003/04/27 08:01:25 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.40 $
+ * @version $Revision: 1.41 $
  */
 public class mainJTree
 	extends JTable
@@ -357,6 +357,7 @@ public class mainJTree
 			fullUpdate();
 	}
 	public void fullUpdate() {
+		((DefaultTreeModel) tree.getModel()).reload();
 		dataModel.fireTableRowsUpdated(1, dataModel.getRowCount());
 	}
 
@@ -484,6 +485,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.41  2003/04/27 08:01:25  fredde
+ * black on new-mail now works correctly
+ *
  * Revision 1.40  2003/04/13 16:37:43  fredde
  * now uses yamm.set/getMailbox
  *
