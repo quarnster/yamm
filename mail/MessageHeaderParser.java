@@ -41,8 +41,9 @@ public class MessageHeaderParser {
 	public MessageHeaderParser() {
 	}
 
-	public long parse(BufferedReader in) throws IOException,
-							MessageParseException {
+	public long parse(BufferedReader in)
+		throws IOException,	MessageParseException
+	{
 		String field = null;
 		String value = null;
 		boolean headersStarted = false;

@@ -23,7 +23,7 @@ import java.io.*;
 /**
  * This class parses attachments
  * @author Fredrik Ehnbom
- * @version $Id: Attachment.java,v 1.5 2001/03/18 17:07:59 fredde Exp $
+ * @version $Id: Attachment.java,v 1.6 2001/04/21 09:33:37 fredde Exp $
  */
 public class Attachment {
 
@@ -31,6 +31,9 @@ public class Attachment {
 	public static final int END			=  0;
 	public static final int MESSAGE 	=  1;
 	public static final int ATTACHMENT 	=  2;
+	public static final int AMESSAGE 	=  3;
+
+	public String name = null;
 
 	public Attachment() {
 	}
@@ -41,7 +44,6 @@ public class Attachment {
 		MessageHeaderParser mhp = new MessageHeaderParser();
 		mhp.parse(in);
 
-		String name     = null;  // Name of the attachment
 		String encoding = null;  // Encoding used for this attachment
 
 		if (mhp.getHeaderField("Content-Type") != null) {
@@ -88,8 +90,8 @@ public class Attachment {
 
 		if (encoding != null) {
 			if (encoding.equalsIgnoreCase("base64") ||
-				encoding.equalsIgnoreCase("x-uuencode")) {
-
+				encoding.equalsIgnoreCase("x-uuencode")
+			) {
 				String temp = null;
 
 				out.println(name);
@@ -109,6 +111,9 @@ public class Attachment {
 						out.flush();
 					}
 				}
+			} else {
+				// probably an inlined message
+				return AMESSAGE;
 			}
 		}
 		return MESSAGE;
@@ -117,6 +122,9 @@ public class Attachment {
 /*
  * Changes:
  * $Log: Attachment.java,v $
+ * Revision 1.6  2001/04/21 09:33:37  fredde
+ * fixed for inlined messages
+ *
  * Revision 1.5  2001/03/18 17:07:59  fredde
  * cleaned up
  *

@@ -26,7 +26,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Parses messages
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: MessageParser.java,v 1.15 2001/03/18 17:08:42 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.16 2001/04/21 09:33:37 fredde Exp $
  */
 public class MessageParser {
 
@@ -157,7 +157,9 @@ public class MessageParser {
 
 		out.println("<html>");
 		out.println("<body>");
-		out.println("<table>");
+		out.println("<table width=\"100%\" bgcolor=\"#BBBBBB\">");
+		out.println("<tr><td>");
+		out.println("<table bgcolor=\"#BBBBBB\">");
 
 		if (mhp.getHeaderField("Date") != null) {
 			DateParser dp = new DateParser();
@@ -170,38 +172,40 @@ public class MessageParser {
 				date = "";
 			}
 
-			out.println("<tr><td>" + YAMM.getString("mail.date") +
-				"</td><td>" + date + "</td></tr>");
+			out.println("<tr><td align=right><b>" + YAMM.getString("mail.date") +
+				"</b></td><td>" + date + "</td></tr>");
 		}
 		if (mhp.getHeaderField("From") != null) {
 			String from = makeClickable(mhp.getHeaderField("From"));
 
-			out.println("<tr><td>" + YAMM.getString("mail.from") +
-				"</td><td>" + from + "</td></tr>");
+			out.println("<tr><td align=right><b>" + YAMM.getString("mail.from") +
+				"</b></td><td>" + from + "</td></tr>");
 		}
 		if (mhp.getHeaderField("To") != null) {
 			String to = makeClickable(mhp.getHeaderField("To"));
-			out.println("<tr><td>" + YAMM.getString("mail.to") +
-				"</td><td>" + to + "</td></tr>");
+			out.println("<tr><td align=right><b>" + YAMM.getString("mail.to") +
+				"</b></td><td>" + to + "</td></tr>");
 		}
 		if (mhp.getHeaderField("cc") != null) {
 			String cc = makeClickable(mhp.getHeaderField("cc"));
-			out.println("<tr><td>cc:</td><td>" + cc + "</td></tr>");
+			out.println("<tr><td align=right><b>cc:</b></td><td>" + cc + "</td></tr>");
 		}
 		if (mhp.getHeaderField("Reply-To") != null) {
 			String replyto = makeClickable(
 						mhp.getHeaderField("Reply-To"));
 
-			out.println("<tr><td>" + 
-				YAMM.getString("mail.reply_to") + "</td><td>" +
+			out.println("<tr><td align=right><b>" + 
+				YAMM.getString("mail.reply_to") + "</b></td><td>" +
 				replyto + "</td></tr>");
 		}
 		if (mhp.getHeaderField("Subject") != null) {
-			out.println("<tr><td>" + 
-				YAMM.getString("mail.subject") + "</td><td>" +
+			out.println("<tr><td align=right><b>" + 
+				YAMM.getString("mail.subject") + "</b></td><td>" +
 				Mailbox.unMime(mhp.getHeaderField("Subject")) +
 				"</td></tr>");
 		}
+		out.println("</table>");
+		out.println("</td></tr>");
 		out.println("</table>");
 		out.println("<br><pre>");
 
@@ -268,6 +272,12 @@ public class MessageParser {
 								)
 							);
 							continue;
+						} else if (test == Attachment.AMESSAGE) {
+							if (a.name != null)
+								out.println("<b>" + a.name + "</b>:<br>");
+							atOut.close();
+							new File(file +	".attach." + attachments).delete();
+							break;
 						} else /* if (test == Attachment.END) */{
 							break bigLoop;
 						}
