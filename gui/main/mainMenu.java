@@ -214,7 +214,12 @@ public class mainMenu extends JMenuBar {
           }
 
           int msg = Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString());
-          if(msg != -1) Mailbox.viewSource(frame.selectedbox, msg, new sourceViewer().jtarea);
+
+
+          if (msg != -1) {
+            sourceViewer sv = new sourceViewer();
+            Mailbox.viewSource(frame.selectedbox, msg, sv.jtarea);
+          }
         }
       }
       else if(kommando.equals(YAMM.getString("file.save_as"))) {

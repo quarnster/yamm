@@ -27,12 +27,10 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.MissingResourceException;
 import java.util.Locale;
-
 import org.gjt.fredde.yamm.YAMM;
 import org.gjt.fredde.yamm.mail.Mailbox;
 import org.gjt.fredde.yamm.YAMMWrite;
 import org.gjt.fredde.yamm.SHMail;
-import org.gjt.fredde.yamm.Print;
 
 /**
  * The toolbar for the main class

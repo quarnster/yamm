@@ -82,12 +82,14 @@ public class mainJTree extends JTree implements DropTargetListener {
             frame.selectedbox = YAMM.home + "/boxes/" +
                                  YAMM.getString("box.inbox");
             Mailbox.createList(frame.selectedbox, frame.listOfMails);
+            frame.mailList.clearSelection();
             ((JTable)frame.mailList).updateUI();
           }
 
           else if(!box.isDirectory()) {
             frame.selectedbox = node.toString();
             Mailbox.createList(frame.selectedbox, frame.listOfMails);
+            frame.mailList.clearSelection();
             ((JTable)frame.mailList).updateUI();
           }
         }
@@ -324,10 +326,6 @@ public class mainJTree extends JTree implements DropTargetListener {
                                                + YAMM.getString("box.trash"))));
               updateUI();
               expandRow(0);
-
-//              ((mainTable)frame.mailList).popup = new JPopupMenu();
-//              ((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
-//              ((mainTable)frame.mailList).createPopup(((mainTable)frame.mailList).popup);
             }
           }
         }

@@ -141,7 +141,7 @@ public class mainTable extends JTable implements DragGestureListener,
     while(i<4) {
       if(getColumnName(i).equals("#")) { break; }
       i++;     
-    }    
+    }
 
     int[] mlist = getSelectedRows();
     int[] dragList = new int[mlist.length];
@@ -513,6 +513,8 @@ public class mainTable extends JTable implements DragGestureListener,
       }     
        
       if(text.equals("Del")) {
+        if (getSelectedRow() == -1) return;
+
         frame.delUnNeededFiles();
         int[] mlist = getSelectedRows();
         int[] deleteList = new int[mlist.length];
@@ -566,6 +568,8 @@ public class mainTable extends JTable implements DragGestureListener,
       }    
 
       if(kommando.equals(YAMM.getString("button.delete"))) {
+        if (getSelectedRow() == -1) return;
+
         frame.delUnNeededFiles();
         int[] mlist = getSelectedRows();
         int[] deleteList = new int[mlist.length];
@@ -604,6 +608,7 @@ public class mainTable extends JTable implements DragGestureListener,
       }
 
       else if(kommando.equals(YAMM.getString("button.reply"))) {
+        if (getSelectedRow() == -1) return;
                  
         String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, 
                                 Integer.parseInt(getValueAt(getSelectedRow(), i).toString()));
@@ -625,7 +630,8 @@ public class mainTable extends JTable implements DragGestureListener,
       while(i<4) {
         if(getColumnName(i).equals("#")) { break; }
         i++;
-      }     
+      }
+      if (getSelectedRow() == -1) return;
        
       int[] mlist = getSelectedRows();
       int[] copyList = new int[mlist.length];  
@@ -633,7 +639,7 @@ public class mainTable extends JTable implements DragGestureListener,
       for(int j = 0;j < mlist.length;j++) {  
         copyList[j] = Integer.parseInt(getValueAt(mlist[j], i).toString());
       }                                                                             
-       
+      Arrays.sort(copyList); 
       Mailbox.copyMail(frame.selectedbox, name, copyList);
     }
   };
@@ -649,6 +655,7 @@ public class mainTable extends JTable implements DragGestureListener,
         i++;
       }
 
+      if (getSelectedRow() == -1) return;
 
       int[] mlist = getSelectedRows();
       int[] moveList = new int[mlist.length];
@@ -656,6 +663,8 @@ public class mainTable extends JTable implements DragGestureListener,
       for(int j = 0;j < mlist.length;j++) {
         moveList[j] = Integer.parseInt(getValueAt(mlist[j], i).toString());
       }
+
+      Arrays.sort(moveList);
 
 
       Mailbox.moveMail(frame.selectedbox, name, moveList);
