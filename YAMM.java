@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * The big Main-class of YAMM
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.44 2000/03/15 13:40:59 fredde Exp $
+ * @version $Id: YAMM.java,v 1.45 2000/03/18 17:36:20 fredde Exp $
  */
 public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
@@ -59,10 +59,10 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	public static String selectedbox = home + sep + "boxes" + sep;
 
 	/** The version of YAMM */
-	public static String version  = Utilities.cvsToVersion("$Name:  $");
+	public static String version  = "0.7.5";
 
 	/** The compileDate of YAMM */
-	public static String compDate = Utilities.cvsToDate("$Date: 2000/03/15 13:40:59 $");
+	public static String compDate = Utilities.cvsToDate("$Date: 2000/03/18 17:36:20 $");
 
 	/** the file that contains the current mail */
 	public String mailPageString = "file:///" + home + "/tmp/cache/";
@@ -691,6 +691,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.45  2000/03/18 17:36:20  fredde
+ * changed the version form cvs-tag to 0.7.5....
+ *
  * Revision 1.44  2000/03/15 13:40:59  fredde
  * cleaned up
  *
