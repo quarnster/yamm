@@ -45,7 +45,6 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/gui/main/NewBoxDialog.class \
 	org/gjt/fredde/yamm/gui/main/NewGroupDialog.class \
 	org/gjt/fredde/yamm/SHMail.class \
-	org/gjt/fredde/yamm/Options.class \
 	org/gjt/fredde/yamm/YAMMWrite.class \
 	org/gjt/fredde/yamm/YAMM.class \
 	org/gjt/fredde/yamm/YammPop3.class \
