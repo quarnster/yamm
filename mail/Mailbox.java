@@ -99,8 +99,17 @@ public class Mailbox {
           makeItem++;
         }
         else if(temp.startsWith("Date: ") && date == null) {
-          date = temp.substring(6, temp.lastIndexOf(":") + 2);
-          SimpleDateFormat dateFormat2 = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss", Locale.US);
+          date = temp.substring(6, temp.lastIndexOf(":") + 3).trim();
+          SimpleDateFormat dateFormat2 = null;
+
+          if (date.charAt(2) == ' ') {
+		dateFormat2 = new SimpleDateFormat("dd MMM yyyy HH:mm:ss",
+						 Locale.US);
+		
+          } else {
+		dateFormat2 = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss",
+						 Locale.US);
+          }
           SimpleDateFormat dateFormat3 = new SimpleDateFormat(YAMM.getString("shortdate"));
           try {
             Date nisse = dateFormat2.parse(date);
@@ -299,8 +308,18 @@ public class Mailbox {
 
           else if(temp.startsWith("Date: ")) {
             if(i == whichmail) {
-              String date = temp.substring(6, temp.lastIndexOf(":") + 2);
-              SimpleDateFormat dateFormat2 = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss", Locale.US);
+              String date = temp.substring(6, temp.lastIndexOf(":") + 3).trim();
+              SimpleDateFormat dateFormat2 = null;
+
+              if (date.charAt(2) == ' ') {
+                    dateFormat2 = new SimpleDateFormat("dd MMM yyyy HH:mm:ss",
+                                                     Locale.US);     
+                
+              } else {
+                    dateFormat2 = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss",
+                                                     Locale.US);     
+              }
+
               SimpleDateFormat dateFormat3 = new SimpleDateFormat(YAMM.getString("longdate"));
               try {
                 Date nisse = dateFormat2.parse(date);
