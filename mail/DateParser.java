@@ -40,10 +40,10 @@ public class DateParser {
 
 		if (date.charAt(2) == ' ' || date.charAt(1) == ' ') {
 			dateParser = new SimpleDateFormat("dd MMM yyyy"
-						+ "HH:mm:ss", Locale.US);
+						+ " HH:mm:ss zzz", Locale.US);
 		} else {
 			dateParser = new SimpleDateFormat("EEE, dd MMM yyyy"
-						+ "HH:mm:ss", Locale.US);
+						+ " HH:mm:ss zzz", Locale.US);
 		}
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat(DateFormat);
