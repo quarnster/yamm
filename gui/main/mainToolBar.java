@@ -178,10 +178,18 @@ public class mainToolBar extends JToolBar {
           i++;
         }
 
-        String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString()));
+        int selMail = Integer.parseInt(frame.mailList.getValueAt(frame.mailList.getSelectedRow(), i).toString());
 
-        YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[0] + " " + YAMM.getString("mail.wrote") + "\n");
-        Mailbox.getMailForReply(frame.selectedbox, Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString()), yam.myTextArea);
+        String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, selMail);
+
+        if (!mail[1].startsWith(YAMM.getString("mail.re"))
+                && !mail[1].startsWith("Re:")) {
+              mail[1] = YAMM.getString("mail.re") + " " + mail[1];
+        }
+
+        YAMMWrite yam = new YAMMWrite(mail[0], mail[1],
+                          mail[0] + " " + YAMM.getString("mail.wrote") + "\n");
+        Mailbox.getMailForReply(frame.selectedbox, selMail, yam.myTextArea);
       }
 
       else if(arg.equals(YAMM.getString("button.forward.tooltip"))) {
@@ -193,10 +201,16 @@ public class mainToolBar extends JToolBar {
           i++;
         }
 
-        String mail[] = Mailbox.getMailForReplyHeaders(frame.selectedbox, Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString()));
+        int selMail = Integer.parseInt(frame.mailList.getValueAt(frame.mailList.getSelectedRow(), i).toString());
+
+        String mail[] = Mailbox.getMailForReplyHeaders(frame.selectedbox, selMail);
+        if (!mail[1].startsWith(YAMM.getString("mail.fwd"))
+               && !mail[1].startsWith("Fwd:")) {
+              mail[1] = YAMM.getString("mail.fwd") + " " + mail[1];
+        }
 
         YAMMWrite yam = new YAMMWrite("", mail[1], mail[0] + " " + YAMM.getString("mail.wrote") + "\n");
-        Mailbox.getMailForReply(frame.selectedbox, Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString()), yam.myTextArea);
+        Mailbox.getMailForReply(frame.selectedbox, selMail, yam.myTextArea);
       }
       else if(arg.equals(YAMM.getString("button.print.tooltip"))) {
 /*
