@@ -1,5 +1,5 @@
-/*  mainToolBar.java - The tool bar for the main-window
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+/*  $Id: mainToolBar.java,v 1.24 2003/03/08 16:56:27 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,9 +32,11 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Id: mainToolBar.java,v 1.23 2003/03/06 23:05:42 fredde Exp $
+ * @version $Revision: 1.24 $
  */
-public class mainToolBar extends JToolBar {
+public class mainToolBar
+	extends JToolBar
+{
 
 	/** The forward button */
 	public JButton forward;
@@ -195,13 +197,13 @@ public class mainToolBar extends JToolBar {
 
 				String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, skip);
 
-				if (!mail[3].startsWith(YAMM.getString("mail.re")) && !mail[3].startsWith("Re:")) {
-					mail[3] = YAMM.getString("mail.re") + " " + mail[3];
+				if (!mail[2].startsWith(YAMM.getString("mail.re")) && !mail[2].startsWith("Re:")) {
+					mail[2] = YAMM.getString("mail.re") + " " + mail[2];
 				}
 
 				YAMMWrite yam = new YAMMWrite(
-					mail[2], mail[1],
-					mail[3], mail[0] + YAMM.getString("mail.wrote") + "\n"
+					mail[0], mail[1],
+					mail[2], mail[0] + YAMM.getString("mail.wrote") + "\n"
 				);
 				Mailbox.getMailForReply(
 					frame.selectedbox,
@@ -222,15 +224,13 @@ public class mainToolBar extends JToolBar {
 					skip
 				);
 
-				if (!mail[3].startsWith(YAMM.getString("mail.fwd")) && !mail[3].startsWith("Fwd:")) {
-					mail[3] = YAMM.getString("mail.fwd") +	" " + mail[3];
+				if (!mail[2].startsWith(YAMM.getString("mail.re")) && !mail[2].startsWith("Re:")) {
+					mail[2] = YAMM.getString("mail.re") + " " + mail[2];
 				}
 
 				YAMMWrite yam = new YAMMWrite(
-					"", mail[1],
-					mail[3], mail[0] +
-					YAMM.getString("mail.wrote") +
-					"\n"
+					mail[0], mail[1],
+					mail[2], mail[0] + YAMM.getString("mail.wrote") + "\n"
 				);
 				Mailbox.getMailForReply(
 					frame.selectedbox,
@@ -259,6 +259,9 @@ public class mainToolBar extends JToolBar {
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.24  2003/03/08 16:56:27  fredde
+ * Updated for the new getMailForReplyHeaders
+ *
  * Revision 1.23  2003/03/06 23:05:42  fredde
  * now gets the correct message when replying/forwarding
  *
