@@ -1,5 +1,5 @@
-/*  MessageParser.java - Parses messages
- *  Copyright (C) 1999-2001 Fredrik Ehnbom
+/*  $Id: MessageParser.java,v 1.21 2003/03/06 23:52:26 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * Parses messages
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: MessageParser.java,v 1.20 2003/03/06 20:14:32 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.21 2003/03/06 23:52:26 fredde Exp $
  */
 public class MessageParser {
 
@@ -140,7 +140,6 @@ public class MessageParser {
 		String encoding = null;
 
 		boolean html = false;
-		boolean mime = false;
 		file = file.substring(0, file.length() - 5);
 		MessageHeaderParser mhp = new MessageHeaderParser();
 		mhp.parse(in);
@@ -219,20 +218,20 @@ public class MessageParser {
 
 
 
-		if (mhp.getHeaderField("MIME-Version") != null && boundary != null) {
+		if (boundary != null) {
 			// expect a little mime message
 			for (;;) {
 				if (in.readLine().equals("--" +	boundary)) {
 					Attachment a = new Attachment();
 					a.parse(in, boundary, file);
-
+	
 					break;
 				}
 			}
-			mime = true;
 		}
 
 		if (boundary == null) {
+
 			PrintWriter o2 = null;
 			String name = null;
 			try {
@@ -252,28 +251,22 @@ public class MessageParser {
 			filter(contentType, encoding, name);
 		}
 
-		if (new File(file + ".message.html").exists()) {
-			temp = null;
-			BufferedReader in2 = null;
-			try {
-				in2 = new BufferedReader(new InputStreamReader(new FileInputStream(file + ".message.html")));
-				while ((temp = in2.readLine()) != null) {
-					out.println(temp);
-				}
-			} finally {
-				if (in2 != null) in2.close();
+		if (new File(file + ".message.html").exists())
+			file += ".message.html";
+		else if (new File(file + ".message.txt.html").exists())
+			file += ".message.txt.html";
+		else
+			file += ".message.txt";
+
+		temp = null;
+		BufferedReader in2 = null;
+		try {
+			in2 = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+			while ((temp = in2.readLine()) != null) {
+				out.println(temp);
 			}
-		} else {
-			temp = null;
-			BufferedReader in2 = null;
-			try {
-				in2 = new BufferedReader(new InputStreamReader(new FileInputStream(file + ".message.txt")));
-				while ((temp = in2.readLine()) != null) {
-					out.println(temp);
-				}
-			} finally {
-				if (in2 != null) in2.close();
-			}
+		} finally {
+			if (in2 != null) in2.close();
 		}
 
 		out.println("</body>");
@@ -286,14 +279,12 @@ public class MessageParser {
 		if (encoding == null && fileName.indexOf(".message.") != -1) {
 			if (contentType == null || contentType.indexOf("text/html") == -1) {
 				File source = new File(fileName);
-				File target = new File(fileName + ".tmp");
+				File target = new File(fileName + ".html");
 
 				new Html().encode(
 					new BufferedInputStream(new FileInputStream(source)),
 					new BufferedOutputStream(new FileOutputStream(target))
 				);
-				source.delete();
-				target.renameTo(source);
 			}
 		}
 
@@ -329,10 +320,8 @@ public class MessageParser {
 			if (contentType == null || contentType.indexOf("text/html") == -1) {
 				new Html().encode(
 					new BufferedInputStream(new FileInputStream(source)),
-					new BufferedOutputStream(new FileOutputStream(target))
+					new BufferedOutputStream(new FileOutputStream(source + ".html"))
 				);
-				source.delete();
-				target.renameTo(source);
 			}
 
 		}
@@ -342,6 +331,9 @@ public class MessageParser {
 /*
  * ChangeLog:
  * $Log: MessageParser.java,v $
+ * Revision 1.21  2003/03/06 23:52:26  fredde
+ * encode text messages to *.message.txt.html instead of just .txt
+ *
  * Revision 1.20  2003/03/06 20:14:32  fredde
  * rewrote mailparsing system
  *
