@@ -1,4 +1,4 @@
-/*  $Id: IndexEntry.java,v 1.3 2003/03/10 11:01:27 fredde Exp $
+/*  $Id: IndexEntry.java,v 1.4 2003/03/10 20:01:56 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -101,6 +101,8 @@ public class IndexEntry {
 		tmp = from.getBytes();
 		System.arraycopy(tmp, 0, b, 0, Math.min(tmp.length, FROMLENGTH));
 		out.write(b);
+
+		if (date == 0) date = System.currentTimeMillis();
 
 		out.writeLong(date);
 		out.writeLong(skip);
