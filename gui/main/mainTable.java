@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.53 2003/04/19 19:46:39 fredde Exp $
+/*  $Id: mainTable.java,v 1.54 2003/04/27 08:03:13 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.53 $
+ * @version $Revision: 1.54 $
  */
 public class mainTable
 	extends JTable
@@ -406,8 +406,12 @@ public class mainTable
 		String sep = System.getProperty("file.separator");
 		String boxHome = Utilities.replace(YAMM.home + "/boxes");
 
+		list.add(Utilities.replace(YAMM.home + "/boxes/inbox")); list2.add(Utilities.replace(YAMM.home + "/boxes/inbox"));
+		list.add(Utilities.replace(YAMM.home + "/boxes/outbox")); list2.add(Utilities.replace(YAMM.home + "/boxes/outbox"));
+		list.add(Utilities.replace(YAMM.home + "/boxes/sent")); list2.add(Utilities.replace(YAMM.home + "/boxes/sent"));
 		fileList(list, new File(boxHome + sep));
 		fileList(list2, new File(boxHome + sep));
+		list.add(Utilities.replace(YAMM.home + "/boxes/trash")); list2.add(Utilities.replace(YAMM.home + "/boxes/trash"));
 
 		JMenuItem row = null;
 		JMenuItem delete = new JMenuItem(YAMM.getString("button.delete"));
@@ -502,18 +506,23 @@ public class mainTable
 	private void fileList(Vector vect, File f) {
 		if ((f.toString()).equals(Utilities.replace(System.getProperty("user.home") + "/.yamm/boxes"))) {
 			String list[] = f.list();
+			Arrays.sort(list);
 			for (int i = 0; i < list.length; i++) {
 				fileList(vect, new File(f, list[i]));
 			}
 		} else if(f.isDirectory()) {
 			String list[] = f.list();
+			Arrays.sort(list);
 			for (int i = 0; i < list.length; i++) {
 				fileList(vect, new File(f, list[i]));
 			}
 		} else {
-			String test = f.toString();
-			test = test.substring(test.lastIndexOf(File.separator) + 1, test.length());
-			if (!test.startsWith(".")) {
+			if (	!(f.toString()).equals(Utilities.replace(YAMM.home + "/boxes/outbox")) &&
+				!(f.toString()).equals(Utilities.replace(YAMM.home + "/boxes/trash")) &&
+				!(f.toString()).equals(Utilities.replace(YAMM.home + "/boxes/inbox")) &&
+				!(f.toString()).equals(Utilities.replace(YAMM.home + "/boxes/sent")) &&
+				 (f.toString()).indexOf(File.separator + ".", (f.toString()).indexOf("boxes")) == -1)
+			{
 				vect.add(f.toString());
 			}
 		}
@@ -776,6 +785,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.54  2003/04/27 08:03:13  fredde
+ * sorts move/copy popup
+ *
  * Revision 1.53  2003/04/19 19:46:39  fredde
  * now changes mail when pressing up/down
  *
