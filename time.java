@@ -38,8 +38,11 @@ import java.text.SimpleDateFormat;
  * <br><br>
  * For more information, please visit 
  * <a href="http://www.swatch.com">http://www.swatch.com</a>.
+ * <br><br>
+ * This package is uses code from Martin Dahl's
+ * <a href="http://bohemians.org/~iznogood/xbeats/">xbeats</a> program.
  * @author Fredrik Ehnbom
- * @version $Id: time.java,v 1.2 2000/03/20 19:19:44 fredde Exp $
+ * @version $Id: time.java,v 1.3 2000/03/26 11:32:23 fredde Exp $
  */
 public abstract class time {
 
@@ -66,7 +69,7 @@ public abstract class time {
 		int sec  = Integer.parseInt(time2.substring(6, 8));   
 
 		long it = (hour * 3600 + min * 60 + sec);
-		it -= c.get(Calendar.DST_OFFSET);
+		if (c.get(Calendar.DST_OFFSET) > 0) it -= 3600;
 		it = (it*1000)/86400;
 
 		if(it >= 1000) {
@@ -81,6 +84,7 @@ public abstract class time {
 	/**
 	 * Returns the number of Swatch beats at the specified clock beat
 	 * @param hour An hour between 1-24
+	 * @return The number of beats at that hour
 	 */
 	public static int timeAt(int hour) {
 
@@ -96,7 +100,8 @@ public abstract class time {
 	 */ 
 	public static long toRegularTime(int it) {
 		int mo = c.get(Calendar.ZONE_OFFSET);
-		long millis1 = it * 86400  + (mo / 3600000) * 60000 - mo;
+		if (c.get(Calendar.DST_OFFSET) > 0) mo += 3600;
+		long millis1 = it * 86400  + (mo / 3600000) * 60000;
 
 		return millis1;
 	}
@@ -119,6 +124,9 @@ public abstract class time {
 /*
  * Changes:
  * $Log: time.java,v $
+ * Revision 1.3  2000/03/26 11:32:23  fredde
+ * gave Martin Dahl the credits he deserves, now should work correctly...
+ *
  * Revision 1.2  2000/03/20 19:19:44  fredde
  * cleaned up and fixed
  *
