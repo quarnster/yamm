@@ -42,18 +42,15 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * The big Main-class of YAMM
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.49 2000/07/16 17:48:36 fredde Exp $
+ * @version $Id: YAMM.java,v 1.50 2000/08/09 16:23:46 fredde Exp $
  */
 public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
-
-	/** The file separator */
-//	public static String sep = File.separator;
 
 	/** The home of yamm */
 	public static String home = Utilities.replace(System.getProperty("user.home") + "/.yamm");
 
 	/** To get the Language strings for buttons, menus, etc... */
-	static protected ResourceBundle         res;
+	private static ResourceBundle         res;
 
 	/** The box the user has selected. */
 	public static String selectedbox = Utilities.replace(home + "/boxes/");
@@ -62,7 +59,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	public static String version  = "0.7.7";
 
 	/** The compileDate of YAMM */
-	public static String compDate = Utilities.cvsToDate("$Date: 2000/07/16 17:48:36 $");
+	public static String compDate = Utilities.cvsToDate("$Date: 2000/08/09 16:23:46 $");
 
 	/** the file that contains the current mail */
 	public String mailPageString = "file:///" + home + "/tmp/cache/";
@@ -72,7 +69,8 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	public Vector attach;
 
 	/** To check if the user has sun.misc.Base64Decoder */
-	static protected boolean base64 = false;
+	private boolean base64 = false;
+	public static boolean base64enc = false;
 
 	/** The vector containing the mails of a box */
 	public Vector listOfMails = new Vector();
@@ -165,27 +163,23 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	 */
 	public YAMM() {
 		try { 
-			mailPage=new URL(mailPageString +
-				res.getString("box.inbox") + "/0.html");
+			mailPage=new URL(mailPageString + res.getString("box.inbox") + "/0.html");
 		} catch (MalformedURLException mue) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
-					mue,
-					YAMM.exceptionNames);
+					mue, YAMM.exceptionNames);
 		}
 
-		System.out.println("Locale: " + getProperty("locale",
-							Locale.getDefault().toString()));
-
-		boolean result = false;
+		System.out.println("Locale: " + getProperty("locale", Locale.getDefault().toString()));
 		System.out.println("Checking for sun classes...");
 
-		if (ClassLoader.getSystemResource(
-				"sun/misc/BASE64Decoder.class") != null) {
-			result = true;
+		if (ClassLoader.getSystemResource("sun/misc/BASE64Decoder.class") != null) {
 			base64 = true;
 		}
-		System.out.println("sun.misc.BASE64Decoder: " +
-						(result ? "yes" : "no"));
+		if (ClassLoader.getSystemResource("sun/misc/BASE64Encoder.class") != null) {
+			base64enc = true;
+		}
+		System.out.println("sun.misc.BASE64Decoder: " + (base64 ? "yes" : "no"));
+		System.out.println("sun.misc.BASE64Encoder: " + (base64enc ? "yes" : "no"));
 
 		// get the main window's settings and default them if they
 		// don't exist 
@@ -211,7 +205,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
 		// the tablemodel for the maillist table
 		TableModel dataModel = new AbstractTableModel() {
-			final String headername[] = { 
+			final String headername[] = {
 				"#",
 				res.getString("table.subject"),
 				res.getString("table.from"),
@@ -228,8 +222,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 				if (row >= listOfMails.size()) {
 					return null;
 				} else {
-					return  ((Vector)listOfMails.elementAt(row)).
-							elementAt(col);
+					return  ((Vector)listOfMails.elementAt(row)).elementAt(col);
 				}
 			}
 			public boolean isCellEditable(int col) {
@@ -247,8 +240,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			mail.setPage(mailPage);
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
-					ioe,
-					YAMM.exceptionNames);
+					ioe, YAMM.exceptionNames);
 		}
 		mail.setEditable(false);
 		mail.addHyperlinkListener(this);
@@ -256,11 +248,10 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
 		JTPane.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		if (text && !ico) {
-			JTPane.addTab(res.getString("mail"),
-					new JScrollPane(mail));
+			JTPane.addTab(res.getString("mail"), new JScrollPane(mail));
 		} else if (ico && !text) {
-			JTPane.addTab("", 
-			new ImageIcon(getClass().getResource("/images/buttons/mail.gif")), 
+			JTPane.addTab("",
+			new ImageIcon(getClass().getResource("/images/buttons/mail.gif")),
 			new JScrollPane(mail));
 		} else {
 			JTPane.addTab(res.getString("mail"),
@@ -289,8 +280,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		// The ListModel for the attachment list
 		ListModel attachModel = new AbstractListModel() {
 			public Object getElementAt(int index) {
-				return ((Vector)attach.elementAt(index)).
-								elementAt(0);
+				return ((Vector)attach.elementAt(index)).elementAt(0);
 			}
 			public int getSize() {
 				return attach.size();
@@ -306,8 +296,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		myList.setBorder(ram);
 
 		if (ico && !text) {
-			JTPane.addTab("", new ImageIcon(getClass().getResource("/images/buttons/attach.gif")),
-			myPanel);
+			JTPane.addTab("", new ImageIcon(getClass().getResource("/images/buttons/attach.gif")), myPanel);
 		} else if (text && !ico) {
 			JTPane.addTab(res.getString("mail.attachment"),myPanel);
 		} else {
@@ -324,8 +313,8 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		// maillists space, this fix still paints the background
 		// in the maillists background color.
 		JPanel bgFix = new JPanel(new BorderLayout());
-		bgFix.add("Center", new JScrollPane(mailList));
 		bgFix.setBackground(mailList.getBackground());
+		bgFix.add("Center", new JScrollPane(mailList));
 
 		SPane = new JSplitPane(0, bgFix, JTPane);
 		SPane.setDividerLocation(hsplit);
@@ -358,29 +347,24 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			String link = e.getURL().toString();
 
 			if ((e.getURL().toString()).startsWith("mailto:")) {
-				link = link.substring(link.indexOf("mailto:") +
-							7, link.length());
+				link = link.substring(link.indexOf("mailto:") +	7, link.length());
 				new YAMMWrite(link);
 			} else {
 				try {
 					new Browser(link);
-				} catch (InterruptedException ie) { 
+				} catch (InterruptedException ie) {
 					new ExceptionDialog(
-						YAMM.getString("msg.error"), 
-						ie,
-						YAMM.exceptionNames);
-				} catch(IOException ioe) { 
+						YAMM.getString("msg.error"),
+						ie, YAMM.exceptionNames);
+				} catch(IOException ioe) {
 					new ExceptionDialog(
-						YAMM.getString("msg.error"), 
-						ioe,
-						YAMM.exceptionNames);
+						YAMM.getString("msg.error"),
+						ioe, YAMM.exceptionNames);
 				}
 			}
-		} else if (e.getEventType() ==
-					HyperlinkEvent.EventType.ENTERED) {
+		} else if (e.getEventType() ==	HyperlinkEvent.EventType.ENTERED) {
 			mail.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		} else if (e.getEventType() ==
-					HyperlinkEvent.EventType.EXITED) {
+		} else if (e.getEventType() ==	HyperlinkEvent.EventType.EXITED) {
 			mail.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		}
 	}
@@ -393,13 +377,10 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			int whichAtt = myList.getSelectedIndex();
 
 			if (whichAtt != -1) {
-				String filename =
-					((Vector)attach.elementAt(whichAtt)).elementAt(0).toString();
-				String encode =
-					((Vector)attach.elementAt(whichAtt)).elementAt(1).toString();
-				String file =
-					((Vector)attach.elementAt(whichAtt)).elementAt(2).toString();
-				String target = home  + "/tmp/" + filename;
+				String filename	= ((Vector)attach.elementAt(whichAtt)).elementAt(0).toString();
+				String encode	= ((Vector)attach.elementAt(whichAtt)).elementAt(1).toString();
+				String file	= ((Vector)attach.elementAt(whichAtt)).elementAt(2).toString();
+				String target	= home  + "/tmp/" + filename;
 
 				if (filename.toLowerCase().endsWith(".jpg") ||
 					filename.toLowerCase().endsWith(".gif")) {
@@ -445,7 +426,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	};
 
 	public void createAttachList() {
-		attach = new Vector();
+		attach.clear();
 
 		String boxName = selectedbox.substring(
 				selectedbox.indexOf("boxes") + 6, 
@@ -453,21 +434,20 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
 		String base = home +  "/tmp/cache/" + boxName;
 
-		int msgNum = (mailList.getSelectedRow() != -1) ? mailList.getSelectedRow() : 0;
-		if (msgNum == -1) msgNum = 0;
+		int msgNum = mailList.getSelectedMessage();
+
+		if (msgNum == -1) {
+			JTPane.setEnabledAt(1, false);
+			return;
+		}
 
 		String[] test = new File(base).list();
 
 		for(int i = 0; i < test.length; i++ ) {
-			if (test[i].indexOf(msgNum + ".attach.") != -1) 
-				addinfo(base + test[i], attach);
+			if (test[i].indexOf(msgNum + ".attach.") != -1)	addinfo(base + test[i], attach);
 		}
-		if (attach.size() == 0) {
-			JTPane.setEnabledAt(1, false);
-		}
-		else {
-			JTPane.setEnabledAt(1, true);
-		}
+		if (attach.size() == 0) JTPane.setEnabledAt(1, false);
+		else JTPane.setEnabledAt(1, true);
 	}
 
 	private void addinfo(String where, Vector attach) {
@@ -482,12 +462,10 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			tmp.add(in.readLine()); // Name of the attachment
 			tmp.add(in.readLine()); // The attachments encoding
 
-        
 			in.close();
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
-					ioe,
-					YAMM.exceptionNames);
+					ioe, YAMM.exceptionNames);
 		}
 
 		tmp.add(where);
@@ -507,15 +485,12 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		getBounds(rv);
 
 		mailList.save();
-		props.setProperty("mainx", new Integer(rv.x).toString());
-		props.setProperty("mainy", new Integer(rv.y).toString());
-		props.setProperty("mainw", new Integer(rv.width).toString());
-		props.setProperty("mainh", new Integer(rv.height).toString());
-		props.setProperty("vsplit", 
-			new Integer(SPane2.getDividerLocation()).toString());
-		props.setProperty("hsplit",
-			new Integer(SPane.getDividerLocation()).toString());
-
+		props.setProperty("mainx", "" + rv.x);
+		props.setProperty("mainy", "" + rv.y);
+		props.setProperty("mainw", "" + rv.width);
+		props.setProperty("mainh", "" + rv.height);
+		props.setProperty("vsplit", "" + SPane2.getDividerLocation());
+		props.setProperty("hsplit", "" + SPane.getDividerLocation());
 
 		try {
 			OutputStream out = new FileOutputStream(home + "/.config");
@@ -523,8 +498,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			out.close();
 		} catch (IOException propsioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
-					propsioe,
-					YAMM.exceptionNames);
+					propsioe, YAMM.exceptionNames);
 		}
 		Utilities.delUnNeededFiles();
 		if (debug != System.err) {
@@ -644,15 +618,13 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			} catch (Exception e) {};
 		} else {
 			try {
-				UIManager.setLookAndFeel(
-					UIManager.getSystemLookAndFeelClassName()
-				);
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch (Exception e) {};
 		}
 
 		if (props.getProperty("splashscreen", "yes").equals("yes")) {
 			splash = new SplashScreen("YAMM " + version + 
-				" Copyright (c) 1999 Fredrik Ehnbom",
+				" Copyright (c) 1999-2000 Fredrik Ehnbom",
 				props.getClass().getResource("/images/logo.gif"));
 		}
 
@@ -670,7 +642,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		if (firstRun) {
 			try {
 				String user = System.getProperty("user.name");
-				SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy"+						" HH:mm:ss zzz", Locale.US);
+				SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
 
 				InetAddress myInetaddr = InetAddress.getLocalHost();
 				String host = myInetaddr.getHostName();
@@ -681,10 +653,8 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 					new FileOutputStream(home + "/boxes/" + 
 					YAMM.getString("box.inbox"))));
 
-				out.println("Date: " + dateFormat.format(
-								new Date()));
-				out.println("From: Fredrik Ehnbom " +
-							"<fredde@gjt.org>");
+				out.println("Date: " + dateFormat.format(new Date()));
+				out.println("From: Fredrik Ehnbom <fredde@gjt.org>");
 				out.println("To: " + user + "@" + host);
 				Object[] args = {
 					YAMM.version,
@@ -694,12 +664,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
 				out.close();
 
-				(new File(home + "/boxes/" +
-					getString("box.outbox"))).createNewFile();
-				(new File(home + "/boxes/" +
-					getString("box.trash"))).createNewFile();
-				(new File(home + "/boxes/" +
-					getString("box.sent"))).createNewFile();
+				(new File(home + "/boxes/" + getString("box.outbox"))).createNewFile();
+				(new File(home + "/boxes/" + getString("box.trash"))).createNewFile();
+				(new File(home + "/boxes/" + getString("box.sent"))).createNewFile();
 			} catch(IOException ioe) { 
 				new ExceptionDialog(YAMM.getString("msg.error"),
 					ioe,
@@ -723,6 +690,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.50  2000/08/09 16:23:46  fredde
+ * readability fixes + added support for base64 encoding
+ *
  * Revision 1.49  2000/07/16 17:48:36  fredde
  * lots of Windows compatiblity fixes
  *
