@@ -33,318 +33,397 @@ import org.gjt.fredde.util.gui.MsgDialog;
  */
 public class YAMMWrite extends JFrame {
 
-  /** A list of files to attach to the mail */
-  static protected Vector         attach;
+	/** A list of files to attach to the mail */
+	static protected Vector         attach;
 
-  /** The textarea for writing in the message */
-  public JTextArea      myTextArea;
+	/** The textarea for writing in the message */
+	public JTextArea      myTextArea;
 
-  JLabel      myLabel;
-  JButton     myButton;
-  JTextField  myTextField1;
-  JTextField  myTextField2;
-  JList       myList;
-
-  Box         vert1, vert2, vert3, hori1, hori2;
-  int         writex, writey, writew, writeh;
-
-  /**
-   * Creates a new empty mail with no subject and recipent
-   */
-  public YAMMWrite() {
-    this("","","");
-  }
-
-  /**
-   * Creates a new empty mail with no subject and with the specified recipent
-   * @param to The recipents address
-   */
-  public YAMMWrite(String to) {
-    this(to, "","");
-  }
-
-  /**
-   * Creates a new empty mail with the specified subject and recipent
-   * @param to The recipents address
-   * @param subject The subject
-   */
-  public YAMMWrite(String to, String subject) {
-    this(to,subject,"");
-  }
-
-  public YAMMWrite(String to, String subject, String body) {
-    setTitle(subject);
-
-    writex = Integer.parseInt(YAMM.getProperty("writex", "0"));
-    writey = Integer.parseInt(YAMM.getProperty("writey", "0"));
-    writew = Integer.parseInt(YAMM.getProperty("writew", "500"));
-    writeh = Integer.parseInt(YAMM.getProperty("writeh", "300"));
-
-    setBounds(writex, writey, writew, writeh);
-    
-    JMenuBar  Meny = new JMenuBar();
-    JMenu     arkiv = new JMenu(YAMM.getString("file"));
-    JMenuItem rad;
-    Meny.add(arkiv);
-
-    rad = new JMenuItem(YAMM.getString("button.cancel"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
-    rad.addActionListener(MListener);
-    arkiv.add(rad);
-
-    setJMenuBar(Meny);
-
-    vert1 = Box.createHorizontalBox();
-    vert2 = Box.createHorizontalBox();
-    vert3 = Box.createVerticalBox();
-    hori1 = Box.createHorizontalBox();
-    hori2 = Box.createHorizontalBox();
-
-    myButton = new JButton(YAMM.getString("button.send"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/send.gif"));
-    myButton.addActionListener(BListener);
-    hori1.add(myButton);
-
-    myButton = new JButton(YAMM.getString("button.cancel"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
-    myButton.addActionListener(BListener);
-    hori1.add(myButton);
-
-    myLabel = new JLabel(YAMM.getString("mail.to") + "  ");
-    vert1.add(myLabel);
-
-    myTextField1 = new JTextField();
-    myTextField1.setMaximumSize(new Dimension(1200, 20));
-    myTextField1.setMinimumSize(new Dimension(75, 20));
-    myTextField1.setText(to);
-    myTextField1.setToolTipText(YAMM.getString("tofield.tooltip"));
-    vert1.add(myTextField1);
-
-    myLabel = new JLabel(YAMM.getString("mail.subject") + "  ");
-    vert2.add(myLabel);
-
-    myTextField2 = new JTextField();
-    myTextField2.addKeyListener(new KeyAdapter(){
-      public void keyReleased(KeyEvent ke) { setTitle(myTextField2.getText()); }
-      public void keyPressed(KeyEvent ke) { setTitle(myTextField2.getText()); }
-    });
-    myTextField2.setMaximumSize(new Dimension(1200, 20));
-    myTextField2.setMinimumSize(new Dimension(75, 20));
-    myTextField2.setText(subject);
-    vert2.add(myTextField2);
-
-    vert3.add(hori1);
-    vert3.add(vert1);
-    vert3.add(vert2);
-
-    myTextArea = new JTextArea();
-    myTextArea.setText(body);
-
-    if(YAMM.getProperty("signatur") != null && !YAMM.getProperty("signatur").equals("")) {
-      try {
-        FileInputStream in = new FileInputStream(YAMM.getProperty("signatur"));
-        String tmp = null;
-        byte[] singb = new byte[in.available()];
-
-        in.read(singb);
-        myTextArea.append(new String(singb));  
-        in.close();
-      } catch (IOException ioe) { System.err.println(ioe); }
-    }
-
-    JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
-    JTPane.addTab(YAMM.getString("mail"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), new JScrollPane(myTextArea));
+	protected JTextField  myTextField1;
+	protected JTextField  myTextField2;
+	protected JList       myList;
 
 
-    JPanel myPanel = new JPanel(new BorderLayout());
-
-    hori1 = Box.createHorizontalBox();
-
-    myButton = new JButton(YAMM.getString("button.add"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/new.gif"));
-    myButton.addActionListener(BListener);
-    hori1.add(myButton);
-
-    myButton = new JButton(YAMM.getString("button.delete"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/delete.gif"));
-    myButton.addActionListener(BListener);
-    hori1.add(myButton);
-
-    attach = new Vector();
-    ListModel dataModel = new AbstractListModel() {
-      public Object getElementAt(int index) { return attach.elementAt(index); }
-      public int    getSize() { return attach.size(); }
-    };
-
-    myList = new JList(/* attach */ dataModel);
-    myList.setCellRenderer(new AttachListRenderer());
-    myPanel.add("Center", myList);
-    myPanel.add("South", hori1);
-
-    Border ram = BorderFactory.createEtchedBorder();
-    myList.setBorder(ram);
-
-
-    JTPane.addTab(YAMM.getString("mail.attachment"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
-   
-    vert3.add(JTPane);
-    getContentPane().add(vert3);
-
-    addWindowListener(new FLyssnare());
-    show();
-  }
-
-  boolean isSendReady() {
-    
-    String TF1 = myTextField1.getText();
-
-    if(TF1.indexOf('@') != -1) {
-      return true;
-    }
-    else return false;
-  }
-
-  ActionListener BListener = new ActionListener() {
-    public void actionPerformed(ActionEvent e) {
-      String arg = ((JButton)e.getSource()).getText();
-
-      if(arg.equals(YAMM.getString("button.send"))) {
-        if(isSendReady()) {
-          try {
-            PrintWriter outFile = new PrintWriter(new FileOutputStream(System.getProperty("user.home") + "/.yamm/boxes/" + YAMM.getString("box.outbox"), true));
-            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-
-            String to = myTextField1.getText(), to2 = "", temp = null;
-            StringTokenizer tok = new StringTokenizer(to, ",");
-
-            while(tok.hasMoreTokens()) {
-              temp = tok.nextToken().trim();
-
-              if(to2.equals("")) to2 = temp;
-              else to2 += "      " + temp;
-
-              if(tok.hasMoreTokens()) to2 += ",\n";
-            }
-
-            if(attach.size() == 0) outFile.println("Date: " + dateFormat.format(new Date()) + "\n" 
-                                                 + "From: " + YAMM.getProperty("username", "Anonymous") + " <" + YAMM.getProperty("email", " ") + ">\n"
-                                                 + "To: " + to2 + "\n"
-                                                 + "Subject: " + myTextField2.getText() + "\n"
-                                                 + "X-Mailer: Yet Another Mail Manager " + YAMM.version + "\n"
-                                                 + "\n"
-                                                 + myTextArea.getText() + "\n"
-                                                 + "\n"
-                                                 + ".\n");
-            else {
-              outFile.println("Date: " + dateFormat.format(new Date()) + "\n"
-                            + "From: " + YAMM.getProperty("username", "Anonymous") + " <" + YAMM.getProperty("email", " ") + ">" + "\n" 
-                            + "To: " + to2 +"\n"
-                            + "Subject: " + myTextField2.getText() + "\n"
-                            + "X-Mailer: Yet Another Mail Manager " + YAMM.version + "\n" 
-                            + "MIME-Version: 1.0\n"
-                            + "Content-Type: multipart/mixed; boundary=\"AttachThis\"\n"
-                            + "\n"
-                            + "This is a multi-part message in MIME format.\n"
-                            + "\n"
-                            + "--AttachThis\nContent-Type: text/plain; charset=us-ascii\n"
-                            + "Content-Transfer-Encoding: 7bit\n"
-                            + "\n"
-                            + myTextArea.getText()
-                            + "\n"
-                            + "\n");
-            }
-            outFile.close();
-            if(attach.size() > 0) new UUEncode(attach);
-          }
-          catch (IOException ioe) { System.out.println("Error: " + ioe); }
-
-          Rectangle rv = new Rectangle();
-          getBounds(rv);
-
-          YAMM.setProperty("writex", new Integer(rv.x).toString());
-          YAMM.setProperty("writey", new Integer(rv.y).toString());
-          YAMM.setProperty("writew", new Integer(rv.width).toString());
-          YAMM.setProperty("writeh", new Integer(rv.height).toString());
-
-          dispose();
-        } else {
-            new MsgDialog(YAMMWrite.this, YAMM.getString("msg.error"),
-				"Missing \"@\" in address field!");
+	/**
+	 * Creates a new empty mail with no subject and recipent
+	 */
+	public YAMMWrite() {
+		this("","","");
 	}
-      }
 
-      else if(arg.equals(YAMM.getString("button.add"))) {
-        addAttach();
-      }
+	/**
+	 * Creates a new empty mail with no subject and with the specified
+	 * recipent
+	 * @param to The recipents address
+	 */
+	public YAMMWrite(String to) {
+		this(to, "","");
+	}
 
-      else if(arg.equals(YAMM.getString("button.delete"))) {
-        int rem = myList.getSelectedIndex();
-        if(rem != -1) {
-          attach.remove(rem);
-          myList.updateUI();
-        }
-      }
+	/**
+	 * Creates a new empty mail with the specified subject and recipent
+	 * @param to The recipents address
+	 * @param subject The subject
+	 */
+	public YAMMWrite(String to, String subject) {
+		this(to,subject,"");
+	}
 
-      else if(arg.equals(YAMM.getString("button.cancel"))) {
-        Rectangle rv = new Rectangle();
-        getBounds(rv);
+	public YAMMWrite(String to, String subject, String body) {
+		setTitle(subject);
 
-        YAMM.setProperty("writex", new Integer(rv.x).toString());
-        YAMM.setProperty("writey", new Integer(rv.y).toString());
-        YAMM.setProperty("writew", new Integer(rv.width).toString());
-        YAMM.setProperty("writeh", new Integer(rv.height).toString());
+		setBounds(
+			Integer.parseInt(YAMM.getProperty("writex", "0")),
+			Integer.parseInt(YAMM.getProperty("writey", "0")),
+			Integer.parseInt(YAMM.getProperty("writew", "500")),
+			Integer.parseInt(YAMM.getProperty("writeh", "300"))
+		);
+    
+		JMenuBar  Meny = new JMenuBar();
+		JMenu     arkiv = new JMenu(YAMM.getString("file"));
+		JMenuItem rad;
+		Meny.add(arkiv);
 
-        dispose();
-      }
-    }
-  };
+		rad = new JMenuItem(YAMM.getString("button.cancel"),
+			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
+								"cancel.gif"));
+		rad.addActionListener(MListener);
+		arkiv.add(rad);
 
-  void addAttach() {
-    JFileChooser jfs = new JFileChooser();
-    jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    jfs.setMultiSelectionEnabled(true);
-    int ret = jfs.showOpenDialog(this);
+		setJMenuBar(Meny);
 
-    if(ret == JFileChooser.APPROVE_OPTION) {
-      // Why can't I get getSelectedFiles() to work?!
-      // File[] file = jfs.getSelectedFiles();
-      File[] file = {jfs.getSelectedFile()};
+		Box vert1 = Box.createHorizontalBox();
+		Box vert2 = Box.createHorizontalBox();
+		Box vert3 = Box.createVerticalBox();
+		Box hori1 = Box.createHorizontalBox();
+		Box hori2 = Box.createHorizontalBox();
 
-      if(file != null) {
+		JButton myButton = new JButton(YAMM.getString("button.send"),
+			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
+								"send.gif"));
+		myButton.addActionListener(BListener);
+		hori1.add(myButton);
 
-        for(int i = 0; i < file.length;i++) {
-          attach.add(file[i]);
-        }
-        myList.updateUI();
-      }
-    }
-  }
+		myButton = new JButton(YAMM.getString("button.cancel"),
+			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
+								"cancel.gif"));
+		myButton.addActionListener(BListener);
+		hori1.add(myButton);
 
-  ActionListener MListener = new ActionListener() {
-    public void actionPerformed(ActionEvent ae) {
-      String kommando = ((JMenuItem)ae.getSource()).getText();
+		JLabel myLabel = new JLabel(YAMM.getString("mail.to") + "  ");
+		vert1.add(myLabel);
 
-      if(kommando.equals(YAMM.getString("button.cancel"))) {
-        Rectangle rv = new Rectangle();
-        getBounds(rv);
+		myTextField1 = new JTextField();
+		myTextField1.setMaximumSize(new Dimension(1200, 20));
+		myTextField1.setMinimumSize(new Dimension(75, 20));
+		myTextField1.setText(to);
+		myTextField1.setToolTipText(YAMM.getString("tofield.tooltip"));
+		vert1.add(myTextField1);
 
-        YAMM.setProperty("writex", new Integer(rv.x).toString());
-        YAMM.setProperty("writey", new Integer(rv.y).toString());
-        YAMM.setProperty("writew", new Integer(rv.width).toString());
-        YAMM.setProperty("writeh", new Integer(rv.height).toString());
+		myLabel = new JLabel(YAMM.getString("mail.subject") + "  ");
+		vert2.add(myLabel);
 
-        dispose();
-      }
-    }
-  };
+		myTextField2 = new JTextField();
+		myTextField2.addKeyListener(new KeyAdapter(){
+			public void keyReleased(KeyEvent ke) {
+				setTitle(myTextField2.getText());
+			}
+			public void keyPressed(KeyEvent ke) {
+				setTitle(myTextField2.getText());
+			}
+		});
+		myTextField2.setMaximumSize(new Dimension(1200, 20));
+		myTextField2.setMinimumSize(new Dimension(75, 20));
+		myTextField2.setText(subject);
+		vert2.add(myTextField2);
 
-  class FLyssnare extends WindowAdapter {
-    public void windowClosing(WindowEvent event) {
-      Rectangle rv = new Rectangle();
-      getBounds(rv);
+		vert3.add(hori1);
+		vert3.add(vert1);
+		vert3.add(vert2);
 
-      YAMM.setProperty("writex", new Integer(rv.x).toString());
-      YAMM.setProperty("writey", new Integer(rv.y).toString());
-      YAMM.setProperty("writew", new Integer(rv.width).toString());
-      YAMM.setProperty("writeh", new Integer(rv.height).toString());
+		myTextArea = new JTextArea();
+		myTextArea.setText(body);
 
-      dispose();
-    }
-  }
+		if (YAMM.getProperty("signatur") != null &&
+				!YAMM.getProperty("signatur").equals("")) {
+			try {
+				FileInputStream in = new FileInputStream(
+						YAMM.getProperty("signatur"));
+				String tmp = null;
+				byte[] singb = new byte[in.available()];
+
+				in.read(singb);
+				myTextArea.append(new String(singb));  
+				in.close();
+			} catch (IOException ioe) {
+				System.err.println(ioe);
+			}
+		}
+
+		JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
+		JTPane.addTab(YAMM.getString("mail"),
+			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
+								"mail.gif"),
+						new JScrollPane(myTextArea));
+
+
+		JPanel myPanel = new JPanel(new BorderLayout());
+
+		hori1 = Box.createHorizontalBox();
+
+		myButton = new JButton(YAMM.getString("button.add"),
+			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
+								"new.gif"));
+		myButton.addActionListener(BListener);
+		hori1.add(myButton);
+
+		myButton = new JButton(YAMM.getString("button.delete"),
+			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
+								"delete.gif"));
+		myButton.addActionListener(BListener);
+		hori1.add(myButton);
+
+		attach = new Vector();
+		ListModel dataModel = new AbstractListModel() {
+			public Object getElementAt(int index) {
+				return attach.elementAt(index);
+			}
+			public int getSize() {
+				return attach.size();
+			}
+		};
+
+		myList = new JList(/* attach */ dataModel);
+		myList.setCellRenderer(new AttachListRenderer());
+		myPanel.add("Center", myList);
+		myPanel.add("South", hori1);
+
+		Border ram = BorderFactory.createEtchedBorder();
+		myList.setBorder(ram);
+
+
+		JTPane.addTab(YAMM.getString("mail.attachment"),
+			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
+							"attach.gif"), myPanel);
+
+		vert3.add(JTPane);
+		getContentPane().add(vert3);
+
+		addWindowListener(new FLyssnare());
+		show();
+	}
+
+	boolean isSendReady() {
+		String TF1 = myTextField1.getText();
+
+		if (TF1.indexOf('@') != -1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	ActionListener BListener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			String arg = ((JButton)e.getSource()).getText();
+
+			if (arg.equals(YAMM.getString("button.send")) &&
+								isSendReady()) {
+				try {
+					PrintWriter outFile = new PrintWriter(
+						new FileOutputStream(
+						YAMM.home + "/boxes/" +
+						YAMM.getString("box.outbox"),
+						true)
+					);
+					SimpleDateFormat df =
+						new SimpleDateFormat(	
+							"EEE, dd MMM yyyy " +
+							"HH:mm:ss zzz",
+							Locale.US
+						);
+
+					String to = myTextField1.getText();
+					String to2 = "";
+					String temp = null;
+					StringTokenizer tok =
+						new StringTokenizer(to, ",");
+
+					while (tok.hasMoreTokens()) {
+						temp = tok.nextToken().trim();
+
+						if (to2.equals("")) {
+							to2 = temp;
+						} else {
+							to2 += "      " + temp;
+						}
+
+						if (tok.hasMoreTokens()) {
+							to2 += ",\n";
+						}
+					}
+
+					if (attach.size() == 0) {
+						outFile.println("Date: " +
+						df.format(new Date()) +
+						"\nFrom: " +
+						YAMM.getProperty("username",
+							"Anonymous") +
+						" <" + YAMM.getProperty("email",
+							" ") +
+						"\nTo: " + to2 +
+						"\nSubject: " +
+						myTextField2.getText() +
+						"\nX-Mailer: " +
+						"Yet Another Mail Manager " +
+						YAMM.version + "\n\n" +
+						myTextArea.getText() +
+						"\n\n.\n");
+					} else {
+						outFile.println("Date: " +
+						df.format(new Date()) +
+						"\nFrom: " +
+						YAMM.getProperty("username",
+								"Anonymous") +
+						" <" + YAMM.getProperty("email",
+									" ") +
+						">" +
+						"\nTo: " + to2 +
+						"\nSubject: " +
+						myTextField2.getText() +
+						"\nX-Mailer: " +
+						"Yet Another Mail Manager " +
+						YAMM.version +
+						"\nMIME-Version: 1.0" +
+						"\nContent-Type: " +
+						"multipart/mixed; " +
+						"boundary=\"AttachThis\"" +
+						"\n" +
+						"\nThis is a multi-part " +
+						"message in MIME format." +
+						"\n" +
+						"\n--AttachThis" +
+						"\nContent-Type: text/plain; " +
+						"charset=us-ascii" +
+						"\nContent-Transfer-Encoding:" +
+						" 7bit" +
+						"\n\n" + myTextArea.getText() +
+						"\n\n");
+					}
+					outFile.close();
+					if (attach.size() > 0) {
+						new UUEncode(attach);
+					}
+				} catch (IOException ioe) {
+					System.out.println("Error: " + ioe);
+				}
+
+				Rectangle rv = new Rectangle();
+				getBounds(rv);
+
+				YAMM.setProperty("writex",
+					new Integer(rv.x).toString());
+				YAMM.setProperty("writey",
+					new Integer(rv.y).toString());
+				YAMM.setProperty("writew",
+					new Integer(rv.width).toString());
+				YAMM.setProperty("writeh",
+					new Integer(rv.height).toString());
+
+				dispose();
+			} else if (arg.equals(YAMM.getString("button.add"))) {
+				addAttach();
+			} else if (arg.equals(YAMM.getString(
+							"button.delete"))) {
+				int rem = myList.getSelectedIndex();
+
+				if (rem != -1) {
+					attach.remove(rem);
+					myList.validate();
+				}
+			} else if (arg.equals(YAMM.getString(
+							"button.cancel"))) {
+				Rectangle rv = new Rectangle();
+				getBounds(rv);
+
+				YAMM.setProperty("writex",
+					new Integer(rv.x).toString());
+				YAMM.setProperty("writey",
+					new Integer(rv.y).toString());
+				YAMM.setProperty("writew",
+					new Integer(rv.width).toString());
+				YAMM.setProperty("writeh",
+					new Integer(rv.height).toString());
+
+				dispose();
+			} else {
+				new MsgDialog(YAMMWrite.this,
+					YAMM.getString("msg.error"),
+					"Missing \"@\" in address field!");
+			}
+		}
+	};
+
+	void addAttach() {
+		JFileChooser jfs = new JFileChooser();
+		jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		jfs.setMultiSelectionEnabled(true);
+		int ret = jfs.showOpenDialog(this);
+
+		if (ret == JFileChooser.APPROVE_OPTION) {
+			// Why can't I get getSelectedFiles() to work?!
+			// File[] file = jfs.getSelectedFiles();
+			File[] file = {
+				jfs.getSelectedFile()
+			};
+
+			if (file != null) {
+
+				for (int i = 0; i < file.length; i++) {
+					attach.add(file[i]);
+				}
+				myList.validate();
+			}
+		}
+	}
+
+	ActionListener MListener = new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+			String kommando = ((JMenuItem)ae.getSource()).getText();
+
+			if (kommando.equals(YAMM.getString("button.cancel"))) {
+				Rectangle rv = new Rectangle();
+				getBounds(rv);
+
+				YAMM.setProperty("writex",
+					new Integer(rv.x).toString());
+				YAMM.setProperty("writey",
+					new Integer(rv.y).toString());
+				YAMM.setProperty("writew",
+					new Integer(rv.width).toString());
+				YAMM.setProperty("writeh",
+					new Integer(rv.height).toString());
+
+				dispose();
+			}
+		}
+	};
+
+	class FLyssnare extends WindowAdapter {
+		public void windowClosing(WindowEvent event) {
+			Rectangle rv = new Rectangle();
+			getBounds(rv);
+
+			YAMM.setProperty("writex",
+				new Integer(rv.x).toString());
+			YAMM.setProperty("writey",
+				new Integer(rv.y).toString());
+			YAMM.setProperty("writew",
+				new Integer(rv.width).toString());
+			YAMM.setProperty("writeh",
+				new Integer(rv.height).toString());
+
+			dispose();
+		}
+	}
 }
-
