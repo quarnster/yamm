@@ -26,7 +26,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Parses messages
  * @author Fredrik Ehnbom
- * @version $Id: MessageParser.java,v 1.10 2000/02/28 13:43:14 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.11 2000/03/17 17:12:10 fredde Exp $
  */
 public class MessageParser {
 
@@ -227,33 +227,39 @@ public class MessageParser {
 			if (test == MessageBodyParser.ATTACHMENT &&
 							contentType.indexOf("multipart/alternative") == -1) {
 				Attachment a = new Attachment();
-				PrintWriter AtOut = new PrintWriter(
+				PrintWriter atOut = null;
+				try {
+					atOut = new PrintWriter(
 						new BufferedOutputStream(
 						new FileOutputStream(file +
 							".attach." +
 							attachments)));
 
 				
-				for (;;) {
-					// Attachment found
-					test = a.parse(in, AtOut);
+					for (;;) {
+						// Attachment found
+						test = a.parse(in, atOut);
 
-					if (test == Attachment.MESSAGE &&
-							contentType.indexOf("multipart/alternative") == -1) {
-						break;
-					} else if (test == Attachment.
-							ATTACHMENT) {
-						attachments++;
-						AtOut.close();
-						AtOut = new PrintWriter(new
-							BufferedOutputStream(
-							new FileOutputStream(
-								file +
-								".attach." +
-								attachments)));
-						continue;
-					} else /* if (test == Attachment.END) */{
-						break bigLoop;
+						if (test == Attachment.MESSAGE &&
+								contentType.indexOf("multipart/alternative") == -1) {
+							break;
+						} else if (test == Attachment.ATTACHMENT) {
+							attachments++;
+							atOut.close();
+							atOut = new PrintWriter(new
+								BufferedOutputStream(
+								new FileOutputStream(
+									file +
+									".attach." +
+									attachments)));
+							continue;
+						} else /* if (test == Attachment.END) */{
+							break bigLoop;
+						}
+					}
+				} finally {
+					if (atOut != null) {
+						atOut.close();
 					}
 				}
 			} else if (test == MessageBodyParser.END) {

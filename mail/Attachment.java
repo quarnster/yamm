@@ -1,5 +1,5 @@
 /*  Attachment.java - Parses attachments
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@ import java.io.*;
 
 /**
  * This class parses attachments
+ * @author Fredrik Ehnbom
+ * @version $Id: Attachment.java,v 1.4 2000/03/17 17:12:10 fredde Exp $
  */
 public class Attachment {
 
@@ -124,3 +126,10 @@ public class Attachment {
 		//return ERROR;
 	}
 }
+/*
+ * Changes:
+ * $Log: Attachment.java,v $
+ * Revision 1.4  2000/03/17 17:12:10  fredde
+ * some fixes
+ *
+ */

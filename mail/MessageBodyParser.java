@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Parses the body of a message
  * @author Fredrik Ehnbom
- * @version $Id: MessageBodyParser.java,v 1.8 2000/02/28 13:42:56 fredde Exp $
+ * @version $Id: MessageBodyParser.java,v 1.9 2000/03/17 17:12:10 fredde Exp $
  */
 public class MessageBodyParser {
 
@@ -208,7 +208,7 @@ public class MessageBodyParser {
 			}
 
 			if (temp.startsWith("--" + attachment)) {
-				if (temp.endsWith("-- ")) {
+				if (temp.endsWith("--")) {
 					return END;
 				} else {
 					return ATTACHMENT;
@@ -251,6 +251,9 @@ public class MessageBodyParser {
 /*
  * Changes:
  * $Log: MessageBodyParser.java,v $
+ * Revision 1.9  2000/03/17 17:12:10  fredde
+ * some fixes
+ *
  * Revision 1.8  2000/02/28 13:42:56  fredde
  * added changelog and soem javadoc tags
  *
