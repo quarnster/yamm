@@ -24,7 +24,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * The ConfigurationWizard is used to configure the settings in YAMM
  * @author Fredrik Ehnbom
- * @version $Id: ConfigurationWizard.java,v 1.2 2000/03/18 14:55:56 fredde Exp $
+ * @version $Id: ConfigurationWizard.java,v 1.3 2000/03/18 17:07:49 fredde Exp $
  */
 public class ConfigurationWizard extends JDialog {
 
@@ -45,7 +45,8 @@ public class ConfigurationWizard extends JDialog {
 		
 		getContentPane().add("Center", jtpane);		
 
-		getContentPane().add("South", new ControlPanel(jtpane));
+		getContentPane().add("South", new ControlPanel(this));
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		show();
 	}
 }
@@ -53,6 +54,9 @@ public class ConfigurationWizard extends JDialog {
 /*
  * Changes:
  * $Log: ConfigurationWizard.java,v $
+ * Revision 1.3  2000/03/18 17:07:49  fredde
+ * default closeoperation=dispose
+ *
  * Revision 1.2  2000/03/18 14:55:56  fredde
  * the server editor now works
  *
