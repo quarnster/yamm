@@ -43,6 +43,7 @@ public class Filter {
 			in = new BufferedReader(
 					new InputStreamReader(
 					new FileInputStream(YAMM.home +
+								YAMM.sep +
 								".filters")));
 
 			String temp = null;
@@ -84,8 +85,10 @@ public class Filter {
 							cheat[0] = i;
 							Mailbox.moveMail(
 								YAMM.home +
+								YAMM.sep +
 								"boxes/.filter",
 								YAMM.home +
+								YAMM.sep +
 								"boxes/" +
 								exec, cheat);
 							i--;
@@ -107,8 +110,10 @@ public class Filter {
 							cheat[0] = i;
 							Mailbox.moveMail(
 								YAMM.home +
+								YAMM.sep +
 								"boxes/.filter",
 								YAMM.home +
+								YAMM.sep +
 								"boxes/" +
 								exec, cheat);
 							i--;
@@ -121,9 +126,9 @@ public class Filter {
 		}
 
 		cheat[0] = 0;
-		while (Mailbox.hasMail(YAMM.home + "boxes/.filter")) {
-			Mailbox.moveMail(YAMM.home + "boxes/.filter",
-						YAMM.home + "boxes/" +
+		while (Mailbox.hasMail(YAMM.home + "/boxes/.filter")) {
+			Mailbox.moveMail(YAMM.home + "/boxes/.filter",
+						YAMM.home + "/boxes/" +
 						YAMM.getString("box.inbox"),
 									cheat);
 		}
