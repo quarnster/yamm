@@ -84,8 +84,8 @@ public class SHMail extends Thread {
       String username = props.getProperty("username");
       String password = new SimpleCrypt("myKey").decrypt(props.getProperty("password"));
       boolean del = false;
-      if(YAMM.getProperty("delete", "false").equals("true")) del = true;
-      if(YAMM.getProperty("sentbox", "false").equals("true")) sent = true;
+      if(YAMM.getProperty("delete", "true").equals("true")) del = true;
+      if(YAMM.getProperty("sentbox", "true").equals("true")) sent = true;
 
       if(type != null && server != null && username != null && password != null) {
         if(type.equals("pop3")) {
