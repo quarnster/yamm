@@ -19,6 +19,7 @@
 package org.gjt.fredde.yamm.encode;
 import java.io.*;
 import javax.swing.JFrame;
+import org.gjt.fredde.util.UUDecoder;
 import org.gjt.fredde.util.gui.MsgDialog;
 import org.gjt.fredde.yamm.gui.imageViewer;
 
@@ -26,98 +27,64 @@ import org.gjt.fredde.yamm.gui.imageViewer;
  * A class to Decode uuencoded files
  */
 public class UUDecode extends Thread{
-  String  temp;
-  byte[]  outputBuffer;
-  int     count = 0;
-  String    filename;
-  String  target;
-  JFrame  frame;
-  boolean view;
+	protected String  filename;
+	protected String  target;
+	protected JFrame  frame;
+	protected boolean view;
 
-  /**
-   * Initializes some stuff
-   * @param frame The frame to use when displaying errors etc.
-   * @param name The name of this Thread
-   * @param whichFile The file to Decode
-   * @param wannaView If the user wants to View the file
-   */
-  public UUDecode(JFrame frame1, String name, String whichFile, String target,  boolean wannaView) {
-    super(name);
-    filename = whichFile;
-    frame = frame1;
-    view = wannaView;
-    this.target = target;
-  }
+	/**
+	 * Initializes some stuff
+	 * @param frame The frame to use when displaying errors etc.
+	 * @param name The name of this Thread
+	 * @param whichFile The file to Decode
+	 * @param wannaView If the user wants to View the file
+	 */
+	public UUDecode(JFrame frame1, String name, String whichFile,
+					String target,  boolean wannaView) {
+		super(name);
+		filename = whichFile;
+		frame = frame1;
+		view = wannaView;
+		this.target = target;
+	}
 
-  /**
-   * Decodes the file
-   */
-  public void run() {
-    try {
-      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
-      DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(target)));
+	/**
+	 * Decodes the file
+	 */
+	public void run() {
+		try {
+			BufferedReader in = new BufferedReader(
+						new InputStreamReader(
+						new FileInputStream(filename)));
+			DataOutputStream out = new DataOutputStream(
+						new BufferedOutputStream(
+						new FileOutputStream(target)));
 
-      for(;;) {
-        temp = in.readLine();
+			for(;;) {
+				String temp = in.readLine();
 
-        if(temp.equals("")) { in.readLine(); break; }
-      }
+				if (temp.equals("")) {
+					in.readLine();
+					break;
+				}
+			}
 
-      for(;;) {
-        temp = in.readLine();
+			new UUDecoder(in, out);
 
-        if (temp == null) break;
+			in.close();
+			out.close();
+		} catch (IOException ioe) {
+			new MsgDialog(frame, "Error!", ioe.toString());
+		}
 
-        if(!temp.equalsIgnoreCase("end")) {
-          byte[] chunk = temp.getBytes();
-          outputBuffer = new byte[100];
-          count = 0;
+		if (view) {
+			String end = target.substring(target.length() - 4,
+							target.length());
 
-          for(int i = 1; i<temp.length();i+=4) {
-            printout(chunk[i], chunk[i+1], chunk[i+2], chunk[i+3]);
-          }
-          out.write(outputBuffer, 0, count);
-          out.flush();
-        }
-        else break;
-      }
-      in.close();
-      out.close();
-    }
-    catch (IOException ioe) {
-      new MsgDialog(frame, "Error!", ioe.toString());
-    }
-
-    if(view) {
-      String end = target.substring(target.length() - 4, target.length());
-      if(end.equalsIgnoreCase(".jpg") || end.equalsIgnoreCase(".gif")) {
-        new imageViewer(target);
-      }
-    }
-  }
-
-  void printout(byte b1, byte b2, byte b3, byte b4) {
-    byte char1 = (byte)(((b1 - ' ') & 0x3F) << 2 | ((b2 - ' ') & 0x3F) >> 4);
-    byte char2 = (byte)(((b2 - ' ') & 0x3F) << 4 | ((b3 - ' ') & 0x3F) >> 2);
-    byte char3 = (byte)(((b3 - ' ') & 0x3F) << 6 | ((b4 - ' ') & 0x3F));
-
-    outputBuffer[count++] = char1;
-    outputBuffer[count++] = char2;
-    outputBuffer[count++] = char3;
-  }
+			if (end.equalsIgnoreCase(".jpg") ||
+						end.equalsIgnoreCase(".gif")) {
+				new imageViewer(target);
+			}
+		}
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
