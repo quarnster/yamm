@@ -151,7 +151,7 @@ public class mainMenu extends JMenuBar {
       else if(kommando.equals(YAMM.getString("help.about"))) {
         new MsgDialog(null, YAMM.getString("help.about"),
                       "Copyright (C) 1999 Fredrik Ehnbom\n"
-                    + "YAMM-version: " + YAMM.yammVersion + "\n"
+                    + "YAMM-version: " + YAMM.version + "\n"
                     + "Compiledate: " + YAMM.compDate + "\n"
                     + "Homepage: http://www.gjt.org/~fredde/yamm.html\n"
                     + "E-mail: <fredde@gjt.org>\n"
@@ -188,11 +188,11 @@ public class mainMenu extends JMenuBar {
          p("os.name", jt);
          p("os.arch", jt);
          p("os.version", jt);
-         jt.append("YAMM.yammVersion: " + YAMM.yammVersion);
+         jt.append("YAMM.yammVersion: " + YAMM.version);
       }
       else if(kommando.equals(YAMM.getString("help.license"))) {
         new MsgDialog(null, YAMM.getString("help.license"), 
-                      "Yet Another Mail Manager " + YAMM.yammVersion + " E-Mail Client\n" +
+                      "Yet Another Mail Manager " + YAMM.version + " E-Mail Client\n" +
                       "Copyright (C) 1999 Fredrik Ehnbom\n" +
                       YAMM.getString("license"),
                       MsgDialog.OK, JLabel.LEFT);
