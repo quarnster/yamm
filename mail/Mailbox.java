@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.49 2003/03/10 12:32:09 fredde Exp $
+/*  $Id: Mailbox.java,v 1.50 2003/03/10 21:49:37 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.49 $
+ * @version $Revision: 1.50 $
  */
 public class Mailbox {
 
@@ -480,7 +480,89 @@ public class Mailbox {
 	 * @param whichmail The mail to copy from fromBox to toBox
 	 */
 	public static boolean copyMail(String fromBox, String toBox, int[] whichmail) {
-		System.err.println("not implemented yet");
+		if (fromBox.equals(toBox)) {
+			return false;
+		} else if (whichmail.length < 1) {
+			return false;
+		}
+
+		BufferedInputStream in = null;
+		BufferedOutputStream outTgt = null;
+
+		long tgtSkip = new File(toBox).length();
+
+		long lastPosition = 0;
+		long copyLen = 0;
+		long skipLen = 0;
+
+		try {
+			byte[] buffer = new byte[BUFFERSIZE];
+
+			File inFile = new File(fromBox);
+			Index srcIndex = new Index(fromBox);
+			Index tgtIndex = new Index(toBox);
+			srcIndex.open();
+			tgtIndex.open();
+			tgtIndex.raf.seek(Index.HEADERSIZE + tgtIndex.messageNum * IndexEntry.SIZE);
+
+			in = new BufferedInputStream(new FileInputStream(inFile));
+			outTgt = new BufferedOutputStream(new FileOutputStream(toBox, true));
+
+			for (int i = 0; i < whichmail.length; i++) {
+				IndexEntry entry = srcIndex.getEntry(whichmail[i]);
+				skipLen = copyLen = entry.skip;
+				skipLen -= lastPosition;
+
+				if (whichmail[i]+1 < srcIndex.messageNum) {
+					lastPosition = srcIndex.getEntry(whichmail[i]+1).skip;
+				} else {
+					lastPosition = inFile.length();
+				}
+				copyLen = lastPosition - copyLen;
+
+				entry.skip = tgtSkip;
+				entry.write(tgtIndex.raf);
+				tgtSkip += copyLen;
+
+				if ((entry.status & IndexEntry.STATUS_READ) == 0) {
+					tgtIndex.newNum++;
+				}
+
+				while (skipLen > 0) {
+					long read = in.skip(Math.min(BUFFERSIZE, skipLen));
+					skipLen -= read;
+				}
+				while (copyLen > 0) {
+					int read = in.read(buffer, 0, (int)Math.min(BUFFERSIZE, copyLen));
+					copyLen -= read;
+					outTgt.write(buffer, 0, read);
+				}
+			}
+
+
+			tgtIndex.messageNum += whichmail.length;
+			tgtIndex.rewrite();
+
+			srcIndex.close();
+			tgtIndex.close();
+
+			in.close();
+			outTgt.close();
+
+		} catch (IOException ioe) {
+			new ExceptionDialog(
+				YAMM.getString("msg.error"),
+				ioe,
+				YAMM.exceptionNames
+			);
+			return false;
+		} finally {
+			try {
+				if (in != null) in.close();
+				if (outTgt != null) outTgt.close();
+			} catch (IOException ioe) {}
+		}
+
 		return true;
 	}
 
@@ -500,10 +582,6 @@ public class Mailbox {
 		BufferedInputStream in = null;
 		BufferedOutputStream outSrc = null;
 		BufferedOutputStream outTgt = null;
-
-		BufferedInputStream inIndex = null;
-		BufferedOutputStream outSrcIndex = null;
-		BufferedOutputStream outTgtIndex = null;
 
 		long skipSub = 0;
 		long tgtSkip = new File(toBox).length();
@@ -549,7 +627,7 @@ public class Mailbox {
 				if (i + 1 < whichmail.length) {
 					copyLen = srcIndex.getEntry(whichmail[i+1]).skip;
 				} else {
-					copyLen = inFile.length()-skipLen;
+					copyLen = inFile.length();
 				}
 				copyLen -= lastPosition;
 
@@ -662,6 +740,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.50  2003/03/10 21:49:37  fredde
+ * moveMail: cleaned up, bug fixed. copyMail: implemented
+ *
  * Revision 1.49  2003/03/10 12:32:09  fredde
  * unreadNum/newNum changes
  *
