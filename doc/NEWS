@@ -1,12 +1,12 @@
 0.7.4:
 	Added:
 		-Mailbox indexing
+		-The "attachment"-tab is now only enabled when there's an attachment
 
 	Fixed/changed:
-		-Manual documents (oklar)
-		-Manual browser (oklar)
 		-Lots of gui-fixes
-		-Message parseing fixes
+		-Message parsing fixes
+		-Lots of bug-fixes
 
 0.7.3:
     Added:

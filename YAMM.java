@@ -60,7 +60,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   public static    String                 version  = "0.7.4";
 
   /** The compileDate of YAMM */
-  public static    String                 compDate     = "1999-11-06";
+  public static    String                 compDate     = "2000-01-11";
 
   /** the file that contains the current mail */
   public String		  mailPageString   = "file:///" + home + "/tmp/cache/";
@@ -101,6 +101,10 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
   /** The statusrow */
   public statusRow status;
+
+  /** The mail/attach tabbedpane */
+  protected JTabbedPane JTPane;
+
 
   /**
    * Returns the translated string.
@@ -217,7 +221,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     mail.setEditable(false);
     mail.addHyperlinkListener(this);
 
-    JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
+    /* JTabbedPane */ JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
     JTPane.setFont(new Font("SansSerif", Font.PLAIN, 10));
     if (text && !ico) {
       JTPane.addTab(res.getString("mail"),  new JScrollPane(mail));
@@ -282,6 +286,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
     mailList = new mainTable(this, dataModel, listOfMails);
     mailList.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
+    createAttachList();
 
     JPanel bgFix = new JPanel(new BorderLayout());
     bgFix.add("Center", new JScrollPane(mailList));
@@ -415,20 +420,31 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     }
   };
 
-  public void createAttachList() {
-    attach = new Vector();
-    String boxName = selectedbox.substring(selectedbox.indexOf("boxes") + 6, 
-                                           selectedbox.length()) + "/";
+	public void createAttachList() {
+		attach = new Vector();
 
-    String base = home +  "/tmp/cache/" + boxName;
-    int msgNum = mailList.getSelectedRow();
-    String[] test = new File(base).list();
+		String boxName = selectedbox.substring(
+				selectedbox.indexOf("boxes") + 6, 
+				selectedbox.length()) + "/";
 
-    for(int i = 0; i < test.length; i++ ) {
-      if(test[i].indexOf(msgNum + ".attach.") != -1) 
-        addinfo(base + test[i], attach);
-    }
-  }
+		String base = home +  "/tmp/cache/" + boxName;
+
+		int msgNum = (mailList.getSelectedRow() != -1) ? mailList.getSelectedRow() : 0;
+		if (msgNum == -1) msgNum = 0;
+
+		String[] test = new File(base).list();
+
+		for(int i = 0; i < test.length; i++ ) {
+			if (test[i].indexOf(msgNum + ".attach.") != -1) 
+				addinfo(base + test[i], attach);
+		}
+		if (attach.size() == 0) {
+			JTPane.setEnabledAt(1, false);
+		}
+		else {
+			JTPane.setEnabledAt(1, true);
+		}
+	}
 
 	protected void addinfo(String where, Vector attach) {
 		Vector tmp = new Vector();
@@ -486,34 +502,47 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     System.exit(0);
   }
 
-  public void delUnNeededFiles(){
-    Vector delFile = new Vector(), delDir = new Vector();
-    System.out.println("Creating list of unneeded files...");
-    createDelList(delFile, delDir, new File(home + "/tmp/"));
-    System.out.println("\nDeleting unneeded files...");
-    delFiles(delFile);
-    delFiles(delDir);
-  }
+	public void delUnNeededFiles(){
+		boolean debug = false;
+		
+		if (YAMM.getProperty("debug.cachedel", "false").equals("true"))
+			debug = true;
+			
+		Vector delFile = new Vector(), delDir = new Vector();
+
+		if (debug)
+			System.err.println("Creating list of unneeded files...");
+		createDelList(delFile, delDir, new File(home + "/tmp/"), debug);
+		if (debug)
+			System.err.println("\nDeleting unneeded files...");
+
+		delFiles(delFile, debug);
+		delFiles(delDir, debug);
+	}
 
 
-  protected void createDelList(Vector delFile, Vector delDir, File dir) {
-    String files[] = dir.list();
+	protected void createDelList(Vector delFile, Vector delDir, File dir, boolean debug) {
+		String files[] = dir.list();
 
-    for(int i = 0; i < files.length;i++) {
-      System.out.println("added \"" + files[i]);
-      File dir2 = new File(dir, files[i]);
-      if(dir2.isDirectory()) {
-        delDir.add(dir2);
-        createDelList(delFile, delDir, dir2);
-      }
-      else delFile.add(dir2);
-    }
-  }
+		for(int i = 0; i < files.length; i++) {
+			if (debug) {
+				System.err.println("added \"" + files[i]);
+			}
+			File dir2 = new File(dir, files[i]);
 
-  public void delFiles(Vector delFile) {
+			if (dir2.isDirectory()) {
+				delDir.add(dir2);
+				createDelList(delFile, delDir, dir2, debug);
+			} else {
+				delFile.add(dir2);
+			}
+		}
+	}
+
+  public void delFiles(Vector delFile, boolean debug) {
     for(int i = 0; i < delFile.size(); i++) {
       String file = delFile.elementAt(i).toString();
-      if(!new File(file).delete()) {
+      if(!new File(file).delete() && debug) {
         System.err.println("Couldn't delete \"" + file + "\"");
       }
     }

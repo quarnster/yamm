@@ -207,9 +207,9 @@ public class mainToolBar extends JToolBar {
 								i).toString());
 
 				long skip = Long.parseLong(
-						((Vector) frame.listOfMails.
-						elementAt(selMail)).
-						elementAt(5).toString());
+					((Vector) frame.listOfMails.elementAt(
+					frame.mailList.getSelectedRow())
+					).elementAt(5).toString());
 
 				String[] mail = Mailbox.getMailForReplyHeaders(
 							frame.selectedbox,
@@ -248,9 +248,9 @@ public class mainToolBar extends JToolBar {
 								i).toString());
 
 				long skip = Long.parseLong(
-						((Vector) frame.listOfMails.
-						elementAt(selMail)).
-						elementAt(5).toString());
+					((Vector) frame.listOfMails.elementAt(
+					frame.mailList.getSelectedRow())
+					).elementAt(5).toString());
 
 				String mail[] = Mailbox.getMailForReplyHeaders(
 							frame.selectedbox,

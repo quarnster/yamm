@@ -278,9 +278,8 @@ public class mainMenu extends JMenuBar {
 
 					long skip = Long.parseLong(
 						((Vector) frame.listOfMails.
-						elementAt(msg)).elementAt(5).
+						elementAt(tmp.getSelectedRow())).elementAt(5).
 						toString());
-
 
 					if (msg != -1) {
 						sourceViewer sv =

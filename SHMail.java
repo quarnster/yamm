@@ -54,7 +54,7 @@ public class SHMail extends Thread {
     knappen = knapp;
     knappen.setEnabled(false);
     frame = frame1;
-    if (frame.version.indexOf("CVS") != -1) {
+    if (YAMM.getProperty("debug.sendget", "false").equals("true")) {
       debug = true;
     }
   }

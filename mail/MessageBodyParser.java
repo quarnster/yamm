@@ -175,6 +175,7 @@ public class MessageBodyParser {
 			if (temp.endsWith("=") && !temp.endsWith("==")) {
 				temp = temp.substring(0, temp.length() - 1);
 				temp += in.readLine();
+				continue;
 			}
 
 			if (temp.indexOf("=") != -1) {
