@@ -87,6 +87,7 @@ public class YAMMWrite extends JFrame {
 		rad = new JMenuItem(YAMM.getString("button.cancel"),
 			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
 								"cancel.gif"));
+		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		rad.addActionListener(MListener);
 		arkiv.add(rad);
 
@@ -98,16 +99,36 @@ public class YAMMWrite extends JFrame {
 		Box hori1 = Box.createHorizontalBox();
 		Box hori2 = Box.createHorizontalBox();
 
-		JButton myButton = new JButton(YAMM.getString("button.send"),
-			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
-								"send.gif"));
+		JButton myButton = new JButton();
+		if (YAMM.text) {
+			myButton.setText(YAMM.getString("button.send"));
+		}
+		if (YAMM.ico) {
+			myButton.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
+						"images/buttons/send.gif"));
+		}
+
+		myButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		myButton.setHorizontalTextPosition(AbstractButton.CENTER);
+		myButton.setVerticalTextPosition(AbstractButton.BOTTOM);
+		myButton.setBorderPainted(false);
 		myButton.addActionListener(BListener);
 		hori1.add(myButton);
 
-		myButton = new JButton(YAMM.getString("button.cancel"),
-			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
-								"cancel.gif"));
+		myButton = new JButton();
+		if (YAMM.text) {
+			myButton.setText(YAMM.getString("button.cancel"));
+		}
+		if (YAMM.ico) {
+			myButton.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
+						"images/buttons/cancel.gif"));
+		}
+
 		myButton.addActionListener(BListener);
+		myButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		myButton.setBorderPainted(false);
+		myButton.setHorizontalTextPosition(AbstractButton.CENTER);
+		myButton.setVerticalTextPosition(AbstractButton.BOTTOM);
 		hori1.add(myButton);
 
 		JLabel myLabel = new JLabel(YAMM.getString("mail.to") + "  ");
@@ -161,6 +182,7 @@ public class YAMMWrite extends JFrame {
 		}
 
 		JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
+		JTPane.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		JTPane.addTab(YAMM.getString("mail"),
 			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
 								"mail.gif"),
@@ -171,15 +193,27 @@ public class YAMMWrite extends JFrame {
 
 		hori1 = Box.createHorizontalBox();
 
-		myButton = new JButton(YAMM.getString("button.add"),
-			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
-								"new.gif"));
+		myButton = new JButton();
+		if (YAMM.text) {
+			myButton.setText(YAMM.getString("button.add"));
+		}
+		if (YAMM.ico) {
+			myButton.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
+						"images/buttons/new.gif"));
+		}
+		myButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		myButton.addActionListener(BListener);
 		hori1.add(myButton);
 
-		myButton = new JButton(YAMM.getString("button.delete"),
-			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
-								"delete.gif"));
+		myButton = new JButton();
+		if (YAMM.text) {
+			myButton.setText(YAMM.getString("button.delete"));
+		}
+		if (YAMM.ico) {
+			myButton.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
+						"images/buttons/delete.gif"));
+		}
+		myButton.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		myButton.addActionListener(BListener);
 		hori1.add(myButton);
 
@@ -338,7 +372,7 @@ public class YAMMWrite extends JFrame {
 
 				if (rem != -1) {
 					attach.remove(rem);
-					myList.validate();
+					myList.updateUI();
 				}
 			} else if (arg.equals(YAMM.getString(
 							"button.cancel"))) {
@@ -381,7 +415,7 @@ public class YAMMWrite extends JFrame {
 				for (int i = 0; i < file.length; i++) {
 					attach.add(file[i]);
 				}
-				myList.validate();
+				myList.updateUI();
 			}
 		}
 	}
