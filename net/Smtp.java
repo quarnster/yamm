@@ -80,7 +80,7 @@ public class Smtp {
     in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
-    System.out.println(in.readLine());
+    in.readLine();
     sendCommand("HELO " + InetAddress.getLocalHost().getHostName(), 250);
   }
 
@@ -127,14 +127,12 @@ public class Smtp {
   /**
    * Sends a command to the server
    * @param c The command to send
-   * @param reply The expected reply
+   * @param reply The expected reply-code
    */
   protected void sendCommand(String c, int reply) throws IOException {
     out.println(c);
-    System.out.println("command: " + c);
    
     String temp = in.readLine();
-    System.out.println("expect: " + reply + ", got " + temp);
     if(!temp.startsWith("" + reply)) throw new IOException ("Expected " + reply + ", got " + temp);
   }
 }
