@@ -33,7 +33,7 @@ import javax.swing.event.*;
 import org.gjt.fredde.yamm.YAMM;
 import org.gjt.fredde.yamm.mail.Mailbox;
 import org.gjt.fredde.yamm.gui.BoxTreeRenderer;
-import org.gjt.fredde.util.gui.MsgDialog;
+import org.gjt.fredde.util.gui.*;
 
 /**
  * The tree for the main window
@@ -144,27 +144,30 @@ public class mainJTree extends JTree implements DropTargetListener {
 		treepop.add(mi);
 	}
 
-  public void drop(DropTargetDropEvent e) {
-    try {
-      DataFlavor stringFlavor = DataFlavor.stringFlavor;
-      Transferable tr = e.getTransferable();
+	public void drop(DropTargetDropEvent e) {
+		try {
+			DataFlavor stringFlavor = DataFlavor.stringFlavor;
+			Transferable tr = e.getTransferable();
 
-      if(e.isDataFlavorSupported(stringFlavor)) {
-        String mails = (String)tr.getTransferData(stringFlavor);
+			if (e.isDataFlavorSupported(stringFlavor)) {
+				String mails = (String)tr.getTransferData(stringFlavor);
 
-        e.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-        doAction(mails, e.getLocation(), e.getDropAction());
-        e.dropComplete(true);
-      }
-      else {
-        e.rejectDrop();
-      }
-    } catch (IOException ioe) {
-        ioe.printStackTrace();
-    } catch (UnsupportedFlavorException ufe) {
-        ufe.printStackTrace();
-    }
-  }
+				e.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+				doAction(mails, e.getLocation(), e.getDropAction());
+				e.dropComplete(true);
+			} else {
+				e.rejectDrop();
+			}
+		} catch (IOException ioe) {
+			new ExceptionDialog(YAMM.getString("msg.error"),
+						ioe,
+						YAMM.exceptionNames);
+		} catch (UnsupportedFlavorException ufe) {
+			new ExceptionDialog(YAMM.getString("msg.error"),
+						ufe,
+						YAMM.exceptionNames);
+		}
+	}
 
   public void dragEnter(DropTargetDragEvent e) { }
   public void dragExit(DropTargetEvent e) { }
@@ -523,9 +526,9 @@ public class mainJTree extends JTree implements DropTargetListener {
 						try {
 							box.createNewFile();
 						} catch (IOException ioe) {
-							Object[] args = {ioe.toString()};
-							new MsgDialog(frame, YAMM.getString("msg.error"),
-								YAMM.getString("msg.exception", args));
+							new ExceptionDialog(YAMM.getString("msg.error"),
+								ioe,
+								YAMM.exceptionNames);
 						}
 
 						top.removeAllChildren();

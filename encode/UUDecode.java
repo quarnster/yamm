@@ -20,8 +20,9 @@ package org.gjt.fredde.yamm.encode;
 import java.io.*;
 import javax.swing.JFrame;
 import org.gjt.fredde.util.UUDecoder;
-import org.gjt.fredde.util.gui.MsgDialog;
+import org.gjt.fredde.util.gui.ExceptionDialog;
 import org.gjt.fredde.yamm.gui.imageViewer;
+import org.gjt.fredde.yamm.YAMM;
 
 /**
  * A class to Decode uuencoded files
@@ -69,7 +70,9 @@ public class UUDecode extends Thread{
 			in.close();
 			out.close();
 		} catch (IOException ioe) {
-			new MsgDialog(frame, "Error!", ioe.toString());
+			new ExceptionDialog(YAMM.getString("msg.error"),
+						ioe,
+						YAMM.exceptionNames);
 		}
 
 		if (view) {

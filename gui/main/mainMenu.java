@@ -45,26 +45,12 @@ public class mainMenu extends JMenuBar {
 	static YAMM frame = null;
 
 	/**
-	 * The Properties that loads and saves information.
-	 */
-	static protected Properties     props = new Properties();
-
-	/**
 	 * Makes the menu, adds a menulistener etc...
 	 * @param frame2 The JFrame that will be used when displaying error
 	 * messages etc
 	 */
 	public mainMenu(YAMM frame2) {
 		frame = frame2;
-
-		try {
-			InputStream in = new FileInputStream(YAMM.home +
-								"/.config");
-			props.load(in);
-			in.close();
-		} catch (IOException propsioe) {
-			System.err.println(propsioe);
-		}
 
 		JMenu file = new JMenu(YAMM.getString("file"));
 		file.setFont(new Font("SansSerif", Font.BOLD, 12));

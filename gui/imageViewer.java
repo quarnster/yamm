@@ -22,6 +22,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import org.gjt.fredde.util.gui.ExceptionDialog;
+import org.gjt.fredde.yamm.YAMM;
 
 /**
  * A class to view images (jpg/gif).
@@ -41,7 +43,9 @@ public class imageViewer extends JFrame {
 			try {
 				t.waitForID(1);
 			} catch(InterruptedException ie) {
-				System.err.println(ie.toString());
+				new ExceptionDialog(YAMM.getString("msg.error"),
+						ie,
+						YAMM.exceptionNames);
 			}
 		}
 

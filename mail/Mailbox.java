@@ -23,6 +23,7 @@ import java.io.*;
 import java.util.*;
 import javax.swing.JTextArea;
 import org.gjt.fredde.yamm.YAMM;
+import org.gjt.fredde.util.gui.ExceptionDialog;
 
 /**
  * A class that handels messages and information about messages
@@ -81,7 +82,9 @@ public class Mailbox {
 			}
 			in.close();
 		} catch (IOException ioe) {
-			System.err.println(ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 		}
 	}
 
@@ -135,7 +138,9 @@ public class Mailbox {
 			try {
 				skipnum = mhp.parse(in);
 			} catch (MessageParseException mpe) {
-				System.err.println(mpe);
+				new ExceptionDialog(YAMM.getString("msg.error"),
+					mpe,
+					YAMM.exceptionNames);
 			}
 
 			subject = mhp.getHeaderField("Subject");
@@ -216,7 +221,9 @@ public class Mailbox {
 			in.close();
 			out.close();
 		} catch(IOException ioe) {
-			System.err.println("Error: " + ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 		}
 	}
 
@@ -294,7 +301,9 @@ public class Mailbox {
 			}
 			in.close();
 		} catch(IOException ioe) {
-			System.out.println("Error: " + ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 		}
 	}
 
@@ -326,7 +335,9 @@ public class Mailbox {
 			try {
 				mhp.parse(in);
 			} catch (MessageParseException mpe) {
-				System.err.println(mpe);
+				new ExceptionDialog(YAMM.getString("msg.error"),
+						mpe,
+						YAMM.exceptionNames);
 			}
 
 			subject = mhp.getHeaderField("Subject");
@@ -382,7 +393,9 @@ public class Mailbox {
 			}
 			in.close();
 		} catch(IOException ioe) {
-			System.err.println(ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 		}
 	}
 
@@ -471,7 +484,9 @@ public class Mailbox {
 			source.delete();
 			target.renameTo(source);
 		} catch (IOException ioe) {
-			System.err.println(ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 		}
 	} 
 
@@ -544,7 +559,9 @@ public class Mailbox {
 			source.delete();
 			target.renameTo(source);
 		} catch (IOException ioe) {
-			System.err.println("test:" + ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+				ioe,
+				YAMM.exceptionNames);
 		}
 		setIndexStatus(whichBox, whichmail, status);
 	}
@@ -595,9 +612,13 @@ public class Mailbox {
 			in.close();
 			outFile.close();
 		} catch (IOException ioe) {
-			System.err.println("Error: " + ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 		} catch (MessageParseException mpe) {
-			System.err.println(mpe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					mpe,
+					YAMM.exceptionNames);
 		}
 	}
 
@@ -624,7 +645,9 @@ public class Mailbox {
 			try {
 				mhp.parse(in);
 			} catch (MessageParseException mpe) {
-				System.err.println(mpe);
+				new ExceptionDialog(YAMM.getString("msg.error"),
+						mpe,
+						YAMM.exceptionNames);
 			}
 
 			if (mhp.getHeaderField("Reply-To") != null) {
@@ -658,7 +681,9 @@ public class Mailbox {
 
 			in.close();
 		} catch (IOException ioe) {
-			System.out.println("Error: " + ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+				ioe,
+				YAMM.exceptionNames);
 		}
 		String[] ret = {from,subject};
 
@@ -688,9 +713,13 @@ public class Mailbox {
 
 			in.close();
 		} catch (IOException ioe) {
-			System.err.println(ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 		} catch (MessageParseException mpe) {
-			System.err.println(mpe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					mpe,
+					YAMM.exceptionNames);
 		}
 	}
 
@@ -827,7 +856,9 @@ public class Mailbox {
 							".tmp to " + whichBox);
 				}
 			} catch (IOException ioe) {
-				System.out.println("Error: " + ioe);
+				new ExceptionDialog(YAMM.getString("msg.error"),
+						ioe,
+						YAMM.exceptionNames);
 				return false;
 			}
 		} else if (whichBox.equals(YAMM.home + sep + "boxes" + sep +
@@ -941,7 +972,9 @@ public class Mailbox {
 							".tmp to " + whichBox);
 				}
 			} catch(IOException ioe) {
-				System.out.println("Error: " + ioe);
+				new ExceptionDialog(YAMM.getString("msg.error"),
+						ioe,
+						YAMM.exceptionNames);
 				return false;
 			}
 		}
@@ -1035,7 +1068,9 @@ public class Mailbox {
 			in.close();
 			outFile2.close();
 		} catch (IOException ioe) {
-			System.out.println(ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+						ioe,
+						YAMM.exceptionNames);
 			return false;
 		}
 		return true;
@@ -1162,7 +1197,9 @@ public class Mailbox {
 								fromBox);
 			}
 		} catch (IOException ioe) {
-			System.out.println(ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 			return false;
 		}
 		return true;
@@ -1192,7 +1229,9 @@ public class Mailbox {
 				}
 			}
 		} catch(IOException ioe) {
-			System.err.println(ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 		}
 		return i;
 	}
@@ -1222,7 +1261,9 @@ public class Mailbox {
 			}
 			in.close();
 		} catch (IOException ioe) {
-			System.err.println(ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+						ioe,
+						YAMM.exceptionNames);
 
 			return false;
 		}

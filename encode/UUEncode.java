@@ -18,13 +18,13 @@
 
 package org.gjt.fredde.yamm.encode;
 import java.io.*;
-import org.gjt.fredde.util.gui.MsgDialog;
 import java.util.Vector;
 import java.util.StringTokenizer;
 import java.net.URL;
 import java.net.URLConnection;
 import org.gjt.fredde.util.UUEncoder;
 import org.gjt.fredde.yamm.YAMM;
+import org.gjt.fredde.util.gui.ExceptionDialog;
 
 /**
  * Encodes file in the uuencode format
@@ -78,8 +78,10 @@ public class UUEncode {
 			}
 			out.writeBytes("\n.\n\n");
 			out.close();
-		} catch(IOException ioe) {
-			System.err.println(ioe);
+		} catch (IOException ioe) {
+			new ExceptionDialog(YAMM.getString("msg.error"),
+						ioe,
+						YAMM.exceptionNames);
 		}
 	}
 
@@ -96,7 +98,9 @@ public class UUEncode {
 			uuenc.encode(in, out);
 			in.close();
 		} catch (IOException ioe) {
-			System.err.println(ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 		}
 	}
 }

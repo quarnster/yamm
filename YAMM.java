@@ -160,7 +160,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			mailPage=new URL(mailPageString +
 				res.getString("box.inbox") + "/0.html");
 		} catch (MalformedURLException mue) {
-			System.err.println(mue);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					mue,
+					YAMM.exceptionNames);
 		}
 
 		System.out.println("Locale: " + getProperty("locale",
@@ -236,7 +238,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		try {
 			mail.setPage(mailPage);
 		} catch (IOException ioe) {
-			System.err.println(ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 		}
 		mail.setEditable(false);
 		mail.addHyperlinkListener(this);
@@ -359,17 +363,15 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 				try {
 					new Browser(link);
 				} catch (InterruptedException ie) { 
-					Object[] args = {ie.toString()};
-					new MsgDialog(this,
+					new ExceptionDialog(
 						YAMM.getString("msg.error"), 
-						YAMM.getString("msg.exception",
-								args));
+						ie,
+						YAMM.exceptionNames);
 				} catch(IOException ioe) { 
-					Object[] args = {ioe.toString()};
-					new MsgDialog(this,
+					new ExceptionDialog(
 						YAMM.getString("msg.error"), 
-						YAMM.getString("msg.exception",
-								args)); 
+						ioe,
+						YAMM.exceptionNames);
 				}
 			}
 		} else if (e.getEventType() ==
@@ -487,7 +489,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
         
 			in.close();
 		} catch (IOException ioe) {
-			System.err.println(ioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
 		}
 
 		tmp.add(where);
@@ -502,31 +506,35 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
   }
 */
 
-  public void Exit() {
-    Rectangle rv = new Rectangle();
-    getBounds(rv);
+	public void Exit() {
+		Rectangle rv = new Rectangle();
+		getBounds(rv);
 
-    mailList.save();
-    props.setProperty("mainx", new Integer(rv.x).toString());
-    props.setProperty("mainy", new Integer(rv.y).toString());
-    props.setProperty("mainw", new Integer(rv.width).toString());
-    props.setProperty("mainh", new Integer(rv.height).toString());
-    props.setProperty("vsplit", 
-                      new Integer(SPane2.getDividerLocation()).toString());
-    props.setProperty("hsplit",
-                      new Integer(SPane.getDividerLocation()).toString());
+		mailList.save();
+		props.setProperty("mainx", new Integer(rv.x).toString());
+		props.setProperty("mainy", new Integer(rv.y).toString());
+		props.setProperty("mainw", new Integer(rv.width).toString());
+		props.setProperty("mainh", new Integer(rv.height).toString());
+		props.setProperty("vsplit", 
+			new Integer(SPane2.getDividerLocation()).toString());
+		props.setProperty("hsplit",
+			new Integer(SPane.getDividerLocation()).toString());
 
 
-    try {
-      OutputStream out = new FileOutputStream(home + "/.config");
-      props.store(out, "YAMM configuration file");
-      out.close();
-    } catch(IOException propsioe) { System.err.println(propsioe); }
+		try {
+			OutputStream out = new FileOutputStream(home + "/.config");
+			props.store(out, "YAMM configuration file");
+			out.close();
+		} catch (IOException propsioe) {
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					propsioe,
+					YAMM.exceptionNames);
+		}
 
-    dispose();
-    delUnNeededFiles();
-    System.exit(0);
-  }
+		dispose();
+		delUnNeededFiles();
+		System.exit(0);
+	}
 
 	public void delUnNeededFiles(){
 		boolean debug = false;
@@ -594,7 +602,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			props.load(in);
 			in.close();    
 		} catch (IOException propsioe) {
-			System.err.println(propsioe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					propsioe,
+					YAMM.exceptionNames);
 		}
 		Locale l = Locale.getDefault();
 		String resLanguage = l.getLanguage();

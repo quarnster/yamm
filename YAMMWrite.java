@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.io.*;
 import org.gjt.fredde.yamm.encode.UUEncode;
 import org.gjt.fredde.yamm.gui.AttachListRenderer;
-import org.gjt.fredde.util.gui.MsgDialog;
+import org.gjt.fredde.util.gui.*;
 
 /**
  * The class for writing mails
@@ -177,7 +177,9 @@ public class YAMMWrite extends JFrame {
 				myTextArea.append(new String(singb));  
 				in.close();
 			} catch (IOException ioe) {
-				System.err.println(ioe);
+				new ExceptionDialog(YAMM.getString("msg.error"),
+							ioe,
+							YAMM.exceptionNames);
 			}
 		}
 
@@ -348,7 +350,10 @@ public class YAMMWrite extends JFrame {
 						new UUEncode(attach);
 					}
 				} catch (IOException ioe) {
-					System.out.println("Error: " + ioe);
+					new ExceptionDialog(
+						YAMM.getString("msg.error"),
+						ioe,
+						YAMM.exceptionNames);
 				}
 
 				Rectangle rv = new Rectangle();

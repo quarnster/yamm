@@ -32,7 +32,7 @@ import java.net.MalformedURLException;
 import org.gjt.fredde.yamm.YAMM;
 import org.gjt.fredde.yamm.YAMMWrite;
 import org.gjt.fredde.yamm.mail.Mailbox;
-import org.gjt.fredde.util.gui.MsgDialog;
+import org.gjt.fredde.util.gui.ExceptionDialog;
 
 /**
  * The Table for listing the mails subject, date and sender.
@@ -176,7 +176,9 @@ public class mainTable extends JTable implements DragGestureListener,
 						text, // transferable
 						this); // drag source listener
 		} catch (InvalidDnDOperationException idoe) {
-			System.err.println(idoe);
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					idoe,
+					YAMM.exceptionNames);
 		}
 	}
 
@@ -594,21 +596,17 @@ public class mainTable extends JTable implements DragGestureListener,
 				frame.mailPage = new URL(frame.mailPageString +
 						boxName + whatMail + ".html");
 			} catch (MalformedURLException mue) { 
-				Object[] args = { 
-					mue.toString()
-				};
-				new MsgDialog(frame,
-					YAMM.getString("msg.error"),
-					YAMM.getString("msg.exception", args)); 
+				new ExceptionDialog(YAMM.getString("msg.error"),
+						mue,
+						YAMM.exceptionNames);
 			}
  
 			try {
 				frame.mail.setPage(frame.mailPage);
 			} catch (IOException ioe) { 
-				Object[] args = {ioe.toString()};
-				new MsgDialog(frame,
-					YAMM.getString("msg.error"), 
-					YAMM.getString("msg.exception", args)); 
+				new ExceptionDialog(YAMM.getString("msg.error"),
+						ioe,
+						YAMM.exceptionNames);
 			}
 
 			frame.createAttachList();
@@ -687,25 +685,17 @@ public class mainTable extends JTable implements DragGestureListener,
 							getSelectedRow() +
 							".html");
 				} catch (MalformedURLException mue) {
-					Object[] args = {
-						mue.toString()
-					};
-					new MsgDialog(frame,
-						YAMM.getString("msg.error"),
-						YAMM.getString("msg.exception",
-									args));
+					new ExceptionDialog(YAMM.getString("msg.error"),
+						mue,
+						YAMM.exceptionNames);
 				}
 
 				try {
 					frame.mail.setPage(frame.mailPage);
 				} catch (IOException ioe) {
-					Object[] args = {
-						ioe.toString()
-					};
-					new MsgDialog(frame,
-						YAMM.getString("msg.error"),
-						YAMM.getString("msg.exception",
-									args));
+					new ExceptionDialog(YAMM.getString("msg.error"),
+							ioe,
+							YAMM.exceptionNames);
 				}
 			}
 
@@ -780,25 +770,17 @@ public class mainTable extends JTable implements DragGestureListener,
 							getSelectedRow() +
 							".html"); 
 				} catch (MalformedURLException mue) { 
-					Object[] args = {
-						mue.toString()
-					};
-					new MsgDialog(frame,
-						YAMM.getString("msg.error"), 
-						YAMM.getString("msg.exception",
-									args)); 
+					new ExceptionDialog(YAMM.getString("msg.error"), 
+							mue,
+							YAMM.exceptionNames);
 				}
 
 				try {
 					frame.mail.setPage(frame.mailPage);
 				} catch (IOException ioe) { 
-					Object[] args = {
-						ioe.toString()
-					};
-					new MsgDialog(frame,
-						YAMM.getString("msg.error"), 
-						YAMM.getString("msg.exception",
-									args)); 
+					new ExceptionDialog(YAMM.getString("msg.error"), 
+							ioe,
+							YAMM.exceptionNames);
 				}
 			} else if (kommando.equals(
 					YAMM.getString("button.reply"))) {
@@ -918,25 +900,17 @@ public class mainTable extends JTable implements DragGestureListener,
 							getSelectedRow() +
 							".html"); 
 			} catch (MalformedURLException mue) { 
-				Object[] args = {
-					mue.toString()
-				};
-				new MsgDialog(frame,
-						YAMM.getString("msg.error"), 
-						YAMM.getString("msg.exception",
-									args)); 
+				new ExceptionDialog(YAMM.getString("msg.error"), 
+						mue,
+						YAMM.exceptionNames);
 			}
 
 			try {
 				frame.mail.setPage(frame.mailPage);
 			} catch (IOException ioe) { 
-				Object[] args = {
-					ioe.toString()
-				};
-				new MsgDialog(frame,
-						YAMM.getString("msg.error"),
-						YAMM.getString("msg.exception",
-									args)); 
+				new ExceptionDialog(YAMM.getString("msg.error"),
+						ioe,
+						YAMM.exceptionNames);
 			}
 		}
 	};
