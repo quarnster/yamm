@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.52 2003/03/15 19:28:35 fredde Exp $
+/*  $Id: Mailbox.java,v 1.53 2003/04/04 15:36:44 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.52 $
+ * @version $Revision: 1.53 $
  */
 public class Mailbox {
 
@@ -49,16 +49,35 @@ public class Mailbox {
 			return subject;
 		}
 
+		
+
 		String start = subject.substring(0, subject.indexOf("=?"));
 		String end   = subject.substring(subject.lastIndexOf("?=") + 2,
 							subject.length());
-		subject      = subject.substring(subject.indexOf("Q?") + 2,
+		int iso = subject.indexOf("?", start.length() + 2) + 1;
+		String encoding = subject.substring(iso, subject.indexOf("?", iso+1));
+		subject      = subject.substring(iso + 1 + encoding.length(),
 						subject.lastIndexOf("?="));
 
 		subject = subject.replace('_', ' ');
 		start = start.replace('_', ' ');
 		end = end.replace('_', ' ');
-		subject = Mime.unMime(subject, false);
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayInputStream in = new ByteArrayInputStream(subject.getBytes());
+		Decoder dec = null;
+
+		if (encoding.equals("B")) {
+			dec = new Base64sun();
+		} else if (encoding.equals("Q")) {
+			dec = new QuotedPrintable();
+		}
+		try {
+			dec.decode(in, out);
+			subject = out.toString();
+		} catch (Exception e) {
+		}
+//		subject = Mime.unMime(subject, false);
 
 		return start + subject + end;
 	}
@@ -843,6 +862,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.53  2003/04/04 15:36:44  fredde
+ * now parses =?-strings as it should
+ *
  * Revision 1.52  2003/03/15 19:28:35  fredde
  * implemented deleteMail
  *
