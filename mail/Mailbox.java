@@ -448,7 +448,7 @@ public class Mailbox {
 						tmp.lastIndexOf(" ") + 1,
 						tmp.length()));
 
-					skip++;
+					skip += status.length() + 14;
 
 					tmp = tmp.substring(0,
 						tmp.lastIndexOf(" ") + 1);
