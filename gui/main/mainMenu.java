@@ -1,4 +1,4 @@
-/*  $Id: mainMenu.java,v 1.40 2003/06/06 10:49:09 fredde Exp $
+/*  $Id: mainMenu.java,v 1.41 2003/06/06 17:09:04 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@ import org.gjt.fredde.util.gui.*;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.40 $
+ * @version $Revision: 1.41 $
  */
 public class mainMenu
 	extends JMenuBar
@@ -46,28 +46,19 @@ public class mainMenu
 	 * Makes the menu, adds a menulistener etc...
 	 */
 	public mainMenu() {
-		JMenu file = new JMenu(YAMM.getString("file"));
-		file.setFont(new Font("SansSerif", Font.BOLD, 12));
 		JMenuItem rad;
-		add(file);
+
 
 		Font f = new Font("SansSerif", Font.PLAIN, 10);
+		Font menuFont = new Font("SansSerif", Font.BOLD, 12);
+
 
 
 		// the file menu
-		rad = new JMenuItem(YAMM.getString("file.new"),
-				new ImageIcon(getClass().getResource("/images/buttons/new_mail.png")));
-		rad.addActionListener(MListener);
-		rad.setFont(f);
-		file.add(rad);
+		JMenu file = new JMenu(YAMM.getString("file"));
+		file.setFont(menuFont);
+		add(file);
 
-		rad = new JMenuItem(YAMM.getString("file.save_as"),
-				new ImageIcon(getClass().getResource("/images/buttons/save_as.png")));
-		rad.addActionListener(MListener);
-		rad.setFont(f);
-		file.add(rad);
-
-		file.addSeparator();
 		rad = new JMenuItem(YAMM.getString("file.empty_trash"),
 				new ImageIcon(getClass().getResource("/images/buttons/delete.png")));
 		rad.addActionListener(MListener);
@@ -75,7 +66,6 @@ public class mainMenu
 		file.add(rad);
 		file.addSeparator();
 
-		
 		rad = new JMenuItem(YAMM.getString("file.exit"),
 				new ImageIcon(getClass().getResource("/images/buttons/exit.png")));
 		rad.addActionListener(MListener);
@@ -84,7 +74,7 @@ public class mainMenu
 
 		// the edit menu
 		JMenu edit = new JMenu(YAMM.getString("edit"));
-		edit.setFont(new Font("SansSerif", Font.BOLD, 12));
+		edit.setFont(menuFont);
 		add(edit);
 
 		rad = new JMenuItem(YAMM.getString("edit.settings"),
@@ -93,15 +83,53 @@ public class mainMenu
 		rad.setFont(f);
 		edit.add(rad);
 
-		rad = new JMenuItem(YAMM.getString("edit.view_source"),
+		// the message menu
+		JMenu message = new JMenu(YAMM.getString("menu.message"));
+		message.setFont(menuFont);
+		add(message);
+
+		rad = new JMenuItem(YAMM.getString("menu.message.new"),
+				new ImageIcon(getClass().getResource("/images/buttons/new_mail.png")));
+		rad.addActionListener(MListener);
+		rad.setFont(f);
+		message.add(rad);
+		message.addSeparator();
+
+		rad = new JMenuItem(YAMM.getString("menu.message.reply"),
+				new ImageIcon(getClass().getResource("/images/buttons/reply.png")));
+		rad.addActionListener(MListener);
+		rad.setFont(f);
+		message.add(rad);
+
+		rad = new JMenuItem(YAMM.getString("menu.message.forward"),
+				new ImageIcon(getClass().getResource("/images/buttons/forward.png")));
+		rad.addActionListener(MListener);
+		rad.setFont(f);
+		message.add(rad);
+		message.addSeparator();
+
+		rad = new JMenuItem(YAMM.getString("menu.message.save_as"),
+				new ImageIcon(getClass().getResource("/images/buttons/save_as.png")));
+		rad.addActionListener(MListener);
+		rad.setFont(f);
+		message.add(rad);
+
+		rad = new JMenuItem(YAMM.getString("menu.message.view_source"),
 				new ImageIcon(getClass().getResource("/images/buttons/search.png")));
 		rad.addActionListener(MListener);
 		rad.setFont(f);
-		edit.add(rad);
+		message.add(rad);
+		message.addSeparator();
+
+		rad = new JMenuItem(YAMM.getString("menu.message.delete"),
+				new ImageIcon(getClass().getResource("/images/buttons/delete.png")));
+		rad.addActionListener(MListener);
+		rad.setFont(f);
+		message.add(rad);
 
 		// the help menu
 		JMenu help = new JMenu(YAMM.getString("help"));
-		help.setFont(new Font("SansSerif", Font.BOLD, 12));
+		help.setFont(menuFont);
 		add(help);
 
 		rad = new JMenuItem(YAMM.getString("help.about_you"),
@@ -256,9 +284,18 @@ public class mainMenu
 				);
 			}  else if (kommando.equals(YAMM.getString("edit.settings"))) {
 				new ConfigurationWizard(YAMM.getInstance());
-			} else if (kommando.equals(YAMM.getString("file.new"))) {
+			} else if (kommando.equals(YAMM.getString("menu.message.new"))) {
 				new YAMMWrite();
-			} else if (kommando.equals(YAMM.getString("edit.view_source"))) {
+			} else if (kommando.equals(YAMM.getString("menu.message.reply"))) {
+				YAMMWrite yam = new YAMMWrite();
+				yam.reply();
+			} else if (kommando.equals(YAMM.getString("menu.message.forward"))) {
+				YAMMWrite yam = new YAMMWrite();
+				yam.forward();
+			} else if (kommando.equals(YAMM.getString("menu.message.delete"))) {
+				YAMM yamm = YAMM.getInstance();
+				yamm.mailList.deleteSelected();
+			} else if (kommando.equals(YAMM.getString("menu.message.view_source"))) {
 				YAMM yamm = YAMM.getInstance();
 				mainTable tmp = yamm.mailList;
 				int test = tmp.getSelectedRow();
@@ -286,7 +323,7 @@ public class mainMenu
 						}
 					}
 				}
-			} else if (kommando.equals(YAMM.getString("file.save_as"))) {
+			} else if (kommando.equals(YAMM.getString("menu.message.save_as"))) {
 				YAMM yamm = YAMM.getInstance();
 				int test = yamm.mailList.getSelectedMessage();
 
@@ -381,6 +418,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.41  2003/06/06 17:09:04  fredde
+ * added Message menu
+ *
  * Revision 1.40  2003/06/06 10:49:09  fredde
  * added empty trash function
  *
