@@ -1,4 +1,4 @@
-/*  $Id: mainMenu.java,v 1.32 2003/03/12 20:21:43 fredde Exp $
+/*  $Id: mainMenu.java,v 1.33 2003/03/14 23:18:46 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -25,6 +25,7 @@ import java.awt.Font;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.text.*;
 import java.util.*;
 import org.gjt.fredde.yamm.gui.sourceViewer;
 import org.gjt.fredde.yamm.mail.Mailbox;
@@ -37,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.32 $
+ * @version $Revision: 1.33 $
  */
 public class mainMenu
 	extends JMenuBar
@@ -132,6 +133,22 @@ public class mainMenu
 	}
 
 	ActionListener MListener = new ActionListener() {
+		protected String format(String src) {
+			String[] end = new String[] {"B", "kB", "MB", "GB"};
+			double num = 0;
+			int i = 0;
+			try { num = (double) Integer.parseInt(src); } catch (Exception e) {num = 0;}
+
+			while (num > 1024 && i < end.length) {
+				num /= 1024;
+				i++;
+			}
+			NumberFormat nf = NumberFormat.getInstance();
+			nf.setMaximumFractionDigits(2);
+
+			return nf.format(num) + " " + end[i];
+		}
+
 		public void actionPerformed(ActionEvent ae) {
 			String kommando = ((JMenuItem)ae.getSource()).getText();
 
@@ -168,8 +185,8 @@ public class mainMenu
 					System.getProperty("user.home"),
 					YAMM.getProperty("stat.sentnum", "0"),
 					YAMM.getProperty("stat.receivednum", "0"),
-					YAMM.getProperty("stat.sentbytes", "0"),
-					YAMM.getProperty("stat.receivedbytes", "0"),
+					format(YAMM.getProperty("stat.sentbytes", "0")),
+					format(YAMM.getProperty("stat.receivedbytes", "0")),
 				};
 
 				JOptionPane.showMessageDialog(
@@ -340,6 +357,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.33  2003/03/14 23:18:46  fredde
+ * added formating of mailsizes in about_me dialog
+ *
  * Revision 1.32  2003/03/12 20:21:43  fredde
  * removed MsgDialog. added sent/received stats. frame -> yamm
  *
