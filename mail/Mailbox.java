@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.41 2003/03/06 23:51:11 fredde Exp $
+/*  $Id: Mailbox.java,v 1.42 2003/03/07 10:53:07 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.41 2003/03/06 23:51:11 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.42 2003/03/07 10:53:07 fredde Exp $
  */
 public class Mailbox {
 
@@ -166,9 +166,8 @@ public class Mailbox {
 				if (from == null) from = "";
 				if (subject == null) subject = "";
 
-				subject = removeQuote(subject);
-				subject = unMime(subject);
-				from = removeQuote(from);
+				subject = unMime(removeQuote(subject));
+				from = unMime(removeQuote(from));
 
 				for (;;) {
 					temp = in.readLine();
@@ -230,9 +229,8 @@ public class Mailbox {
 						if (subject == null)
 							subject = "";
 
-						subject = removeQuote(subject);
-						subject = unMime(subject);
-						from = removeQuote(from);
+						subject = unMime(removeQuote(subject));
+						from = unMime(removeQuote(from));
 					}
 				}
 				in.close();
@@ -1438,6 +1436,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.42  2003/03/07 10:53:07  fredde
+ * unMime fixes
+ *
  * Revision 1.41  2003/03/06 23:51:11  fredde
  * fixed getMailForReply
  *
