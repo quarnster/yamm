@@ -1,4 +1,4 @@
-/*  $Id: SHMail.java,v 1.33 2003/03/10 09:41:00 fredde Exp $
+/*  $Id: SHMail.java,v 1.34 2003/03/10 11:00:09 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -31,19 +31,13 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Revision: 1.33 $
+ * @version $Revision: 1.34 $
  */
 public class SHMail
 	extends Thread
 {
 	/** Properties for smtpserver etc */
 	static protected Properties props = new Properties();
-
-	/**
-	 * Wheter or not the messages should be putted in the "sent"-box
-	 * after sending it
-	 */
-	static protected boolean sent = false;
 
 	/** If pop-debugging info should be printed */
 	static private boolean popdebug = false;
@@ -74,7 +68,6 @@ public class SHMail
 		popdebug	= YAMM.getProperty("debug.pop",  "false").equals("true");
 		smtpdebug	= YAMM.getProperty("debug.smtp", "false").equals("true");
 		del		= YAMM.getProperty("delete", "true").equals("true");
-		sent		= YAMM.getProperty("sentbox","true").equals("true");
 	}
 
 	/**
@@ -82,6 +75,7 @@ public class SHMail
 	 * and connects to the servers with a config-file.
 	 */
 	public void run() {
+		String outbox = Utilities.replace(YAMM.home + "/boxes/outbox");
 		yamm.status.progress(0);
 		yamm.status.setStatus("");
 
@@ -148,29 +142,20 @@ public class SHMail
 
 		if (
 			YAMM.getProperty("smtpserver") != null &&
-			Mailbox.hasMail(YAMM.home + "/boxes/outbox")
+			Mailbox.hasMail(outbox)
 		) {
 			Smtp smtp = null;
 			BufferedReader in = null;
-			PrintWriter out = null;
 			PrintWriter mail = null;
 
 			try {
-				File boxFile = new File(YAMM.home + "/boxes/outbox");
+				File boxFile = new File(outbox);
 				smtp = new YammSmtp(YAMM.getProperty("smtpserver"), 25, smtpdebug);
 				in = new BufferedReader(
 					new InputStreamReader(
 						new FileInputStream(boxFile)
 					)
 				);
-
-				if (sent) {
-					out = new PrintWriter(
-						new BufferedOutputStream(
-	        					new FileOutputStream(YAMM.home + "/boxes/sent", true)
-						)
-					);
-				}
 
 				String temp = null, from2 = null, to2 = null;
 				Index idx = new Index(boxFile.toString());
@@ -211,7 +196,6 @@ public class SHMail
 						System.out.println("form: " + from);
 						smtp.from(from);
 						from2 = temp;
-						if (sent) out.println(from2);
 					} else if (temp.startsWith("To:")) {
 						to2 = temp;
 
@@ -228,11 +212,9 @@ public class SHMail
 							}
 							smtp.to(MessageParser.getEmail(temp.substring(0, temp.length())));
 						}
-						if (sent) out.println(to2);
 					} else if (temp.startsWith("Subject:")) {
 						mail = smtp.getOutputStream();
 						mail.println(from2 + "\n" + to2 + "\n" + temp);
-						if (sent) out.println(temp);
 
 						for (;;) {
 							temp = in.readLine();
@@ -243,7 +225,6 @@ public class SHMail
 							yamm.status.setStatus(mailStatus + "  " + read + "/" + length);
 							yamm.status.progress((int) (((float) read / length) * 100));
 
-							if (sent) out.println(temp);
 
 							if (temp.equals(".")) {
 								smtp.sendMessage();
@@ -266,32 +247,28 @@ public class SHMail
 						}
 						mail = null;
 					} else {
-						if (sent)
-							out.println(temp);
 						if (mail != null)
 							mail.println(temp);
 					}
 				}
 				in.close();
-
-				File file = new File(Utilities.replace(YAMM.home + "/boxes/outbox"));
-				file.delete();
-				file.createNewFile();
 			} catch (IOException ioe) {
 				new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
 			} finally {
 				try {
 					if (in != null) in.close();
-					if (sent && out != null) out.close();
 					if (smtp != null) smtp.close();
 					if (mail != null) mail.close();
 				} catch (IOException ioe) {}
 			}
-			if (sent) {
-				String box = Utilities.replace(YAMM.home + "/boxes/sent");
-				yamm.tree.unreadTable.put(box, Mailbox.getUnread(box));
-				yamm.tree.dataModel.fireTableDataChanged();
+
+			int[] move = new int[Mailbox.getUnread(outbox)[0]];
+			for (int i = 0; i < move.length; i++) {
+				move[i] = i;
 			}
+
+			String sent = Utilities.replace(YAMM.home + "/boxes/sent");
+			Mailbox.moveMail(outbox, sent, move);
 		}
 		yamm.status.setStatus(YAMM.getString("msg.done"));
 		yamm.status.progress(100);
@@ -327,6 +304,9 @@ public class SHMail
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.34  2003/03/10 11:00:09  fredde
+ * now uses the new index system better. removed sent-check
+ *
  * Revision 1.33  2003/03/10 09:41:00  fredde
  * non localized box filenames
  *
