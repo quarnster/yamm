@@ -28,7 +28,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.30 2000/03/14 21:19:12 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.31 2000/03/15 11:13:45 fredde Exp $
  */
 public class Mailbox {
 
@@ -143,101 +143,131 @@ public class Mailbox {
 			out   = new PrintWriter(new BufferedOutputStream(
 						new FileOutputStream(target)));
 			int i = 0;
+			int unread = 0;
 
-			MessageHeaderParser mhp = new MessageHeaderParser();
-			DateParser dp = new DateParser();
-			dp.setTargetFormat(YAMM.getString("shortdate"));
+			if (hasMail(whichBox)) {
+				MessageHeaderParser mhp = new MessageHeaderParser();
+				DateParser dp = new DateParser();
+				dp.setTargetFormat(YAMM.getString("shortdate"));
 
-			try {
-				skipnum = mhp.parse(in);
-			} catch (MessageParseException mpe) {
-				new ExceptionDialog(YAMM.getString("msg.error"),
-					mpe,
-					YAMM.exceptionNames);
-			}
-
-			subject = mhp.getHeaderField("Subject");
-			from    = mhp.getHeaderField("From");
-			date    = mhp.getHeaderField("Date");
-			status  = mhp.getHeaderField("YAMM-Status");
-
-			if (status == null)
-				status = "Unread";
-			if (from == null)
-				from = "";
-			if (subject == null)
-				subject = "";
-
-
-			subject = removeQuote(subject);
-			subject = unMime(subject);
-			from = removeQuote(from);
-
-
-			for (;;) {
-				temp = in.readLine();
-				skipnum += temp.length() + System.getProperty
-						("line.separator").length();
-
-				if (temp == null) {
-					break;
-				} else if (temp.equals(".")) {
-					out.print(i + " ");
-
-					if (subject != null) {
-						out.print("\"" + subject +
-								"\" ");
-					} else {
-						out.print("\"\" ");
-					}
-                                         
-					if (from != null) {
-						out.print("\"" + from + "\" ");
-					} else {
-						out.print("\"\" ");
-					}
-
-					if (date != null) {
-						try {
-							date = dp.parse(date);
-						} catch (ParseException pe) {
-							date = mhp.
-							getHeaderField("Date");
-						}
-						out.print("\"" +date + "\" ");
-					} else {
-						out.print("\"\" ");
-					}                                   
-
-					out.print("\"" + status + "\" ");
-
-					out.println(skipped);
-					out.flush();
-					i++;
-
-					skipped = skipnum;
-
-					try {
-						skipnum += mhp.parse(in);
-					} catch (MessageParseException mpe) {
-						break;
-					}
-					subject = mhp.getHeaderField("Subject");
-					from    = mhp.getHeaderField("From");
-					date    = mhp.getHeaderField("Date");
-					status  = mhp.getHeaderField("YAMM-" +
-								"Status");
-					if (status == null)
-						status = "Unread";
-					if (from == null)
-						from = "";
-					if (subject == null)
-						subject = "";
-
-					subject = removeQuote(subject);
-					subject = unMime(subject);
-					from = removeQuote(from);
+				try {
+					skipnum = mhp.parse(in);
+				} catch (MessageParseException mpe) {
+					new ExceptionDialog(YAMM.getString("msg.error"),
+						mpe,
+						YAMM.exceptionNames);
 				}
+
+				subject = mhp.getHeaderField("Subject");
+				from    = mhp.getHeaderField("From");
+				date    = mhp.getHeaderField("Date");
+				status  = mhp.getHeaderField("YAMM-Status");
+
+				if (status == null)
+					status = "Unread";
+				if (from == null)
+					from = "";
+				if (subject == null)
+					subject = "";
+
+
+				subject = removeQuote(subject);
+				subject = unMime(subject);
+				from = removeQuote(from);
+
+
+				for (;;) {
+					temp = in.readLine();
+					if (temp == null)
+						break;
+
+					skipnum += temp.length() + System.getProperty
+							("line.separator").length();
+
+					if (temp.equals(".")) {
+						out.print(i + " ");
+
+						if (subject != null) {
+							out.print("\"" + subject +
+								"\" ");
+						} else {
+							out.print("\"\" ");
+						}
+                                         
+						if (from != null) {
+							out.print("\"" + from + "\" ");
+						} else {
+							out.print("\"\" ");
+						}
+
+						if (date != null) {
+							try {
+								date = dp.parse(date);
+							} catch (ParseException pe) {
+								date = mhp.
+								getHeaderField("Date");
+							}
+							out.print("\"" +date + "\" ");
+						} else {
+							out.print("\"\" ");
+						}                                   
+
+						out.print("\"" + status + "\" ");
+
+						out.println(skipped);
+						out.flush();
+						i++;
+
+						skipped = skipnum;
+
+						try {
+							skipnum += mhp.parse(in);
+						} catch (MessageParseException mpe) {
+							break;
+						}
+						subject = mhp.getHeaderField("Subject");
+						from    = mhp.getHeaderField("From");
+						date    = mhp.getHeaderField("Date");
+						status  = mhp.getHeaderField("YAMM-" +
+								"Status");
+						if (status == null) {
+							status = "Unread";
+							unread++;
+						}
+						if (from == null)
+							from = "";
+						if (subject == null)
+							subject = "";
+
+						subject = removeQuote(subject);
+						subject = unMime(subject);
+						from = removeQuote(from);
+					}
+				}
+				in.close();
+				out.close();
+
+				in = new BufferedReader(new InputStreamReader(
+							new FileInputStream(target)));
+
+				out = new PrintWriter(new BufferedOutputStream(
+							new FileOutputStream(target + ".tmp")));
+
+				out.println(i + ", " + unread);
+
+				for (;;) {
+					String tmp = in.readLine();
+
+					if (tmp == null) break;
+					else out.println(tmp);
+				}
+
+				File tmp = new File(target + ".tmp");
+				File old = new File(target);
+				old.delete();
+				tmp.renameTo(old);
+			} else {
+				out.println("0, 0");
 			}
 		} catch(IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
@@ -250,6 +280,51 @@ public class Mailbox {
 			} catch (IOException ioe) {}
 		}
 	}
+
+	public static int[] getUnread(String box) {
+
+		int sep = box.lastIndexOf(YAMM.sep);
+
+		String box2 = box.substring(0, sep + 1) +
+				"." + 
+				box.substring(sep + 1, box.length()) +
+				".index";
+
+		File indexfile = new File(box2);
+
+		if (!indexfile.exists()) {
+			updateIndex(box);
+		}
+
+		BufferedReader in = null;
+
+		String tmp = null;
+		int unread[] = new int[2];
+
+		try {
+			in = new BufferedReader(new InputStreamReader(
+						new FileInputStream(box2)));
+
+			tmp = in.readLine();
+		} catch (IOException ioe) {
+			new ExceptionDialog(YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames);
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException ioe) {}
+		}
+
+		if (tmp != null) {
+//			tmp = tmp.substring(tmp.indexOf(",") + 2, tmp.length()).trim();
+			unread[0] = Integer.parseInt(tmp.substring(0, tmp.indexOf(",")));
+			unread[1] = Integer.parseInt(tmp.substring(tmp.indexOf(",") + 2, tmp.length()));
+		}
+
+		return unread;
+	}
+	
 
 	/**
 	 * Creates a list with the mails in this box.
@@ -264,6 +339,7 @@ public class Mailbox {
 
 //		String temp = null;
 		mailList.clear();
+		mailList.ensureCapacity(getUnread(whichBox)[0]);
 		Vector vec1 = new Vector(6);
 		int sep = whichBox.lastIndexOf(YAMM.sep);
 
@@ -292,6 +368,7 @@ public class Mailbox {
 			in = new BufferedReader(new InputStreamReader(
 						new FileInputStream(box)));
 
+			in.readLine(); // skip messages, unread messages header
 			StreamTokenizer tok = new StreamTokenizer(in);
 			
 			for (;;) {
@@ -448,12 +525,17 @@ public class Mailbox {
 		BufferedReader in = null;
 		PrintWriter out = null;
 
+		int[] unread = getUnread(whichBox);
+		unread[1]--;
+		
 		try {
 			in = new BufferedReader(new InputStreamReader(
 						new FileInputStream(source)));
 			out   = new PrintWriter(new BufferedOutputStream(
 						new FileOutputStream(target)));
 
+			in.readLine(); // skip unread, total msg header
+			out.println(unread[0] + ", " + unread[1]);
 			StreamTokenizer tok = new StreamTokenizer(in);
 
 			for (int i = 0; i < whichmail; i++) {
@@ -1319,6 +1401,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.31  2000/03/15 11:13:45  fredde
+ * boxes now show if and how many unread messages they have
+ *
  * Revision 1.30  2000/03/14 21:19:12  fredde
  * better io-cleanup
  *

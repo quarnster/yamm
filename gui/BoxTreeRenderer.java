@@ -23,11 +23,12 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 import org.gjt.fredde.yamm.YAMM;
+import org.gjt.fredde.yamm.mail.Mailbox;
 
 /**
  * The renderer for the mailbox tree
  * @author Fredrik Ehnbom
- * @version $Id: BoxTreeRenderer.java,v 1.3 2000/03/05 18:02:53 fredde Exp $
+ * @version $Id: BoxTreeRenderer.java,v 1.4 2000/03/15 11:13:45 fredde Exp $
  */
 public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
                                                                    
@@ -68,7 +69,6 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 			thisbox = tok.nextToken();
 		}
 
-
 		if (leaf && !thisbox.endsWith(".g")) {
 			if (thisbox.equals(YAMM.getString("box.inbox"))) {
 				setIcon(inbox);
@@ -88,7 +88,14 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 
 		if (thisbox.endsWith(".g")) {
 			setText(thisbox.substring(0, thisbox.length() -2));
-		} else setText(thisbox);
+		} else if (!thisbox.equals(YAMM.getString("box.boxes"))) {
+			int unread[] = Mailbox.getUnread(s);
+			if (unread[1] != -1 && unread[1] != 0 && YAMM.getProperty("showunread", "true").equals("true")) thisbox += " " + unread[1] + "/" + unread[0];
+			setText(thisbox);
+		} else {
+			setText(thisbox);
+		}
+
 		setForeground(Color.black);
 		this.selected = selected;
 		return this;
@@ -130,6 +137,9 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 /*
  * Changes:
  * $Log: BoxTreeRenderer.java,v $
+ * Revision 1.4  2000/03/15 11:13:45  fredde
+ * boxes now show if and how many unread messages they have
+ *
  * Revision 1.3  2000/03/05 18:02:53  fredde
  * now gets the images used for the jar-file
  *

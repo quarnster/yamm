@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * The Table for listing the mails subject, date and sender.
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.25 2000/03/12 17:23:17 fredde Exp $
+ * @version $Id: mainTable.java,v 1.26 2000/03/15 11:13:45 fredde Exp $
  */
 public class mainTable extends JTable implements DragGestureListener,
 							DragSourceListener {
@@ -559,6 +559,8 @@ public class mainTable extends JTable implements DragGestureListener,
 						getSelectedRow(), skip, "Read");
 					Mailbox.createList(frame.selectedbox,
 							frame.listOfMails);
+
+					frame.tree.updateUI();
 				}
 				changeButtonMode(true);
 			} else { 
@@ -839,6 +841,9 @@ public class mainTable extends JTable implements DragGestureListener,
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.26  2000/03/15 11:13:45  fredde
+ * boxes now show if and how many unread messages they have
+ *
  * Revision 1.25  2000/03/12 17:23:17  fredde
  * clear selection when deleting files
  *
