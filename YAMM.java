@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.66 2003/03/16 11:02:28 fredde Exp $
+/*  $Id: YAMM.java,v 1.67 2003/04/04 18:02:42 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,18 +42,14 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.66 $
+ * @version $Revision: 1.67 $
  */
 public class YAMM
 	extends JFrame
 	implements HyperlinkListener
 {
-	public static int INDEX_NUM = 0;
-	public static int INDEX_SUBJECT = 1;
-	public static int INDEX_FROM = 2;
-	public static int INDEX_DATE = 3;
-	public static int INDEX_STATUS = 4;
-	public static int INDEX_SKIP = 5;
+	/** The yamm instance */
+	private static YAMM _yamm = null;
 
 	/** The home of yamm */
 	public static String home = Utilities.replace(System.getProperty("user.home") + "/.yamm");
@@ -125,6 +121,13 @@ public class YAMM
 	 */
 	public static Profiler profiler = null;
 
+	public static YAMM getInstance() {
+		if (_yamm == null) {
+			_yamm = new YAMM();
+		}
+		return _yamm;
+	}
+
 	/**
 	 * Returns the translated string.
 	 *
@@ -173,10 +176,13 @@ public class YAMM
 		props.setProperty(property, value);
 	}
 
+	private YAMM() {
+	}
+
 	/**
 	 * Creates the main-window and adds all the components in it.
 	 */
-	public YAMM() {
+	public void init() {
 		try {
 			mailPage=new URL(mailPageString + "inbox" + "/0.html");
 		} catch (MalformedURLException mue) {
@@ -209,10 +215,10 @@ public class YAMM
 		getContentPane().setLayout(new BorderLayout());
 
 		// the menubar
-		setJMenuBar(new mainMenu(this));
+		setJMenuBar(new mainMenu());
 
 		// the toolbar
-		tbar = new mainToolBar(this);
+		tbar = new mainToolBar();
 		getContentPane().add("North", tbar);
 
 		// create a list of mails in the selected box
@@ -313,7 +319,8 @@ public class YAMM
 		SPane.setPreferredSize(new Dimension(300, 50));
 		SPane.setOneTouchExpandable(true);
 
-		tree = new mainJTree(this, tbar);
+		tree = new mainJTree();
+		tree.init();
 
 		spane = new JScrollPane(tree);
 		spane.getViewport().setOpaque(true);
@@ -327,7 +334,6 @@ public class YAMM
 		status.button.setText(res.getString("button.cancel"));
 		getContentPane().add("South", status);
 		addWindowListener(new FLyssnare());
-		show();
 	}
 
 
@@ -458,7 +464,7 @@ public class YAMM
   }
 */
 
-	public void Exit() {
+	public void exit() {
 		Rectangle rv = new Rectangle();
 		getBounds(rv);
 
@@ -496,7 +502,7 @@ public class YAMM
 	 */
 	class FLyssnare extends WindowAdapter {
 		public void windowClosing(WindowEvent event) {
-			Exit();
+			exit();
 		}
 	}
 
@@ -582,7 +588,6 @@ public class YAMM
 	 * ~home/.yamm/boxes/local/inbox.
 	 */
 	public static void main(String argv[]) {
-		YAMM nFrame = null;
 		SplashScreen splash = null;
 		boolean firstRun = false;
 
@@ -678,8 +683,10 @@ public class YAMM
 		}
 
 		profiler = new Profiler();
-		nFrame = new YAMM();
-		nFrame.setTitle("Yet Another Mail Manager " + version + " " + compDate);
+		YAMM yamm = YAMM.getInstance();
+		yamm.setTitle("Yet Another Mail Manager " + version + " " + compDate);
+		yamm.init();
+		yamm.show();
 		if (splash != null) splash.dispose();
 	}
 }
@@ -687,6 +694,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.67  2003/04/04 18:02:42  fredde
+ * implemented Singleton stuff
+ *
  * Revision 1.66  2003/03/16 11:02:28  fredde
  * bumped versionnumber up to 0.9
  *
