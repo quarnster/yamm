@@ -375,6 +375,7 @@ public class Mailbox {
 	    outFile.println("<pre>");
             for(;;) {
               outFile.println(temp);
+              outFile.flush();
 
               temp = in.readLine();
 
@@ -402,7 +403,7 @@ public class Mailbox {
 
               if(!html && (temp.indexOf("<") != -1 || temp.indexOf(">") != -1 || temp.indexOf("=") != -1)) temp = removeTags(temp);
 
-              if(temp.indexOf("://") != -1 && temp.indexOf("href=") == -1 && temp.indexOf("HREF=") == -1) {
+              if(!html && temp.indexOf("://") != -1 && temp.indexOf("href=") == -1 && temp.indexOf("HREF=") == -1) {
                 int    protBegin = temp.indexOf("://");
                 int    space     = temp.indexOf(" ", protBegin + 3);
                 String prot      = temp.substring( (((protBegin - 4) != -1) ? protBegin - 4 : 0), protBegin + 3).trim();
@@ -429,7 +430,7 @@ public class Mailbox {
                 temp = begin + "<a href=\"" + prot + link + "\">" + prot + link + "</a>" + end;
               }
 
-              else if(temp.indexOf("@") != -1 && temp.indexOf("href=") == -1 && temp.indexOf("HREF=") == -1) {
+              else if(!html && temp.indexOf("@") != -1 && temp.indexOf("href=") == -1 && temp.indexOf("HREF=") == -1) {
                 String temp2 = null;
 
                 StringTokenizer tok = new StringTokenizer(temp);

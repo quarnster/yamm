@@ -50,7 +50,7 @@ public class mainTable extends JTable {
 
   static protected YAMM                   frame = null;
 
-  static protected JPopupMenu             popup = null;
+  public JPopupMenu             popup = null;
 
   static protected ResourceBundle         res   = null;
 
@@ -67,21 +67,22 @@ public class mainTable extends JTable {
 
     TableColumn column = null;
     column = getColumnModel().getColumn(3);
-    column.setPreferredWidth(115);
-    column.setMaxWidth(130);
+    column.setPreferredWidth(125);
+    column.setMaxWidth(140);
     column.setMinWidth(10);
     column = getColumnModel().getColumn(0);
     column.setPreferredWidth(20);
     column.setMinWidth(10);
     column.setMaxWidth(50);
 
-    setFont(new Font("Serif", 0, 12));
-    setRowHeight(14);
+    setRowHeight(12);
     setSelectionMode(2);
     setColumnSelectionAllowed(false);
     setShowHorizontalLines(false);
     setShowVerticalLines(false);
-    setDefaultRenderer(getColumnClass(0), new myRenderer());
+    myRenderer rend = new myRenderer();
+    rend.setFont(new Font("SansSerif", Font.PLAIN, 12));
+    setDefaultRenderer(getColumnClass(0), rend /* new myRenderer() */ );
 
     TMListener(this);
 
@@ -129,11 +130,11 @@ public class mainTable extends JTable {
 
 
 
-  protected void createPopup(JPopupMenu jpmenu) {
+  public void createPopup(JPopupMenu jpmenu) {
     Vector list = new Vector();          
     
     fileList(list, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
-    StringTokenizer tok;
+//    StringTokenizer tok;
     
     JMenu copy = new JMenu(res.getString("edit.copy")), move = new JMenu(res.getString("edit.move"));
     JMenuItem row, delete = new JMenuItem(res.getString("button.delete")), reply = new JMenuItem(res.getString("button.reply")); 
@@ -143,9 +144,10 @@ public class mainTable extends JTable {
     for(int i = 0;i<list.size();i++) {
       String temp = list.get(i).toString();
 
-      tok = new StringTokenizer(temp, System.getProperty("file.separator"));
-      String name = null;
-      while(tok.hasMoreTokens()) name = tok.nextToken();
+//      tok = new StringTokenizer(temp, System.getProperty("file.separator"));
+      String sep = System.getProperty("file.separator");
+      String name = temp.substring((System.getProperty("user.home") + sep + ".yamm" + sep + "boxes" + sep).length(), temp.length());
+//      while(tok.hasMoreTokens()) name = tok.nextToken();
       if(name.startsWith(".")) continue;
 
       row = new JMenuItem(name);
@@ -156,6 +158,7 @@ public class mainTable extends JTable {
       row.addActionListener(FMListener);
       move.add(row);
     }
+
     jpmenu.add(reply);
     jpmenu.addSeparator();
     jpmenu.add(copy);
