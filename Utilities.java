@@ -25,9 +25,22 @@ import java.util.jar.*;
 /**
  * This Class provides some useful utilities
  * @author Fredrik Ehnbom
- * @version $Id: Utilities.java,v 1.7 2001/04/21 09:30:40 fredde Exp $
+ * @version $Id: Utilities.java,v 1.8 2003/03/14 23:16:37 fredde Exp $
  */
 public final class Utilities {
+
+	/**
+	 * Parses an int and handles exceptions (if any)
+	 */
+	public static int parseIntSafe(String str) {
+		int ret = 0;
+		try {
+			ret = Integer.parseInt(str);
+		} catch (Exception e) {
+			ret = 0;
+		}
+		return ret;
+	}
 
 	/**
 	 * Gets the compiledate of this archive
@@ -41,7 +54,7 @@ public final class Utilities {
 			Date d = new Date(je.getTime());
 			SimpleDateFormat dateFormat = new SimpleDateFormat("EEEEEEE, MMMMMMMM dd yyyy HH:mm:ss");
 			date = dateFormat.format(d);
-			
+
 			jf.close();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -169,6 +182,9 @@ public final class Utilities {
 /*
  * Changes:
  * $Log: Utilities.java,v $
+ * Revision 1.8  2003/03/14 23:16:37  fredde
+ * added parseIntSafe
+ *
  * Revision 1.7  2001/04/21 09:30:40  fredde
  * fixed
  *
