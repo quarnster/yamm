@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.34 2003/03/10 12:31:01 fredde Exp $
+/*  $Id: mainJTree.java,v 1.35 2003/03/10 20:00:05 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.34 $
+ * @version $Revision: 1.35 $
  */
 public class mainJTree
 	extends JTable
@@ -253,14 +253,14 @@ public class mainJTree
 			if (list.length == 0) return;
 			if (action.equals("move")) {
 				Mailbox.moveMail(yamm.selectedbox, box, list);
+				Mailbox.createList(yamm.selectedbox, yamm);
+				yamm.mailList.update();
 			} else {
 				Mailbox.copyMail(yamm.selectedbox, box, list);
 			}
 
 			Utilities.delUnNeededFiles();
-			Mailbox.createList(yamm.selectedbox, yamm);
 			dataModel.fireTableDataChanged();
-			yamm.mailList.update();
 		}
 	}
 
@@ -393,6 +393,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.35  2003/03/10 20:00:05  fredde
+ * only update mailList when needed
+ *
  * Revision 1.34  2003/03/10 12:31:01  fredde
  * show number of new messages
  *
