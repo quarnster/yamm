@@ -20,7 +20,7 @@ package org.gjt.fredde.yamm.gui.main;
 
 import javax.swing.*;
 import java.awt.event.*;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.print.PrinterJob;
 import java.io.*;
 import java.util.Properties;
@@ -33,7 +33,6 @@ import org.gjt.fredde.yamm.mail.Mailbox;
 import org.gjt.fredde.yamm.YAMMWrite;
 import org.gjt.fredde.yamm.SHMail;
 import org.gjt.fredde.yamm.Print;
-// import gui.printPreview;
 
 /**
  * The toolbar for the main class
@@ -49,11 +48,10 @@ public class mainToolBar extends JToolBar {
   /** The print button */
   public JButton print;
 
+  protected static boolean text = true, ico = true;
+  protected static String content = YAMM.getProperty("button.content", "South");
   JButton b;
   YAMM frame;
-
-  /** The Properties that loads and saves information. */
-  static protected Properties     props = new Properties();
 
   /**
    * Creates the toolbar.
@@ -61,76 +59,117 @@ public class mainToolBar extends JToolBar {
    */
   public mainToolBar(YAMM frame2) {
     frame = frame2;
-
-    try {
-      InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-      props.load(in);
-      in.close();
-    } catch (IOException propsioe) { System.err.println(propsioe); }
+//    boolean text = true, ico = true;
+    if(YAMM.getProperty("button.icon", "true").equals("false")) ico = false;
+    if(YAMM.getProperty("button.text", "true").equals("false")) text = false;
 
     /* send mails in outbox get mail to inbox */
-    b = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/recycle.gif"));
+    b = new JButton();
+    if(ico) b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/recycle.gif"));
+    if(text) b.setText(YAMM.getString("button.send_get"));
+    b.setToolTipText(YAMM.getString("button.send_get.tooltip"));
+    b.setFont(new Font("SansSerif", Font.PLAIN, 10));
+    setAlign(b, content);
     b.setBorderPainted(false);
-    b.setToolTipText(YAMM.getString("button.send_get"));
     b.addActionListener(BListener);
     add(b);
     addSeparator();
 
 
     /* button to write a new mail */
-    b = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/new_mail.gif"));
+    b = new JButton();
+    if(ico) b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/new_mail.gif"));
+    if(text) b.setText(YAMM.getString("button.new_mail"));
+    b.setFont(new Font("SansSerif", Font.PLAIN, 10));
+    setAlign(b, content);
     b.addActionListener(BListener);
     b.setBorderPainted(false);
-    b.setToolTipText(YAMM.getString("button.new_mail"));
+    b.setToolTipText(YAMM.getString("button.new_mail.tooltip"));
     add(b);
 
     /* reply button */
-    reply = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/reply.gif"));
+    reply = new JButton();
+    if(ico) reply.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/reply.gif"));
+    if(text) reply.setText(YAMM.getString("button.reply"));
+    reply.setFont(new Font("SansSerif", Font.PLAIN, 10));    
+    setAlign(reply, content);                           
     reply.addActionListener(BListener);
     reply.setBorderPainted(false);
-    reply.setToolTipText(YAMM.getString("button.reply"));
+    reply.setToolTipText(YAMM.getString("button.reply.tooltip"));
     reply.setEnabled(false);
     add(reply);
 
     /* forward button */
-    forward = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/forward.gif"));
+    forward = new JButton();
+    if(ico) forward.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/forward.gif"));
+    if(text) forward.setText(YAMM.getString("button.forward"));
+    forward.setFont(new Font("SansSerif", Font.PLAIN, 10));    
+    setAlign(forward, content);                           
     forward.addActionListener(BListener);
     forward.setBorderPainted(false);
-    forward.setToolTipText(YAMM.getString("button.forward"));
+    forward.setToolTipText(YAMM.getString("button.forward.tooltip"));
     forward.setEnabled(false);
     add(forward);
 
     /* button to print page */
-    print = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/print.gif"));
+    print = new JButton();
+    if(ico) print.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/print.gif"));
+    if(text) print.setText(YAMM.getString("button.print"));
+    print.setFont(new Font("SansSerif", Font.PLAIN, 10));    
+    setAlign(print, content);                           
     print.setBorderPainted(false);
-    print.setToolTipText(YAMM.getString("button.print"));
+    print.setToolTipText(YAMM.getString("button.print.tooltip"));
     print.addActionListener(BListener);
     print.setEnabled(false);
     addSeparator();
     add(print);
 
     /* button to exit from program */
-    b = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/exit.gif"));
+    b = new JButton();
+    if(ico) b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/exit.gif"));
+    if(text) b.setText(YAMM.getString("button.exit"));
+    b.setFont(new Font("SansSerif", Font.PLAIN, 10));    
+    setAlign(b, content);                           
     b.setBorderPainted(false);
-    b.setToolTipText(YAMM.getString("button.exit"));
+    b.setToolTipText(YAMM.getString("button.exit.tooltip"));
     b.addActionListener(BListener);
     addSeparator();
     add(b);
   }
 
+  protected void setAlign(JButton b, String content) {
+    if(content.equals("North"))  {
+      b.setHorizontalTextPosition(AbstractButton.CENTER);
+      b.setVerticalTextPosition(AbstractButton.TOP); 
+    }                                              
+    else if(content.equals("West")) {
+      b.setHorizontalTextPosition(AbstractButton.LEFT);  
+      b.setVerticalTextPosition(AbstractButton.CENTER);  
+    }                                              
+    else if(content.equals("East")) {
+      b.setHorizontalTextPosition(AbstractButton.RIGHT);
+      b.setVerticalTextPosition(AbstractButton.CENTER); 
+    }
+    else {
+      b.setHorizontalTextPosition(AbstractButton.CENTER);
+      b.setVerticalTextPosition(AbstractButton.BOTTOM); 
+    }
+  }
+
+
   ActionListener BListener = new ActionListener() {
     public void actionPerformed(ActionEvent e) {
       String arg = ((JButton)e.getSource()).getToolTipText();
 
-      if(arg.equals(YAMM.getString("button.new_mail"))) {
+      if(arg.equals(YAMM.getString("button.new_mail.tooltip"))) {
         new YAMMWrite();
       }
  
-      else if(arg.equals(YAMM.getString("button.send_get"))) {
+      else if(arg.equals(YAMM.getString("button.send_get.tooltip"))) {
         new SHMail(frame, "mailthread", (JButton)e.getSource()).start();
       }
 
-      else if(arg.equals(YAMM.getString("button.reply"))) {
+      else if(arg.equals(YAMM.getString("button.reply.tooltip"))) {
   
       int i = 0;
 
@@ -145,7 +184,7 @@ public class mainToolBar extends JToolBar {
         Mailbox.getMailForReply(frame.selectedbox, Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString()), yam.myTextArea);
       }
 
-      else if(arg.equals(YAMM.getString("button.forward"))) {
+      else if(arg.equals(YAMM.getString("button.forward.tooltip"))) {
 
         int i = 0;
 
@@ -159,7 +198,7 @@ public class mainToolBar extends JToolBar {
         YAMMWrite yam = new YAMMWrite("", mail[1], mail[0] + " " + YAMM.getString("mail.wrote") + "\n");
         Mailbox.getMailForReply(frame.selectedbox, Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString()), yam.myTextArea);
       }
-      else if(arg.equals(YAMM.getString("button.print"))) {
+      else if(arg.equals(YAMM.getString("button.print.tooltip"))) {
 /*
         int i = 0;
 
@@ -179,7 +218,7 @@ public class mainToolBar extends JToolBar {
         }
 //        new Print(frame, i);
       }
-      else if(arg.equals(YAMM.getString("button.exit"))) {
+      else if(arg.equals(YAMM.getString("button.exit.tooltip"))) {
         frame.Exit();
       }
     }
