@@ -33,8 +33,7 @@ import javax.swing.border.*;
 
 import org.gjt.fredde.yamm.mail.*;
 import org.gjt.fredde.yamm.gui.*;
-import org.gjt.fredde.util.gui.MsgDialog;
-import org.gjt.fredde.util.gui.SplashScreen;
+import org.gjt.fredde.util.gui.*;
 import org.gjt.fredde.yamm.gui.main.*;
 import org.gjt.fredde.yamm.encode.*;
 
@@ -96,6 +95,7 @@ public class YAMM extends JFrame implements HyperlinkListener
   JSplitPane   SPane, SPane2;
   JTree        tree;
   JTabbedPane  JTPane;
+  public statusRow status;
 
   int          mainx, mainy, mainw, mainh, hsplit, vsplit;
 
@@ -314,7 +314,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     attach = new Vector();
 
     ListModel attachModel = new AbstractListModel() {
-      public Object getElementAt(int index) { return ((Vector)attach.elementAt(index)).elementAt(1); }
+      public Object getElementAt(int index) { return attach.elementAt(index); }
       public int    getSize() { return attach.size(); }
     };
 
@@ -344,6 +344,8 @@ public class YAMM extends JFrame implements HyperlinkListener
     SPane2.setDividerLocation(vsplit);
     getContentPane().add("Center", SPane2);
 
+    status = new statusRow(res);
+    getContentPane().add("South", status);
     addWindowListener(new FLyssnare());
     show();
   }
@@ -391,6 +393,7 @@ public class YAMM extends JFrame implements HyperlinkListener
           if(filename.endsWith(".jpg") || filename.endsWith(".gif") || filename.endsWith(".JPG") || filename.endsWith(".GIF")) {
             new File("tmp").mkdir();
 
+/*
             if(encode.equalsIgnoreCase("base64")) {
               if(base64) {
                 Mailbox.export_attach(selectedbox, mailList.getSelectedRow(), filename);
@@ -405,6 +408,7 @@ public class YAMM extends JFrame implements HyperlinkListener
             
               new UUDecode(null, "UUDecode " + filename, home + "/tmp/" + filename, true).start();
             }
+
           }
 
           else if(encode.equalsIgnoreCase("base64")) {
@@ -437,12 +441,41 @@ public class YAMM extends JFrame implements HyperlinkListener
                 new UUDecode(null, "UUDecode " + filename, jfs.getSelectedFile().toString(), false).start();
               }
             }
-          }  
+*/
+          }
         }
       }
     }
   };
 
+  public void createAttachList() {
+    attach = new Vector();
+    String boxName = selectedbox.substring(selectedbox.indexOf("boxes") + 6, 
+                                           selectedbox.length()) + "/";
+
+    String[] test = new File(System.getProperty("user.home") + "/.yamm/tmp/cache/" + boxName).list();
+
+    for(int i = 0; i < test.length; i++ ) {
+      if(test[i].indexOf("0.attach.") != -1) attach.add(test[i]);
+    }
+  }
+
+/*
+  protected void createAttachList(Vector list File dir) {
+    String files[] = dir.list();
+
+    for(int i = 0; i < files.length;i++) {
+      System.out.println("added \"" + files[i]);
+      File dir2 = new File(dir, files[i]);
+      if(dir2.isDirectory()) {
+        delDir.add(dir2);
+        createDelList(delFile, delDir, dir2);
+      }
+      else delFile.add(dir2);
+    }
+  }
+*/
+    
   public void Exit() {
     Rectangle rv = new Rectangle();
     getBounds(rv);

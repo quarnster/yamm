@@ -23,8 +23,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import org.gjt.fredde.util.net.*;
 import org.gjt.fredde.util.gui.MsgDialog;
-import org.gjt.fredde.yamm.gui.pDialog;
 import org.gjt.fredde.yamm.mail.*;
+import org.gjt.fredde.yamm.YAMM;
 
 /**
  * Sends and gets mail
@@ -35,7 +35,7 @@ public class SHMail extends Thread {
   static protected Properties props = new Properties();
 
   JButton knappen;
-  JFrame frame;
+  YAMM frame;
 
   /**
    * Disables the send/get-button and inits some stuff
@@ -43,7 +43,7 @@ public class SHMail extends Thread {
    * @param name the name of this thread.
    * @param knapp the button to disable.
    */
-  public SHMail(JFrame frame1, String name, JButton knapp) {
+  public SHMail(YAMM frame1, String name, JButton knapp) {
     super(name);
     knappen = knapp;
     knappen.setEnabled(false);
@@ -55,7 +55,8 @@ public class SHMail extends Thread {
    * connects to the servers with a config-file.
    */
   public void run() {
-    pDialog pd = new pDialog("Status");
+    frame.status.progress(0);
+    frame.status.setStatus("");
 
     File files[] = new File(System.getProperty("user.home") + "/.yamm/servers/").listFiles();
 
@@ -77,16 +78,16 @@ public class SHMail extends Thread {
 
       if(type != null && server != null && username != null && password != null) {
         if(type.equals("pop3")) {
-          pd.setString("contacting server: " + server);
+          frame.status.setStatus("contaction server: " + server);
 
           try { 
             Pop3 pop = new Pop3(username, password, server, System.getProperty("user.home") + "/.yamm/boxes/.filter");
             int messages = pop.getMessageCount();
 
             for(int j = 1; j<=messages;j++) {
-              pd.setString("Getting mail " + j + " of " + messages);
+              frame.status.setStatus("Getting mail " + j + " of " + messages);
 
-              pd.progress(100 - ( ( 100 * messages - 100 * j ) / messages ) );
+              frame.status.progress(100 - ( ( 100 * messages - 100 * j ) / messages ) );
               pop.getMessage(j);
               if(del) pop.deleteMessage(j);
             }
@@ -107,8 +108,8 @@ public class SHMail extends Thread {
     } catch (IOException propsioe) { System.err.println(propsioe); }
 
     if(props.getProperty("smtpserver") != null && Mailbox.hasMail(System.getProperty("user.home") + "/.yamm/boxes/outbox")) {
-      pd.setString("Sending mails...");
-      pd.progress(0);
+      frame.status.setStatus("Sending mails...");
+      frame.status.progress(0);
       try { 
         Smtp smtp = new Smtp(props.getProperty("smtpserver"));
         BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
@@ -154,7 +155,8 @@ public class SHMail extends Thread {
 
               else if(temp.equals(".")) {
                 smtp.sendMessage();
-                pd.setString("Sending mail " + i);
+                frame.status.setStatus("Sending mail " + i);
+                
                 i++;
                 break;
               }
@@ -171,22 +173,21 @@ public class SHMail extends Thread {
       }
       catch(IOException ioe) { new MsgDialog(frame, "Error!", ioe.toString()); }
     }
-    pd.setString("done!");
-    pd.progress(100);
+    frame.status.setStatus("done!");
+    frame.status.progress(100);
 
     if(Mailbox.hasMail(System.getProperty("user.home") + "/.yamm/boxes/.filter")) {
-      pd.setString("Applying filters...");
-      pd.progress(0);
+      frame.status.setStatus("Applying filters...");
+      frame.status.progress(0);
 
       try { new Filter(); }
       catch (IOException ioe) { new MsgDialog(frame, "Error!", ioe.toString()); }
 
-      pd.setString("done!");
-      pd.progress(100);
+      frame.status.setStatus("done!");
+      frame.status.progress(100);
     }
     
     knappen.setEnabled(true);
-    pd.dispose();
   }
 }
   
