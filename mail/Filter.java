@@ -1,4 +1,4 @@
-/*  $Id: Filter.java,v 1.10 2003/03/09 17:43:51 fredde Exp $
+/*  $Id: Filter.java,v 1.11 2003/03/10 09:51:00 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ public class Filter {
 		Vector list = new Vector();
 		BufferedReader in = null;
 		String filterBox = Utilities.replace(YAMM.home + "/boxes/.filter");
-		String inBox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox"));
+		String inBox = Utilities.replace(YAMM.home + "/boxes/inbox");
 
 		Mailbox.createFilterList(list);
 
