@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Id: mainToolBar.java,v 1.18 2000/03/25 15:46:24 fredde Exp $
+ * @version $Id: mainToolBar.java,v 1.19 2000/03/25 16:02:00 fredde Exp $
  */
 public class mainToolBar extends JToolBar {
 
@@ -252,14 +252,14 @@ public class mainToolBar extends JToolBar {
 				String mail[] = Mailbox.getMailForReplyHeaders(
 							frame.selectedbox, skip);
 
-				if (!mail[1].startsWith(
+				if (!mail[2].startsWith(
 						YAMM.getString("mail.fwd")) &&
-						!mail[1].startsWith("Fwd:")) {
-					mail[1] = YAMM.getString("mail.fwd") +
-								" " + mail[1];
+						!mail[2].startsWith("Fwd:")) {
+					mail[2] = YAMM.getString("mail.fwd") +
+								" " + mail[2];
 				}
 
-				YAMMWrite yam = new YAMMWrite("", mail[1],
+				YAMMWrite yam = new YAMMWrite("", mail[2],
 								mail[0] +
 						YAMM.getString("mail.wrote") +
 									"\n");
@@ -293,6 +293,9 @@ public class mainToolBar extends JToolBar {
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.19  2000/03/25 16:02:00  fredde
+ * the email was in the subjectfield when forwarding...
+ *
  * Revision 1.18  2000/03/25 15:46:24  fredde
  * uses the new getMailForReplyHeaders method
  *
