@@ -114,7 +114,7 @@ public class SHMail extends Thread {
     } catch (IOException propsioe) { System.err.println(propsioe); }
 
     if(props.getProperty("smtpserver") != null && Mailbox.hasMail(System.getProperty("user.home") + "/.yamm/boxes/outbox")) {
-      frame.status.setStatus("Sending mails...");
+      frame.status.setStatus(res.getString("server.send"));
       frame.status.progress(0);
       try { 
         Smtp smtp = new Smtp(props.getProperty("smtpserver"));
