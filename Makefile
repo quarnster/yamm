@@ -55,7 +55,7 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 all: YAMM
 
 jar: YAMM
-	jar cvf yamm.jar \
+	jar cmvf MANIFEST.MF yamm.jar \
 	org/gjt/fredde/yamm/*.class \
 	org/gjt/fredde/yamm/gui/*.class \
 	org/gjt/fredde/yamm/gui/confwiz/*.class \
@@ -65,6 +65,7 @@ jar: YAMM
 	org/gjt/fredde/util/*.class \
 	org/gjt/fredde/util/gui/*.class \
 	org/gjt/fredde/util/net/*.class \
+	YAMM_*.properties \
 	images/
 
 clean:
