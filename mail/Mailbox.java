@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.48 2003/03/10 09:42:45 fredde Exp $
+/*  $Id: Mailbox.java,v 1.49 2003/03/10 12:32:09 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.48 $
+ * @version $Revision: 1.49 $
  */
 public class Mailbox {
 
@@ -105,13 +105,14 @@ public class Mailbox {
 
 	public static int[] getUnread(String box) {
 		Index idx = null;
-		int[] unread = new int[2];
+		int[] unread = new int[3];
 		try {
 			idx = new Index(box);
 			idx.open();
 
 			unread[0] = idx.messageNum;
 			unread[1] = idx.unreadNum;
+			unread[2] = idx.newNum;
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
 		} finally {
@@ -268,6 +269,7 @@ public class Mailbox {
 			idx.open();
 			if ((statusChange & IndexEntry.STATUS_READ) != 0) {
 				idx.unreadNum--;
+				idx.unreadNum += idx.newNum;
 				idx.newNum = 0;
 				idx.write();
 			}
@@ -556,7 +558,6 @@ public class Mailbox {
 				tgtSkip += skipLen;
 
 				if ((entry.status & IndexEntry.STATUS_READ) == 0) {
-					tgtIndex.unreadNum++;
 					tgtIndex.newNum++;
 					srcIndex.unreadNum--;
 					srcIndex.newNum = 0;
@@ -661,6 +662,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.49  2003/03/10 12:32:09  fredde
+ * unreadNum/newNum changes
+ *
  * Revision 1.48  2003/03/10 09:42:45  fredde
  * non localized box filenames
  *
