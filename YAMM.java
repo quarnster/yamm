@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * The big Main-class of YAMM
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.46 2000/04/01 20:50:09 fredde Exp $
+ * @version $Id: YAMM.java,v 1.47 2000/04/11 13:26:42 fredde Exp $
  */
 public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
@@ -59,10 +59,10 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	public static String selectedbox = home + sep + "boxes" + sep;
 
 	/** The version of YAMM */
-	public static String version  = "0.7.5";
+	public static String version  = "0.7.6";
 
 	/** The compileDate of YAMM */
-	public static String compDate = Utilities.cvsToDate("$Date: 2000/04/01 20:50:09 $");
+	public static String compDate = Utilities.cvsToDate("$Date: 2000/04/11 13:26:42 $");
 
 	/** the file that contains the current mail */
 	public String mailPageString = "file:///" + home + "/tmp/cache/";
@@ -724,6 +724,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.47  2000/04/11 13:26:42  fredde
+ * changed version number to 0.7.6
+ *
  * Revision 1.46  2000/04/01 20:50:09  fredde
  * fixed to make the profiling system work
  *
