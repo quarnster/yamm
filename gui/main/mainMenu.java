@@ -1,5 +1,5 @@
 /*  mainMenu.java - mainMenu class
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+ *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Id: mainMenu.java,v 1.27 2000/12/31 14:08:19 fredde Exp $
+ * @version $Id: mainMenu.java,v 1.28 2001/03/18 17:07:02 fredde Exp $
  */
 public class mainMenu
 	extends JMenuBar
@@ -185,10 +185,11 @@ public class mainMenu
 				new MsgDialog(
 					null,
 					YAMM.getString("help.about"),
-					"Copyright (C) 1999, 2000 Fredrik Ehnbom\n" +
+					"Copyright (C) 1999-2001 Fredrik Ehnbom\n" +
 					YAMM.getString("info.about", args) +
 					"Tuomas Kuosmanen \n" +
-					"Rafael Escovar "
+					"Rafael Escovar \n" + 
+					"Ricardo A Mattar "
 				);
 			} else if (kommando.equals(YAMM.getString("help.bug_report"))) {
 				YAMMWrite yw = new YAMMWrite("fredde@gjt.org", "Bug report");
@@ -222,7 +223,7 @@ public class mainMenu
 					YAMM.getString("help.license"),
 					"Yet Another Mail Manager " +
 					YAMM.version + " E-Mail Client\n" +
-					"Copyright (C) 1999-2000 Fredrik Ehnbom\n" +
+					"Copyright (C) 1999-2001 Fredrik Ehnbom\n" +
 					YAMM.getString("license"),
 					MsgDialog.OK, JLabel.LEFT
 				);
@@ -331,6 +332,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.28  2001/03/18 17:07:02  fredde
+ * updated
+ *
  * Revision 1.27  2000/12/31 14:08:19  fredde
  * additional credits in here instead of in resource files
  *

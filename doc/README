@@ -1,34 +1,19 @@
 YAMM - Yet Another Mail Manager
 
-Copyright (C) 1999 Fredrik Ehnbom
+Copyright (C) 1999-2001 Fredrik Ehnbom
 See 'COPYING' for licence information.
 
 See 'doc/INSTALL' for installation instructions.
 
 
-Filters:
-    Right now you have to hack the filters manually in '<home>/.yamm/.filters'
-    The file can look like this:
-
-      subject;contains;test;test-files;testing
-
-    'subject' means that it is the subject that should be checked.
-    It can also be 'from', 'to' or 'reply'.
-    'contains' is the condition. It can also be 'is'.
-    'test' is the argument. It can be whatever you want.
-    'test-files' is the box. It can be whatever you want.
-    'testing' is the name of this filter. It can be whatever you want.
-
-    In other words this means:
-
-      If the subject contains test, then move the mail to the box test-files.
-
 Author:
     Fredrik Ehnbom <fredde@gjt.org>
 
-Thanks to:
-    Tuomas Kuosmanen <tigert@gimp.org>
-    Rafael Escovar <rafa75@cantv.net>
+Additional credits:
+    Tuomas Kuosmanen <tigert@gimp.org>, most icons
+    Rafael Escovar <rafa75@cantv.net>, Spanish translation
+    Ricardo A Mattar <mattar@altavista.net>, Portuguese translation
+    
 
 Website:
     http://www.gjt.org/~fredde/yamm/

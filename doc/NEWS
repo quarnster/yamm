@@ -1,9 +1,15 @@
-0.7.8:
+0.8:
 	Added:
 		-Spanish translation thanks to Rafael Escovar
+		-Portuguese translation thanks to Ricardo A Mattar
 		-The ability to encode Base64 with help from sun-classes
+		-Visual configuration of filters
+		-You can easier follow the progress when downloading and
+		 sending mails
+		-Everything I forgot to put here... :)
 
 	Fixed:
+		-some mailparsing fixes made
 		-lots of small bugfixes
 		-the sorting of the messages is much better
 		-lots of bugfixes when using icon-only mode for the buttons

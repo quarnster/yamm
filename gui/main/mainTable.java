@@ -1,5 +1,5 @@
 /*  mainTable.java - The JTable for the main-window
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+ *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,12 +38,12 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.36 2000/12/31 14:10:59 fredde Exp $
+ * @version $Id: mainTable.java,v 1.37 2001/03/18 17:07:21 fredde Exp $
  */
 public class mainTable
 	extends JTable
-	implements      DragGestureListener,
-			DragSourceListener
+	implements DragGestureListener,
+				DragSourceListener
 {
 	/** If it should sort 1 to 10 or 10 to 1*/
 	private static boolean	firstSort = true;
@@ -51,14 +51,14 @@ public class mainTable
 	/** Which column that was sorted */
 	private static int		sortedCol = 0;
 
-	private static YAMM		frame = null;
+	private static YAMM			frame = null;
 	protected JPopupMenu		popup = null;
 	private static DragSource	drag = null;
 
 	private final AbstractTableModel dataModel = new AbstractTableModel() {
 		private final String headername[] = {
 	        	"#",
-			YAMM.getString("table.subject"),
+				YAMM.getString("table.subject"),
 		        YAMM.getString("table.from"),
 	        	YAMM.getString("table.date")
 		};
@@ -67,25 +67,25 @@ public class mainTable
 	        	return 4;
 		}
 
-	        public final int getRowCount() {
+		public final int getRowCount() {
 			return  frame.listOfMails.length;
-	        }
-
-		public final Object getValueAt(int row, int col) {
-	        	if (row >= frame.listOfMails.length) {
-		        	return null;
-			} else {
-	        		return  frame.listOfMails[row][col];
-		        }
 		}
 
-	        public final boolean isCellEditable(int col) {
+		public final Object getValueAt(int row, int col) {
+			if (row >= frame.listOfMails.length) {
+				return null;
+			} else {
+				return  frame.listOfMails[row][col];
+			}
+		}
+
+		public final boolean isCellEditable(int col) {
 			return false;
-	        }
+		}
 
 		public final String getColumnName(int column) {
 			return headername[column];
-	        }
+		}
 	};
 
 	/**
@@ -272,7 +272,6 @@ public class mainTable
 				}
 			}
 		}
-		repaint();
 	}
 
 	/**
@@ -309,7 +308,6 @@ public class mainTable
 				}
 			}
 		}
-		repaint();
 	}
 
 	public void createPopup(JPopupMenu jpmenu) {
@@ -447,20 +445,9 @@ public class mainTable
 				int column = tableView.convertColumnIndexToModel(viewColumn);
 
 				if (column != -1) {
-					if (column == sortedCol) {
-						if (firstSort) {
-							SortFirst(column);
-							firstSort = false;
-						} else {
-							SortLast(column);
-							firstSort = true;
-						}
-					} else {
-						if (firstSort) SortFirst(column);
-						else SortLast(column);
-						firstSort = !firstSort;
-						sortedCol = column;
-					}
+					sortedCol = column;
+					firstSort = !firstSort;
+					update();
 				}
 			}
 		};
@@ -491,8 +478,8 @@ public class mainTable
 					Mailbox.setStatus(frame.selectedbox, getSelectedMessage(), skip, "Read");
 					Mailbox.createList(frame.selectedbox, frame);
 
-					frame.tree.repaint();
 					update();
+					frame.tree.updateUI();
 				}
 				changeButtonMode(true);
 			} else {
@@ -561,8 +548,8 @@ public class mainTable
 
 				Mailbox.updateIndex(frame.selectedbox);
 				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")));
-				frame.tree.repaint();
 				update();
+				frame.tree.updateUI();
 
 				if (frame.listOfMails.length < 0) {
 					return;
@@ -607,9 +594,9 @@ public class mainTable
 
 				Mailbox.updateIndex(frame.selectedbox);
 				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")));
-				frame.tree.repaint();
-
 				update();
+				frame.tree.updateUI();
+
 				changeButtonMode(false);
 				clearSelection();
 			} else if (kommando.equals(YAMM.getString("button.reply"))) {
@@ -666,7 +653,8 @@ public class mainTable
 			Arrays.sort(copyList);
 			Mailbox.copyMail(frame.selectedbox, name, copyList);
 			Mailbox.updateIndex(name);
-			frame.tree.repaint();
+			update();
+			frame.tree.updateUI();
 		}
 	};
 
@@ -699,14 +687,16 @@ public class mainTable
 			Mailbox.createList(frame.selectedbox, frame);
 			Mailbox.updateIndex(name);
 			update();
-
-			frame.tree.repaint();
+			frame.tree.updateUI();
 		}
 	};
 }
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.37  2001/03/18 17:07:21  fredde
+ * updated
+ *
  * Revision 1.36  2000/12/31 14:10:59  fredde
  * replaced updateUI's with repaint where I could.
  *
