@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.56 2003/06/06 13:13:42 fredde Exp $
+/*  $Id: mainTable.java,v 1.57 2003/06/06 17:08:23 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.56 $
+ * @version $Revision: 1.57 $
  */
 public class mainTable
 	extends JTable
@@ -655,32 +655,7 @@ public class mainTable
 			String text = ae.getActionCommand();
 
 			if (text.equals("DEL")) {
-				if (getSelectedRow() == -1) {
-					return;
-				}
-
-				Utilities.delUnNeededFiles();
-				int[] mlist = getSelectedRows();
-				int[] deleteList = new int[mlist.length];
-
-				for (int j = 0; j < mlist.length; j++) {
-					deleteList[j] = yamm.keyIndex[mlist[j]];
-				}
-
-				Arrays.sort(deleteList);
-				Mailbox.deleteMail(yamm.getMailbox(), deleteList);
-				Mailbox.createList(yamm.getMailbox(), yamm);
-
-				update();
-				yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
-				yamm.tree.fullUpdate();
-
-				if (yamm.listOfMails.length < 0) {
-					return;
-				}
-
-				changeButtonMode(false);
-				clearSelection();
+				deleteSelected();
 			} else if (text.equals("UP")) {
 				try {
 					int row = getSelectedRow() - 1;
@@ -697,34 +672,38 @@ public class mainTable
 		}
 	};
 
+	public void deleteSelected() {
+		if (getSelectedRow() == -1) {
+			return;
+		}
+
+		Utilities.delUnNeededFiles();
+		int[] mlist = getSelectedRows();
+		int[] deleteList = new int[mlist.length];
+
+		for (int j = 0; j < mlist.length; j++) {
+			deleteList[j] = yamm.keyIndex[mlist[j]];;
+		}
+
+		Arrays.sort(deleteList);
+
+		Mailbox.deleteMail(yamm.getMailbox(), deleteList);
+		Mailbox.createList(yamm.getMailbox(), yamm);
+
+		update();
+		yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
+		yamm.tree.fullUpdate();
+
+		changeButtonMode(false);
+		clearSelection();
+	}
+
 	private ActionListener OtherMListener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 			String kommando = ((JMenuItem)ae.getSource()).getText();
 
 			if (kommando.equals(YAMM.getString("button.delete"))) {
-				if (getSelectedRow() == -1) {
-					return;
-				}
-
-				Utilities.delUnNeededFiles();
-				int[] mlist = getSelectedRows();
-				int[] deleteList = new int[mlist.length];
-
-				for (int j = 0; j < mlist.length; j++) {
-					deleteList[j] = yamm.keyIndex[mlist[j]];;
-				}
-
-				Arrays.sort(deleteList);
-
-				Mailbox.deleteMail(yamm.getMailbox(), deleteList);
-				Mailbox.createList(yamm.getMailbox(), yamm);
-
-				update();
-				yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
-				yamm.tree.fullUpdate();
-
-				changeButtonMode(false);
-				clearSelection();
+				deleteSelected();
 			} else if (kommando.equals(YAMM.getString("table.reply"))) {
 				if (getSelectedRow() == -1) {
 					return;
@@ -794,6 +773,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.57  2003/06/06 17:08:23  fredde
+ * added method deleteSelected
+ *
  * Revision 1.56  2003/06/06 13:13:42  fredde
  * now uses localized box names in the popup menu
  *
