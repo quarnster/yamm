@@ -1,4 +1,4 @@
-/*  $Id: mainMenu.java,v 1.34 2003/03/15 19:35:28 fredde Exp $
+/*  $Id: mainMenu.java,v 1.35 2003/04/04 18:03:48 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,24 +38,15 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.34 $
+ * @version $Revision: 1.35 $
  */
 public class mainMenu
 	extends JMenuBar
 {
 	/**
-	 * This yamm is used to do som yammstuff
-	 */
-	static YAMM yamm = null;
-
-	/**
 	 * Makes the menu, adds a menulistener etc...
-	 * @param yamm2 The JFrame that will be used when displaying error
-	 * messages etc
 	 */
-	public mainMenu(YAMM yamm2) {
-		yamm = yamm2;
-
+	public mainMenu() {
 		JMenu file = new JMenu(YAMM.getString("file"));
 		file.setFont(new Font("SansSerif", Font.BOLD, 12));
 		JMenuItem rad;
@@ -153,7 +144,7 @@ public class mainMenu
 			String kommando = ((JMenuItem)ae.getSource()).getText();
 
 			if (kommando.equals(YAMM.getString("file.exit"))) {
-				yamm.Exit();
+				YAMM.getInstance().exit();
 			} else if (kommando.equals(YAMM.getString("help.about_you"))) {
 				String host = null;
 				String ipaddress = null;
@@ -190,7 +181,7 @@ public class mainMenu
 				};
 
 				JOptionPane.showMessageDialog(
-					yamm,
+					YAMM.getInstance(),
 					YAMM.getString("info.about.you", args),
 					YAMM.getString("help.about_you"),
 					JOptionPane.INFORMATION_MESSAGE
@@ -205,7 +196,7 @@ public class mainMenu
 				};
 
 				JOptionPane.showMessageDialog(
-					yamm,
+					YAMM.getInstance(),
 					"Copyright (C) 1999-2003 Fredrik Ehnbom\n" +
 					YAMM.getString("info.about", args) + "\n" + 
 					"Tuomas Kuosmanen\n" +
@@ -245,7 +236,7 @@ public class mainMenu
 			} else if (kommando.equals(YAMM.getString("help.license"))) {
 
 				JOptionPane.showMessageDialog(
-					yamm,
+					YAMM.getInstance(),
 					"Yet Another Mail Manager " +
 					YAMM.version + " E-Mail Client\n" +
 					"Copyright (C) 1999-2003 Fredrik Ehnbom\n" +
@@ -254,10 +245,11 @@ public class mainMenu
 					JOptionPane.INFORMATION_MESSAGE
 				);
 			}  else if (kommando.equals(YAMM.getString("edit.settings"))) {
-				new ConfigurationWizard(yamm);
+				new ConfigurationWizard(YAMM.getInstance());
 			} else if (kommando.equals(YAMM.getString("file.new"))) {
 				new YAMMWrite();
 			} else if (kommando.equals(YAMM.getString("edit.view_source"))) {
+				YAMM yamm = YAMM.getInstance();
 				mainTable tmp = yamm.mailList;
 				int test = tmp.getSelectedRow();
 
@@ -286,6 +278,7 @@ public class mainMenu
 					}
 				}
 			} else if (kommando.equals(YAMM.getString("file.save_as"))) {
+				YAMM yamm = YAMM.getInstance();
 				int test = yamm.mailList.getSelectedMessage();
 
 				if (test != -1 && test <= yamm.listOfMails.length) {
@@ -358,6 +351,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.35  2003/04/04 18:03:48  fredde
+ * updated for Singleton stuff
+ *
  * Revision 1.34  2003/03/15 19:35:28  fredde
  * .gif -> .png. Added Daniel Johnson
  *

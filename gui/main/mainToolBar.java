@@ -1,4 +1,4 @@
-/*  $Id: mainToolBar.java,v 1.28 2003/04/04 15:39:23 fredde Exp $
+/*  $Id: mainToolBar.java,v 1.29 2003/04/04 18:03:48 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 public class mainToolBar
 	extends JToolBar
@@ -48,24 +48,22 @@ public class mainToolBar
 //	public JButton print;
 
 	private String content = YAMM.getProperty("button.content", "South");
-	private YAMM frame;
 
 	/**
 	 * Creates the toolbar.
-	 * @param frame2 The JFrame to use for error messages etc.
 	 */
-	public mainToolBar(YAMM frame2) {
-		frame = frame2;
-		if (!(frame.ico && !frame.text)) {
+	public mainToolBar() {
+		YAMM yamm = YAMM.getInstance();
+		if (!(yamm.ico && !yamm.text)) {
 			setFloatable(false);
 		}
 
 		/* send mails in outbox get mail to inbox */
 		JButton b = new JButton();
-		if (frame.ico) {
+		if (yamm.ico) {
 			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/recycle.png")));
 		}
-		if (frame.text) {
+		if (yamm.text) {
 			b.setText(YAMM.getString("button.send_get"));
 		}
 		b.setToolTipText(YAMM.getString("button.send_get.tooltip"));
@@ -79,10 +77,10 @@ public class mainToolBar
 
 		/* button to write a new mail */
 		b = new JButton();
-		if (frame.ico) {
+		if (yamm.ico) {
 			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/new_mail.png")));
 		}
-		if (frame.text) {
+		if (yamm.text) {
 			b.setText(YAMM.getString("button.new_mail"));
 		}
 		b.setFont(new Font("SansSerif", Font.PLAIN, 10));
@@ -94,10 +92,10 @@ public class mainToolBar
 
 		/* reply button */
 		reply = new JButton();
-		if (frame.ico) {
+		if (yamm.ico) {
 			reply.setIcon(new ImageIcon(getClass().getResource("/images/buttons/reply.png")));
 		}
-		if (frame.text) {
+		if (yamm.text) {
 			reply.setText(YAMM.getString("button.reply"));
 		}
 		reply.setFont(new Font("SansSerif", Font.PLAIN, 10));
@@ -110,18 +108,17 @@ public class mainToolBar
 
 		/* forward button */
 		forward = new JButton();
-		if (frame.ico) {
+		if (yamm.ico) {
 			forward.setIcon(new ImageIcon(getClass().getResource("/images/buttons/forward.png")));
 		}
-		if (frame.text) {
+		if (yamm.text) {
 			forward.setText(YAMM.getString("button.forward"));
 		}
 		forward.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		setAlign(forward, content);
 		forward.addActionListener(BListener);
 		forward.setBorderPainted(false);
-		forward.setToolTipText(
-				YAMM.getString("button.forward.tooltip"));
+		forward.setToolTipText(YAMM.getString("button.forward.tooltip"));
 		forward.setEnabled(false);
 		add(forward);
 		addSeparator();
@@ -146,10 +143,10 @@ public class mainToolBar
 */
 		/* button to exit from program */
 		b = new JButton();
-		if (frame.ico) {
+		if (yamm.ico) {
 			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/exit.png")));
 		}
-		if (frame.text) {
+		if (yamm.text) {
 			b.setText(YAMM.getString("button.exit"));
 		}
 		b.setFont(new Font("SansSerif", Font.PLAIN, 10));
@@ -186,12 +183,10 @@ public class mainToolBar
 				YAMMWrite yam = new YAMMWrite();
 				yam.sign();
 			} else if (arg.equals(YAMM.getString("button.send_get.tooltip"))) {
-				new SHMail(frame, "mailthread",	(JButton)e.getSource()).start();
+				new SHMail(YAMM.getInstance(), "mailthread", (JButton)e.getSource()).start();
 			} else if (arg.equals(YAMM.getString("button.reply.tooltip"))) {
-				int i = 0;
-
+				YAMM frame = YAMM.getInstance();
 				int selMail = frame.keyIndex[frame.mailList.getSelectedRow()];
-
 				long skip = frame.listOfMails[selMail].skip;
 
 				String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, skip);
@@ -211,10 +206,8 @@ public class mainToolBar
 				);
 				yam.sign();
 			} else if (arg.equals(YAMM.getString("button.forward.tooltip"))) {
-				int i = 0;
-
+				YAMM frame = YAMM.getInstance();
 				int selMail = frame.keyIndex[frame.mailList.getSelectedRow()];
-
 				long skip = frame.listOfMails[selMail].skip;
 
 				String mail[] = Mailbox.getMailForReplyHeaders(
@@ -236,6 +229,7 @@ public class mainToolBar
 					yam.myTextArea
 				);
 				yam.sign();
+/*
 			} else if (arg.equals(YAMM.getString("button.print.tooltip"))) {
 				PrintJob pj = frame.getToolkit().getPrintJob(frame, "print", null);
 
@@ -249,8 +243,9 @@ public class mainToolBar
 					}
 					pj.end();
 				}
+*/
 			} else if(arg.equals(YAMM.getString("button.exit.tooltip"))) {
-				frame.Exit();
+				YAMM.getInstance().exit();
 			}
 		}
 	};
@@ -258,6 +253,9 @@ public class mainToolBar
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.29  2003/04/04 18:03:48  fredde
+ * updated for Singleton stuff
+ *
  * Revision 1.28  2003/04/04 15:39:23  fredde
  * added space before mail.wrote
  *

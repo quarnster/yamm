@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.38 2003/03/15 19:49:15 fredde Exp $
+/*  $Id: mainJTree.java,v 1.39 2003/04/04 18:03:48 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.38 $
+ * @version $Revision: 1.39 $
  */
 public class mainJTree
 	extends JTable
@@ -49,8 +49,6 @@ public class mainJTree
 
 	private JPopupMenu treepop;
 	private DefaultMutableTreeNode top = new DefaultMutableTreeNode(YAMM.getString("box.boxes"));
-	private static YAMM yamm;
-	private static mainToolBar tbar;
 	private boolean sentbox = false;
 	private TreeTableCellRenderer tree;
 
@@ -104,13 +102,11 @@ public class mainJTree
 
 	/**
 	 * Creates the tree and adds all the treestuff to the tree.
-	 * @param yamm2 The JFrame that will be used for error messages etc
-	 * @param top2 The TreeNode that this tree will use.
-	 * @param tbar2 The mainToolBar to disable/enable buttons on.
 	 */
-	public mainJTree(YAMM yamm2, mainToolBar tbar2) {
-		this.yamm = yamm2;
-		this.tbar = tbar2;
+	public mainJTree() {
+	}
+
+	public void init() {
 		sentbox = YAMM.getProperty("sentbox", "true").equals("true");
 
 		setModel(dataModel);
@@ -133,7 +129,7 @@ public class mainJTree
 		tree.setCellRenderer(brend);
 		updateNodes();
 		setDefaultRenderer(TreeTableCellRenderer.class, tree);
-		setDefaultEditor(TreeTableCellRenderer.class, new TreeTableCellEditor());  
+		setDefaultEditor(TreeTableCellRenderer.class, new TreeTableCellEditor());
 
 
 		DefaultTableCellRenderer rend = new DefaultTableCellRenderer();
@@ -340,11 +336,12 @@ public class mainJTree
 
 			if (list.length == 0) return;
 			if (action.equals("move")) {
+				YAMM yamm = YAMM.getInstance();
 				Mailbox.moveMail(yamm.selectedbox, box, list);
 				Mailbox.createList(yamm.selectedbox, yamm);
 				yamm.mailList.update();
 			} else {
-				Mailbox.copyMail(yamm.selectedbox, box, list);
+				Mailbox.copyMail(YAMM.getInstance().selectedbox, box, list);
 			}
 
 			Utilities.delUnNeededFiles();
@@ -403,11 +400,12 @@ public class mainJTree
 	private ActionListener treepoplistener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 			String kommando = ((JMenuItem)ae.getSource()).getText();
+			YAMM yamm = YAMM.getInstance();
 
 			if (kommando.equals(YAMM.getString("tree.new.box"))) {
-				new NewBoxDialog(yamm);
+				new NewBoxDialog(YAMM.getInstance());
 			} else if (kommando.equals(YAMM.getString("tree.new.group"))) {
-				new NewGroupDialog(yamm);
+				new NewGroupDialog(YAMM.getInstance());
 			} else 	if (getSelectedRow() != -1) {
 				File del = new File(tree.getPathForRow(getSelectedRow()).getLastPathComponent().toString());
 
@@ -451,6 +449,8 @@ public class mainJTree
 			if (me.isPopupTrigger()) treepop.show(getParent(), me.getX(), me.getY());
 			else if (getSelectedRow() != -1) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode)(tree.getPathForRow(getSelectedRow()).getLastPathComponent());
+				YAMM yamm = YAMM.getInstance();
+				mainToolBar tbar = yamm.tbar;
 
 				if (!(node.toString()).equals(YAMM.getString("box.boxes"))) {
 					File box = new File(node.toString());
@@ -489,6 +489,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.39  2003/04/04 18:03:48  fredde
+ * updated for Singleton stuff
+ *
  * Revision 1.38  2003/03/15 19:49:15  fredde
  * sorts boxlist. works properly as a treetable now
  *
