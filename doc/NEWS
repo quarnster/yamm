@@ -1,4 +1,4 @@
-since 0.9:
+0.9.1:
 	Adds/fixes/changes:
 		-"?="-subjects are now parsed as they should
 		-boxes with unread mail gets bold
