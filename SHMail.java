@@ -85,7 +85,8 @@ public class SHMail extends Thread {
 
             for(int j = 1; j<=messages;j++) {
               pd.setString("Getting mail " + j + " of " + messages);
-              pd.progress(100 - ( 100 + ( ( 100 - i * 100 ) / messages ) ) );
+
+              pd.progress(100 - ( 100 * ( ( messages - i ) / messages ) ) );
               pop.getMessage(j);
               if(del) pop.deleteMessage(j);
             }
@@ -133,10 +134,12 @@ public class SHMail extends Thread {
               temp = temp.substring(4, temp.length());
               while(temp.endsWith(",")) {
                 smtp.to(temp.substring(0, temp.length()-1));
-                System.out.println(temp);
                 temp = in.readLine().trim();
                 to2 += "\n      " + temp;
               }
+              smtp.to(temp.substring(0, temp.length()-1));
+              to2 += "\n      " + temp;
+              temp = in.readLine();
             }
           }
 

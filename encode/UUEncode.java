@@ -21,6 +21,8 @@ import java.io.*;
 import org.gjt.fredde.util.gui.MsgDialog;
 import java.util.Vector;
 import java.util.StringTokenizer;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * Encodes file in the uuencode format
@@ -46,11 +48,17 @@ public class UUEncode {
       for(int i = 0; i < attach.size();i++) {
         StringTokenizer tok = new StringTokenizer(attach.elementAt(i).toString(), System.getProperty("file.separator"));
 
+        URL url = new URL("file:///" + attach.elementAt(i).toString());
+        URLConnection uc = url.openConnection();
+        uc.connect(); 
+        String ctype = uc.getContentType();
+
         if(!(tok.countTokens() <= 1))
           for(;1 < tok.countTokens();tok.nextToken()) {}
         filename = tok.nextToken();
+
         
-        out.writeBytes("\nContent-Type: application/octet-stream; name=\"" + filename + "\"\nContent-Transfer-Encoding: x-uuencode\nContent-Disposition: attachment; filename=\"" + filename + "\"\n\n");
+        out.writeBytes("\nContent-Type: " + ctype + "; name=\"" + filename + "\"\nContent-Transfer-Encoding: x-uuencode\nContent-Disposition: attachment; filename=\"" + filename + "\"\n\n");
         encodeFile(attach.elementAt(i).toString());
         out.writeBytes("\n--AttachThis");
       }

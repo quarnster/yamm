@@ -1,25 +1,26 @@
 0.7.2:
     Added:
-      -Installer
-      -Splitted YAMM.java
       -some javadoc things to sourcecode
-      -YAMMWrite's title is now set to what's typed in the subject field
       -sourceViewer
       -Print button
       -You can now save your messages
       -Filters
-      -merged the inboxes into one
       -made email addresses clickable
+      -more mime support. (no more =<2 digit hexcode>!)
 
     Fixed/changed:
+      -merged the inboxes into one
+      -Splitted YAMM.java
+      -YAMMWrite's title is now set to what's typed in the subject field
       -Huge code cleanup
       -Made the mailhandling as it was supposed to be from the beginning
-      -Trash bug
-      -some home stuff bugs
-      -Speed of base64 decoding (forgot to buffer the in- and outputstreams...)
+      -Trash bug fixed
+      -some home stuff bugs fixed
+      -Speed of base64 decoding fixed (forgot to buffer the in- and outputstreams...)
       -package changing to suit the gjt
       -rewrite of Pop3.java
       -rewrite of Smtp.java
+      -the content-type for a file is now what it should be instead of application/octet-stream
 
 0.7.1:
     Added:

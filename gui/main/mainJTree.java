@@ -251,10 +251,11 @@ public class mainJTree extends JTree {
 
   MouseListener mouseListener2 = new MouseAdapter() {
     public void mouseReleased(MouseEvent me) {
-
-      if(me.isPopupTrigger()) {
-        treepop.show(getParent(), me.getX(), me.getY());
-      }
+      if(me.isPopupTrigger()) treepop.show(getParent(), me.getX(), me.getY());
     }
+    public void mousePressed(MouseEvent me) {
+      if(me.isPopupTrigger()) treepop.show(getParent(), me.getX(), me.getY());
+    }
+
   };
 }

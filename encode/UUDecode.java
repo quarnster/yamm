@@ -52,7 +52,7 @@ public class UUDecode extends Thread{
    */
   public void run() {
     try {
-      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream("temp.encode")));
+      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(System.getProperty("user.home") + "/.yamm/tmp/encode")));
       DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(filename)));
       in.readLine();
 

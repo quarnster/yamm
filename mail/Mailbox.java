@@ -284,6 +284,7 @@ public class Mailbox {
       BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(whichBox)));
       PrintWriter outFile = new PrintWriter(new BufferedOutputStream(new FileOutputStream(yammhome + "/tmp/" + mailName + ".html")));
       int i = 0;
+      outFile.println("<html>\n<body>");
 
       for(;;) {
         temp = in.readLine();
@@ -380,7 +381,8 @@ public class Mailbox {
               if(temp == null) break;
 
 
-              else if(temp.startsWith("<!doctype") || temp.indexOf("</html>") != -1) temp = in.readLine();
+              else if(temp.startsWith("<!doctype")) temp = in.readLine();
+              else if(temp.toLowerCase().indexOf("</html>") != -1) { html = false; temp = in.readLine(); }
 
               else if(temp.toLowerCase().indexOf("<html>") != -1) { html = true; temp = in.readLine(); }
               
@@ -398,7 +400,8 @@ public class Mailbox {
                 }
               }
 
-              if(!html && temp.indexOf("<") != -1 || temp.indexOf(">") != -1 || temp.indexOf("=") != -1) temp = removeTags(temp);
+              if(!html && (temp.indexOf("<") != -1 || temp.indexOf(">") != -1 || temp.indexOf("=") != -1)) temp = removeTags(temp);
+
               if(temp.indexOf("://") != -1 && temp.indexOf("href=") == -1 && temp.indexOf("HREF=") == -1) {
                 int    protBegin = temp.indexOf("://");
                 int    space     = temp.indexOf(" ", protBegin + 3);
@@ -495,6 +498,7 @@ public class Mailbox {
           }
         }
       }
+      outFile.println("</pre></body></html>");
       in.close();
       outFile.close();
     }
@@ -523,13 +527,25 @@ public class Mailbox {
     }
     if(html.indexOf("=") != -1) {
       index = 0;
-      for(;html.indexOf("=", index) != -1 && html.indexOf("=", index) + 2 <= html.length();) {
+      char[] check = "0123456789ABCDEF".toCharArray();
+      for(;html.indexOf("=", index) != -1 && html.indexOf("=", index) + 2 < html.length();) {
         index = html.indexOf("=", index) + 1;
+        char[] hex = html.substring(index, index+2).toCharArray();
+        boolean char1 = false, char2 = false;
 
-        int htmlchar = Integer.parseInt(html.substring(index, index+2), 16);
-        String begin = html.substring(0, index -1);
-        String end = html.substring(index + 2, html.length());
-        html = begin + "&#" + htmlchar + ";" + end;
+        for(int i = 0; i < 16;i++) {
+          if(hex[0] == check[i]) { char1 = true; break; }
+        }
+        for(int i = 0; i < 16;i++) {
+          if(hex[1] == check[i]) { char2 = true; break; }
+        }
+
+        if(char1 && char2) {
+          int htmlchar = Integer.parseInt(new String(hex), 16);
+          String begin = html.substring(0, index -1);
+          String end = html.substring(index + 2, html.length());
+          html = begin + "&#" + htmlchar + ";" + end;
+        }
       }
     }
 
@@ -615,13 +631,25 @@ public class Mailbox {
 
             if(temp.indexOf("=") != -1) {
               int index = 0;
-              for(;temp.indexOf("=", index) != -1 && temp.indexOf("=", index) + 2 <= temp.length();) {
+              char[] check = "0123456789ABCDEF".toCharArray();
+              for(;temp.indexOf("=", index) != -1 && temp.indexOf("=", index) + 2 < temp.length();) {
                 index = temp.indexOf("=", index) + 1;
-                int htmlchar = Integer.parseInt(temp.substring(index, index +2), 16);
-                System.out.println("htmlchar: " + htmlchar);
-                String begin = temp.substring(0, index -1);
-                String end = temp.substring(index + 2, temp.length());
-                temp = begin + (char)htmlchar + end;
+                char[] hex = temp.substring(index, index+2).toCharArray();
+                boolean char1 = false, char2 = false;
+
+                for(int j = 0; j < 16;j++) {
+                  if(hex[0] == check[j]) { char1 = true; break; }
+                }
+                for(int j = 0; j < 16;j++) {
+                  if(hex[1] == check[j]) { char2 = true; break; }
+                }
+
+                if(char1 && char2) {
+                  int htmlchar = Integer.parseInt(new String(hex), 16);
+                  String begin = temp.substring(0, index -1);
+                  String end = temp.substring(index + 2, temp.length());
+                  temp = begin + (int)htmlchar + end;
+                }
               }
             }
             if(temp == null) break;

@@ -56,7 +56,7 @@ public class YAMM extends JFrame implements HyperlinkListener
   public static    String                 compDate     = "19990409";
 
   /** the file that contains the current mail */
-  public String		  mailPageString   = "file:/" + System.getProperty("user.home") + "/.yamm/tmp/";
+  public String		  mailPageString   = "file:///" + System.getProperty("user.home") + "/.yamm/tmp/";
   public URL	          mailPage; //     = new URL("file:/" + System.getProperty("user.home") + "/.yamm/tmp/mail.html");
   public boolean	  mailName = false;
 
@@ -187,7 +187,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     setBounds(mainx, mainy, mainw, mainh);
     getContentPane().setLayout(new BorderLayout());
 
-
+/*
     // if you want to redirekt the err stream to a file.
     // good for debugging
     try {
@@ -198,7 +198,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     catch (IOException ioe) {
       System.out.println(ioe);
     }
-
+*/
 
     // get the resources to use
     try {
@@ -760,14 +760,14 @@ public class YAMM extends JFrame implements HyperlinkListener
 
   MouseListener mouseListener = new MouseAdapter() {
     public void mouseReleased(MouseEvent me) {
-      if(me.isPopupTrigger()) {
-        myPopup.show(mailList, me.getX(), me.getY());
-      }
+      if(me.isPopupTrigger()) myPopup.show(mailList, me.getX(), me.getY());
       else get_mail();
       if(mailList.getSelectedRow() != -1 && !(mailList.getSelectedRow() >= listOfMails.size())) { ((JButton)tbar.reply).setEnabled(true); ((JButton)tbar.print).setEnabled(true); ((JButton)tbar.forward).setEnabled(true);}
       else { ((JButton)tbar.reply).setEnabled(false); ((JButton)tbar.forward).setEnabled(false); ((JButton)tbar.print).setEnabled(false); }
     }
-
+    public void mousePressed(MouseEvent me) {
+      if(me.isPopupTrigger()) myPopup.show(mailList, me.getX(), me.getY());
+    }
     
     void get_mail() {
       int i = 0;

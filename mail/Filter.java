@@ -82,7 +82,7 @@ public class Filter {
             if(temp2.toLowerCase().indexOf(con3.toLowerCase()) != -1) {
               System.out.println("mail " + i + "'s " + con1 + " contains " + con3 + ". Will move to " + exec);
               list.remove(i);
-              Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" + exec, i);
+              Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" + exec, i - 1);
               i--;
             }
           }

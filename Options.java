@@ -67,6 +67,7 @@ public class Options extends JDialog {
       mre.printStackTrace();
       System.exit(1);
     }
+    setTitle(res.getString("SETTINGS"));
 
     JTPane = new JTabbedPane(JTabbedPane.LEFT);
 
