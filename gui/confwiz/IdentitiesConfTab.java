@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * The configurationtab for the profiles
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: IdentitiesConfTab.java,v 1.4 2000/04/11 13:27:39 fredde Exp $
+ * @version $Id: IdentitiesConfTab.java,v 1.5 2000/04/15 13:06:13 fredde Exp $
  */
 public class IdentitiesConfTab extends JPanel {
 
@@ -45,6 +45,11 @@ public class IdentitiesConfTab extends JPanel {
 	 * The list of profiles
 	 */
 	private JList profileList = null;
+
+	/**
+	 * The Combobox with the profiles
+	 */
+	private final JComboBox def;
 
 	/**
 	 * The parent JDialog
@@ -115,8 +120,10 @@ public class IdentitiesConfTab extends JPanel {
 
 		Box hori = Box.createHorizontalBox();
 
-		final JComboBox def = new JComboBox(cmodel);
-		def.setSelectedIndex(YAMM.profiler.getDefault());
+		/* final JComboBox */def = new JComboBox(cmodel);
+		if (vect2.size() != 0) {
+			def.setSelectedIndex(YAMM.profiler.getDefault());
+		}
 		def.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				YAMM.profiler.props.setProperty("profile.default", "" + def.getSelectedIndex());
@@ -155,6 +162,7 @@ public class IdentitiesConfTab extends JPanel {
 					}
 
 					profileList.updateUI();
+					def.updateUI();
 				}
 			} else if (text.equals(YAMM.getString("edit")) && idx != -1) {
 				String file = ((Vector) vect2.elementAt(idx)).elementAt(1).toString();
@@ -174,6 +182,7 @@ public class IdentitiesConfTab extends JPanel {
 					}
 
 					profileList.updateUI();
+					def.updateUI();
 				}
 			} else if (idx != -1) {
 				profileList.setSelectedIndex(-1);
@@ -181,6 +190,7 @@ public class IdentitiesConfTab extends JPanel {
 				YAMM.profiler.remove(file);
 				vect2.remove(idx);
 				profileList.updateUI();
+				def.updateUI();
 			}
 		}
 	};
@@ -188,6 +198,9 @@ public class IdentitiesConfTab extends JPanel {
 /*
  * ChangeLog:
  * $Log: IdentitiesConfTab.java,v $
+ * Revision 1.5  2000/04/15 13:06:13  fredde
+ * now works when there are no profiles
+ *
  * Revision 1.4  2000/04/11 13:27:39  fredde
  * confwiz.ident.default -> YAMM.getString("...
  *
