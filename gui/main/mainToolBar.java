@@ -130,7 +130,7 @@ public class mainToolBar extends JToolBar {
       }
  
       else if(arg.equals(res.getString("button.send_get"))) {
-        new SHMail(frame, "mailthread", (JButton)e.getSource()).start();
+        new SHMail(frame, "mailthread", (JButton)e.getSource(), res).start();
       }
 
       else if(arg.equals(res.getString("button.reply"))) {
