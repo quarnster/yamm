@@ -131,42 +131,98 @@ public class mainTable extends JTable {
 
 
   public void createPopup(JPopupMenu jpmenu) {
-    Vector list = new Vector();          
+    Vector list = new Vector(), list2 = new Vector();          
+    String boxHome = System.getProperty("user.home") + "/.yamm/boxes";
     
-    fileList(list, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
-//    StringTokenizer tok;
+    fileList(list, new File(System.getProperty("user.home") + 
+                                                  "/.yamm/boxes/"));
+    fileList(list2, new File(System.getProperty("user.home") + 
+                                                  "/.yamm/boxes/"));
     
-    JMenu copy = new JMenu(res.getString("edit.copy")), move = new JMenu(res.getString("edit.move"));
-    JMenuItem row, delete = new JMenuItem(res.getString("button.delete")), reply = new JMenuItem(res.getString("button.reply")); 
+    JMenuItem row, delete = new JMenuItem(res.getString("button.delete")),
+              reply = new JMenuItem(res.getString("button.reply")); 
     delete.addActionListener(OtherMListener);
     reply.addActionListener(OtherMListener);
 
-    for(int i = 0;i<list.size();i++) {
-      String temp = list.get(i).toString();
-
-//      tok = new StringTokenizer(temp, System.getProperty("file.separator"));
-      String sep = System.getProperty("file.separator");
-      String name = temp.substring((System.getProperty("user.home") + sep + ".yamm" + sep + "boxes" + sep).length(), temp.length());
-//      while(tok.hasMoreTokens()) name = tok.nextToken();
-      if(name.startsWith(".")) continue;
-
-      row = new JMenuItem(name);
-      row.addActionListener(KMListener);
-      copy.add(row);
-
-      row = new JMenuItem(name);
-      row.addActionListener(FMListener);
-      move.add(row);
-    }
-
     jpmenu.add(reply);
     jpmenu.addSeparator();
-    jpmenu.add(copy);
-    jpmenu.add(move);
+    createPopCommand(jpmenu, res.getString("edit.copy"), list, boxHome, KMListener);
+    createPopCommand(jpmenu, res.getString("edit.move"), list2, boxHome, FMListener);
     jpmenu.add(delete);
   }
 
-   private void fileList(Vector vect, File f) {
+    
+  private void createPopCommand(JMenu menu, Vector flist, String base, ActionListener list) {
+    String dname = base.substring(base.lastIndexOf(File.separator) + 1, base.length());
+    if(dname.endsWith(".g")) dname = dname.substring(0, dname.length()-2);
+    JMenu m = new JMenu(dname);
+
+    for(int j=0;j < flist.size();j++) {
+      String fpath = flist.elementAt(j).toString();
+
+      if(fpath.indexOf(base) != -1) {
+        String fname = fpath.substring(base.length() +1, fpath.length());
+
+        if(fname.indexOf(File.separator) != -1) {
+          menu.add(m); 
+          String path = flist.elementAt(j).toString();
+          path = path.substring(0, path.lastIndexOf(File.separator)); 
+          createPopCommand(m, flist, path, list); 
+          j--;
+        }
+        else {
+          extMItem mitem = new extMItem(fname);
+          mitem.setFullName(fpath);
+          mitem.addActionListener(list);
+          flist.remove(j);
+          j--;
+          m.add(mitem);
+        }
+      }
+      else { 
+        menu.add(m);
+        j--;
+        break;
+      }
+    }
+    menu.add(m);
+  }
+
+  private void createPopCommand(JPopupMenu menu, String menuName, Vector flist, String base, ActionListener list) {
+    JMenu m = new JMenu(menuName);                                                                            
+                                  
+    for(int j=0;j < flist.size();j++) {
+      String fpath = flist.elementAt(j).toString();
+                                              
+      if(fpath.indexOf(base) != -1) {         
+        String fname = fpath.substring(base.length() +1, fpath.length());
+
+        if(fname.indexOf(File.separator) != -1) {
+          menu.add(m);
+          String path = flist.elementAt(j).toString();
+          path = path.substring(0, path.lastIndexOf(File.separator));
+          createPopCommand(m, flist, path, list);
+          j--;
+        }     
+        else {
+          extMItem mitem = new extMItem(fname);
+          mitem.setFullName(fpath);
+          mitem.addActionListener(list);
+          flist.remove(j);
+          j--;
+          m.add(mitem);
+        }
+      }  
+      else {
+        menu.add(m);
+        j--;
+        break;
+      }       
+    }  
+    menu.add(m);
+  }
+
+  private void fileList(Vector vect, File f) {
     if((f.toString()).equals(System.getProperty("user.home") + "/.yamm/boxes")) {
       String list[] = f.list();                                                  
       for(int i = 0; i < list.length; i++)
@@ -179,10 +235,9 @@ public class mainTable extends JTable {
         fileList(vect, new File(f, list[i]));
     }
     else {
-      String file = f.toString();
-//      file = file.subString(file.listIndexOf(System.getProperty("file.separator")), file.length());
-
-      vect.add(file);
+      String test = f.toString();
+      test = test.substring(test.lastIndexOf(File.separator) + 1, test.length());
+      if(!test.startsWith(".")) vect.add(f.toString()); 
     }
   }
  
@@ -282,11 +337,12 @@ public class mainTable extends JTable {
  
 
       frame.attach = new Vector();
-      if(frame.mailName) frame.mailName = false;
-      else frame.mailName = true;
  
-      Mailbox.getMail(frame.selectedbox,whatMail, frame.attach, frame.mailName);
-      try { frame.mailPage = new URL(frame.mailPageString + frame.mailName + ".html"); }
+      Mailbox.getMail(frame.selectedbox,whatMail /* , frame.attach, frame.mailName */);
+      try {
+        String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes/") + 6, frame.selectedbox.length()) + "/"; 
+        frame.mailPage = new URL(frame.mailPageString + boxName + whatMail + ".html"); 
+      }
       catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
  
       try { frame.mail.setPage(frame.mailPage); }
@@ -308,7 +364,7 @@ public class mainTable extends JTable {
       }    
 
       if(kommando.equals(res.getString("button.delete"))) {
-
+        frame.delUnNeededFiles();
         int[] mlist = frame.mailList.getSelectedRows();
         int[] deleteList = new int[mlist.length];
 
@@ -327,12 +383,13 @@ public class mainTable extends JTable {
         frame.mailList.updateUI();
         frame.attach = new Vector();
 
-        if(frame.mailName) frame.mailName = false;
-        else frame.mailName = true;
 
-        Mailbox.getMail(frame.selectedbox, frame.mailList.getSelectedRow(), frame.attach, frame.mailName);
+        Mailbox.getMail(frame.selectedbox, frame.mailList.getSelectedRow() /*, frame.attach, frame.mailName */);
 
-        try { frame.mailPage = new URL(frame.mailPageString + frame.mailName + ".html"); }
+        try { 
+          String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes/") + 6, frame.selectedbox.length()) + "/"; 
+          frame.mailPage = new URL(frame.mailPageString + boxName + frame.mailList.getSelectedRow()  + ".html"); 
+        }
         catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
 
         try { frame.mail.setPage(frame.mailPage); }
@@ -354,7 +411,7 @@ public class mainTable extends JTable {
 
   protected ActionListener KMListener = new ActionListener() {
     public void actionPerformed(ActionEvent ae) {
-      String kommando = ((JMenuItem)ae.getSource()).getText();
+      String name = ((extMItem)ae.getSource()).getFullName();
                                                               
       int i = 0;                                              
                 
@@ -369,17 +426,16 @@ public class mainTable extends JTable {
       for(int j = 0;j < mlist.length;j++) {  
         copyList[j] = Integer.parseInt(frame.mailList.getValueAt(mlist[j], i).toString());
       }                                                                             
-      String ybox = System.getProperty("user.home") + "/.yamm/boxes/";
        
       for (int a=0; a<copyList.length; a++ ) {
-        Mailbox.copyMail(frame.selectedbox, ybox + kommando, copyList[a]);
+        Mailbox.copyMail(frame.selectedbox, name, copyList[a]);
       }                                                      
     }
   };
 
   protected ActionListener FMListener = new ActionListener() {
     public void actionPerformed(ActionEvent ae) {
-      String kommando = ((JMenuItem)ae.getSource()).getText();
+      String name = ((extMItem)ae.getSource()).getFullName();
 
       int i = 0;
 
@@ -396,10 +452,9 @@ public class mainTable extends JTable {
         moveList[j] = Integer.parseInt(frame.mailList.getValueAt(mlist[j], i).toString());
       }
 
-      String ybox = System.getProperty("user.home") + "/.yamm/boxes/";
 
       for (int a=moveList.length -1; a>=0; a-- ) {
-        Mailbox.moveMail(frame.selectedbox, ybox + kommando, moveList[a]);
+        Mailbox.moveMail(frame.selectedbox, name, moveList[a]);
       }
 
       Mailbox.createList(frame.selectedbox, frame.listOfMails);
@@ -407,12 +462,15 @@ public class mainTable extends JTable {
       frame.mailList.updateUI();
       frame.attach = new Vector();
 
-      if(frame.mailName) frame.mailName = false;
-      else frame.mailName = true;
+//      if(frame.mailName) frame.mailName = false;
+//      else frame.mailName = true;
 
-      Mailbox.getMail(frame.selectedbox, frame.mailList.getSelectedRow(), frame.attach, frame.mailName);
+      Mailbox.getMail(frame.selectedbox, frame.mailList.getSelectedRow());
 
-      try { frame.mailPage = new URL(frame.mailPageString + frame.mailName + ".html"); }
+      try { 
+        String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes/") + 6, frame.selectedbox.length()) + "/"; 
+        frame.mailPage = new URL(frame.mailPageString + boxName + frame.mailList.getSelectedRow() + "html"); 
+      }
       catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
 
       try { frame.mail.setPage(frame.mailPage); }
