@@ -1,5 +1,5 @@
-/*  Mailbox.java - box handling system
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+/*  $Id: Mailbox.java,v 1.41 2003/03/06 23:51:11 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.40 2003/03/06 20:14:32 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.41 2003/03/06 23:51:11 fredde Exp $
  */
 public class Mailbox {
 
@@ -842,29 +842,35 @@ public class Mailbox {
 	 * @param whichmail Which mail to export
 	 * @param jtarea The JTextArea to append the message to
 	 */
-	public static void getMailForReply(String whichBox, int whichmail,
-							long skip,
-							JTextArea jtarea) {
-
+	public static void getMailForReply(String whichBox, int whichmail, long skip, JTextArea jtarea) {
 		BufferedReader in = null;
+
+		String boxpath = whichBox.substring(whichBox.indexOf("boxes") +	6, whichBox.length());
+		String file = YAMM.home + "/tmp/cache/" + boxpath + "/" + whichmail + ".message.";
+
+		if (new File(file + "txt").exists()) 
+			file += "txt";
+		else if (new File(file + "html").exists())
+			file += "html";
+		else
+			return;
+
 		try {
 			in = new BufferedReader(
-					new InputStreamReader(
-					new FileInputStream(whichBox)));
+				new InputStreamReader(new FileInputStream(file))
+			);
 
-			in.skip(skip);
+			String temp = null;
+			while ((temp = in.readLine()) != null) {
+				jtarea.append(">" + temp + "\n");
+			}
 
-
-			ReplyMessageParser rmp = new ReplyMessageParser(in,
-									jtarea);
 		} catch (IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-					ioe,
-					YAMM.exceptionNames);
-		} catch (MessageParseException mpe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-					mpe,
-					YAMM.exceptionNames);
+			new ExceptionDialog(
+				YAMM.getString("msg.error"),
+				ioe,
+				YAMM.exceptionNames
+			);
 		} finally {
 			try {
 				if (in != null) in.close();
@@ -1432,6 +1438,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.41  2003/03/06 23:51:11  fredde
+ * fixed getMailForReply
+ *
  * Revision 1.40  2003/03/06 20:14:32  fredde
  * rewrote mailparsing system
  *
