@@ -52,7 +52,7 @@ public class Base64Decode extends Thread {
 			os.close();
 
 			if (end.equals(".gif") || end.equals(".jpg")) {
-				new imageViewer(filename);
+				new imageViewer(target);
 			}
 		} catch (IOException e) {
 			System.err.println(e);
