@@ -461,7 +461,8 @@ public class Mailbox {
                   temp = begin + "<a href=\"mailto:" + temp2 + "\">" + temp2 + "</a>" + end;
                 }
 
-                else if(temp.startsWith("--" + boundary)) { // && !temp.endsWith("--")) {
+                else if(temp.startsWith("--" + boundary) && temp.endsWith("--")) break;
+                else if(temp.startsWith("--" + boundary) && !temp.endsWith("--")) {
                   attaches++;
 
                   try {
@@ -479,7 +480,7 @@ public class Mailbox {
                       temp =  in.readLine();
 
                       if(temp == null) break;
-                      if(temp.equals(".")) break;
+                      if(temp.equals(".")) return;
                       if(temp.equals("")) break;
 
                       out.println(temp);
@@ -1108,12 +1109,6 @@ public class Mailbox {
           }
         }
       }
-      for(;;) {
-        temp = in.readLine();
-        if(temp == null) break;
-        else outFile2.println(temp);
-      }
-
       in.close();
       outFile2.close();
     }
