@@ -88,4 +88,51 @@ public class MessageHeaderParser {
 		return skipnum;
 	}
 
+	public long parse(RandomAccessFile in)
+		throws IOException,	MessageParseException
+	{
+		String field = null;
+		String value = null;
+		boolean headersStarted = false;
+		headers = new Hashtable();
+		long skipnum = 0;
+
+		for (;;) {
+			String temp = in.readLine();
+
+			if (temp == null) {
+				throw new MessageParseException("Unexpected " +
+							"end of message.");
+			}
+			skipnum += temp.length() + System.getProperty
+					("line.separator").length();
+
+			if (temp.startsWith(" ") || temp.startsWith("\t")) {
+				value += " " + temp.trim();
+			} else if (temp.indexOf(":") != -1) {
+				if (!headersStarted) {
+					headersStarted = true;
+				}
+				if (field != null && value != null) {
+					headers.put(field, value);
+				}
+				field = temp.substring(0, temp.indexOf(":"));
+				field = field.toLowerCase();
+				value = temp.substring(temp.indexOf(":") + 1,
+							temp.length()).trim();
+			} else {
+				if (!headersStarted) {
+					continue;
+				} else {
+					if (field != null && value != null) {
+						headers.put(field, value);
+					}
+					break;
+				}
+			}
+		}
+
+		return skipnum;
+	}
+
 }
