@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.45 2003/03/08 16:57:03 fredde Exp $
+/*  $Id: Mailbox.java,v 1.46 2003/03/09 17:44:33 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.45 $
+ * @version $Revision: 1.46 $
  */
 public class Mailbox {
 
@@ -103,7 +103,7 @@ public class Mailbox {
 		}
 	}
 
-	private static String removeQuote(String quote) {
+	protected static String removeQuote(String quote) {
 		quote = quote.replace('\\', '|');
 
 		while (quote.indexOf("|") != -1) {
@@ -123,190 +123,21 @@ public class Mailbox {
 		return quote;
 	}
 
-	/**
-	 * Updates the index for the mails in the current box
-	 * @param whichBox The box to update the index for
-	 */
-	public static void updateIndex(String whichBox) {
-		long skipnum = 0;
-		long skipped = 0;
-
-		String subject = null;
-		String from = null;
-		String date = null;
-		String status = null;
-		String temp = null;
-		int sep = whichBox.lastIndexOf(File.separator);
-
-		String target = whichBox.substring(0, sep + 1) + "." + whichBox.substring(sep + 1, whichBox.length()) + ".index";
-
-		BufferedReader in = null;
-		PrintWriter out = null;
-
-		try {
-			in = new BufferedReader(new InputStreamReader(new FileInputStream(whichBox)));
-			out   = new PrintWriter(new BufferedOutputStream(new FileOutputStream(target)));
-
-			int i = 0;
-			int unread = 0;
-
-			if (hasMail(whichBox)) {
-				MessageHeaderParser mhp = new MessageHeaderParser();
-				DateParser dp = new DateParser();
-				dp.setTargetFormat(YAMM.getString("shortdate"));
-
-				try {
-					skipnum = mhp.parse(in);
-				} catch (MessageParseException mpe) {
-					new ExceptionDialog(YAMM.getString("msg.error"), mpe, YAMM.exceptionNames);
-				}
-
-				subject = mhp.getHeaderField("Subject");
-				from    = mhp.getHeaderField("From");
-				date    = mhp.getHeaderField("Date");
-				status  = mhp.getHeaderField("YAMM-Status");
-
-				if (status == null) {
-					status = "Unread";
-					unread++;
-				}
-				if (from == null) from = "";
-				if (subject == null) subject = "";
-
-				subject = removeQuote(unMime(subject));
-				from = removeQuote(unMime(from));
-
-				for (;;) {
-					temp = in.readLine();
-					if (temp == null) break;
-
-					skipnum += temp.length() + System.getProperty("line.separator").length();
-
-					if (temp.equals(".")) {
-						out.print(i + " ");
-
-						if (subject != null) {
-							out.print("\"" + subject + "\" ");
-						} else {
-							out.print("\"\" ");
-						}
-
-						if (from != null) {
-							out.print("\"" + from + "\" ");
-						} else {
-							out.print("\"\" ");
-						}
-
-						if (date != null) {
-							try {
-								date = dp.parse(date);
-							} catch (ParseException pe) {
-								date = mhp.
-								getHeaderField("Date");
-							}
-							out.print("\"" +date + "\" ");
-						} else {
-							out.print("\"\" ");
-						}
-
-						out.print("\"" + status + "\" ");
-
-						out.println(skipped);
-						out.flush();
-						i++;
-
-						skipped = skipnum;
-
-						try {
-							skipnum += mhp.parse(in);
-						} catch (MessageParseException mpe) {
-							break;
-						}
-						subject = mhp.getHeaderField("Subject");
-						from    = mhp.getHeaderField("From");
-						date    = mhp.getHeaderField("Date");
-						status  = mhp.getHeaderField("YAMM-Status");
-
-						if (status == null) {
-							status = "Unread";
-							unread++;
-						}
-						if (from == null)
-							from = "";
-						if (subject == null)
-							subject = "";
-
-						subject = removeQuote(unMime(subject));
-						from = removeQuote(unMime(from));
-					}
-				}
-				in.close();
-				out.close();
-
-				in = new BufferedReader(new InputStreamReader(
-							new FileInputStream(target)));
-
-				out = new PrintWriter(new BufferedOutputStream(
-							new FileOutputStream(target + ".tmp")));
-
-				out.println(i + ", " + unread);
-
-				for (;;) {
-					String tmp = in.readLine();
-
-					if (tmp == null) break;
-					else out.println(tmp);
-				}
-
-				in.close();
-				out.close();
-
-				File tmp = new File(target + ".tmp");
-				File old = new File(target);
-				old.delete();
-				tmp.renameTo(old);
-			} else {
-				out.println("0, 0");
-			}
-		} catch(IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
-		} finally {
-			try {
-				if (in != null) in.close();
-				if (out != null) out.close();
-			} catch (IOException ioe) {}
-		}
-	}
-
 	public static int[] getUnread(String box) {
-		int sep = box.lastIndexOf(File.separator);
-		String box2 = box.substring(0, sep + 1) + "." + box.substring(sep + 1, box.length()) + ".index";
-		File indexfile = new File(box2);
-
-		if (!indexfile.exists()) {
-			updateIndex(box);
-		}
-
-		BufferedReader in = null;
-
-		String tmp = null;
-		int unread[] = new int[2];
-
+		Index idx = null;
+		int[] unread = new int[2];
 		try {
-			in = new BufferedReader(new InputStreamReader(new FileInputStream(box2)));
-			tmp = in.readLine();
+			idx = new Index(box);
+			idx.open();
+
+			unread[0] = idx.messageNum;
+			unread[1] = idx.unreadNum;
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
 		} finally {
 			try {
-				if (in != null) in.close();
+				if (idx != null) idx.close();
 			} catch (IOException ioe) {}
-		}
-
-		if (tmp != null) {
-//			tmp = tmp.substring(tmp.indexOf(",") + 2, tmp.length()).trim();
-			unread[0] = Integer.parseInt(tmp.substring(0, tmp.indexOf(",")));
-			unread[1] = Integer.parseInt(tmp.substring(tmp.indexOf(",") + 2, tmp.length()));
 		}
 
 		return unread;
@@ -329,80 +160,25 @@ public class Mailbox {
 	 *
 	 * @param whichBox Which box to get messages from.
 	 */
-
-	public static String[][] createList(String whichBox) {
-		String subject = null;
-		String from = null;
-		String date = null;
-		String status = null;
-
-		int sep = whichBox.lastIndexOf(File.separator);
-
-		String box = whichBox.substring(0, sep + 1) + "." + whichBox.substring(sep + 1, whichBox.length()) + ".index";
-
-		String[][] listOfMails;
-
-		if (!hasMail(whichBox)) {
-			listOfMails = new String[0][6];
-			return listOfMails;
-		}
-		File indexfile = new File(box);
-
-		Date boxdate = new Date(new File(whichBox).lastModified());
-		Date indexdate = new Date(indexfile.lastModified());
-
-		if (!indexfile.exists() || boxdate.after(indexdate)) {
-			updateIndex(whichBox);
-		}
-
-		listOfMails = new String[getUnread(whichBox)[0]][6];
-
-		BufferedReader in = null;
-
+	public static IndexEntry[] createList(String whichBox) {
+		Index i = null;
+		IndexEntry[] entries = null;
 		try {
-			in = new BufferedReader(new InputStreamReader(new FileInputStream(box)));
-
-			in.readLine(); // skip messages, unread messages header
-			StreamTokenizer tok = new StreamTokenizer(in);
-
-			for (int i = 0;; i++) {
-				if (tok.nextToken() == StreamTokenizer.TT_EOF) {
-					break;
-				}
-
-				// message number
-				int num = (int) tok.nval;
-
-				listOfMails[i][0] = Integer.toString(num);
-
-				// subject
-				tok.nextToken();
-				listOfMails[i][1] = tok.sval;
-
-				// from
-				tok.nextToken();
-				listOfMails[i][2] = tok.sval;
-
-				// date
-				tok.nextToken();
-				listOfMails[i][3] = tok.sval;
-
-				// read
-				tok.nextToken();
-				listOfMails[i][4] = tok.sval;
-
-				// skip
-				tok.nextToken();
-				listOfMails[i][5] = "" + (long) tok.nval;
-			}
+			i = new Index(whichBox);
+			i.open();
+			entries = i.getEntries();
 		} catch(IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
+			new ExceptionDialog(
+				YAMM.getString("msg.error"),
+				ioe,
+				YAMM.exceptionNames
+			);
 		} finally {
 			try {
-				if (in != null) in.close();
-			} catch (IOException ioe) {}
+				if (i != null) i.close();
+			} catch (IOException e) {}
 		}
-		return listOfMails;
+		return entries;
 	}
 
 	/**
@@ -498,108 +274,6 @@ public class Mailbox {
 		}
 	}
 
-	private static void setIndexStatus(YAMM yamm, String whichBox, int whichmail, String status, int addLength) {
-		int sep = whichBox.lastIndexOf(File.separator);
-		String box = whichBox.substring(0, sep + 1) +
-				"." +
-				whichBox.substring(sep + 1, whichBox.length()) +
-				".index";
-
-		boolean add = false;
-
-		File source = new File(box);
-		File target = new File(box + ".tmp");
-
-		BufferedReader in = null;
-		PrintWriter out = null;
-		int i;
-
-		int[] unread = getUnread(whichBox);
-		unread[1]--;
-
-		try {
-			in = new BufferedReader(new InputStreamReader(
-						new FileInputStream(source)));
-			out   = new PrintWriter(new BufferedOutputStream(
-						new FileOutputStream(target)));
-
-			in.readLine(); // skip unread, total msg header
-			out.println(unread[0] + ", " + unread[1]);
-			StreamTokenizer tok = new StreamTokenizer(in);
-
-			// skip to the mail we are changing status for
-			for (i = 0; i < whichmail; i++) {
-				out.println(in.readLine());
-			}
-
-			tok.nextToken();
-			out.print((int) tok.nval + " ");
-
-			tok.nextToken();
-			out.print("\"" + removeQuote(tok.sval) + "\" ");
-
-			tok.nextToken();
-			out.print("\"" + removeQuote(tok.sval) + "\" ");
-
-			tok.nextToken();
-			out.print("\"" + tok.sval + "\" ");
-
-			tok.nextToken();
-			out.print("\"" + status + "\" ");
-			if (tok.sval.equals("Unread") || addLength != 0) {
-				add = true;
-			}
-			yamm.listOfMails[i][4] = status;
-
-			tok.nextToken();
-			out.println((long) tok.nval + "");
-
-
-			String tmp = null;
-
-			if (!add) {
-				while ((tmp = in.readLine()) != null) {
-					out.println(tmp);
-				}
-			} else {
-				while ((tmp = in.readLine()) != null) {
-					i++;
-					if (tmp.equals("")) continue;
-
-					long skip = Long.parseLong(
-						tmp.substring(
-						tmp.lastIndexOf(" ") + 1,
-						tmp.length())) + addLength;
-
-
-					yamm.listOfMails[i][5] = "" + skip;
-
-					tmp = tmp.substring(0,
-						tmp.lastIndexOf(" ") + 1);
-
-					out.print(tmp);
-					out.println(skip + "");
-				}
-			}
-
-			in.close();
-			out.close();
-
-			source.delete();
-			target.renameTo(source);
-		} catch (IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-					ioe,
-					YAMM.exceptionNames);
-		} finally {
-			try {
-				if (in != null) in.close();
-				if (out != null) out.close();
-			} catch (IOException ioe) {}
-		}
-	}
-
-
 
 	/**
 	 * This function sets the status of the mail.
@@ -607,91 +281,30 @@ public class Mailbox {
 	 * @param whichmail The mail to set the status for.
 	 * @param status The status string.
 	 */
-	public static void setStatus(YAMM yamm, String whichBox, int whichmail, long skip,
-								String status) {
-		File source = new File(whichBox);
-		File target = new File(whichBox + ".tmp");
-		String temp = null;
-
-		BufferedReader in = null;
-		PrintWriter out = null;
-		int addLength = 0; // how many bytes that was added
-		long size = 0;
-		if (whichmail + 1 < yamm.listOfMails.length) {
-			size = source.length() - 
-				Long.parseLong(yamm.listOfMails[whichmail+1][YAMM.INDEX_SKIP]);
-		}
-
-		char[] buffer = new char[BUFFERSIZE];
-
+	public static void setStatus(YAMM yamm, String whichBox, int whichmail, IndexEntry e, int statusChange) {
+		Index idx = null;
 		try {
-			in = new BufferedReader(new InputStreamReader(
-						new FileInputStream(source)));
-			out   = new PrintWriter(new BufferedOutputStream(
-						new FileOutputStream(target)));
-
-			// just copy all data before the message
-			while (skip > 0) {
-				int read = in.read(buffer, 0, (int)Math.min(BUFFERSIZE, skip));
-				skip -= read;
-				out.write(buffer, 0, read);
+			idx = new Index(whichBox);
+			idx.open();
+			if ((statusChange & IndexEntry.STATUS_READ) != 0) {
+				idx.unreadNum--;
+				idx.newNum = 0;
+				idx.write();
 			}
-
-			boolean header = true;
-
-			for (;;) {
-				temp = in.readLine();
-
-				if (temp == null) {
-					break;
-				} else if (temp.equals(".")) {
-					out.println(temp);
-					break;
-				}
-
-				if (header) {
-					if (temp.equals("")) {
-						header = false;
-					}
-
-					if (temp.startsWith("YAMM-Status:")) {
-						String temp2 = "YAMM-Status: " + status;
-						addLength = temp2.length() - temp.length();
-						temp = temp2;
-					} else if (temp.equals("")) {
-						// this message didn't have a YAMM-Status header before this..
-						temp = "YAMM-Status: " + status + "\n";
-						addLength = temp.length();
-					}
-				}
-				out.println(temp);
-			}
-
-			// just copy all data after the message
-			while (size > 0) {
-				int read = in.read(buffer, 0, (int) Math.min(BUFFERSIZE, size));
-				size -= read;
-				out.write(buffer, 0, read);
-			}
-
-			in.close();
-			out.close();
-
-			source.delete();
-			target.renameTo(source);
-		} catch (IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-				ioe,
-				YAMM.exceptionNames);
+			idx.saveEntry(e, whichmail);
+		} catch (Exception ie) {
+			new ExceptionDialog(
+				YAMM.getString("msg.error"),
+				ie,
+				YAMM.exceptionNames
+			);
 		} finally {
 			try {
-				if (in != null) in.close();
-				if (out != null) out.close();
+				if (idx != null) {
+					idx.close();
+				}
 			} catch (IOException ioe) {}
 		}
-		addLength += System.getProperty("line.separator").length();
-
-		setIndexStatus(yamm, whichBox, whichmail, status, addLength);
 	}
 
 	/**
@@ -867,242 +480,13 @@ public class Mailbox {
 		boolean firstmail = true;
 		String home = System.getProperty("user.home");
 		String sep = System.getProperty("file.separator");
+		String trash = YAMM.home + sep + "boxes" + sep + YAMM.getString("box.trash");
 		int next = 0;
 
-		if (!whichBox.equals(YAMM.home + sep + "boxes" + sep +
-						YAMM.getString("box.trash"))) {
-
-			BufferedReader in = null;
-			PrintWriter outFile = null;
-			PrintWriter outFile2 = null;
-
-			try {
-				File inputFile = new File(whichBox);
-				File outputFile = new File(whichBox + ".tmp");
-
-				outFile = new PrintWriter(
-					new BufferedOutputStream(
-					new FileOutputStream(outputFile)));
-
-				outFile2 = new PrintWriter(
-					new BufferedOutputStream(
-					new FileOutputStream(YAMM.home +
-							"/boxes/" +
-						YAMM.getString("box.trash"),
-									true)));
-				in = new BufferedReader(new InputStreamReader(
-					new FileInputStream(inputFile)));
-
-				int i = 0;
-
-				for (;;) {
-					temp = in.readLine();
-
-					if (temp == null) {
-						break;
-					} else if (firstmail && i != whichmail[next]) {
-						for (;;) {
-							outFile.println(temp);
-							temp = in.readLine();
-
-							if (temp == null) {
-								break;
-							} else if(temp.equals(".")) {
-								outFile.println(temp);
-								break;
-							}
-						}
-						firstmail = false;
-					} else if (firstmail && i == whichmail[next]) {
-						for (;;) {
-							outFile2.println(temp);
-							temp = in.readLine();
-
-							if (temp == null) {
-								break;
-							} else if(temp.equals(".")) {
-								outFile2.println(temp);
-								break;
-							}
-						}
-						if (!(next++ < whichmail.length	- 1)) {
-							break;
-						}
-						firstmail = false;
-					} else if (!firstmail && i != whichmail[next]) {
-						for (;;) {
-							outFile.println(temp);
-							temp = in.readLine();
-
-							if (temp == null) {
-								break;
-							} else if (temp.equals(".")) {
-								outFile.println(temp);
-								break;
-							}
-						}
-					} else if(!firstmail && i == whichmail[next]) {
-
-						for (;;) {
-							outFile2.println(temp);
-							temp = in.readLine();
-
-							if (temp == null) {
-								break;
-							} else if (temp.equals(".")) {
-								outFile2.println(temp);
-								break;
-							}
-						}
-						if (!(next++ < whichmail.length	- 1)) {
-							break;
-						}
-					}
-					i++;
-				}
-				for (;;) {
-					temp = in.readLine();
-
-					if (temp == null) {
-						break;
-					} else {
-						outFile.println(temp);
-					}
-				}
-
-				in.close();
-				outFile.close();
-				outFile2.close();
-
-				inputFile.delete();
-				if (!outputFile.renameTo(inputFile)) {
-					System.err.println("ERROR: Couldn't " +
-							"rename " + whichBox +
-							".tmp to " + whichBox);
-				}
-			} catch (IOException ioe) {
-				new ExceptionDialog(YAMM.getString("msg.error"),
-						ioe,
-						YAMM.exceptionNames);
-				return false;
-			} finally {
-				try {
-					if (in != null) in.close();
-					if (outFile != null) outFile.close();
-					if (outFile2 != null) outFile2.close();
-				} catch (IOException ioe) {}
-			}
-		} else if (whichBox.equals(YAMM.home + sep + "boxes" + sep +
-						YAMM.getString("box.trash"))) {
-
-			BufferedReader in = null;
-			PrintWriter outFile = null;
-
-			try {
-				File inputFile = new File(YAMM.home + "/boxes/"
-						+ YAMM.getString("box.trash"));
-				File outputFile = new File(YAMM.home + "/boxes/"
-					+ YAMM.getString("box.trash") +	".tmp");
-
-				in = new BufferedReader(new InputStreamReader(
-					new FileInputStream(inputFile)));
-
-				outFile = new PrintWriter(new BufferedOutputStream(
-					new FileOutputStream(outputFile)));
-
-				int i = 0;
-
-				for (;;) {
-					temp = in.readLine();
-
-					if (temp == null) {
-						break;
-					} else if (firstmail && i != whichmail[next]) {
-						for (;;) {
-							outFile.println(temp);
-							temp = in.readLine();
-
-							if (temp == null) {
-								break;
-							} else if (temp.equals(".")) {
-								outFile.println(temp);
-								break;
-							}
-						}
-						firstmail = false;
-					} else if(firstmail && i == whichmail[next]) {
-
-						for (;;) {
-							temp = in.readLine();
-
-							if (temp == null) {
-								break;
-							} else if (temp.equals(".")) {
-								break;
-							}
-						}
-						if (!(next++ < whichmail.length	- 1)) {
-							break;
-						}
-						firstmail = false;
-					} else if (!firstmail && i != whichmail[next]) {
-						for (;;) {
-							outFile.println(temp);
-							temp = in.readLine();
-
-							if (temp == null) {
-								break;
-							} else if (temp.equals(".")) {
-								outFile.println(temp);
-								break;
-							}
-						}
-					} else if (!firstmail && i == whichmail[next]) {
-						for (;;) {
-							temp = in.readLine();
-
-							if (temp == null) {
-								break;
-							} else if (temp.equals(".")) {
-								break;
-							}
-						}
-						if (!(next++ < whichmail.length - 1)) {
-							break;
-						}
-					}
-					i++;
-				}
-				for (;;) {
-					temp = in.readLine();
-
-					if (temp == null) {
-						break;
-					} else {
-						outFile.println(temp);
-					}
-				}
-
-				in.close();
-				outFile.close();
-
-				inputFile.delete();
-				if (!outputFile.renameTo(inputFile)) {
-					System.err.println("ERROR: Couldn't " +
-							"rename " + whichBox +
-							".tmp to " + whichBox);
-				}
-			} catch(IOException ioe) {
-				new ExceptionDialog(YAMM.getString("msg.error"),
-						ioe,
-						YAMM.exceptionNames);
-				return false;
-			} finally {
-				try {
-					if (in != null) in.close();
-					if (outFile != null) outFile.close();
-				} catch (IOException ioe) {}
-			}
+		if (!whichBox.equals(trash)) {
+			moveMail(whichBox, trash, whichmail);
+		} else if (whichBox.equals(trash)) {
+			System.err.println("not implemented yet");
 		}
 		return true;
 	}
@@ -1113,96 +497,8 @@ public class Mailbox {
 	 * @param toBox To which box
 	 * @param whichmail The mail to copy from fromBox to toBox
 	 */
-	public static boolean copyMail(String fromBox, String toBox,
-							int[] whichmail) {
-
-		String  temp = null;
-		boolean firstmail = true;
-		int next = 0;
-
-		BufferedReader in = null;
-		PrintWriter outFile2 = null;
-
-		try {
-			in = new BufferedReader(new InputStreamReader(
-					new FileInputStream(fromBox)));
-
-			outFile2 = new PrintWriter(new BufferedOutputStream(
-					new FileOutputStream(toBox, true)));
-
-			int i = 0;
-
-			for (;;) {
-				temp = in.readLine();
-
-				if (temp == null) {
-					break;
-				} else if (firstmail && i != whichmail[next]) {
-					for (;;) {
-						temp = in.readLine();
-
-						if (temp == null) {
-							break;
-						} else if (temp.equals(".")) {
-							break;
-						}
-					}
-					firstmail = false;
-				} else if (firstmail && i == whichmail[next]) {
-					for (;;) {
-						outFile2.println(temp);
-						temp = in.readLine();
-
-						if (temp == null) {
-							break;
-						} else if (temp.equals(".")) {
-							outFile2.println(temp);
-							break;
-						}
-					}
-					if (!(next++ < whichmail.length - 1)) {
-						break;
-					}
-					firstmail = false;
-				} else if(!firstmail && i != whichmail[next]) {
-					for (;;) {
-						temp = in.readLine();
-
-						if (temp == null) {
-							break;
-						} else if (temp.equals(".")) {
-							break;
-						}
-					}
-				} else if(!firstmail && i == whichmail[next]) {
-					for (;;) {
-						outFile2.println(temp);
-						temp = in.readLine();
-
-						if (temp == null) {
-							break;
-						} else if (temp.equals(".")) {
-							outFile2.println(temp);
-							break;
-						}
-					}
-					if (!(next++ < whichmail.length - 1)) {
-						break;
-					}
-				}
-				i++;
-			}
-		} catch (IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-						ioe,
-						YAMM.exceptionNames);
-			return false;
-		} finally {
-			try {
-				if (in != null) in.close();
-				if (outFile2 != null) outFile2.close();
-			} catch (IOException ioe) {}
-		}
+	public static boolean copyMail(String fromBox, String toBox, int[] whichmail) {
+		System.err.println("not implemented yet");
 		return true;
 	}
 
@@ -1212,169 +508,137 @@ public class Mailbox {
 	 * @param toBox The box to move the mail to
 	 * @param whichmail The mail to move
 	 */
-	public static boolean moveMail(String fromBox, String toBox,
-							int[] whichmail) {
-		String temp = null;
-		boolean firstmail = true;
-		int next = 0;
-
-
+	public static boolean moveMail(String fromBox, String toBox, int[] whichmail) {
 		if (fromBox.equals(toBox)) {
 			return false;
+		} else if (whichmail.length < 1) {
+			return false;
 		}
 
-		BufferedReader in = null;
-		PrintWriter outFile = null;
-		PrintWriter outFile2 = null;
+		BufferedInputStream in = null;
+		BufferedOutputStream outSrc = null;
+		BufferedOutputStream outTgt = null;
+
+		BufferedInputStream inIndex = null;
+		BufferedOutputStream outSrcIndex = null;
+		BufferedOutputStream outTgtIndex = null;
+
+		long skipSub = 0;
+		long tgtSkip = new File(toBox).length();
+
+		long lastPosition = 0;
+		long copyLen = 0;
+		long skipLen = 0;
 
 		try {
-			File inputFile = new File(fromBox);
+			byte[] buffer = new byte[BUFFERSIZE];
 
-			in = new BufferedReader(new InputStreamReader(
-					new FileInputStream(inputFile)));
+			File inFile = new File(fromBox);
+			File outSrcFile = new File(fromBox + ".tmp");
+			Index srcIndex = new Index(fromBox);
+			Index tgtIndex = new Index(toBox);
+			srcIndex.open();
+			tgtIndex.open();
+			tgtIndex.raf.seek(Index.HEADERSIZE + tgtIndex.messageNum * IndexEntry.SIZE);
 
-			File outputFile = new File(fromBox + ".tmp");
+			in = new BufferedInputStream(new FileInputStream(inFile));
+			outSrc = new BufferedOutputStream(new FileOutputStream(outSrcFile));
+			outTgt = new BufferedOutputStream(new FileOutputStream(toBox, true));
 
-			outFile = new PrintWriter(new BufferedOutputStream(
-					new FileOutputStream(outputFile)));
-
-			outFile2 = new PrintWriter(new BufferedOutputStream(
-					new FileOutputStream(toBox, true)));
-
-			int i = 0;
-
-			for (;;) {
-				temp = in.readLine();
-
-				if (temp == null) {
-					break;
-				} else if (firstmail && i != whichmail[next]) {
-					for (;;) {
-						outFile.println(temp);
-						temp = in.readLine();
-
-						if (temp == null) {
-							break;
-						} else if (temp.equals(".")) {
-							outFile.println(temp);
-							break;
-						}
-					}
-					firstmail = false;
-				} else if (firstmail && i == whichmail[next]) {
-					for (;;) {
-						outFile2.println(temp);
-						temp = in.readLine();
-
-						if (temp == null) {
-							break;
-						} else if (temp.equals(".")) {
-							outFile2.println(temp);
-							break;
-						}
-					}
-					if (!(next++ < whichmail.length - 1)) {
-						break;
-					}
-					firstmail = false;
-				} else if (!firstmail && i != whichmail[next]) {
-					for (;;) {
-						outFile.println(temp);
-						temp = in.readLine();
-
-						if (temp == null) {
-							break;
-						} else if (temp.equals(".")) {
-							outFile.println(temp);
-							break;
-						}
-					}
-				} else if (i == whichmail[next]) {
-					for (;;) {
-						outFile2.println(temp);
-						temp = in.readLine();
-
-						if (temp == null) {
-							break;
-						} else if (temp.equals(".")) {
-							outFile2.println(temp);
-							break;
-						}
-					}
-					if (!(next++ < whichmail.length - 1)) {
-						break;
-					}
-				}
-				i++;
+			// copy everything up to the first message to be moved
+			copyLen = lastPosition = srcIndex.getEntry(whichmail[0]).skip;
+			while (copyLen > 0) {
+				int read = in.read(buffer, 0, (int)Math.min(BUFFERSIZE, copyLen));
+				copyLen -= read;
+				outSrc.write(buffer, 0, read);
 			}
-			for (;;) {
-				temp = in.readLine();
-				if (temp == null) {
-					break;
+
+			for (int i = 0; i < whichmail.length; i++) {
+				IndexEntry entry = srcIndex.getEntry(whichmail[i]);
+				skipLen = entry.skip;
+
+				if (whichmail[i]+1 < srcIndex.messageNum) {
+					lastPosition = srcIndex.getEntry(whichmail[i]+1).skip;
 				} else {
-					outFile.println(temp);
+					lastPosition = inFile.length();
+				}
+				skipLen = lastPosition - skipLen;
+
+				if (i + 1 < whichmail.length) {
+					copyLen = srcIndex.getEntry(whichmail[i+1]).skip;
+				} else {
+					copyLen = inFile.length()-skipLen;
+				}
+				copyLen -= lastPosition;
+
+				entry.skip = tgtSkip;
+				entry.write(tgtIndex.raf);
+				tgtSkip += skipLen;
+
+				if ((entry.status & IndexEntry.STATUS_READ) == 0) {
+					tgtIndex.unreadNum++;
+					tgtIndex.newNum++;
+					srcIndex.unreadNum--;
+					srcIndex.newNum = 0;
+				}
+				skipSub += skipLen;
+
+				int lastMessage = srcIndex.messageNum;
+				if (i + 1 < whichmail.length) {
+					lastMessage = whichmail[i+1];
+				}
+				for (int j = whichmail[i] + 1; j < lastMessage; j++) {
+					IndexEntry ie = srcIndex.getEntry(j);
+					srcIndex.raf.seek(Index.HEADERSIZE + (j - (i+1)) * IndexEntry.SIZE);
+					ie.skip -= skipSub;
+					ie.write(srcIndex.raf);
+				}
+
+				while (skipLen > 0) {
+					int read = in.read(buffer, 0, (int)Math.min(BUFFERSIZE, skipLen));
+					skipLen -= read;
+					outTgt.write(buffer, 0, read);
+				}
+				while (copyLen > 0) {
+					int read = in.read(buffer, 0, (int)Math.min(BUFFERSIZE, copyLen));
+					copyLen -= read;
+					outSrc.write(buffer, 0, read);
 				}
 			}
+
+
+			srcIndex.messageNum -= whichmail.length;
+			tgtIndex.messageNum += whichmail.length;
+			srcIndex.rewrite();
+			tgtIndex.rewrite();
+
+			srcIndex.close();
+			tgtIndex.close();
 
 			in.close();
-			outFile.close();
-			outFile2.close();
+			outSrc.close();
+			outTgt.close();
 
-			inputFile.delete();
-			if (!outputFile.renameTo(inputFile)) {
-				System.err.println("Couldn't rename " +
-							fromBox + ".tmp to " +
-								fromBox);
+			inFile.delete();
+			if (!outSrcFile.renameTo(inFile)) {
+				System.err.println("Couldn't rename " + outSrcFile + " to " + inFile);
 			}
 		} catch (IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-					ioe,
-					YAMM.exceptionNames);
+			new ExceptionDialog(
+				YAMM.getString("msg.error"),
+				ioe,
+				YAMM.exceptionNames
+			);
 			return false;
 		} finally {
 			try {
 				if (in != null) in.close();
-				if (outFile != null) outFile.close();
-				if (outFile2 != null) outFile2.close();
+				if (outSrc != null) outSrc.close();
+				if (outTgt != null) outTgt.close();
 			} catch (IOException ioe) {}
 		}
+
 		return true;
-	}
-
-	/**
-	 * Counts how many mails the box have.
-	 * @param whichbox The box to count the mails in
-	 */
-	public static int mailsInBox(String whichbox) {
-		String temp = null;
-
-		int i = 0;
-
-		BufferedReader in = null;
-
-		try {
-			in = new BufferedReader(new InputStreamReader(
-						new FileInputStream(whichbox)));
-
-			for(;;) {
-				temp = in.readLine();
-
-				if (temp == null) {
-					break;
-				} else if (temp.equals(".")) {
-					i++;
-				}
-			}
-		} catch(IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-					ioe,
-					YAMM.exceptionNames);
-		} finally {
-			try {
-				if (in != null) in.close();
-			} catch (IOException ioe) {}
-		}
-		return i;
 	}
 
 	/**
@@ -1417,6 +681,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.46  2003/03/09 17:44:33  fredde
+ * cleaned up. now uses the new index system
+ *
  * Revision 1.45  2003/03/08 16:57:03  fredde
  * updated getMailForReplyHeaders
  *
