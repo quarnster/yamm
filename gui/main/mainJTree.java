@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.31 2003/03/09 14:05:56 fredde Exp $
+/*  $Id: mainJTree.java,v 1.32 2003/03/09 17:50:34 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public class mainJTree
 	extends JTable
@@ -257,7 +257,6 @@ public class mainJTree
 
 			Utilities.delUnNeededFiles();
 			Mailbox.createList(yamm.selectedbox, yamm);
-			Mailbox.updateIndex(box);
 			dataModel.fireTableDataChanged();
 			yamm.mailList.update();
 		}
@@ -392,6 +391,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.32  2003/03/09 17:50:34  fredde
+ * no need for Mailbox.updateIndex with the new index system
+ *
  * Revision 1.31  2003/03/09 14:05:56  fredde
  * drag and drop fixed. variable frame renamed to yamm
  *
