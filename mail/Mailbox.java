@@ -102,7 +102,7 @@ public class Mailbox {
           date = temp.substring(6, temp.lastIndexOf(":") + 3).trim();
           SimpleDateFormat dateFormat2 = null;
 
-          if (date.charAt(2) == ' ') {
+          if (date.charAt(2) == ' ' || date.charAt(1) == ' ') {
 		dateFormat2 = new SimpleDateFormat("dd MMM yyyy HH:mm:ss",
 						 Locale.US);
 		
@@ -311,7 +311,7 @@ public class Mailbox {
               String date = temp.substring(6, temp.lastIndexOf(":") + 3).trim();
               SimpleDateFormat dateFormat2 = null;
 
-              if (date.charAt(2) == ' ') {
+              if (date.charAt(2) == ' ' || date.charAt(1) == ' ') {
                     dateFormat2 = new SimpleDateFormat("dd MMM yyyy HH:mm:ss",
                                                      Locale.US);     
                 
