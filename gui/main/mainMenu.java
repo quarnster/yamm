@@ -1,4 +1,4 @@
-/*  $Id: mainMenu.java,v 1.39 2003/05/24 08:47:55 fredde Exp $
+/*  $Id: mainMenu.java,v 1.40 2003/06/06 10:49:09 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -29,16 +29,15 @@ import java.text.*;
 import java.util.*;
 import org.gjt.fredde.yamm.gui.sourceViewer;
 import org.gjt.fredde.yamm.mail.Mailbox;
-import org.gjt.fredde.yamm.YAMMWrite;
-// import org.gjt.fredde.yamm.Options;
+import org.gjt.fredde.yamm.*;
 import org.gjt.fredde.yamm.gui.confwiz.ConfigurationWizard;
-import org.gjt.fredde.yamm.YAMM;
+import org.gjt.fredde.util.gui.*;
 
 /**
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.39 $
+ * @version $Revision: 1.40 $
  */
 public class mainMenu
 	extends JMenuBar
@@ -52,26 +51,35 @@ public class mainMenu
 		JMenuItem rad;
 		add(file);
 
+		Font f = new Font("SansSerif", Font.PLAIN, 10);
+
 
 		// the file menu
 		rad = new JMenuItem(YAMM.getString("file.new"),
 				new ImageIcon(getClass().getResource("/images/buttons/new_mail.png")));
 		rad.addActionListener(MListener);
-		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		rad.setFont(f);
 		file.add(rad);
 
 		rad = new JMenuItem(YAMM.getString("file.save_as"),
 				new ImageIcon(getClass().getResource("/images/buttons/save_as.png")));
 		rad.addActionListener(MListener);
-		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		rad.setFont(f);
 		file.add(rad);
 
 		file.addSeparator();
+		rad = new JMenuItem(YAMM.getString("file.empty_trash"),
+				new ImageIcon(getClass().getResource("/images/buttons/delete.png")));
+		rad.addActionListener(MListener);
+		rad.setFont(f);
+		file.add(rad);
+		file.addSeparator();
 
+		
 		rad = new JMenuItem(YAMM.getString("file.exit"),
 				new ImageIcon(getClass().getResource("/images/buttons/exit.png")));
 		rad.addActionListener(MListener);
-		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		rad.setFont(f);
 		file.add(rad);
 
 		// the edit menu
@@ -82,13 +90,13 @@ public class mainMenu
 		rad = new JMenuItem(YAMM.getString("edit.settings"),
 				new ImageIcon(getClass().getResource("/images/buttons/prefs.png")));
 		rad.addActionListener(MListener);
-		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		rad.setFont(f);
 		edit.add(rad);
 
 		rad = new JMenuItem(YAMM.getString("edit.view_source"),
 				new ImageIcon(getClass().getResource("/images/buttons/search.png")));
 		rad.addActionListener(MListener);
-		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		rad.setFont(f);
 		edit.add(rad);
 
 		// the help menu
@@ -99,19 +107,19 @@ public class mainMenu
 		rad = new JMenuItem(YAMM.getString("help.about_you"),
 				new ImageIcon(getClass().getResource("/images/buttons/help.png")));
 		rad.addActionListener(MListener);
-		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		rad.setFont(f);
 		help.add(rad);
 
 		rad = new JMenuItem(YAMM.getString("help.about"),
 				new ImageIcon(getClass().getResource("/images/buttons/help.png")));
 		rad.addActionListener(MListener);
-		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		rad.setFont(f);
 		help.add(rad);
 
 		rad = new JMenuItem(YAMM.getString("help.license"),
 				new ImageIcon(getClass().getResource("/images/types/text.png")));
 		rad.addActionListener(MListener);
-		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		rad.setFont(f);
 		help.add(rad);
 
 		help.addSeparator();
@@ -119,7 +127,7 @@ public class mainMenu
 		rad = new JMenuItem(YAMM.getString("help.bug_report"),
 				new ImageIcon(getClass().getResource("/images/buttons/bug.png")));
 		rad.addActionListener(MListener);
-		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		rad.setFont(f);
 		help.add(rad);
 	}
 
@@ -310,6 +318,27 @@ public class mainMenu
 						);
 					}
 				}
+			} else if (kommando.equals(YAMM.getString("file.empty_trash"))) {
+				YAMM yamm = YAMM.getInstance();
+				String trash = Utilities.replace(yamm.home + "/boxes/trash");
+				new File(trash).delete();
+				new File(Mailbox.getIndexName(trash)).delete();
+				try {
+					new File(trash).createNewFile();
+				} catch (IOException e) {
+					new ExceptionDialog(
+						YAMM.getString("msg.error"),
+						e,
+						YAMM.exceptionNames
+					);
+
+				}
+				yamm.tree.unreadTable.put(trash, new int[] {0,0,0});
+				yamm.tree.fullUpdate();
+				if (yamm.getMailbox().equals(trash)) {
+					yamm.setMailbox(trash);
+				}
+				yamm.mailList.update();
 			}
 		}
 		void p(String prop, JTextArea ta) {
@@ -352,6 +381,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.40  2003/06/06 10:49:09  fredde
+ * added empty trash function
+ *
  * Revision 1.39  2003/05/24 08:47:55  fredde
  * added Ilane to credits list
  *
