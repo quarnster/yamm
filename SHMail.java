@@ -86,7 +86,7 @@ public class SHMail extends Thread {
             for(int j = 1; j<=messages;j++) {
               pd.setString("Getting mail " + j + " of " + messages);
 
-              pd.progress(100 - ( 100 * ( ( messages - i ) / messages ) ) );
+              pd.progress(100 - ( ( 100 * messages - 100 * j ) / messages ) );
               pop.getMessage(j);
               if(del) pop.deleteMessage(j);
             }
