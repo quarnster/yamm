@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.43 2003/03/07 20:22:00 fredde Exp $
+/*  $Id: Mailbox.java,v 1.44 2003/03/07 22:23:19 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.43 2003/03/07 20:22:00 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.44 2003/03/07 22:23:19 fredde Exp $
  */
 public class Mailbox {
 
@@ -104,13 +104,20 @@ public class Mailbox {
 	}
 
 	private static String removeQuote(String quote) {
+		quote = quote.replace('\\', '|');
+
+		while (quote.indexOf("|") != -1) {
+			quote = quote.substring(0, quote.indexOf("|")) +
+				"\\\\" +
+				quote.substring(quote.indexOf("|") + 1);
+		}
+
 		quote = quote.replace('\"', '|');
 
 		while (quote.indexOf("|") != -1) {
 			quote = quote.substring(0, quote.indexOf("|")) +
 				"\\\"" +
-				quote.substring(quote.indexOf("|") + 1,
-								quote.length());
+				quote.substring(quote.indexOf("|") + 1);
 		}
 
 		return quote;
@@ -1438,6 +1445,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.44  2003/03/07 22:23:19  fredde
+ * removeQuote now also handles backslashes
+ *
  * Revision 1.43  2003/03/07 20:22:00  fredde
  * do not regenerate the message if it has allready been cached. unMime before removeQuote
  *
