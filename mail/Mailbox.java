@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.44 2003/03/07 22:23:19 fredde Exp $
+/*  $Id: Mailbox.java,v 1.45 2003/03/08 16:57:03 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.44 2003/03/07 22:23:19 fredde Exp $
+ * @version $Revision: 1.45 $
  */
 public class Mailbox {
 
@@ -762,8 +762,6 @@ public class Mailbox {
 	public static String[] getMailForReplyHeaders(String whichBox, long skip) {
 		String  temp = null;
 		String  from = null;
-		String  finalFrom = "";
-		String  email = null;
 		String  subject = null;
 		String  to = null;
 
@@ -792,37 +790,12 @@ public class Mailbox {
 
 			subject = mhp.getHeaderField("Subject");
 			subject = unMime(subject);
-
-			if (from == null) {
-				from = "";
-			} else {
-				StringTokenizer tok = new StringTokenizer(from);
-
-				while (tok.hasMoreTokens()) {
-					email = tok.nextToken();
-
-					if (email.indexOf("@") != -1) {
-						email = MessageParser.
-							parseLink(email)[1];
-					//		break;
-					} else {
-						finalFrom += email + " ";
-					}
-				}
-				if (finalFrom.trim().equals("")) {
-					finalFrom = email + " ";
-				}
-			}
-
-			if (subject == null) {
-				subject = "";
-			}
-
 			to = mhp.getHeaderField("To");
 
-			if (to == null) {
-				to = "";
-			}
+
+			if (subject == null) subject = "";
+			if (from == null) from = "";
+			if (to == null) to = "";
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 				ioe,
@@ -834,9 +807,8 @@ public class Mailbox {
 		}
 
 		String[] ret = {
-				finalFrom,
+				from,
 				to,
-				email,
 				subject
 		};
 
@@ -1445,6 +1417,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.45  2003/03/08 16:57:03  fredde
+ * updated getMailForReplyHeaders
+ *
  * Revision 1.44  2003/03/07 22:23:19  fredde
  * removeQuote now also handles backslashes
  *
