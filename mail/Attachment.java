@@ -1,5 +1,5 @@
 /*  Attachment.java - Parses attachments
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+ *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,20 +23,21 @@ import java.io.*;
 /**
  * This class parses attachments
  * @author Fredrik Ehnbom
- * @version $Id: Attachment.java,v 1.4 2000/03/17 17:12:10 fredde Exp $
+ * @version $Id: Attachment.java,v 1.5 2001/03/18 17:07:59 fredde Exp $
  */
 public class Attachment {
 
 	public static final int ERROR		= -1;
-	public static final int END		=  0;
+	public static final int END			=  0;
 	public static final int MESSAGE 	=  1;
 	public static final int ATTACHMENT 	=  2;
 
 	public Attachment() {
 	}
 
-	public int parse(BufferedReader in, PrintWriter out) throws IOException,
-							MessageParseException {
+	public int parse(BufferedReader in, PrintWriter out)
+		throws IOException, MessageParseException
+	{
 		MessageHeaderParser mhp = new MessageHeaderParser();
 		mhp.parse(in);
 
@@ -48,42 +49,32 @@ public class Attachment {
 
 			if (name.indexOf("name=") != -1) {
 				// remove unwanted info
-				name = name.substring(name.indexOf("name=") + 5,
-						name.length()).trim();
+				name = name.substring(name.indexOf("name=") + 5, name.length()).trim();
 
 				if (name.indexOf(";") != -1) {
-					name = name.substring(0,
-						name.indexOf(";")).trim();
+					name = name.substring(0, name.indexOf(";")).trim();
 				}
 
-				if (name.startsWith("\"") &&
-							name.endsWith("\"")) {
-					name = name.substring(1,
-							name.length() - 1);
+				if (name.startsWith("\"") && name.endsWith("\"")) {
+					name = name.substring(1, name.length() - 1);
 				}
 			} else {
 				name = null;
 			}
 		}
 
-		if (mhp.getHeaderField("Content-Disposition") != null &&
-								name == null) {
+		if (mhp.getHeaderField("Content-Disposition") != null && name == null) {
 			name = mhp.getHeaderField("Content-Disposition");
 
 			if (name.indexOf("filename=") != -1) {
-				name = name.substring(
-					name.indexOf("filename=") + 9,
-							name.length()).trim();
+				name = name.substring(name.indexOf("filename=") + 9, name.length()).trim();
 
 				if (name.indexOf(";") != -1) {
-					name = name.substring(0,
-							name.indexOf(";"));
+					name = name.substring(0, name.indexOf(";"));
 				}
 
-				if (name.startsWith("\"") &&
-							name.endsWith("\"")) {
-					name = name.substring(1,
-							name.length() - 1);
+				if (name.startsWith("\"") && name.endsWith("\"")) {
+					name = name.substring(1, name.length() - 1);
 				}
 			} else {
 				name = null;
@@ -92,8 +83,7 @@ public class Attachment {
 		}
 
 		if (mhp.getHeaderField("Content-Transfer-Encoding") != null) {
-			encoding = mhp.getHeaderField("Content-Transfer" +
-							"-Encoding").trim();
+			encoding = mhp.getHeaderField("Content-Transfer-Encoding").trim();
 		}
 
 		if (encoding != null) {
@@ -101,6 +91,7 @@ public class Attachment {
 				encoding.equalsIgnoreCase("x-uuencode")) {
 
 				String temp = null;
+
 				out.println(name);
 				out.flush();
 				out.println(encoding);
@@ -118,17 +109,17 @@ public class Attachment {
 						out.flush();
 					}
 				}
-			} else {
-				return MESSAGE;
 			}
 		}
 		return MESSAGE;
-		//return ERROR;
 	}
 }
 /*
  * Changes:
  * $Log: Attachment.java,v $
+ * Revision 1.5  2001/03/18 17:07:59  fredde
+ * cleaned up
+ *
  * Revision 1.4  2000/03/17 17:12:10  fredde
  * some fixes
  *

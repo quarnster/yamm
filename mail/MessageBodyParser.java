@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Parses the body of a message
  * @author Fredrik Ehnbom
- * @version $Id: MessageBodyParser.java,v 1.9 2000/03/17 17:12:10 fredde Exp $
+ * @version $Id: MessageBodyParser.java,v 1.10 2001/03/18 17:08:20 fredde Exp $
  */
 public class MessageBodyParser {
 
@@ -185,21 +185,17 @@ public class MessageBodyParser {
 		this.html = html;
 	}
 
-	public int parse(BufferedReader in, PrintWriter out,
-				String attachment) throws IOException,
-							MessageParseException {
+	public int parse(BufferedReader in, PrintWriter out, String attachment)
+		throws IOException, MessageParseException
+	{
 		String temp = in.readLine();
 
 		for (;;) {
-
 			if (temp == null) {
-				throw new MessageParseException("Unexpected" +
-							"end of message.");
+				throw new MessageParseException("Unexpected end of message.");
 			}
 
-			if (!htmlMsg && temp.toLowerCase().indexOf("html")
-					!= -1 && temp.indexOf("<") != -1 &&
-					temp.indexOf(".") == -1) {
+			if (!htmlMsg && temp.toLowerCase().indexOf("html") != -1 && temp.indexOf("<") != -1 && temp.indexOf(".") == -1) {
 				htmlMsg = true;
 			}
 
@@ -245,12 +241,14 @@ public class MessageBodyParser {
 			out.println(temp);
 			temp = in.readLine();
 		}
-//		return ERROR;
 	}
 }
 /*
  * Changes:
  * $Log: MessageBodyParser.java,v $
+ * Revision 1.10  2001/03/18 17:08:20  fredde
+ * cleaned up
+ *
  * Revision 1.9  2000/03/17 17:12:10  fredde
  * some fixes
  *
