@@ -31,7 +31,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Id: YAMMWrite.java,v 1.18 2000/03/05 18:06:08 fredde Exp $
+ * @version $Id: YAMMWrite.java,v 1.19 2000/03/15 13:41:14 fredde Exp $
  */
 public class YAMMWrite extends JFrame {
 
@@ -366,16 +366,14 @@ public class YAMMWrite extends JFrame {
 				dispose();
 			} else if (arg.equals(YAMM.getString("button.add"))) {
 				addAttach();
-			} else if (arg.equals(YAMM.getString(
-							"button.delete"))) {
+			} else if (arg.equals(YAMM.getString("button.delete"))) {
 				int rem = myList.getSelectedIndex();
 
 				if (rem != -1 && rem < attach.size()) {
 					attach.remove(rem);
 					myList.updateUI();
 				}
-			} else if (arg.equals(YAMM.getString(
-							"button.cancel"))) {
+			} else if (arg.equals(YAMM.getString("button.cancel"))) {
 				Rectangle rv = new Rectangle();
 				getBounds(rv);
 
@@ -463,6 +461,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.19  2000/03/15 13:41:14  fredde
+ * cleaned up
+ *
  * Revision 1.18  2000/03/05 18:06:08  fredde
  * gets it's images for the jar file. Also fixed a nullpointer in the attachment list.
  *

@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * The big Main-class of YAMM
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.43 2000/03/15 11:13:45 fredde Exp $
+ * @version $Id: YAMM.java,v 1.44 2000/03/15 13:40:59 fredde Exp $
  */
 public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
@@ -62,7 +62,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	public static String version  = Utilities.cvsToVersion("$Name:  $");
 
 	/** The compileDate of YAMM */
-	public static String compDate = Utilities.cvsToDate("$Date: 2000/03/15 11:13:45 $");
+	public static String compDate = Utilities.cvsToDate("$Date: 2000/03/15 13:40:59 $");
 
 	/** the file that contains the current mail */
 	public String mailPageString = "file:///" + home + "/tmp/cache/";
@@ -79,9 +79,6 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
 	/** The properties to get configuration stuff from */
 	static protected Properties props = new Properties();
-
-	/** What's in the tree */
-	static protected DefaultMutableTreeNode top;
 
 	/** The Table that lists the mails in listOfMails */
 	public mainTable mailList;
@@ -331,8 +328,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		SPane.setPreferredSize(new Dimension(300, 50));
 		SPane.setOneTouchExpandable(true);
 
-		top = new DefaultMutableTreeNode(YAMM.getString("box.boxes"));
-		/* mainJTree */ tree = new mainJTree(this, top, tbar);
+		tree = new mainJTree(this, tbar);
 
 		SPane2 = new JSplitPane(1, tree, SPane);
 		SPane2.setDividerLocation(vsplit);
@@ -695,6 +691,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.44  2000/03/15 13:40:59  fredde
+ * cleaned up
+ *
  * Revision 1.43  2000/03/15 11:13:45  fredde
  * boxes now show if and how many unread messages they have
  *
