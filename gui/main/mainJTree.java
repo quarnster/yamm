@@ -92,7 +92,7 @@ public class mainJTree extends JTree {
             ((JTable)frame.mailList).updateUI();
           }
         }
-       if(((JTable)frame.mailList).getSelectedRow() != -1 && !(((JTable)frame.mailList).getSelectedRow() >= frame.listOfMails.size())) { ((JButton)tbar.reply).setEnabled(true); ((JButton)tbar.forward).setEnabled(true); ((JButton)tbar.print).setEnabled(true); }
+       if(((mainTable)frame.mailList).getSelectedRow() != -1 && !(((JTable)frame.mailList).getSelectedRow() >= frame.listOfMails.size())) { ((JButton)tbar.reply).setEnabled(true); ((JButton)tbar.forward).setEnabled(true); ((JButton)tbar.print).setEnabled(true); }
        else { ((JButton)tbar.reply).setEnabled(false); ((JButton)tbar.forward).setEnabled(false); ((JButton)tbar.print).setEnabled(false); }
       }
     });
