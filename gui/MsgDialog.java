@@ -94,13 +94,6 @@ public class MsgDialog extends JDialog {
   public MsgDialog(JFrame frame, String title, String text, int buttons, int alignment) {
     super(frame, true);
 
-/*
-    try { res = ResourceBundle.getBundle("resources.YAMM", Locale.getDefault()); }
-    catch (MissingResourceException mre) {
-      mre.printStackTrace();
-      System.exit(1);
-    }
-*/
     setResizable(false);
     setTitle(title);
     setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -182,8 +175,10 @@ public class MsgDialog extends JDialog {
     public void actionPerformed(ActionEvent event) {
       String button = event.getActionCommand();
     
-      if(button == "Ok") result = OK;
-      else if(button == "Yes") result = YES;
+      if(button == "Ok") {
+        dispose();
+      }
+      if(button == "Yes") result = YES;
       else if(button == "No") result = NO;
       setVisible(false);
     }
