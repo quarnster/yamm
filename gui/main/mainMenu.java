@@ -1,5 +1,5 @@
 /*  mainMenu.java - mainMenu class
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,12 +30,15 @@ import org.gjt.fredde.util.gui.MsgDialog;
 import org.gjt.fredde.yamm.gui.sourceViewer;
 import org.gjt.fredde.yamm.mail.Mailbox;
 import org.gjt.fredde.yamm.YAMMWrite;
-import org.gjt.fredde.yamm.Options;
+// import org.gjt.fredde.yamm.Options;
+import org.gjt.fredde.yamm.gui.confwiz.ConfigurationWizard;
 import org.gjt.fredde.yamm.YAMM;
 
 /**
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
+ * @author Fredrik Ehnbom
+ * @version $Id: mainMenu.java,v 1.20 2000/02/28 13:46:42 fredde Exp $
  */
 public class mainMenu extends JMenuBar {
 
@@ -235,7 +238,7 @@ public class mainMenu extends JMenuBar {
 				);
 			}  else if (kommando.equals(YAMM.getString(
 							"edit.settings"))) {
-				new Options(frame);
+				new ConfigurationWizard(frame);
 			} else if (kommando.equals(YAMM.getString(
 								"file.new"))) {
 				new YAMMWrite();
@@ -355,3 +358,10 @@ public class mainMenu extends JMenuBar {
 		}
 	}
 }
+/*
+ * Changes:
+ * $Log: mainMenu.java,v $
+ * Revision 1.20  2000/02/28 13:46:42  fredde
+ * added some javadoc tags and changelog. Cleaned up
+ *
+ */
