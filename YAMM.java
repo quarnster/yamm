@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.71 2003/06/08 18:48:59 fredde Exp $
+/*  $Id: YAMM.java,v 1.72 2003/06/08 19:54:42 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.71 $
+ * @version $Revision: 1.72 $
  */
 public class YAMM
 	extends JFrame
@@ -435,6 +435,12 @@ public class YAMM
 		}
 	};
 
+	public void setNullPage() {
+		mail.setText("");
+		attach.clear();
+		JTPane.setEnabledAt(1, false);
+	}
+
 	public void createAttachList() {
 		attach.clear();
 
@@ -806,6 +812,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.72  2003/06/08 19:54:42  fredde
+ * setNullPage added
+ *
  * Revision 1.71  2003/06/08 18:48:59  fredde
  * tbar -> toolbar
  *
