@@ -25,8 +25,8 @@ import org.gjt.fredde.yamm.YAMM;
 
 /**
  * Parses messages
- * @author Fredrik Ehnbom
- * @version $Id: MessageParser.java,v 1.12 2000/03/25 15:45:54 fredde Exp $
+ * @author Fredrik Ehnbom <fredde@gjt.org>
+ * @version $Id: MessageParser.java,v 1.13 2000/04/01 21:26:41 fredde Exp $
  */
 public class MessageParser {
 
@@ -34,6 +34,20 @@ public class MessageParser {
 
 	public String makeClickable(String click) {
 		return MessageBodyParser.makeEmailLink(click);
+	}
+
+	public static String getEmail(String link) {
+		StringTokenizer tok = new StringTokenizer(link);
+
+		while (tok.hasMoreTokens()) {
+			String temp = tok.nextToken();
+
+			if (temp.indexOf("@") != -1) {
+				return MessageParser.parseLink(temp)[1];
+			}
+		}
+
+		return null;
 	}
 
 	public static String[] parseLink(String link) {
@@ -281,6 +295,6 @@ public class MessageParser {
 	}
 }
 /*
- * Changes:
- * $log
+ * ChangeLog:
+ * $log$
  */
