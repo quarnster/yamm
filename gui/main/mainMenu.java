@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Id: mainMenu.java,v 1.26 2000/12/26 11:23:27 fredde Exp $
+ * @version $Id: mainMenu.java,v 1.27 2000/12/31 14:08:19 fredde Exp $
  */
 public class mainMenu
 	extends JMenuBar
@@ -186,7 +186,9 @@ public class mainMenu
 					null,
 					YAMM.getString("help.about"),
 					"Copyright (C) 1999, 2000 Fredrik Ehnbom\n" +
-					YAMM.getString("info.about", args)
+					YAMM.getString("info.about", args) +
+					"Tuomas Kuosmanen \n" +
+					"Rafael Escovar "
 				);
 			} else if (kommando.equals(YAMM.getString("help.bug_report"))) {
 				YAMMWrite yw = new YAMMWrite("fredde@gjt.org", "Bug report");
@@ -329,6 +331,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.27  2000/12/31 14:08:19  fredde
+ * additional credits in here instead of in resource files
+ *
  * Revision 1.26  2000/12/26 11:23:27  fredde
  * YAMM.listOfMails is now of type String[][]
  *
