@@ -34,6 +34,13 @@ public class imageViewer extends JFrame {
 
       public imagePanel(String whichimage) {
         iImage = Toolkit.getDefaultToolkit().getImage(whichimage);
+
+        MediaTracker t = new MediaTracker(this);
+        t.addImage(iImage, 1);
+        try {
+          t.waitForID(1);
+        }
+        catch(InterruptedException ie) { System.err.println(ie.toString()); }
       }
 
       public Dimension getPreferredSize() {
@@ -54,6 +61,7 @@ public class imageViewer extends JFrame {
      * @param image The path to the image to view.
      */
     public imageViewer(String image) {
+      setTitle(image);
       getContentPane().setLayout(new BorderLayout());
       filename = image;
 
@@ -65,7 +73,14 @@ public class imageViewer extends JFrame {
       Dimension screen = getToolkit().getScreenSize();
 
       Dimension im = ip.getMaximumSize();
-      setBounds((screen.width - im.width + 20)/2, (screen.height - im.height + 70)/2, im.width + 20, im.height + 70);
+      int width = im.width, height = im.height;
+      if(width > screen.width + 15) width = screen.width - 215;
+      if(height > screen.height + 55) height = screen.height - 255;
+
+      setBounds((screen.width - width + 15)/2, 
+                (screen.height - height + 55)/2, 
+                width + 15, 
+                height + 55);
 
       addWindowListener(new WindowAdapter() {
         public void windowClosing(WindowEvent evt) {
