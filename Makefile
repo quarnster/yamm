@@ -10,7 +10,6 @@ CLASSES = org/gjt/fredde/yamm/YAMM.class \
 	org/gjt/fredde/yamm/SHMail.class \
 	org/gjt/fredde/yamm/Print.class \
 	org/gjt/fredde/yamm/gui/imageViewer.class \
-	org/gjt/fredde/yamm/gui/pDialog.class \
 	org/gjt/fredde/yamm/gui/sourceViewer.class \
 	org/gjt/fredde/yamm/gui/main/mainMenu.class \
 	org/gjt/fredde/yamm/gui/main/mainToolBar.class \
@@ -25,17 +24,18 @@ CLASSES = org/gjt/fredde/yamm/YAMM.class \
 	org/gjt/fredde/util/net/Pop3.class \
 	org/gjt/fredde/util/net/Smtp.class \
         org/gjt/fredde/util/gui/MsgDialog.class \
+        org/gjt/fredde/util/gui/statusRow.class \
         org/gjt/fredde/util/gui/SplashScreen.class
 
 all: YAMM
 
 clean:
-	rm -f org/gjt/fredde/yamm/*.class          org/gjt/fredde/yamm/*~
-	rm -f org/gjt/fredde/yamm/encode/*.class   org/gjt/fredde/yamm/encode/*~
-	rm -f org/gjt/fredde/yamm/mail/*.class     org/gjt/fredde/yamm/mail/*~
-	rm -f org/gjt/fredde/yamm/gui/*.class      org/gjt/fredde/yamm/gui/*~
-	rm -f org/gjt/fredde/yamm/gui/main/*.class org/gjt/fredde/yamm/gui/main/*~
-	rm -f org/gjt/fredde/util/net/*.class      org/gjt/fredde/util/net/*~
-	rm -f org/gjt/fredde/util/gui/*.class      org/gjt/fredde/util/gui/*~
+	rm -f org/gjt/fredde/yamm/*.class
+	rm -f org/gjt/fredde/yamm/encode/*.class
+	rm -f org/gjt/fredde/yamm/mail/*.class
+	rm -f org/gjt/fredde/yamm/gui/*.class
+	rm -f org/gjt/fredde/yamm/gui/main/*.class
+	rm -f org/gjt/fredde/util/net/*.class
+	rm -f org/gjt/fredde/util/gui/*.class
 
 YAMM: $(CLASSES)
