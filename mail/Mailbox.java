@@ -195,6 +195,7 @@ public class Mailbox {
    * @param whichmail Which mail in the box that the attachment is in
    * @param filename The filename of the attachment to export
    */
+/*
   public static void export_attach(String whichBox, int whichmail, String filename) {
     String  temp = null;
     String  boundary = null;
@@ -257,9 +258,9 @@ public class Mailbox {
       System.err.println(ioe);
     }
   }
-
+*/
   /**
-   * Prints the mail to ~home/.yamm/tmp/mail.html
+   * Prints the mail to ~home/.yamm/tmp/cache/<whichBox>/<whichmail>.html
    * @param whichBox Which box the message is in
    * @param whichmail Whichmail to export
    * @param attach Which vector to add attachments to
@@ -271,6 +272,7 @@ public class Mailbox {
     boolean wait = true;
     boolean html = false;
     ResourceBundle res = null;
+    int attaches = 0;
 
     temp = System.getProperty("user.home") + "/.yamm/";
     String tempdir = temp + "tmp/";
@@ -458,6 +460,33 @@ public class Mailbox {
                   temp = begin + "<a href=\"mailto:" + temp2 + "\">" + temp2 + "</a>" + end;
                 }
 
+                else if(temp.startsWith("--" + boundary)) { // && !temp.endsWith("--")) {
+                  attaches++;
+
+                  try {
+                    PrintWriter out = new PrintWriter(
+                                      new BufferedOutputStream(
+                                      new FileOutputStream(new File(cache, whichmail + ".attach." + attaches))));
+                    for(int four = 0; four < 4; four++) {
+                      temp = in.readLine();
+                      if(temp == null) break;
+
+                      out.println(temp);
+                    }
+
+                    for(;;) {
+                      temp =  in.readLine();
+
+                      if(temp == null) break;
+                      if(temp.equals(".")) break;
+                      if(temp.equals("")) break;
+
+                      out.println(temp);
+                    }
+                    out.close();
+                  }
+                  catch(IOException ioe) { System.out.println("Error!: " + ioe); }
+                }
 /* 
                 else if(temp.startsWith("--" + boundary)) {
                   String encode = null, filename = null;
