@@ -1,5 +1,5 @@
 /*  YAMM.java - main class
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+ *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,14 +42,14 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.52 2000/12/26 11:21:11 fredde Exp $
+ * @version $Id: YAMM.java,v 1.53 2001/03/18 17:05:46 fredde Exp $
  */
 public class YAMM
 	extends JFrame
 	implements HyperlinkListener
 {
 	/** The home of yamm */
-        public static String home = Utilities.replace(System.getProperty("user.home") + "/.yamm");
+	public static String home = Utilities.replace(System.getProperty("user.home") + "/.yamm");
 
 	/** To get the Language strings for buttons, menus, etc... */
 	private static ResourceBundle         res;
@@ -58,10 +58,10 @@ public class YAMM
 	public static String selectedbox = Utilities.replace(home + "/boxes/");
 
 	/** The version of YAMM */
-	public static String version  = "0.7.7";
+	public static String version  = "0.8";
 
 	/** The compileDate of YAMM */
-	public static String compDate = Utilities.cvsToDate("$Date: 2000/12/26 11:21:11 $");
+	public static String compDate = Utilities.getCompileDate();
 
 	/** the file that contains the current mail */
 	public String mailPageString = "file:///" + home + "/tmp/cache/";
@@ -515,6 +515,81 @@ public class YAMM
 		}
 	}
 
+	private static void createFiles() {
+		try {
+			new File(home + "/servers").mkdirs();
+			new File(home + "/boxes").mkdirs();
+			new File(home + "/.config").createNewFile();
+			new File(home + "/.profiles").createNewFile();
+			new File(home + "/.filters").createNewFile();
+			new File(home + "/tmp").mkdirs();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+			System.exit(1);
+		}
+	}
+
+	private static void convert() {
+		OutputStream out = null;
+		Properties newProps = new Properties();
+
+		newProps.setProperty("profile.num", "1");
+		newProps.setProperty("profile.0.name", props.getProperty("username"));
+		newProps.setProperty("profile.0.email", props.getProperty("email"));
+		newProps.setProperty("profile.0.sign", props.getProperty("signatur"));
+
+		try {
+			out = new FileOutputStream(home + "/.profiles");
+
+			newProps.store(out, "YAMM profiles");
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		} finally {
+			try {
+				if (out != null) {
+					out.close();
+				}
+			} catch (IOException ioe) {}
+		}
+	}
+
+	private static void createWelcomeMessage() {
+		try {
+			String user = System.getProperty("user.name");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+
+			InetAddress myInetaddr = InetAddress.getLocalHost();
+			String host = myInetaddr.getHostName();
+			if (host == null) host = "localhost";
+
+			PrintWriter out = new PrintWriter(
+				new BufferedOutputStream(
+				new FileOutputStream(home + "/boxes/" +
+				YAMM.getString("box.inbox")))
+			);
+
+			out.println("Date: " + dateFormat.format(new Date()));
+			out.println("From: Fredrik Ehnbom <fredde@gjt.org>");
+			out.println("To: " + user + "@" + host);
+			Object[] args = {
+				YAMM.version,
+				user
+			};
+			out.println(YAMM.getString("msg.welcome", args));
+			out.close();
+
+			new File(home + "/boxes/" + getString("box.outbox")).createNewFile();
+			new File(home + "/boxes/" + getString("box.trash")).createNewFile();
+			new File(home + "/boxes/" + getString("box.sent")).createNewFile();
+		} catch(IOException ioe) {
+			new ExceptionDialog(
+				YAMM.getString("msg.error"),
+				ioe,
+				YAMM.exceptionNames
+			);
+		}
+	}
+
 	/**
 	 * Shows a SplashScreen while starting the program.
 	 * It checks if the user has config-files, if not it'll
@@ -528,18 +603,7 @@ public class YAMM
 
 		if (!(new File(home)).exists()) {
 			firstRun = true;
-
-			try {
-				new File(home + "/servers").mkdirs();
-				new File(home + "/boxes").mkdirs();
-				new File(home + "/.config").createNewFile();
-				new File(home + "/.profiles").createNewFile();
-				new File(home + "/.filters").createNewFile();
-				new File(home + "/tmp").mkdirs();
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
-				System.exit(1);
-			}
+			createFiles();
 		}
 
 
@@ -554,27 +618,7 @@ public class YAMM
 
 		// convert the old profile format to the new
 		if (new File(home + "/.config").exists() && !new File(home + "/.profiles").exists()) {
-			OutputStream out = null;
-			Properties newProps = new Properties();
-
-			newProps.setProperty("profile.num", "1");
-			newProps.setProperty("profile.0.name", props.getProperty("username"));
-			newProps.setProperty("profile.0.email", props.getProperty("email"));
-			newProps.setProperty("profile.0.sign", props.getProperty("signatur"));
-
-			try {
-				out = new FileOutputStream(home + "/.profiles");
-
-				newProps.store(out, "YAMM profiles");
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
-			} finally {
-				try {
-					if (out != null) {
-						out.close();
-					}
-				} catch (IOException ioe) {}
-			}
+			convert();
 		}
 
 		Locale l = Locale.getDefault();
@@ -603,7 +647,9 @@ public class YAMM
 			try {
 				debug = new PrintStream(
 					new BufferedOutputStream(
-					new FileOutputStream(props.getProperty("debug.file"))));
+						new FileOutputStream(props.getProperty("debug.file"))
+					)
+				);
 			} catch (IOException ioe) {
 				debug = System.err;
 			}
@@ -621,7 +667,7 @@ public class YAMM
 
 		if (props.getProperty("splashscreen", "yes").equals("yes")) {
 			splash = new SplashScreen("YAMM " + version +
-				" Copyright (c) 1999-2000 Fredrik Ehnbom",
+				" Copyright (c) 1999-2001 Fredrik Ehnbom",
 				props.getClass().getResource("/images/logo.gif"));
 		}
 
@@ -637,41 +683,7 @@ public class YAMM
 		exceptionNames = tmp;
 
 		if (firstRun) {
-			try {
-				String user = System.getProperty("user.name");
-				SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-
-				InetAddress myInetaddr = InetAddress.getLocalHost();
-				String host = myInetaddr.getHostName();
-				if (host == null) host = "localhost";
-
-				PrintWriter out = new PrintWriter(
-					new BufferedOutputStream(
-					new FileOutputStream(home + "/boxes/" +
-					YAMM.getString("box.inbox")))
-				);
-
-				out.println("Date: " + dateFormat.format(new Date()));
-				out.println("From: Fredrik Ehnbom <fredde@gjt.org>");
-				out.println("To: " + user + "@" + host);
-				Object[] args = {
-					YAMM.version,
-					user
-				};
-				out.println(YAMM.getString("msg.welcome", args));
-
-				out.close();
-
-				(new File(home + "/boxes/" + getString("box.outbox"))).createNewFile();
-				(new File(home + "/boxes/" + getString("box.trash"))).createNewFile();
-				(new File(home + "/boxes/" + getString("box.sent"))).createNewFile();
-			} catch(IOException ioe) {
-				new ExceptionDialog(
-					YAMM.getString("msg.error"),
-					ioe,
-					YAMM.exceptionNames
-				);
-			}
+			createWelcomeMessage();
 		}
 
 		if (props.getProperty("button.mode", "both").equals("text")) {
@@ -690,6 +702,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.53  2001/03/18 17:05:46  fredde
+ * better init
+ *
  * Revision 1.52  2000/12/26 11:21:11  fredde
  * YAMM.listOfMails is now of type String[][]
  *
