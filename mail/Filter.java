@@ -19,8 +19,7 @@
 package org.gjt.fredde.yamm.mail;
 
 import java.io.*;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 import org.gjt.fredde.yamm.YAMM;
 
 /**
@@ -32,6 +31,7 @@ public class Filter {
 	 * Starts the filtering
 	 */
 	public Filter() throws IOException {
+		Hashtable changedBoxes = new Hashtable();
 		int type = 0;
 		int cheat[] = new int[1];
 		Vector list = new Vector();
@@ -83,14 +83,16 @@ public class Filter {
 									con3)) {
 							list.remove(i);
 							cheat[0] = i;
+							String target = YAMM.home +
+									YAMM.sep +
+									"boxes/" +
+									exec;
 							Mailbox.moveMail(
 								YAMM.home +
 								YAMM.sep +
 								"boxes/.filter",
-								YAMM.home +
-								YAMM.sep +
-								"boxes/" +
-								exec, cheat);
+								target , cheat);
+							changedBoxes.put(target, target);
 							i--;
 						}
 					}
@@ -108,14 +110,18 @@ public class Filter {
 									!= -1) {
 							list.remove(i);
 							cheat[0] = i;
+
+							String target = YAMM.home +
+									YAMM.sep +
+									"boxes/" +
+									exec;
+
 							Mailbox.moveMail(
 								YAMM.home +
 								YAMM.sep +
 								"boxes/.filter",
-								YAMM.home +
-								YAMM.sep +
-								"boxes/" +
-								exec, cheat);
+								target, cheat);
+							changedBoxes.put(target, target);
 							i--;
 						}
 					}
@@ -126,11 +132,18 @@ public class Filter {
 		}
 
 		cheat[0] = 0;
+		if (Mailbox.hasMail(YAMM.home + "/boxes/.filter")) {
+			changedBoxes.put(YAMM.home + "/boxes/" + YAMM.getString("box.inbox"),
+						YAMM.home + "/boxes/" + YAMM.getString("box.inbox"));
+		}
 		while (Mailbox.hasMail(YAMM.home + "/boxes/.filter")) {
 			Mailbox.moveMail(YAMM.home + "/boxes/.filter",
 						YAMM.home + "/boxes/" +
 						YAMM.getString("box.inbox"),
 									cheat);
+		}
+		for (Enumeration e = changedBoxes.elements(); e.hasMoreElements(); ) {
+			Mailbox.updateIndex(e.nextElement().toString());
 		}
 	}
 }
