@@ -39,7 +39,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Id: mainJTree.java,v 1.24 2000/08/09 16:31:56 fredde Exp $
+ * @version $Id: mainJTree.java,v 1.25 2000/11/03 11:17:58 fredde Exp $
  */
 public class mainJTree extends JTree implements DropTargetListener {
 
@@ -59,7 +59,7 @@ public class mainJTree extends JTree implements DropTargetListener {
 	public mainJTree(YAMM frame2, mainToolBar tbar2) { 
 		this.frame = frame2;
 		this.tbar = tbar2;
-		sentbox = YAMM.getProperty("sentbox", "false").equals("true");
+		sentbox = YAMM.getProperty("sentbox", "true").equals("true");
 
 		new DropTarget(this, // component
 				DnDConstants.ACTION_COPY_OR_MOVE, // actions
@@ -353,6 +353,9 @@ public class mainJTree extends JTree implements DropTargetListener {
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.25  2000/11/03 11:17:58  fredde
+ * sentbox should be shown by default
+ *
  * Revision 1.24  2000/08/09 16:31:56  fredde
  * calls mailList.update() instead of mailList.updateUI()
  *
