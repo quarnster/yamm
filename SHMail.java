@@ -1,5 +1,5 @@
-/*  SHMail.java - sends and gets mail
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+/*  $Id: SHMail.java,v 1.30 2003/03/07 20:20:58 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom
- * @version $Id: SHMail.java,v 1.29 2003/03/06 23:04:42 fredde Exp $
+ * @version $Id: SHMail.java,v 1.30 2003/03/07 20:20:58 fredde Exp $
  */
 public class SHMail extends Thread {
 
@@ -50,6 +50,10 @@ public class SHMail extends Thread {
 	/** If smtp-debugging info should be printed */
 	static private boolean smtpdebug = false;
 
+	/** If messages should be deleted after getting them */
+	static private boolean del = false;
+
+
 
 	JButton knappen;
 	YAMM frame;
@@ -66,8 +70,10 @@ public class SHMail extends Thread {
 		knappen.setEnabled(false);
 		frame = frame1;
 
-		if (YAMM.getProperty("debug.pop", "false").equals("true")) popdebug = true;
-		if (YAMM.getProperty("debug.smtp", "false").equals("true")) smtpdebug = true;
+		popdebug	= YAMM.getProperty("debug.pop",  "false").equals("true");
+		smtpdebug	= YAMM.getProperty("debug.smtp", "false").equals("true");
+		del		= YAMM.getProperty("delete", "true").equals("true");
+		sent		= YAMM.getProperty("sentbox","true").equals("true");
 	}
 
 	/**
@@ -98,13 +104,6 @@ public class SHMail extends Thread {
 			String username = props.getProperty("username");
 			String password = new SimpleCrypt("myKey").decrypt(
 						props.getProperty("password"));
-			boolean del = false;
-			if (YAMM.getProperty("delete", "true").equals("true")) {
-				del = true;
-			}
-			if (YAMM.getProperty("sentbox","true").equals("true")) {
-				sent = true;
-			}
 
 			int port = 110;
 			try {
@@ -292,6 +291,9 @@ public class SHMail extends Thread {
 		frame.status.setStatus(YAMM.getString("msg.done"));
 		frame.status.progress(100);
 
+		frame.status.setStatus("");
+		frame.status.progress(0);
+
 		if (Mailbox.hasMail(YAMM.home + "/boxes/.filter")) {
 			frame.status.setStatus(YAMM.getString("server.filter"));
 			frame.status.progress(0);
@@ -310,9 +312,9 @@ public class SHMail extends Thread {
 			frame.status.progress(100);
 
 			frame.tree.repaint();
+			frame.status.setStatus("You have new mail!");
+			frame.status.progress(0);
 		}
-		frame.status.setStatus("");
-		frame.status.progress(0);
 
 		knappen.setEnabled(true);
 	}
@@ -320,6 +322,9 @@ public class SHMail extends Thread {
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.30  2003/03/07 20:20:58  fredde
+ * moved more getProperty stuff to init. Now tells the user that he got mail if he did
+ *
  * Revision 1.29  2003/03/06 23:04:42  fredde
  * only send email information with the smtp.to-command
  *
