@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.43 2003/03/10 09:46:34 fredde Exp $
+ * @version $Id: mainTable.java,v 1.44 2003/03/10 11:02:42 fredde Exp $
  */
 public class mainTable
 	extends JTable
@@ -238,6 +238,23 @@ public class mainTable
 	 */
 	private void SortFirst(int col) {
 		if (yamm.listOfMails == null) return;
+		int temp = -1;
+
+		if (col == 3) {
+			for (int i = 0; i < yamm.listOfMails.length; i++) {
+				for (int j = 0; j < yamm.listOfMails.length; j++) {
+					long one = yamm.listOfMails[yamm.keyIndex[i]].date;
+					long two = yamm.listOfMails[yamm.keyIndex[j]].date;
+
+					if (one < two) {
+						temp = yamm.keyIndex[j];
+						yamm.keyIndex[j] = yamm.keyIndex[i];
+						yamm.keyIndex[i] = temp;
+					}
+				}
+			}
+		}
+
 /*
 		int temp = -1;
 		if (col == 0) {
@@ -275,6 +292,23 @@ public class mainTable
 	 */
 	private void SortLast(int col) {
 		if (yamm.listOfMails == null) return;
+
+		int temp = -1;
+
+		if (col == 3) {
+			for (int i = 0; i < yamm.listOfMails.length; i++) {
+				for (int j = 0; j < yamm.listOfMails.length; j++) {
+					long one = yamm.listOfMails[yamm.keyIndex[i]].date;
+					long two = yamm.listOfMails[yamm.keyIndex[j]].date;
+
+					if (one > two) {
+						temp = yamm.keyIndex[j];
+						yamm.keyIndex[j] = yamm.keyIndex[i];
+						yamm.keyIndex[i] = temp;
+					}
+				}
+			}
+		}
 /*
 		int temp = -1;
 
@@ -482,7 +516,8 @@ public class mainTable
 					dataModel.fireTableRowsUpdated(row, row);
 					yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
 					row = yamm.tree.getSelectedRow();
-					yamm.tree.dataModel.fireTableRowsUpdated(row, row);
+					if (row != -1)
+						yamm.tree.dataModel.fireTableRowsUpdated(row, row);
 				}
 				changeButtonMode(true);
 				if (me.getClickCount() == 2) new MailReader(yamm.mailPage);
@@ -545,7 +580,8 @@ public class mainTable
 				update();
 				yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
 				int row = yamm.tree.getSelectedRow();
-				yamm.tree.dataModel.fireTableRowsUpdated(row, row);
+				if (row != -1)
+					yamm.tree.dataModel.fireTableRowsUpdated(row, row);
 
 
 				if (yamm.listOfMails.length < 0) {
@@ -584,7 +620,8 @@ public class mainTable
 				update();
 				yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
 				int row = yamm.tree.getSelectedRow();
-				yamm.tree.dataModel.fireTableRowsUpdated(row, row);
+				if (row != -1)
+					yamm.tree.dataModel.fireTableRowsUpdated(row, row);
 
 				changeButtonMode(false);
 				clearSelection();
@@ -637,7 +674,8 @@ public class mainTable
 			update();
 			yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
 			int row = yamm.tree.getSelectedRow();
-			yamm.tree.dataModel.fireTableRowsUpdated(row, row);
+			if (row != -1)
+				yamm.tree.dataModel.fireTableRowsUpdated(row, row);
 		}
 	};
 
@@ -663,13 +701,17 @@ public class mainTable
 			update();
 			yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
 			int row = yamm.tree.getSelectedRow();
-			yamm.tree.dataModel.fireTableRowsUpdated(row, row);
+			if (row != -1)
+				yamm.tree.dataModel.fireTableRowsUpdated(row, row);
 		}
 	};
 }
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.44  2003/03/10 11:02:42  fredde
+ * added sorting for datecolumn. check if row != -1 before fireTableRowsUpdated on the boxtree
+ *
  * Revision 1.43  2003/03/10 09:46:34  fredde
  * non localized box filenames. Uses dataModel.fireTableRowsUpdated instead of DataChanged
  *
