@@ -28,7 +28,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.38 2003/03/05 15:08:21 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.39 2003/03/05 15:59:08 fredde Exp $
  */
 public class Mailbox {
 
@@ -312,80 +312,9 @@ public class Mailbox {
 	 * @param mailList The String array which will recieve the information
 	 */
 	public static void createList(String whichBox, YAMM yamm) {
-		String subject = null;
-		String from = null;
-		String date = null;
-		String status = null;
-
-		int sep = whichBox.lastIndexOf(File.separator);
-
-		String box = whichBox.substring(0, sep + 1) + "." + whichBox.substring(sep + 1, whichBox.length()) + ".index";
-
-
-		if (!hasMail(whichBox)) {
-			yamm.listOfMails = new String[0][6];
-			yamm.keyIndex = new int[0];
-			return;
-		}
-		File indexfile = new File(box);
-
-		Date boxdate = new Date(new File(whichBox).lastModified());
-		Date indexdate = new Date(indexfile.lastModified());
-
-		if (!indexfile.exists() || boxdate.after(indexdate)) {
-			updateIndex(whichBox);
-		}
-
-		int num = getUnread(whichBox)[0];
-		yamm.listOfMails = new String[num][6];
-		yamm.keyIndex = new int[num];
-
-		BufferedReader in = null;
-
-		try {
-			in = new BufferedReader(new InputStreamReader(new FileInputStream(box)));
-
-			in.readLine(); // skip messages, unread messages header
-			StreamTokenizer tok = new StreamTokenizer(in);
-
-			for (int i = 0;; i++) {
-				if (tok.nextToken() == StreamTokenizer.TT_EOF) {
-					break;
-				}
-
-				// message number
-				num = (int) tok.nval;
-				yamm.listOfMails[i][0] = Integer.toString(num);
-
-				// subject
-				tok.nextToken();
-				yamm.listOfMails[i][1] = tok.sval;
-
-				// from
-				tok.nextToken();
-				yamm.listOfMails[i][2] = tok.sval;
-
-				// date
-				tok.nextToken();
-				yamm.listOfMails[i][3] = tok.sval;
-
-				// read
-				tok.nextToken();
-				yamm.listOfMails[i][4] = tok.sval;
-
-				// skip
-				tok.nextToken();
-				yamm.listOfMails[i][5] = "" + (long) tok.nval;
-
-				yamm.keyIndex[i] = i;
-			}
-		} catch(IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
-		} finally {
-			try {
-				if (in != null) in.close();
-			} catch (IOException ioe) {}
-		}
+		yamm.listOfMails = createList(whichBox);
+		yamm.keyIndex = new int[yamm.listOfMails.length];
+		for (int i = 0; i < yamm.keyIndex.length; i++) yamm.keyIndex[i] = i;
 	}
 
 	/**
@@ -393,7 +322,7 @@ public class Mailbox {
 	 *
 	 * @param whichBox Which box to get messages from.
 	 */
-/*
+
 	public static String[][] createList(String whichBox) {
 		String subject = null;
 		String from = null;
@@ -467,7 +396,7 @@ public class Mailbox {
 		}
 		return listOfMails;
 	}
-*/
+
 	/**
 	 * Creates a list with the mails in the filter box.
 	 * @param mailList The vector that should contain the information
@@ -1501,6 +1430,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.39  2003/03/05 15:59:08  fredde
+ * createList fixes
+ *
  * Revision 1.38  2003/03/05 15:08:21  fredde
  * Setting status for messages should be much faster now
  *
