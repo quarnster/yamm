@@ -41,6 +41,8 @@ public class UUDecoder {
 
 			if (temp == null) {
 				break;
+			} else if (temp.startsWith("begin")) {
+				continue;
 			} else if (!temp.equalsIgnoreCase("end") &&
 					!temp.equals("") && !temp.equals("`")) {
 				byte[] b = temp.getBytes();
@@ -55,7 +57,7 @@ public class UUDecoder {
 								i += 4) {
 
 						if (j + 3 > length) {
-							for (int x = i; j <
+							for (int x = i; x <
 									length;
 									j++,
 									x++) {
