@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.64 2003/03/10 21:51:06 fredde Exp $
+/*  $Id: YAMM.java,v 1.65 2003/03/15 19:25:51 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.64 $
+ * @version $Revision: 1.65 $
  */
 public class YAMM
 	extends JFrame
@@ -242,11 +242,11 @@ public class YAMM
 			JTPane.addTab(res.getString("mail"), new JScrollPane(mail));
 		} else if (ico && !text) {
 			JTPane.addTab("",
-			new ImageIcon(getClass().getResource("/images/buttons/mail.gif")),
+			new ImageIcon(getClass().getResource("/images/buttons/mail.png")),
 			new JScrollPane(mail));
 		} else {
 			JTPane.addTab(res.getString("mail"),
-			new ImageIcon(getClass().getResource("/images/buttons/mail.gif")),
+			new ImageIcon(getClass().getResource("/images/buttons/mail.png")),
 			new JScrollPane(mail));
 		}
 
@@ -260,7 +260,7 @@ public class YAMM
 			b.setText(res.getString("button.view_extract"));
 		}
 		if (ico) {
-			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/search.gif")));
+			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/search.png")));
 		}
 		b.setToolTipText(res.getString("button.view_extract"));
 		b.addActionListener(BListener);
@@ -286,7 +286,7 @@ public class YAMM
 		if (ico && !text) {
 			JTPane.addTab(
 				"",
-				new ImageIcon(getClass().getResource("/images/buttons/attach.gif")),
+				new ImageIcon(getClass().getResource("/images/buttons/attach.png")),
 				myPanel
 			);
 		} else if (text && !ico) {
@@ -294,7 +294,7 @@ public class YAMM
 		} else {
 			JTPane.addTab(
 				res.getString("mail.attachment"),
-				new ImageIcon(getClass().getResource("/images/buttons/attach.gif")),
+				new ImageIcon(getClass().getResource("/images/buttons/attach.png")),
 				myPanel
 			);
 		}
@@ -653,7 +653,7 @@ public class YAMM
 		if (props.getProperty("splashscreen", "yes").equals("yes")) {
 			splash = new SplashScreen("YAMM " + version +
 				" Copyright (c) 1999-2003 Fredrik Ehnbom",
-				props.getClass().getResource("/images/logo.gif"));
+				props.getClass().getResource("/images/logo.png"));
 		}
 
 		selectedbox += "/inbox";
@@ -687,6 +687,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.65  2003/03/15 19:25:51  fredde
+ * .gif -> .png
+ *
  * Revision 1.64  2003/03/10 21:51:06  fredde
  * welcome message is of type text/html
  *
