@@ -23,10 +23,7 @@ import java.awt.event.*;
 import java.awt.*;
 import java.awt.print.PrinterJob;
 import java.io.*;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.MissingResourceException;
-import java.util.Locale;
+import java.util.*;
 import org.gjt.fredde.yamm.YAMM;
 import org.gjt.fredde.yamm.mail.Mailbox;
 import org.gjt.fredde.yamm.YAMMWrite;
@@ -209,9 +206,14 @@ public class mainToolBar extends JToolBar {
 						frame.mailList.getSelectedRow(),
 								i).toString());
 
+				long skip = Long.parseLong(
+						((Vector) frame.listOfMails.
+						elementAt(selMail)).
+						elementAt(5).toString());
+
 				String[] mail = Mailbox.getMailForReplyHeaders(
 							frame.selectedbox,
-								selMail);
+							selMail, skip);
 
 				if (!mail[1].startsWith(
 						YAMM.getString("mail.re")) &&
@@ -225,7 +227,7 @@ public class mainToolBar extends JToolBar {
 						YAMM.getString("mail.wrote") +
 									"\n");
 				Mailbox.getMailForReply(frame.selectedbox,
-								selMail,
+								selMail, skip,
 								yam.myTextArea);
 			} else if (arg.equals(YAMM.getString(
 						"button.forward.tooltip"))) {
@@ -245,9 +247,14 @@ public class mainToolBar extends JToolBar {
 						frame.mailList.getSelectedRow(),
 								i).toString());
 
+				long skip = Long.parseLong(
+						((Vector) frame.listOfMails.
+						elementAt(selMail)).
+						elementAt(5).toString());
+
 				String mail[] = Mailbox.getMailForReplyHeaders(
 							frame.selectedbox,
-								selMail);
+								selMail, skip);
 				if (!mail[1].startsWith(
 						YAMM.getString("mail.fwd")) &&
 						!mail[1].startsWith("Fwd:")) {
@@ -260,7 +267,7 @@ public class mainToolBar extends JToolBar {
 						YAMM.getString("mail.wrote") +
 									"\n");
 				Mailbox.getMailForReply(frame.selectedbox,
-									selMail,
+								selMail, skip,
 								yam.myTextArea);
 			} else if (arg.equals(YAMM.getString(
 						"button.print.tooltip"))) {

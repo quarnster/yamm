@@ -276,12 +276,18 @@ public class mainMenu extends JMenuBar {
 							tmp.getSelectedRow(),i).
 								toString());
 
+					long skip = Long.parseLong(
+						((Vector) frame.listOfMails.
+						elementAt(msg)).elementAt(5).
+						toString());
+
 
 					if (msg != -1) {
 						sourceViewer sv =
 							new sourceViewer();
 						Mailbox.viewSource(
 							frame.selectedbox, msg,
+							skip,
 							sv.jtarea
 						);
 					}

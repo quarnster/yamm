@@ -509,7 +509,7 @@ public class mainTable extends JTable implements DragGestureListener,
 			String outbox = YAMM.home + YAMM.sep + "boxes" +
 					YAMM.sep + YAMM.getString("box.outbox");
 
-			if (v.elementAt(4) != null ||
+			if (!v.elementAt(4).toString().equals("Unread") ||
 					outbox.equals(frame.selectedbox)) {
 				setForeground(Color.black);
 			} else {
@@ -548,11 +548,16 @@ public class mainTable extends JTable implements DragGestureListener,
 						YAMM.sep +
 						YAMM.getString("box.outbox");
 
-				if (v.elementAt(4) == null
+				if (v.elementAt(4).toString().equals("Unread")
 					&& !frame.selectedbox.equals(outbox)) {
 
+					long skip = Long.parseLong(
+					((Vector) listOfMails.elementAt(
+						getSelectedRow())).
+						elementAt(5).toString());
+
 					Mailbox.setStatus(frame.selectedbox,
-						getSelectedRow(), "Read");
+						getSelectedRow(), skip, "Read");
 					Mailbox.createList(frame.selectedbox,
 							frame.listOfMails);
 				}
@@ -569,19 +574,24 @@ public class mainTable extends JTable implements DragGestureListener,
 		}
  
 		void get_mail() {
+
 			int i = 0;
- 
+
 			while (i < 4) {
 				if (getColumnName(i).equals("#")) {
-					 break;
+					break;
 				}
-				i++;
 			}
+
+			long skip = Long.parseLong(
+					((Vector) listOfMails.elementAt(
+						getSelectedRow())).
+						elementAt(5).toString());
 
 			int whatMail = Integer.parseInt(getValueAt(
 					getSelectedRow(), i).toString());
 
-			Mailbox.getMail(frame.selectedbox,whatMail);
+			Mailbox.getMail(frame.selectedbox, whatMail, skip);
 			try {
 				String boxName = frame.selectedbox.substring(
 					frame.selectedbox.indexOf("boxes") + 6,
@@ -654,8 +664,13 @@ public class mainTable extends JTable implements DragGestureListener,
 				updateUI();
 				frame.attach = new Vector();
 
+				long skip = Long.parseLong(
+					((Vector) listOfMails.elementAt(
+						getSelectedRow())).
+						elementAt(5).toString());
+
 				Mailbox.getMail(frame.selectedbox,
-							getSelectedRow());
+							getSelectedRow(), skip);
 
 				try {
 					String boxName = frame.selectedbox.
@@ -739,9 +754,13 @@ public class mainTable extends JTable implements DragGestureListener,
 				updateUI();
 				frame.attach = new Vector();
 
+				long skip = Long.parseLong(
+					((Vector) listOfMails.elementAt(
+						getSelectedRow())).
+						elementAt(5).toString());
 
 				Mailbox.getMail(frame.selectedbox,
-							getSelectedRow());
+						getSelectedRow(), skip);
 
 				try { 
 					String boxName = frame.selectedbox.
@@ -785,21 +804,26 @@ public class mainTable extends JTable implements DragGestureListener,
 				if (getSelectedRow() == -1) {
 					return;
 				}
+
+				int msgnum = Integer.parseInt(
+					getValueAt(getSelectedRow(), i).
+								toString());
+
+				long skip = Long.parseLong(
+						((Vector) frame.listOfMails.
+						elementAt(msgnum)).elementAt(5).
+								toString());
                  
 				String[] mail = Mailbox.getMailForReplyHeaders(
-					frame.selectedbox, 
-					Integer.parseInt(
-					getValueAt(getSelectedRow(),
-								i).toString()));
+					frame.selectedbox, msgnum, skip);
  
 				YAMMWrite yam = new YAMMWrite(mail[0], mail[1],
 						mail[0] + " " +
 						YAMM.getString("mail.wrote") +
 						"\n");
+
 				Mailbox.getMailForReply(frame.selectedbox, 
-						Integer.parseInt(getValueAt(
-							getSelectedRow(),
-								i).toString()), 
+								msgnum, skip,
 								yam.myTextArea);
 			}
 		}
@@ -871,8 +895,13 @@ public class mainTable extends JTable implements DragGestureListener,
 			Mailbox.createList(frame.selectedbox,
 							frame.listOfMails);
 			mainTable.this.updateUI();
+			long skip = Long.parseLong(
+				((Vector) listOfMails.elementAt(
+						getSelectedRow())).
+						elementAt(5).toString());
 
-			Mailbox.getMail(frame.selectedbox, getSelectedRow());
+			Mailbox.getMail(frame.selectedbox, getSelectedRow(),
+									skip);
 
 			try { 
 				String boxName = frame.selectedbox.substring(
