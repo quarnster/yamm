@@ -27,102 +27,112 @@ import java.io.File;
  * A class to view images (jpg/gif).
  */
 public class imageViewer extends JFrame {
-    String filename;
+	String filename;
 
-    class imagePanel extends JPanel {
-      Image iImage;
+	class imagePanel extends JPanel {
+		Image iImage;
 
-      public imagePanel(String whichimage) {
-        iImage = Toolkit.getDefaultToolkit().getImage(whichimage);
+		public imagePanel(String whichimage) {
+			iImage = Toolkit.getDefaultToolkit().getImage(
+								whichimage);
 
-        MediaTracker t = new MediaTracker(this);
-        t.addImage(iImage, 1);
-        try {
-          t.waitForID(1);
-        }
-        catch(InterruptedException ie) { System.err.println(ie.toString()); }
-      }
+			MediaTracker t = new MediaTracker(this);
+			t.addImage(iImage, 1);
+			try {
+				t.waitForID(1);
+			} catch(InterruptedException ie) {
+				System.err.println(ie.toString());
+			}
+		}
 
-      public Dimension getPreferredSize() {
-        return new Dimension(iImage.getWidth(this), iImage.getHeight(this));
-      }
+		public Dimension getPreferredSize() {
+			return new Dimension(iImage.getWidth(this),
+							iImage.getHeight(this));
+		}
 
-      public Dimension getMaximumSize() {
-        return getPreferredSize();
-      }
+		public Dimension getMaximumSize() {
+			return getPreferredSize();
+		}
 
-      public void paint(Graphics g) {
-        g.drawImage(iImage, 0, 0, this);
-      }
-    }
+		public void paint(Graphics g) {
+			g.drawImage(iImage, 0, 0, this);
+		}
+	}
 
-    /**
-     * Creates a window and adds the specified image in it.
-     * @param image The path to the image to view.
-     */
-    public imageViewer(String image) {
-      setTitle(image);
-      getContentPane().setLayout(new BorderLayout());
-      filename = image;
+	/**
+	 * Creates a window and adds the specified image in it.
+	 * @param image The path to the image to view.
+	 */
+	public imageViewer(String image) {
+		setTitle(image);
+		getContentPane().setLayout(new BorderLayout());
+		filename = image;
 
-      imagePanel ip = new imagePanel(image);
-      JScrollPane jspane = new JScrollPane(ip, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		imagePanel ip = new imagePanel(image);
+		JScrollPane jspane = new JScrollPane(ip);
 
-      getContentPane().add("Center", jspane);
+		getContentPane().add("Center", jspane);
 
-      Dimension screen = getToolkit().getScreenSize();
+		Dimension screen = getToolkit().getScreenSize();
 
-      Dimension im = ip.getMaximumSize();
-      int width = im.width, height = im.height;
-      if(width > screen.width + 15) width = screen.width - 215;
-      if(height > screen.height + 55) height = screen.height - 255;
+		Dimension im = ip.getMaximumSize();
+		int width = im.width;
+		int height = im.height;
 
-      setBounds((screen.width - width + 15)/2, 
-                (screen.height - height + 55)/2, 
-                width + 15, 
-                height + 55);
+		if (width > screen.width + 15) {
+			width = screen.width - 215;
+		}
+		if (height > screen.height + 55) {
+			height = screen.height - 255;
+		}
 
-      addWindowListener(new WindowAdapter() {
-        public void windowClosing(WindowEvent evt) {
-          dispose(); 
-        }
-      });
+		setBounds((screen.width - width + 15)/2, 
+				(screen.height - height + 55)/2, 
+							width + 15, 
+								height + 55);
 
-      Box box = Box.createHorizontalBox();
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent evt) {
+				dispose(); 
+			}
+		});
+
+		Box box = Box.createHorizontalBox();
       
-      JButton b = new JButton("Save");
-      b.addActionListener(BListener);
-      box.add(b);
+		JButton b = new JButton("Save");
+		b.addActionListener(BListener);
+		box.add(b);
 
-      b = new JButton("Exit");
-      b.addActionListener(BListener);
-      box.add(b);
+		b = new JButton("Exit");
+		b.addActionListener(BListener);
+		box.add(b);
 
-      getContentPane().add("South", box);
-      show();
-    }
+		getContentPane().add("South", box);
+		show();
+	}
 
-  ActionListener BListener = new ActionListener() {
-    public void actionPerformed(ActionEvent e) {
-      String arg = ((JButton)e.getSource()).getText();
+	ActionListener BListener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			String arg = ((JButton)e.getSource()).getText();
 
-      if(arg.equals("Save")) {
-        JFileChooser jfs = new JFileChooser();
-        jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        jfs.setMultiSelectionEnabled(false);
-        jfs.setSelectedFile(new File(filename));
-        int ret = jfs.showSaveDialog(null);
+			if (arg.equals("Save")) {
+				JFileChooser jfs = new JFileChooser();
+				jfs.setFileSelectionMode(
+						JFileChooser.FILES_ONLY);
+				jfs.setMultiSelectionEnabled(false);
+				jfs.setSelectedFile(new File(filename));
+				int ret = jfs.showSaveDialog(null);
 
-        if(ret == JFileChooser.APPROVE_OPTION) {
-          new File(filename).renameTo(jfs.getSelectedFile());
-        }
+				if (ret == JFileChooser.APPROVE_OPTION) {
+					new File(filename).renameTo(
+							jfs.getSelectedFile());
+				}
 
-        dispose();
-      }
-      else if(arg.equals("Exit")) {
-        new File(filename).delete();
-        dispose();
-      }
-    }
-  };
+				dispose();
+			} else if(arg.equals("Exit")) {
+				new File(filename).delete();
+				dispose();
+			}
+		}
+	};
 }

@@ -27,26 +27,26 @@ import java.awt.BorderLayout;
  */
 public class sourceViewer extends JFrame {
 
-  /** The JTextArea to be used when viewing the source */
-  public  JTextArea jtarea;
+	/** The JTextArea to be used when viewing the source */
+	public  JTextArea jtarea;
 
-  /**
-   * Creates the window
-   */
-  public sourceViewer() {
-    setBounds(140, 0, 550, 560);
-    getContentPane().setLayout(new BorderLayout());
+	/**
+	 * Creates the window
+	 */
+	public sourceViewer() {
+		setBounds(140, 0, 550, 560);
+		getContentPane().setLayout(new BorderLayout());
 
-    jtarea = new JTextArea();
-    jtarea.setEditable(false);
-    getContentPane().add("Center", new JScrollPane(jtarea));
+		jtarea = new JTextArea();
+		jtarea.setEditable(false);
+		getContentPane().add("Center", new JScrollPane(jtarea));
 
-    addWindowListener(new WindowAdapter() {
-      public void windowClosing(WindowEvent event) {
-        dispose();
-      }
-    });
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent event) {
+				dispose();
+			}
+		});
 
-    show();
-  }
+		show();
+	}
 }

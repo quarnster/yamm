@@ -28,71 +28,105 @@ import org.gjt.fredde.yamm.YAMM;
  */
 public class Filter {
 
-  String confHome = System.getProperty("user.home") + "/.yamm/";
-  String temp, temp2;
-  String con1, con2, con3, exec;
-  StringTokenizer tok;
-  BufferedReader in;
-  int type;
-  int cheat[] = new int[1];
-  Vector list = new Vector();
+	/**
+	 * Starts the filtering
+	 */
+	public Filter() throws IOException {
+		int type = 0;
+		int cheat[] = new int[1];
+		Vector list = new Vector();
+		BufferedReader in = null;
 
-  /**
-   * Starts the filtering
-   */
-  public Filter() throws IOException {
+		Mailbox.createFilterList(list);
 
-    Mailbox.createFilterList(list);
+		try {
+			in = new BufferedReader(
+					new InputStreamReader(
+					new FileInputStream(YAMM.home +
+								".filters")));
 
-    try{
-      in = new BufferedReader(new InputStreamReader(new FileInputStream(confHome + ".filters")));
+			String temp = null;
 
-      for(;;) {
-        temp = in.readLine();
+			for (;;) {
+				temp = in.readLine();
 
-        if(temp == null) break;
+				if (temp == null) {
+					break;
+				}
 
-        tok = new StringTokenizer(temp, ";");
-        con1 = tok.nextToken();
-        con2 = tok.nextToken();
-        con3 = tok.nextToken();
-        exec = tok.nextToken();
+				StringTokenizer tok = new StringTokenizer(temp,
+									";");
+				String con1 = tok.nextToken();
+				String con2 = tok.nextToken();
+				String con3 = tok.nextToken();
+				String exec = tok.nextToken();
 
-        if(con1.equals("from")) type = 0;
-        else if(con1.equals("to")) type = 1;
-        else if(con1.equals("subject")) type = 2;
-        else if(con1.equals("reply")) type = 3;
+				if (con1.equals("from")) {
+					 type = 0;
+				} else if (con1.equals("to")) {
+					type = 1;
+				} else if (con1.equals("subject")) {
+					type = 2;
+				} else if (con1.equals("reply")) {
+					type = 3;
+				}
 
-        if(con2.equals("is")) {
-          for(int i=0; i < list.size();i++) {
-            temp2 = ((Vector)list.elementAt(i)).elementAt(type).toString();
-            if(temp2.equalsIgnoreCase(con3)) {
-              list.remove(i);
-              cheat[0] = i;
-              Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" + exec, cheat);
-              i--;
-            }
-          }
-        }
-        else if(con2.equals("contains")) {
-          for(int i=0; i < list.size();i++) {
-            temp2 = ((Vector)list.elementAt(i)).elementAt(type).toString();
-            if(temp2.toLowerCase().indexOf(con3.toLowerCase()) != -1) {
-              list.remove(i);
-              cheat[0] = i;
-              Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" + exec, cheat);
-              i--;
-            }
-          }
-        }
-      }
-    } finally { in.close(); }
+				if (con2.equals("is")) {
+					for (int i = 0; i < list.size(); i++) {
+						Vector v = (Vector)
+							list.elementAt(i);
+						String temp2 =
+							v.elementAt(type).
+								toString();
+						if (temp2.equalsIgnoreCase(
+									con3)) {
+							list.remove(i);
+							cheat[0] = i;
+							Mailbox.moveMail(
+								YAMM.home +
+								"boxes/.filter",
+								YAMM.home +
+								"boxes/" +
+								exec, cheat);
+							i--;
+						}
+					}
+				} else if (con2.equals("contains")) {
+					for (int i = 0; i < list.size(); i++) {
+						Vector v = (Vector)
+							list.elementAt(i);
+						String temp2 =
+							v.elementAt(type).
+								toString();
 
-    cheat[0] = 0;
-    while(Mailbox.hasMail(confHome + "boxes/.filter")) {
-      Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" +
-                       YAMM.getString("box.inbox"), cheat);
-    }
-  }
+						if (temp2.toLowerCase().
+								indexOf(con3.
+								toLowerCase())
+									!= -1) {
+							list.remove(i);
+							cheat[0] = i;
+							Mailbox.moveMail(
+								YAMM.home +
+								"boxes/.filter",
+								YAMM.home +
+								"boxes/" +
+								exec, cheat);
+							i--;
+						}
+					}
+				}
+			}
+		} finally {
+			in.close();
+		}
+
+		cheat[0] = 0;
+		while (Mailbox.hasMail(YAMM.home + "boxes/.filter")) {
+			Mailbox.moveMail(YAMM.home + "boxes/.filter",
+						YAMM.home + "boxes/" +
+						YAMM.getString("box.inbox"),
+									cheat);
+		}
+	}
 }
 

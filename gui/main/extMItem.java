@@ -25,28 +25,28 @@ import javax.swing.JMenuItem;
  */
 public class extMItem extends JMenuItem {
 
-  /** the full name of this extMItem */
-  protected String name = null;
+	/** the full name of this extMItem */
+	protected String name = null;
 
-  /**
-   * Creates a new extended menu item
-   * @param name Sets the text of this menu to 'name'
-   */
-  public extMItem(String name) {
-    setText(name);
-  }
+	/**
+	 * Creates a new extended menu item
+	 * @param name Sets the text of this menu to 'name'
+	 */
+	public extMItem(String name) {
+		super(name);
+	}
 
-  /**
-   * Sets the full name of this extMItem to 'name'
-   */
-  public void setFullName(String name) {
-    this.name = name;
-  }
+	/**
+	 * Sets the full name of this extMItem to 'name'
+	 */
+	public void setFullName(String name) {
+		this.name = name;
+	}
 
-  /**
-   * Gets the full name of this extMItem
-   */
-  public String getFullName() {
-    return name;
-  }
+	/**
+	 * Gets the full name of this extMItem
+	 */
+	public String getFullName() {
+		return name;
+	}
 }
