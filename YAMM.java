@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.65 2003/03/15 19:25:51 fredde Exp $
+/*  $Id: YAMM.java,v 1.66 2003/03/16 11:02:28 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.65 $
+ * @version $Revision: 1.66 $
  */
 public class YAMM
 	extends JFrame
@@ -65,7 +65,7 @@ public class YAMM
 	public static String selectedbox = Utilities.replace(home + "/boxes/");
 
 	/** The version of YAMM */
-	public static String version  = "0.8";
+	public static String version  = "0.9";
 
 	/** The compileDate of YAMM */
 	public static String compDate = Utilities.getCompileDate();
@@ -687,6 +687,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.66  2003/03/16 11:02:28  fredde
+ * bumped versionnumber up to 0.9
+ *
  * Revision 1.65  2003/03/15 19:25:51  fredde
  * .gif -> .png
  *
