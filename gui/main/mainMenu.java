@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Id: mainMenu.java,v 1.21 2000/03/05 18:02:53 fredde Exp $
+ * @version $Id: mainMenu.java,v 1.22 2000/03/15 13:43:00 fredde Exp $
  */
 public class mainMenu extends JMenuBar {
 
@@ -216,7 +216,8 @@ public class mainMenu extends JMenuBar {
 				p("os.name", jt);
 				p("os.arch", jt);
 				p("os.version", jt);
-				jt.append("YAMM.version: " + YAMM.version);
+				jt.append("YAMM.version: " + YAMM.version + "\n");
+				jt.append("YAMM.compDate: " + YAMM.compDate);
 			} else if (kommando.equals(YAMM.getString(
 							"help.license"))) {
 				new MsgDialog(null,
@@ -361,6 +362,9 @@ public class mainMenu extends JMenuBar {
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.22  2000/03/15 13:43:00  fredde
+ * added YAMM.compDate to bug report
+ *
  * Revision 1.21  2000/03/05 18:02:53  fredde
  * now gets the images used for the jar-file
  *
