@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.30 2003/03/08 21:44:07 fredde Exp $
+/*  $Id: mainJTree.java,v 1.31 2003/03/09 14:05:56 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.30 $
+ * @version $Revision: 1.31 $
  */
 public class mainJTree
 	extends JTable
@@ -49,7 +49,7 @@ public class mainJTree
 
 	private JPopupMenu treepop;
 	private DefaultMutableTreeNode top = new DefaultMutableTreeNode(YAMM.getString("box.boxes"));
-	private static YAMM frame;
+	private static YAMM yamm;
 	private static mainToolBar tbar;
 	private boolean sentbox = false;
 	private TreeTableCellRenderer tree;
@@ -100,21 +100,15 @@ public class mainJTree
 
 	/**
 	 * Creates the tree and adds all the treestuff to the tree.
-	 * @param frame2 The JFrame that will be used for error messages etc
+	 * @param yamm2 The JFrame that will be used for error messages etc
 	 * @param top2 The TreeNode that this tree will use.
 	 * @param tbar2 The mainToolBar to disable/enable buttons on.
 	 */
-	public mainJTree(YAMM frame2, mainToolBar tbar2) {
-		this.frame = frame2;
+	public mainJTree(YAMM yamm2, mainToolBar tbar2) {
+		this.yamm = yamm2;
 		this.tbar = tbar2;
 		sentbox = YAMM.getProperty("sentbox", "true").equals("true");
 
-		new DropTarget(
-			this, // component
-			DnDConstants.ACTION_COPY_OR_MOVE, // actions
-			this //DropTargetListener
-		);
- 
 		setModel(dataModel);
 
 		setColumnSelectionAllowed(false);
@@ -125,7 +119,7 @@ public class mainJTree
 		TableColumn column = getColumnModel().getColumn(1);
 		column.setIdentifier("num");
 		column.setMinWidth(5);
-		column.setMaxWidth(50);
+		column.setMaxWidth(100);
 		column.setPreferredWidth(50);
 
 		tree = new TreeTableCellRenderer(this);
@@ -138,11 +132,6 @@ public class mainJTree
 		DefaultTableCellRenderer rend = new DefaultTableCellRenderer();
 		rend.setHorizontalAlignment(JLabel.RIGHT);
 		setDefaultRenderer(int.class, rend);
-		tree.setSelectionModel(new DefaultTreeSelectionModel() {
-			{
-				setSelectionModel(listSelectionModel);
-			}
-		});
 
 
 		getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -172,6 +161,17 @@ public class mainJTree
 
 		if (YAMM.getProperty("main.tree.switch", "false").equals("true"))
 			getColumnModel().moveColumn(1, 0);
+
+		new DropTarget(
+			this, // component
+			DnDConstants.ACTION_COPY_OR_MOVE, // actions
+			this //DropTargetListener
+		);
+		tree.setSelectionModel(new DefaultTreeSelectionModel() {
+			{
+				setSelectionModel(mainJTree.this.getSelectionModel());
+			}
+		});
 
 	}
 
@@ -233,7 +233,7 @@ public class mainJTree
 	protected void doAction(String mails, Point p, int act) {
 		String action = (act == DnDConstants.ACTION_MOVE ? "move" : "copy");
 
-		TreePath tp = tree.getPathForLocation(p.x, p.y);
+		TreePath tp = tree.getPathForRow(p.y / getRowHeight());
 		String box = null;
 
 		if (tp != null) {
@@ -250,16 +250,16 @@ public class mainJTree
 
 			if (list.length == 0) return;
 			if (action.equals("move")) {
-				Mailbox.moveMail(frame.selectedbox, box, list);
+				Mailbox.moveMail(yamm.selectedbox, box, list);
 			} else {
-				Mailbox.copyMail(frame.selectedbox, box, list);
+				Mailbox.copyMail(yamm.selectedbox, box, list);
 			}
 
 			Utilities.delUnNeededFiles();
-			Mailbox.createList(frame.selectedbox, frame);
+			Mailbox.createList(yamm.selectedbox, yamm);
 			Mailbox.updateIndex(box);
 			dataModel.fireTableDataChanged();
-			frame.mailList.update();
+			yamm.mailList.update();
 		}
 	}
 
@@ -304,9 +304,9 @@ public class mainJTree
 			String kommando = ((JMenuItem)ae.getSource()).getText();
 
 			if (kommando.equals(YAMM.getString("tree.new.box"))) {
-				new NewBoxDialog(frame);
+				new NewBoxDialog(yamm);
 			} else if (kommando.equals(YAMM.getString("tree.new.group"))) {
-				new NewGroupDialog(frame);
+				new NewGroupDialog(yamm);
 			} else 	if (getSelectedRow() != -1) {
 				File del = new File(tree.getPathForRow(getSelectedRow()).getLastPathComponent().toString());
 
@@ -318,21 +318,21 @@ public class mainJTree
 							!file.endsWith(Utilities.replace("/" + YAMM.getString("box.sent"))) &&
 							!file.endsWith(Utilities.replace("/" + YAMM.getString("box.trash")))) {
 
-						frame.selectedbox = "deleted";
+						yamm.selectedbox = "deleted";
 						del.delete();
 						updateNodes();
 
-						frame.mailList.popup = new JPopupMenu();
-						frame.mailList.popup.setInvoker(frame.mailList);
-						frame.mailList.createPopup(((mainTable)frame.mailList).popup);
+						yamm.mailList.popup = new JPopupMenu();
+						yamm.mailList.popup.setInvoker(yamm.mailList);
+						yamm.mailList.createPopup(((mainTable)yamm.mailList).popup);
 					}
 				} else if(del.exists()) {
 					if (!del.delete()) {
 						Object[] args = {del.toString()};
-						new MsgDialog(frame, YAMM.getString("msg.error"),
+						new MsgDialog(yamm, YAMM.getString("msg.error"),
 							YAMM.getString("msg.file.delete-dir", args));
 					} else {
-						frame.selectedbox = "deleted";
+						yamm.selectedbox = "deleted";
 						updateNodes();
 					}
 				}
@@ -350,15 +350,15 @@ public class mainJTree
 					File box = new File(node.toString());
 
 					if (node.toString().equals("deleted") || !box.exists()) {
-						frame.selectedbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox"));
-						Mailbox.createList(frame.selectedbox, frame);
-						frame.mailList.clearSelection();
-						frame.mailList.update();
+						yamm.selectedbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox"));
+						Mailbox.createList(yamm.selectedbox, yamm);
+						yamm.mailList.clearSelection();
+						yamm.mailList.update();
 					} else if (!box.isDirectory()) {
-						frame.selectedbox = node.toString();
-						Mailbox.createList(frame.selectedbox, frame);
-						frame.mailList.clearSelection();
-						frame.mailList.update();
+						yamm.selectedbox = node.toString();
+						Mailbox.createList(yamm.selectedbox, yamm);
+						yamm.mailList.clearSelection();
+						yamm.mailList.update();
 					}
 
 					if (box.isDirectory()) {
@@ -371,8 +371,8 @@ public class mainJTree
 					}
 				}
 
-				if ( ((mainTable)frame.mailList).getSelectedRow() != -1 &&
-						!(((JTable)frame.mailList).getSelectedRow() >= frame.listOfMails.length)) {
+				if ( ((mainTable)yamm.mailList).getSelectedRow() != -1 &&
+						!(((JTable)yamm.mailList).getSelectedRow() >= yamm.listOfMails.length)) {
 					tbar.reply.setEnabled(true);
 					tbar.forward.setEnabled(true);
 					//tbar.print.setEnabled(true);
@@ -392,6 +392,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.31  2003/03/09 14:05:56  fredde
+ * drag and drop fixed. variable frame renamed to yamm
+ *
  * Revision 1.30  2003/03/08 21:44:07  fredde
  * saves column index. drag and drop working again
  *
