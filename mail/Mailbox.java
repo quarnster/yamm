@@ -67,7 +67,7 @@ public class Mailbox {
    * @param mailList The vector that should contain the information
    */
   public static void createList(String whichBox, Vector mailList) {
-    String subject = null, from = null, date = null;
+    String subject = null, from = null, date = null, status = null;
 
     String temp = null;
     mailList.clear(); // = new Vector();
@@ -94,6 +94,10 @@ public class Mailbox {
           subject = temp.substring(8, temp.length());
           makeItem++;
         }
+        else if(temp.startsWith("YAMM-Status:") && status == null) {
+          status = temp.substring(13, temp.length());
+          makeItem++;
+        }
         else if(temp.startsWith("Date: ") && date == null) {
           date = temp.substring(6, temp.lastIndexOf(":") + 2);
           SimpleDateFormat dateFormat2 = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss", Locale.US);
@@ -111,12 +115,14 @@ public class Mailbox {
           vec1.insertElementAt(subject, 1);
           vec1.insertElementAt(from, 2);
           vec1.insertElementAt(date, 3);
+          vec1.insertElementAt(status, 4);
 
           mailList.insertElementAt(vec1, i);
           vec1 = new Vector();
           subject = null;
           from = null;
           date = null;
+          status = null;
           makeItem = 0;
           i++;
         }
@@ -190,6 +196,68 @@ public class Mailbox {
     }
   }
 
+  /**
+   * This function sets the status of the mail.
+   * @param whichBox The box the message is in.
+   * @param whichmail The mail to set the status for.
+   * @param status The status string.
+   */
+  public static void setStatus(String whichBox, int whichmail, String status) {
+    File source = new File(whichBox),target = new File(whichBox + ".tmp");
+    String temp = null;
+    try {
+      BufferedReader in = new BufferedReader(
+                          new InputStreamReader(new FileInputStream(source)));
+      PrintWriter out   = new PrintWriter(new BufferedOutputStream(
+                          new FileOutputStream(target)));
+      int i = 0;
+
+      for(;;) {
+        temp = in.readLine();
+   
+        if(temp == null)
+          break;
+
+        else if(temp.equals(".")) i++;
+
+        if(i == whichmail) {
+          out.println(temp);
+          boolean header = false;
+          for(;;) {
+            temp = in.readLine();
+
+            if(temp == null) break;
+
+
+            else if(temp.equals(".")) { i++; out.println(temp); break; }
+
+            if(temp.startsWith("YAMM-Status:")) {
+              i++;
+              temp = "YAMM-Status: " + status;
+              break;
+            }
+            else if(temp.equals("") && header) {
+              i++;
+              temp = "YAMM-Status: " + status + "\n";
+              break;
+            }
+
+            if(!temp.equals("")) header = true; 
+
+            out.println(temp);
+          }
+        }
+
+        out.println(temp);
+      }
+      in.close();
+      out.close();
+
+      source.delete();
+      target.renameTo(source);
+    } catch (IOException ioe) { System.err.println("test:" + ioe); }
+  }
+ 
   /**
    * Prints the mail to ~home/.yamm/tmp/cache/<whichBox>/<whichmail>.html
    * @param whichBox Which box the message is in
