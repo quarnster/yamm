@@ -39,32 +39,70 @@ public class MessageParser {
 		String begin = "";
 		String end   = "";
 		String temp = link;
+		boolean stuff = false;
 
-		if (temp.endsWith(".")) {
-			temp = temp.substring(0, temp.length() - 1);
-			end = ".";
-		}
+		for (;;) {
 
-		if (temp.endsWith(",")) {
-			temp = temp.substring(0, temp.length() - 1);
-			end = "," + end;
-		}
+			if (temp.endsWith(".")) {
+				temp = temp.substring(0, temp.length() - 1);
+				end = ".";
 
-		if (temp.startsWith("mailto:")) {
-			temp = temp.substring(7, temp.length());
-			begin = "mailto:";
-		}
+				stuff = true;
+			}
 
-		if (temp.startsWith("(") && temp.endsWith(")")) {
-			temp = temp.substring(1, temp.length() - 1);
-			begin = begin + "(";
-			end = ")" + end;
-		}
+			if (temp.endsWith(",")) {
+				temp = temp.substring(0, temp.length() - 1);
+				end = "," + end;
+				stuff = true;
+			}
 
-		if (temp.startsWith("<") && temp.endsWith(">")) {
-			temp = temp.substring(1, temp.length() - 1);
-			begin = begin + "&lt;";
-			end = "&gt;" + end;
+			if (temp.startsWith("mailto:")) {
+				temp = temp.substring(7, temp.length());
+				begin = "mailto:";
+				stuff = true;
+			}
+
+			if (temp.startsWith("(")) {
+				temp = temp.substring(1, temp.length());
+				begin = begin + "(";
+				stuff = true;
+			}
+
+			if (temp.endsWith(")")) {
+				temp = temp.substring(0, temp.length() - 1);
+				end = ")" + end;
+				stuff = true;
+			}
+
+			if (temp.startsWith("<")) {
+				temp = temp.substring(1, temp.length());
+				begin = begin + "&lt;";
+				stuff = true;
+			}
+
+			if (temp.endsWith(">")) {
+				temp = temp.substring(0, temp.length() - 1);
+				end = "&gt;" + end;
+				stuff = true;
+			}
+
+			if (temp.startsWith("\"")) {
+				temp = temp.substring(1, temp.length());
+				begin = begin + "\"";
+				stuff = true;
+			}
+
+			if (temp.endsWith("\"")) {
+				temp = temp.substring(0, temp.length() - 1);
+				end = "\"" + end;
+				stuff = true;
+			}
+
+			if (stuff != true) {
+				break;
+			} else {
+				stuff = false;
+			}
 		}
 
 		String[] tmp = { begin, temp, end };
