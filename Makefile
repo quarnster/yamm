@@ -41,6 +41,8 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/gui/main/mainJTree.class \
 	org/gjt/fredde/yamm/gui/main/mainTable.class \
 	org/gjt/fredde/yamm/gui/main/mainMenu.class \
+	org/gjt/fredde/yamm/gui/main/NewBoxDialog.class \
+	org/gjt/fredde/yamm/gui/main/NewGroupDialog.class \
 	org/gjt/fredde/yamm/SHMail.class \
 	org/gjt/fredde/yamm/Options.class \
 	org/gjt/fredde/yamm/YAMMWrite.class \
@@ -71,6 +73,7 @@ clean:
 	rm -f org/gjt/fredde/yamm/mail/*.class
 	rm -f org/gjt/fredde/yamm/gui/*.class
 	rm -f org/gjt/fredde/yamm/gui/main/*.class
+	rm -f org/gjt/fredde/yamm/gui/confwiz/*.class
 	rm -f org/gjt/fredde/util/net/*.class
 	rm -f org/gjt/fredde/util/gui/*.class
 	rm -f org/gjt/fredde/util/*.class
