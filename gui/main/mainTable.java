@@ -39,7 +39,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * The Table for listing the mails subject, date and sender.
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.32 2000/07/16 17:48:36 fredde Exp $
+ * @version $Id: mainTable.java,v 1.33 2000/08/09 16:36:28 fredde Exp $
  */
 public class mainTable extends JTable implements DragGestureListener,
 							DragSourceListener {
@@ -65,6 +65,9 @@ public class mainTable extends JTable implements DragGestureListener,
 	 * @param listOfMails the Maillist vector
 	 */
 	public mainTable(YAMM frame, TableModel tm, Vector listOfMails) {
+		super();
+		firstSort = YAMM.getProperty("sorting.type", "true").equals("true");
+		sortedCol = Integer.parseInt(YAMM.getProperty("sorting.col", "0"));
 		drag = DragSource.getDefaultDragSource();
 
 		drag.createDefaultDragGestureRecognizer(
@@ -127,6 +130,7 @@ public class mainTable extends JTable implements DragGestureListener,
 		popup = new JPopupMenu();
 		popup.setInvoker(this);
 		createPopup(popup);
+		update();
 	}
 
 	public void save() {
@@ -138,6 +142,24 @@ public class mainTable extends JTable implements DragGestureListener,
 		YAMM.setProperty(c.getIdentifier().toString() + ".width", c.getWidth()+"");
 		c = getColumnModel().getColumn(3);
 		YAMM.setProperty(c.getIdentifier().toString() + ".width", c.getWidth()+"");
+
+		YAMM.setProperty("sorting.col", "" + sortedCol);
+		YAMM.setProperty("sorting.type", "" + firstSort);
+	}
+
+	public int getSelectedMessage() {
+		int i = 0;
+		int sel = getSelectedRow();
+		if (sel == -1) return -1;
+
+		while (i < 4) {
+			if (getColumnName(i).equals("#")) {
+				break;
+			}
+			i++;
+		}
+
+		return Integer.parseInt(getValueAt(sel, i).toString());
 	}
 
 	private String getSelected() {
@@ -181,43 +203,34 @@ public class mainTable extends JTable implements DragGestureListener,
 		}
 	}
 
-	public void dragDropEnd(DragSourceDropEvent e) {
-	}
-	public void dragEnter(DragSourceDragEvent e) {
-	}
-	public void dragExit(DragSourceEvent e) {
-	}
-	public void dragOver(DragSourceDragEvent e) {
-	}
-	public void dropActionChanged(DragSourceDragEvent e) {
-	}
+	public void dragDropEnd(DragSourceDropEvent e) {}
+	public void dragEnter(DragSourceDragEvent e) {}
+	public void dragExit(DragSourceEvent e) {}
+	public void dragOver(DragSourceDragEvent e) {}
+	public void dropActionChanged(DragSourceDragEvent e) {}
 
 
 	/**
 	 * Sorts 1 -> 10
 	 */
 	private void SortFirst(int col) {
+		if (listOfMails == null) return;
 		if (col == 0) {
 			for (int i = 0; i < listOfMails.size(); i++) {
 				Object temp = null;
 				for (int j = 0; j < listOfMails.size(); j++) {
-					Vector v = (Vector)
-						listOfMails.elementAt(i);
-					int one = Integer.parseInt(
-						v.elementAt(col).toString());
+					Vector v = (Vector) listOfMails.elementAt(i);
+					int one = Integer.parseInt(v.elementAt(col).toString());
 
-					v = (Vector)
-						listOfMails.elementAt(j);
+					v = (Vector) listOfMails.elementAt(j);
 
-					int two = Integer.parseInt(
-						v.elementAt(col).toString());
+					int two = Integer.parseInt(v.elementAt(col).toString());
 
 					v = listOfMails;
 
 					if (one < two) {
 						temp = v.elementAt(j);
-						v.setElementAt(
-							v.elementAt(i), j);
+						v.setElementAt(v.elementAt(i), j);
 						v.setElementAt(temp, i);
 					}
 				}
@@ -227,21 +240,17 @@ public class mainTable extends JTable implements DragGestureListener,
 				Object temp = null;
 				for (int j = 0; j < listOfMails.size(); j++) {
 
-					Vector v = (Vector)
-						listOfMails.elementAt(i);
+					Vector v = (Vector) listOfMails.elementAt(i);
 					String s1 = v.elementAt(col).toString();
 
-					v = (Vector)
-						listOfMails.elementAt(j);
+					v = (Vector) listOfMails.elementAt(j);
 					String s2 = v.elementAt(col).toString();
 
 					v = listOfMails;
 
-					if (s1.toLowerCase().compareTo(
-							s2.toLowerCase()) < 0) {
+					if (s1.toLowerCase().compareTo(s2.toLowerCase()) < 0) {
 						temp = v.elementAt(j);
-						v.setElementAt(
-							v.elementAt(i), j);
+						v.setElementAt(v.elementAt(i), j);
 						v.setElementAt(temp, i);
 					}
 				}
@@ -254,35 +263,31 @@ public class mainTable extends JTable implements DragGestureListener,
 	 * Sorts 10 -> 1
 	 */
 	private void SortLast(int col) {
+		if (listOfMails == null) return;
 		if (col == 0) {
 			for (int i = 0; i < listOfMails.size(); i++) {
 				Object temp = null;
 				for (int j = 0; j < listOfMails.size(); j++) {
-					Vector v = (Vector)
-						listOfMails.elementAt(i);
-					int one = Integer.parseInt(
-						v.elementAt(col).toString());
+					Vector v = (Vector) listOfMails.elementAt(i);
+					int one = Integer.parseInt(v.elementAt(col).toString());
 
 					v = (Vector) listOfMails.elementAt(j);
-					int two = Integer.parseInt(
-						v.elementAt(col).toString());
+					int two = Integer.parseInt(v.elementAt(col).toString());
  
 					v = listOfMails;
 
 					if (one > two) {
 						temp = v.elementAt(j);
-						v.setElementAt(
-							v.elementAt(i), j);
+						v.setElementAt(v.elementAt(i), j);
 						v.setElementAt(temp, i);
 					}
-				}  
-			}  
+				}
+			}
 		}  else {
 			for (int i = 0; i < listOfMails.size(); i++) {
 				Object temp = null;
 				for (int j = 0; j < listOfMails.size(); j++) {
-					Vector v = (Vector)
-						listOfMails.elementAt(i);
+					Vector v = (Vector) listOfMails.elementAt(i);
 					String s1 = v.elementAt(col).toString();
 
 					v = (Vector) listOfMails.elementAt(j);
@@ -290,11 +295,9 @@ public class mainTable extends JTable implements DragGestureListener,
 
 					v = listOfMails;
 
-					if (s1.toLowerCase().compareTo(
-							s2.toLowerCase()) > 0) {
+					if (s1.toLowerCase().compareTo(s2.toLowerCase()) > 0) {
 						temp = v.elementAt(j);
-						v.setElementAt(
-							v.elementAt(i), j);
+						v.setElementAt(v.elementAt(i), j);
 						v.setElementAt(temp, i);
 					}
 				}  
@@ -307,10 +310,10 @@ public class mainTable extends JTable implements DragGestureListener,
 		Vector list = new Vector(), list2 = new Vector();
 		String sep = System.getProperty("file.separator");
 		String boxHome = Utilities.replace(YAMM.home + "/boxes");
-    
+
 		fileList(list, new File(boxHome + sep));
 		fileList(list2, new File(boxHome + sep));
-    
+
 		JMenuItem row = null;
 		JMenuItem delete = new JMenuItem(YAMM.getString("button.delete"));
 		JMenuItem reply = new JMenuItem(YAMM.getString("button.reply")); 
@@ -327,7 +330,6 @@ public class mainTable extends JTable implements DragGestureListener,
 		jpmenu.add(delete);
 	}
 
-    
 	private void createPopCommand(JMenu menu, Vector flist,	String base, ActionListener list) {
 		String dname = base.substring(base.lastIndexOf(File.separator) + 1, base.length());
 
@@ -448,8 +450,9 @@ public class mainTable extends JTable implements DragGestureListener,
 							firstSort = true;
 						}
 					} else {
-						SortFirst(column);
-						firstSort = false;
+						if (firstSort) SortFirst(column);
+						else SortLast(column);
+						firstSort = !firstSort;
 						sortedCol = column;
 					}
 				}
@@ -457,6 +460,12 @@ public class mainTable extends JTable implements DragGestureListener,
 		};
 		JTableHeader th = tableView.getTableHeader();
 		th.addMouseListener(lmListener);
+	}
+
+	public void update() {
+		if (!firstSort) SortFirst(sortedCol);
+		else SortLast(sortedCol);
+		updateUI();
 	}
 
 	private MouseListener mouseListener = new MouseAdapter() {
@@ -467,7 +476,7 @@ public class mainTable extends JTable implements DragGestureListener,
 				get_mail();
 			}
 
-			if (getSelectedRow() != -1 && !(getSelectedRow() >= frame.listOfMails.size())) { 
+			if (getSelectedRow() != -1) { 
 				Vector v = (Vector) frame.listOfMails.elementAt(getSelectedRow());
 
 				String outbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
@@ -475,13 +484,14 @@ public class mainTable extends JTable implements DragGestureListener,
 				if (v.elementAt(4).toString().equals("Unread") && !frame.selectedbox.equals(outbox)) {
 					long skip = Long.parseLong(((Vector) listOfMails.elementAt(getSelectedRow())).elementAt(5).toString());
 
-					Mailbox.setStatus(frame.selectedbox, getSelectedRow(), skip, "Read");
+					Mailbox.setStatus(frame.selectedbox, getSelectedMessage(), skip, "Read");
 					Mailbox.createList(frame.selectedbox, frame.listOfMails);
 
 					frame.tree.repaint();
+					update();
 				}
 				changeButtonMode(true);
-			} else { 
+			} else {
 				changeButtonMode(false);
 			}
 		}
@@ -498,6 +508,7 @@ public class mainTable extends JTable implements DragGestureListener,
 				if (getColumnName(i).equals("#")) {
 					break;
 				}
+				i++;
 			}
 
 			long skip = Long.parseLong(((Vector) listOfMails.elementAt(getSelectedRow())).elementAt(5).toString());
@@ -514,7 +525,7 @@ public class mainTable extends JTable implements DragGestureListener,
 			} catch (MalformedURLException mue) { 
 				new ExceptionDialog(YAMM.getString("msg.error"), mue, YAMM.exceptionNames);
 			}
- 
+
 			try {
 				frame.mail.setPage(frame.mailPage);
 			} catch (IOException ioe) { 
@@ -601,11 +612,11 @@ public class mainTable extends JTable implements DragGestureListener,
 				Mailbox.deleteMail(frame.selectedbox, deleteList);
 				Mailbox.createList(frame.selectedbox, listOfMails);
 
-				updateUI();
 				Mailbox.updateIndex(frame.selectedbox);
 				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")));
 				frame.tree.updateUI();
 
+				update();
 				changeButtonMode(false);
 				clearSelection();
 			} else if (kommando.equals(YAMM.getString("button.reply"))) {
@@ -632,9 +643,9 @@ public class mainTable extends JTable implements DragGestureListener,
 
 
 	public void changeButtonMode(boolean b) {
-		((JButton)frame.tbar.reply).setEnabled(b);
+		frame.tbar.reply.setEnabled(b);
 		//((JButton)frame.tbar.print).setEnabled(b);
-		((JButton)frame.tbar.forward).setEnabled(b); 
+		frame.tbar.forward.setEnabled(b); 
 	}
 
 	private ActionListener KMListener = new ActionListener() {
@@ -694,7 +705,7 @@ public class mainTable extends JTable implements DragGestureListener,
 			Mailbox.moveMail(frame.selectedbox, name, moveList);
 			Mailbox.createList(frame.selectedbox, frame.listOfMails);
 			Mailbox.updateIndex(name);
-			mainTable.this.updateUI();
+			updateUI();
 			frame.tree.updateUI();
 		}
 	};
@@ -702,6 +713,9 @@ public class mainTable extends JTable implements DragGestureListener,
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.33  2000/08/09 16:36:28  fredde
+ * readability fixes and fixed better sorting
+ *
  * Revision 1.32  2000/07/16 17:48:36  fredde
  * lots of Windows compatiblity fixes
  *
