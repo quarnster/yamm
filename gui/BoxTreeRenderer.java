@@ -1,4 +1,4 @@
-/*  $Id: BoxTreeRenderer.java,v 1.11 2003/03/15 20:38:37 fredde Exp $
+/*  $Id: BoxTreeRenderer.java,v 1.12 2003/04/04 18:03:18 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -23,12 +23,13 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 import org.gjt.fredde.yamm.YAMM;
+import org.gjt.fredde.yamm.gui.main.*;
 import org.gjt.fredde.yamm.mail.Mailbox;
 
 /**
  * The renderer for the mailbox tree
  * @author Fredrik Ehnbom
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class BoxTreeRenderer
 	extends JLabel
@@ -62,6 +63,13 @@ public class BoxTreeRenderer
 		boolean hasFocus
 	) {
 		String thisbox = value.toString();
+
+		int[] s = (int[]) YAMM.getInstance().tree.unreadTable.get(thisbox);
+		if (s != null && s[2] > 0)
+			setFont(getFont().deriveFont(Font.BOLD));
+		else
+			setFont(getFont().deriveFont(Font.PLAIN));
+
 
 		if (thisbox.indexOf(System.getProperty("file.separator")) != -1) {
 			thisbox = thisbox.substring(thisbox.lastIndexOf(System.getProperty("file.separator")) + System.getProperty("file.separator").length());
@@ -106,6 +114,9 @@ public class BoxTreeRenderer
 /*
  * Changes:
  * $Log: BoxTreeRenderer.java,v $
+ * Revision 1.12  2003/04/04 18:03:18  fredde
+ * text gets bold if the box has new messages
+ *
  * Revision 1.11  2003/03/15 20:38:37  fredde
  * fixed plaf stuff
  *
