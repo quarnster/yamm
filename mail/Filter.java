@@ -1,4 +1,4 @@
-/*  $Id: Filter.java,v 1.13 2003/03/11 15:19:10 fredde Exp $
+/*  $Id: Filter.java,v 1.14 2003/03/28 21:25:47 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import org.gjt.fredde.yamm.Utilities;
 /**
  * A class that filters incoming messages
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class Filter {
 
@@ -36,14 +36,20 @@ public class Filter {
 	public Filter(YAMM yamm)
 		throws IOException
 	{
+		this(yamm, Utilities.replace(YAMM.home + "/boxes/.filter"));
+
+	}
+
+	public Filter(YAMM yamm, String filterBox)
+		throws IOException
+	{
 		LinkedList changedList = new LinkedList();
 		int type = 0;
 		int cheat[] = new int[1];
 		Vector list = new Vector();
 		BufferedReader in = null;
-		String filterBox = Utilities.replace(YAMM.home + "/boxes/.filter");
 		String inBox = Utilities.replace(YAMM.home + "/boxes/inbox");
-		new File(Utilities.replace(YAMM.home + "/boxes/..filter.index")).delete();
+		new File(Mailbox.getIndexName(filterBox)).delete();
 
 		Mailbox.createFilterList(list);
 
@@ -110,8 +116,7 @@ public class Filter {
 			in.close();
 		}
 
-		cheat[0] = 0;
-		if (Mailbox.hasMail(filterBox)) {
+		if (Mailbox.hasMail(filterBox) && !filterBox.equals(inBox)) {
 			int[] msg = new int[Mailbox.getUnread(filterBox)[0]];
 			for (int i = 0; i < msg.length; i++) msg[i] = i;
 			Mailbox.moveMail(filterBox, inBox, msg);
