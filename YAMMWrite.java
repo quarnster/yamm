@@ -31,12 +31,6 @@ import org.gjt.fredde.yamm.encode.UUEncode;
  */
 public class YAMMWrite extends JFrame {
 
-  /** Used for Language stuff */
-  static protected ResourceBundle res;
-
-  /** To load and save the configuration */
-  static protected Properties     props  = new Properties();
-
   /** A list of files to attach to the mail */
   static protected Vector         attach;
 
@@ -78,32 +72,21 @@ public class YAMMWrite extends JFrame {
 
   public YAMMWrite(String to, String subject, String body) {
     setTitle(subject);
-    try {
-      InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-      props.load(in);
-      in.close();
-    } catch (IOException propsioe) { System.err.println(propsioe); }
 
-    writex = Integer.parseInt(props.getProperty("writex", "0"));
-    writey = Integer.parseInt(props.getProperty("writey", "0"));
-    writew = Integer.parseInt(props.getProperty("writew", "500"));
-    writeh = Integer.parseInt(props.getProperty("writeh", "300"));
+    writex = Integer.parseInt(YAMM.getProperty("writex", "0"));
+    writey = Integer.parseInt(YAMM.getProperty("writey", "0"));
+    writew = Integer.parseInt(YAMM.getProperty("writew", "500"));
+    writeh = Integer.parseInt(YAMM.getProperty("writeh", "300"));
 
     setBounds(writex, writey, writew, writeh);
     
-    try { res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault()); }
-    catch (MissingResourceException mre) {
-      mre.printStackTrace();
-      System.exit(1);
-    }
-   
     JMenuBar  Meny = new JMenuBar();
-    JMenu     arkiv = new JMenu(res.getString("file"));
+    JMenu     arkiv = new JMenu(YAMM.getString("file"));
     JMenuItem rad;
     Meny.add(arkiv);
 
     // Arkiv menyn
-    rad = new JMenuItem(res.getString("button.cancel"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
+    rad = new JMenuItem(YAMM.getString("button.cancel"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
     rad.addActionListener(MListener);
     arkiv.add(rad);
 
@@ -116,15 +99,15 @@ public class YAMMWrite extends JFrame {
     hori1 = Box.createHorizontalBox();
     hori2 = Box.createHorizontalBox();
 
-    myButton = new JButton(res.getString("button.send"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/send.gif"));
+    myButton = new JButton(YAMM.getString("button.send"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/send.gif"));
     myButton.addActionListener(BListener);
     hori1.add(myButton);
 
-    myButton = new JButton(res.getString("button.cancel"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
+    myButton = new JButton(YAMM.getString("button.cancel"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
     myButton.addActionListener(BListener);
     hori1.add(myButton);
 
-    myLabel = new JLabel(res.getString("mail.to") + "  ");
+    myLabel = new JLabel(YAMM.getString("mail.to") + "  ");
 //    panel.add(myLabel);
     vert1.add(myLabel);
 
@@ -132,11 +115,11 @@ public class YAMMWrite extends JFrame {
     myTextField1.setMaximumSize(new Dimension(1200, 20));
     myTextField1.setMinimumSize(new Dimension(75, 20));
     myTextField1.setText(to);
-    myTextField1.setToolTipText(res.getString("tofield.tooltip"));
+    myTextField1.setToolTipText(YAMM.getString("tofield.tooltip"));
 //    panel.add(myTextField1);
     vert1.add(myTextField1);
 
-    myLabel = new JLabel(res.getString("mail.subject") + "  ");
+    myLabel = new JLabel(YAMM.getString("mail.subject") + "  ");
 //    panel.add(myLabel);
     vert2.add(myLabel);
 
@@ -161,9 +144,9 @@ public class YAMMWrite extends JFrame {
     myTextArea = new JTextArea();
     myTextArea.setText(body);
 
-    if(props.getProperty("signatur") != null && !props.getProperty("signatur").equals("")) {
+    if(YAMM.getProperty("signatur") != null && !YAMM.getProperty("signatur").equals("")) {
       try {
-        FileInputStream in = new FileInputStream(props.getProperty("signatur"));
+        FileInputStream in = new FileInputStream(YAMM.getProperty("signatur"));
         String tmp = null;
         byte[] singb = new byte[in.available()];
 
@@ -174,7 +157,7 @@ public class YAMMWrite extends JFrame {
     }
 
     JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
-    JTPane.addTab(res.getString("mail"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), new JScrollPane(myTextArea));
+    JTPane.addTab(YAMM.getString("mail"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), new JScrollPane(myTextArea));
 
     class MyCellRenderer extends JLabel implements ListCellRenderer {
       protected boolean selected;
@@ -243,11 +226,11 @@ public class YAMMWrite extends JFrame {
 
     hori1 = Box.createHorizontalBox();
 
-    myButton = new JButton(res.getString("button.add"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/new.gif"));
+    myButton = new JButton(YAMM.getString("button.add"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/new.gif"));
     myButton.addActionListener(BListener);
     hori1.add(myButton);
 
-    myButton = new JButton(res.getString("button.delete"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/delete.gif"));
+    myButton = new JButton(YAMM.getString("button.delete"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/delete.gif"));
     myButton.addActionListener(BListener);
     hori1.add(myButton);
 
@@ -268,7 +251,7 @@ public class YAMMWrite extends JFrame {
     myList.setBorder(ram);
 
 
-    JTPane.addTab(res.getString("mail.attachment"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
+    JTPane.addTab(YAMM.getString("mail.attachment"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
    
     vert3.add(JTPane);
     getContentPane().add(vert3);
@@ -296,7 +279,7 @@ public class YAMMWrite extends JFrame {
     public void actionPerformed(ActionEvent e) {
       String arg = ((JButton)e.getSource()).getText();
 
-      if(arg.equals(res.getString("button.send"))) {
+      if(arg.equals(YAMM.getString("button.send"))) {
         if(isSendReady()) {
           try {
             PrintWriter outFile = new PrintWriter(new FileOutputStream(System.getProperty("user.home") + "/.yamm/boxes/" + YAMM.getString("box.outbox"), true));
@@ -315,7 +298,7 @@ public class YAMMWrite extends JFrame {
             }
 
             if(attach.size() == 0) outFile.println("Date: " + dateFormat.format(new Date()) + "\n" 
-                                                 + "From: " + props.getProperty("username", "Anonymous") + " <" + props.getProperty("email", " ") + ">\n"
+                                                 + "From: " + YAMM.getProperty("username", "Anonymous") + " <" + YAMM.getProperty("email", " ") + ">\n"
                                                  + "To: " + to2 + "\n"
                                                  + "Subject: " + myTextField2.getText() + "\n"
                                                  + "X-Mailer: Yet Another Mail Manager " + YAMM.yammVersion + "\n"
@@ -325,7 +308,7 @@ public class YAMMWrite extends JFrame {
                                                  + ".\n");
             else {
               outFile.println("Date: " + dateFormat.format(new Date()) + "\n"
-                            + "From: " + props.getProperty("username", "Anonymous") + " <" + props.getProperty("email", " ") + ">" + "\n" 
+                            + "From: " + YAMM.getProperty("username", "Anonymous") + " <" + YAMM.getProperty("email", " ") + ">" + "\n" 
                             + "To: " + to2 +"\n"
                             + "Subject: " + myTextField2.getText() + "\n"
                             + "X-Mailer: Yet Another Mail Manager " + YAMM.yammVersion + "\n" 
@@ -348,26 +331,20 @@ public class YAMMWrite extends JFrame {
           Rectangle rv = new Rectangle();
           getBounds(rv);
 
-          props.setProperty("writex", new Integer(rv.x).toString());
-          props.setProperty("writey", new Integer(rv.y).toString());
-          props.setProperty("writew", new Integer(rv.width).toString());
-          props.setProperty("writeh", new Integer(rv.height).toString());
-
-          try {
-            OutputStream out = new FileOutputStream(System.getProperty("user.home") + "/.yamm/.config");
-            props.store(out, "YAMM configuration file");
-            out.close();
-          } catch(IOException propsioe) { System.err.println(propsioe); }
+          YAMM.setProperty("writex", new Integer(rv.x).toString());
+          YAMM.setProperty("writey", new Integer(rv.y).toString());
+          YAMM.setProperty("writew", new Integer(rv.width).toString());
+          YAMM.setProperty("writeh", new Integer(rv.height).toString());
 
           dispose();
         }
       }
 
-      else if(arg.equals(res.getString("button.add"))) {
+      else if(arg.equals(YAMM.getString("button.add"))) {
         addAttach();
       }
 
-      else if(arg.equals(res.getString("button.delete"))) {
+      else if(arg.equals(YAMM.getString("button.delete"))) {
         int rem = myList.getSelectedIndex();
         if(rem != -1) {
           attach.remove(rem);
@@ -375,26 +352,14 @@ public class YAMMWrite extends JFrame {
         }
       }
 
-      else if(arg.equals(res.getString("button.cancel"))) {
+      else if(arg.equals(YAMM.getString("button.cancel"))) {
         Rectangle rv = new Rectangle();
         getBounds(rv);
 
-        try {
-          InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props.load(in);
-          in.close();
-        } catch (IOException propsioe) { System.err.println(propsioe); }
-
-        props.setProperty("writex", new Integer(rv.x).toString());
-        props.setProperty("writey", new Integer(rv.y).toString());
-        props.setProperty("writew", new Integer(rv.width).toString());
-        props.setProperty("writeh", new Integer(rv.height).toString());
-
-        try {
-          OutputStream out = new FileOutputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props.store(out, "YAMM configuration file");
-          out.close();
-        } catch(IOException propsioe) { System.err.println(propsioe); }
+        YAMM.setProperty("writex", new Integer(rv.x).toString());
+        YAMM.setProperty("writey", new Integer(rv.y).toString());
+        YAMM.setProperty("writew", new Integer(rv.width).toString());
+        YAMM.setProperty("writeh", new Integer(rv.height).toString());
 
         dispose();
       }
@@ -426,26 +391,14 @@ public class YAMMWrite extends JFrame {
     public void actionPerformed(ActionEvent ae) {
       String kommando = ((JMenuItem)ae.getSource()).getText();
 
-      if(kommando.equals(res.getString("button.cancel"))) {
+      if(kommando.equals(YAMM.getString("button.cancel"))) {
         Rectangle rv = new Rectangle();
         getBounds(rv);
 
-        try {
-          InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props.load(in);
-          in.close();
-        } catch (IOException propsioe) { System.err.println(propsioe); }
-
-        props.setProperty("writex", new Integer(rv.x).toString());
-        props.setProperty("writey", new Integer(rv.y).toString());
-        props.setProperty("writew", new Integer(rv.width).toString());
-        props.setProperty("writeh", new Integer(rv.height).toString());
-
-        try {
-          OutputStream out = new FileOutputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props.store(out, "YAMM configuration file");
-          out.close();
-        } catch(IOException propsioe) { System.err.println(propsioe); }
+        YAMM.setProperty("writex", new Integer(rv.x).toString());
+        YAMM.setProperty("writey", new Integer(rv.y).toString());
+        YAMM.setProperty("writew", new Integer(rv.width).toString());
+        YAMM.setProperty("writeh", new Integer(rv.height).toString());
 
         dispose();
       }
@@ -457,22 +410,10 @@ public class YAMMWrite extends JFrame {
       Rectangle rv = new Rectangle();
       getBounds(rv);
 
-      try {
-        InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-        props.load(in);
-        in.close();
-      } catch (IOException propsioe) { System.err.println(propsioe); }
-
-      props.setProperty("writex", new Integer(rv.x).toString());
-      props.setProperty("writey", new Integer(rv.y).toString());
-      props.setProperty("writew", new Integer(rv.width).toString());
-      props.setProperty("writeh", new Integer(rv.height).toString());
-
-      try {
-        OutputStream out = new FileOutputStream(System.getProperty("user.home") + "/.yamm/.config");
-        props.store(out, "YAMM configuration file");
-        out.close();
-      } catch(IOException propsioe) { System.err.println(propsioe); }
+      YAMM.setProperty("writex", new Integer(rv.x).toString());
+      YAMM.setProperty("writey", new Integer(rv.y).toString());
+      YAMM.setProperty("writew", new Integer(rv.width).toString());
+      YAMM.setProperty("writeh", new Integer(rv.height).toString());
 
       dispose();
     }

@@ -35,6 +35,8 @@ public class SHMail extends Thread {
    /** Properties for smtpserver etc */
   static protected Properties props = new Properties();
 
+  static protected boolean sent = false;
+
   JButton knappen;
   YAMM frame;
 
@@ -63,19 +65,21 @@ public class SHMail extends Thread {
 
     for(int i=0;i<files.length;i++) {
       /* load the config */
+
       try {
         InputStream in = new FileInputStream(files[i]);
         props.load(in);
         in.close();
       } catch (IOException propsioe) { System.err.println(propsioe); }
 
+
       String type = props.getProperty("type");
       String server = props.getProperty("server");
       String username = props.getProperty("username");
       String password = YAMM.decrypt(props.getProperty("password"));
-      boolean del;
-      if(props.getProperty("delete", "false").equals("true")) del = true;
-      else del = false;
+      boolean del = false;
+      if(YAMM.getProperty("delete", "false").equals("true")) del = true;
+      if(YAMM.getProperty("sentbox", "false").equals("true")) sent = true;
 
       if(type != null && server != null && username != null && password != null) {
         if(type.equals("pop3")) {
@@ -110,29 +114,44 @@ public class SHMail extends Thread {
     }
 
    /* load the config */
+/*
    try {
      InputStream in = new FileInputStream(YAMM.home + "/.config");
      props = new Properties();
      props.load(in);
      in.close();
     } catch (IOException propsioe) { System.err.println(propsioe); }
+*/
 
-    if(props.getProperty("smtpserver") != null && Mailbox.hasMail(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"))) {
+    if(YAMM.getProperty("smtpserver") != null && Mailbox.hasMail(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"))) {
       Object[] argstmp = {""};
       frame.status.setStatus(YAMM.getString("server.send", argstmp));
       frame.status.progress(0);
       try { 
-        Smtp smtp = new Smtp(props.getProperty("smtpserver"));
-        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"))));
+        Smtp smtp = new Smtp(YAMM.getProperty("smtpserver"));
+        BufferedReader in = new BufferedReader(
+                            new InputStreamReader(
+                            new FileInputStream(YAMM.home + "/boxes/" +
+                                                YAMM.getString("box.outbox"))));
+        PrintWriter out = null;
+
+        if(sent) { 
+          out = new PrintWriter(
+                new BufferedOutputStream(
+                new FileOutputStream(YAMM.getString("box.sent"), true)));
+        }
+
         String temp = null, from2 = null, to2 = null;
         int i = 1;
 
         for(;;) {
           temp = in.readLine();
 
-          if(temp == null) break;
 
-          else if(temp.startsWith("From:")) {
+          if(temp == null) break;
+          if(sent) out.println(temp);
+
+          if(temp.startsWith("From:")) {
             smtp.from(temp.substring(temp.indexOf("<") + 1, temp.indexOf(">")));
             from2 = temp;
           }
@@ -156,15 +175,17 @@ public class SHMail extends Thread {
           }
 
           else if(temp.startsWith("Subject:")) {
-            PrintWriter out = smtp.getOutputStream();
-            out.println(from2 + "\n" + to2 + "\n" + temp);
+            PrintWriter mail = smtp.getOutputStream();
+            mail.println(from2 + "\n" + to2 + "\n" + temp);
 
             for(;;) {
               temp = in.readLine();
 
               if(temp == null) break;
 
-              else if(temp.equals(".")) {
+              if(sent) out.println(temp);
+
+              if(temp.equals(".")) {
                 smtp.sendMessage();
                 Object[] args = {"" + i};
                 frame.status.setStatus(YAMM.getString("server.send", args));
@@ -172,11 +193,12 @@ public class SHMail extends Thread {
                 i++;
                 break;
               }
-              out.println(temp);
+              mail.println(temp);
             }
           }
         }
         in.close();
+        if(sent) out.close();
         File file = new File(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
         file.delete();
         file.createNewFile();

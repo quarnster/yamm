@@ -56,10 +56,10 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   public static String                 selectedbox  = home + "/boxes/"; //+ res.getString("box.inbox");
 
   /** The version of YAMM */
-  public static    String                 yammVersion  = "0.7.2";
+  public static    String                 yammVersion  = "0.7.3 CVS";
 
   /** The compileDate of YAMM */
-  public static    String                 compDate     = "1999-06-21";
+  public static    String                 compDate     = "1999-09-04";
 
   /** the file that contains the current mail */
   public String		  mailPageString   = "file:///" + home + "/tmp/cache/";
@@ -157,20 +157,30 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   }
 
   /**
+   * Returns the property
+   */
+  public static String getProperty(String property) {
+    return props.getProperty(property);
+  }
+
+  /** 
+   * Returns the property
+   */
+  public static String getProperty(String prop, String def) {
+    return props.getProperty(prop, def);
+  }
+
+  /**
+   * Sets a property
+   */
+  public static void setProperty(String property, String value) {
+    props.setProperty(property, value);
+  }
+
+  /**
    * Creates the main-window and adds all the components in it.
    */
   public YAMM() {
-/*
-    try {
-      res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", 
-                                     Locale.getDefault());
-    }          
-    catch (MissingResourceException mre) {
-      mre.printStackTrace();
-      System.exit(1);
-    }
-*/
-
     Mailbox.getMail(selectedbox, 0);
     try { 
       mailPage= new URL(mailPageString + res.getString("box.inbox") + "/0.html");
@@ -186,14 +196,6 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     if(ClassLoader.getSystemResource("sun/misc/BASE64Decoder.class") == null) { result = false; }
     else { result = true; base64 = true; }
     System.out.println("sun.misc.BASE64Decoder: " + ((result) ? "yes" : "no"));
-
-
-    // load the config
-    try {
-      InputStream in = new FileInputStream(home + "/.config");
-      props.load(in);
-      in.close();
-    } catch (IOException propsioe) { System.err.println(propsioe); }
 
     // get the main window's settings and default them if an exception is caught 
     mainx = Integer.parseInt(props.getProperty("mainx", "0"));
@@ -570,12 +572,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     Rectangle rv = new Rectangle();
     getBounds(rv);
 
-    try {
-      InputStream in = new FileInputStream(home + "/.config");
-      props.load(in);
-      in.close();
-    } catch (IOException propsioe) { System.err.println(propsioe); }
-
+    mailList.save();
     props.setProperty("mainx", new Integer(rv.x).toString());
     props.setProperty("mainy", new Integer(rv.y).toString());
     props.setProperty("mainw", new Integer(rv.width).toString());
@@ -652,6 +649,13 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
       mre.printStackTrace();
       System.exit(1);
     }
+
+    try {             
+      InputStream in = new FileInputStream(home + "/.config");
+      props.load(in);
+      in.close();    
+    } catch (IOException propsioe) { System.err.println(propsioe); }
+
 
     selectedbox += res.getString("box.inbox");
     if(!(new File(System.getProperty("user.home") + "/.yamm/boxes")).exists()) {
