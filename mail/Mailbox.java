@@ -575,6 +575,10 @@ public class Mailbox {
 			}
 		}
 
+		if (!hasMail(whichBox)) {
+			return;
+		}
+
 		try {
 			BufferedReader in = new BufferedReader(
 						new InputStreamReader(
