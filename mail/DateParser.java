@@ -1,4 +1,4 @@
-/*  $Id: DateParser.java,v 1.3 2003/03/09 14:04:20 fredde Exp $
+/*  $Id: DateParser.java,v 1.4 2003/03/09 17:42:45 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * Parses dates in common mail-dateformats.
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class DateParser {
 
@@ -57,10 +57,18 @@ public class DateParser {
 		SimpleDateFormat dateParser = null;
 
 		if (date.charAt(2) == ' ' || date.charAt(1) == ' ') {
-			dateParser = new SimpleDateFormat(
-				"dd MMM yyyy HH:mm:ss zzz",
-				Locale.US
-			);
+			if (date.length() > 21) {
+				dateParser = new SimpleDateFormat(
+					"dd MMM yyyy HH:mm:ss zzz",
+					Locale.US
+					);
+			} else {
+				dateParser = new SimpleDateFormat(
+					"dd MMM yy hh:mm:ss a",
+					Locale.US
+				);
+			}
+
 		} else {
 			dateParser = new SimpleDateFormat(
 				"EEE, dd MMM yyyy HH:mm:ss zzz",
@@ -78,5 +86,9 @@ public class DateParser {
 	}
 
 	public DateParser() {
+	}
+
+	public DateParser(String DateFormat) {
+		setTargetFormat(DateFormat);
 	}
 }
