@@ -143,10 +143,33 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   }
 
   /**
+   * Returns the translated string
+   */
+  public static final String getString(String s) {
+    return res.getString(s);
+  }
+
+  /**
+   * Returns the translated string
+   */
+  public static final String getString(String s, Object[] args) {
+    return MessageFormat.format(res.getString(s), args);
+  }
+
+  /**
    * Creates the main-window and adds all the components in it.
    */
   public YAMM() {
-    Mailbox.getMail(selectedbox, 0 /* , attach  , mailName */);
+    try {
+      res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", 
+                                     Locale.getDefault());
+    }          
+    catch (MissingResourceException mre) {
+      mre.printStackTrace();
+      System.exit(1);
+    }
+
+    Mailbox.getMail(selectedbox, 0);
     try { 
       mailPage = new URL(mailPageString + "/inbox/" + "0.html"); 
     }
@@ -183,32 +206,12 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
 
     // if you want to redirekt the err stream to a file.
-    // good for debugging
-/*
-    try {
-      FileOutputStream err = new FileOutputStream("stderr.log");
-      PrintStream errPrintStream = new PrintStream(err);
-      System.setErr(errPrintStream);
-    }
-    catch (IOException ioe) {
-      System.out.println(ioe);
-    }
-*/
-
-    // get the resources to use
-    try {
-      res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault());
-    }
-    catch (MissingResourceException mre) {
-      mre.printStackTrace();
-      System.exit(1);
-    }
 
     // the menubar
-    setJMenuBar(new mainMenu(this, res));
+    setJMenuBar(new mainMenu(this));
 
     // the toolbar
-    tbar = new mainToolBar(this, res);
+    tbar = new mainToolBar(this);
     getContentPane().add("North", tbar);
 
     // create a list of mails in the selected box
@@ -216,7 +219,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
     // handles some stuff for the table
     TableModel dataModel = new AbstractTableModel() {
-      final String headername[] = { "#",res.getString("mail.subject"), res.getString("mail.from"), res.getString("mail.date") };
+      final String headername[] = { "#", res.getString("mail.subject"), res.getString("mail.from"), res.getString("mail.date") };
 
       public int getColumnCount() { return 4; }
       public int getRowCount() {  return  listOfMails.size(); }
@@ -226,7 +229,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
       public String getColumnName(int column) {  return headername[column]; }
     };
 
-    mailList = new mainTable(this, res, dataModel, listOfMails);
+    mailList = new mainTable(this, dataModel, listOfMails);
 
     mail = new JEditorPane();
     mail.setContentType("text/html");
@@ -355,7 +358,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     Border ram = BorderFactory.createEtchedBorder();
     myList.setBorder(ram);
 
-    JTPane.addTab(res.getString("button.attach"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
+    JTPane.addTab(res.getString("mail.attachment"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
 
     SPane = new JSplitPane(0, new JScrollPane(mailList), JTPane);
 
@@ -419,12 +422,16 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
               }
             }
             catch (InterruptedException ie) { 
-              new MsgDialog(this, res.getString("msg.error"), ie.toString());
+              Object[] args = {ie.toString()};
+              new MsgDialog(this, YAMM.getString("msg.error"), 
+                                  YAMM.getString("msg.exception", args));
             }
           }
         }
         catch(IOException ioe) { 
-          new MsgDialog(this, res.getString("msg.error"), ioe.toString()); 
+          Object[] args = {ioe.toString()};
+          new MsgDialog(this, YAMM.getString("msg.error"), 
+                              YAMM.getString("msg.exception", args)); 
         }
       }
     }

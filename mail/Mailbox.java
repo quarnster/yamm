@@ -26,6 +26,7 @@ import java.awt.print.Book;
 import java.util.*;
 import javax.swing.JTextArea;
 import org.gjt.fredde.util.gui.MsgDialog;
+import org.gjt.fredde.yamm.YAMM;
 
 /**
  * A class that handels messages and information about messages
@@ -96,7 +97,7 @@ public class Mailbox {
         else if(temp.startsWith("Date: ") && date == null) {
           date = temp.substring(6, temp.lastIndexOf(":") + 2);
           SimpleDateFormat dateFormat2 = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss", Locale.US);
-          SimpleDateFormat dateFormat3 = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+          SimpleDateFormat dateFormat3 = new SimpleDateFormat(YAMM.getString("shortdate"));
           try {
             Date nisse = dateFormat2.parse(date);
 
@@ -190,76 +191,6 @@ public class Mailbox {
   }
 
   /**
-   * Exports the specified attachment.
-   * @param whichBox Which box to use
-   * @param whichmail Which mail in the box that the attachment is in
-   * @param filename The filename of the attachment to export
-   */
-/*
-  public static void export_attach(String whichBox, int whichmail, String filename) {
-    String  temp = null;
-    String  boundary = null;
-
-    try {
-      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(whichBox)));
-      PrintWriter outFile = new PrintWriter(new BufferedOutputStream(new FileOutputStream(System.getProperty("user.home") + "/.yamm/tmp/encode")));
-      int i = 0;
-      boolean correctFile = false, checked = false;
-
-      for(;;) {
-        temp = in.readLine();
-      
-        if(temp == null)
-          break;
-
-        else if(temp.equals(".")) i++;
-
-
-        if (i == whichmail) {
-          for(;;) {
-            temp = in.readLine();
-            if (temp == null) break;
-
-            else if(temp.indexOf("boundary=\"") != -1) {
-              boundary = temp.substring(temp.indexOf("boundary=\"") + 10, temp.indexOf("\"", temp.indexOf("boundary=\"") + 11));
-            }
-
-            else if(temp.startsWith("Content-Type:")) {
-              for(;;) {
-                temp = in.readLine();
-
-                if(temp == null) break;
-
-                if(temp.indexOf(filename) != -1) correctFile = true;
-
-                if(temp.equals("") && correctFile) {
-                  for(;;) {
-                    temp = in.readLine();
-       
-                    if(temp == null) break;
-        
-                    else if(temp.equals(".")) {checked = true; break; }
-                    else if(temp.startsWith("--" + boundary)) { checked = true; break; }
-                    else outFile.println(temp);
-                  }
-                }
-                if(checked) break;
-              }
-            }
-            if(checked) break;
-          }
-        }
-        if(checked) break;
-      }
-      in.close();
-      outFile.close();
-    }
-    catch(IOException ioe) {
-      System.err.println(ioe);
-    }
-  }
-*/
-  /**
    * Prints the mail to ~home/.yamm/tmp/cache/<whichBox>/<whichmail>.html
    * @param whichBox Which box the message is in
    * @param whichmail Whichmail to export
@@ -271,7 +202,6 @@ public class Mailbox {
     String  temp = null;
     boolean wait = true;
     boolean html = false;
-    ResourceBundle res = null;
     int attaches = 0;
 
     temp = System.getProperty("user.home") + "/.yamm/";
@@ -288,13 +218,6 @@ public class Mailbox {
       }
 
       try {
-        res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault());
-      }
-      catch (MissingResourceException mre) {
-        mre.printStackTrace();
-        System.exit(1);
-      }
-      try {
         BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(whichBox)));
         PrintWriter outFile = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(cache, whichmail + ".html"))));
         int i = 0;
@@ -310,13 +233,13 @@ public class Mailbox {
             if(i == whichmail) {
               String date = temp.substring(6, temp.lastIndexOf(":") + 2);
               SimpleDateFormat dateFormat2 = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss", Locale.US);
-              SimpleDateFormat dateFormat3 = new SimpleDateFormat("EEEEEEEE, dd MMMMMMMM yyyy HH:mm:ss", Locale.getDefault());
+              SimpleDateFormat dateFormat3 = new SimpleDateFormat(YAMM.getString("longdate"));
               try {
                 Date nisse = dateFormat2.parse(date);
 
                 date = dateFormat3.format(nisse);
               } catch (ParseException pe) { System.err.println(pe); date = " ";}
-	      outFile.println("<b>" + res.getString("mail.date") + "</b> " + date + "<br>");
+	      outFile.println("<b>" + YAMM.getString("mail.date") + "</b> " + date + "<br>");
             }
           }
 
@@ -328,11 +251,11 @@ public class Mailbox {
               String from = "test";
               if(temp.indexOf("<") != -1 && temp.indexOf(">") != -1) {
                 from = temp.substring(temp.lastIndexOf("<") + 1, temp.lastIndexOf(">"));
-                outFile.println("<b>" + res.getString("mail.from") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
+                outFile.println("<b>" + YAMM.getString("mail.from") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
               }
               else {
                 from = temp.substring(6, temp.length());
-                outFile.println("<b>" + res.getString("mail.from") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
+                outFile.println("<b>" + YAMM.getString("mail.from") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
               }
               wait = false;
             }
@@ -353,7 +276,7 @@ public class Mailbox {
               }
 
               if(temp.indexOf("<br>") == -1) temp += "<br>";
-              outFile.println("<b>" + res.getString("mail.to") + "</b> " + temp);
+              outFile.println("<b>" + YAMM.getString("mail.to") + "</b> " + temp);
             }
           }
 
@@ -361,11 +284,11 @@ public class Mailbox {
             String reply = "test";
             if(temp.indexOf("<") != -1 && temp.indexOf(">") != -1) {
               reply = temp.substring(temp.lastIndexOf("<") + 1, temp.lastIndexOf(">"));
-              outFile.println("<b>" + res.getString("mail.reply_to") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
+              outFile.println("<b>" + YAMM.getString("mail.reply_to") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
             }
             else {
               reply = temp.substring(6, temp.length());
-              outFile.println("<b>" + res.getString("mail.reply_to") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
+              outFile.println("<b>" + YAMM.getString("mail.reply_to") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
             }
           }
 
@@ -379,7 +302,7 @@ public class Mailbox {
           else if(temp.startsWith("Subject:")) {
             if(i == whichmail) {
               if(temp.indexOf("<br>") == -1) temp += "<br>";
-              outFile.println("<b>" + res.getString("mail.subject") + "</b> " + temp.substring(8, temp.length()));
+              outFile.println("<b>" + YAMM.getString("mail.subject") + "</b> " + temp.substring(8, temp.length()));
             }
           }
 
@@ -726,127 +649,6 @@ public class Mailbox {
     } catch(IOException ioe) { System.out.println("Error: " + ioe); }
   }
 
-  /**
-   * Gets the content of this mail and adds to the specified JTextArea
-   * @param whichBox Which box the message is in
-   * @param whichmail Which mail to export
-   * @param jtarea The JTextArea to append the message to
-   */
-/*
-  public static void getMailForPrint(String whichBox, int whichmail, Book bk) {
-
-    String  temp = null, boundary = null;
-    ResourceBundle res = null;
-    boolean wait = true;
-    int y = 10;
-
-    try {
-      res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault());
-    }
-    catch (MissingResourceException mre) {
-      mre.printStackTrace();
-      System.exit(1);
-    }
-
-    try {
-      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(whichBox)));
-      int i = 0;
-
-      for(;;) {
-        temp = in.readLine();
-      
-        if(temp == null) break;
-        else if(temp.equals(".")) i++;
-
-        else if(temp.startsWith("Date: ") && i == whichmail) {
-          String date = temp.substring(6, temp.lastIndexOf(":") + 2);
-          SimpleDateFormat dateFormat2 = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss", Locale.US);
-          SimpleDateFormat dateFormat3 = new SimpleDateFormat("EEEEEEEE, dd MMMMMMMM yyyy HH:mm:ss", Locale.getDefault());
-
-          try {
-            Date nisse = dateFormat2.parse(date);
-
-            date = dateFormat3.format(nisse);
-          } catch (ParseException pe) { System.err.println(pe); date = " ";}
-          System.out.println(res.getString("DATE") + ": " + date);
-//          g.drawString(res.getString("DATE") + ": " + date, 5, y);
-          y+=15;
-        }
-
-        else if(temp.equals(".")) i++;
-
-        else if(temp.startsWith("From:") && i == whichmail) {
-          String from = temp.substring(6, temp.length());
-          System.out.println(res.getString("FROM") + ": " + from);
-//          g.drawString(res.getString("FROM") + ": " + from, 5, y);
-          y+=15;
-	  wait = false;
-        }
-
-        else if(temp.startsWith("To:") && i == whichmail) {
-          temp = temp.substring(4, temp.length());
-
-          while(temp.indexOf(",", temp.length() - 5) != -1) {
-            String temp2 = in.readLine();
-            if(temp2.indexOf("<") != -1) temp2 = temp2.substring(temp2.indexOf("<")  +1, temp2.lastIndexOf(">"));
-            temp += temp2;
-          }
-          System.out.println(res.getString("TO") + ": " +  temp);
-//          g.drawString(res.getString("TO") + ": " +  temp, 5, y);
-          y+=15;
-        }
-
-        else if(temp.startsWith("Subject:") && i == whichmail) {
-          System.out.println(res.getString("SUBJECT") + ": " + temp.substring(9, temp.length()));
-//          g.drawString(res.getString("SUBJECT") + ": " + temp.substring(9, temp.length()), 5, y);
-          y+=15;
-        }
-
-        else if(temp.indexOf("boundary=\"") != -1 && i == whichmail) {
-          boundary = temp.substring(temp.indexOf("boundary=\"") + 10, temp.indexOf("\"", temp.indexOf("boundary=\"") + 11));
-        }
-
-        else if(temp.equals("") && i == whichmail && !wait) {
-          for(;;y+=15) {
-            System.out.println(temp);
-//            if(temp.equals("")) g.drawString("\n", 5, y);
-//            else g.drawString(temp, 5, y);
-
-            temp = in.readLine();
-
-            if(temp == null) break;
-            else if(temp.indexOf("MIME") != -1 || temp.indexOf("mime") != -1) {
-              temp = in.readLine();
-
-              if(temp.equals("--" + boundary)) {
-                for(;;) {
-                  temp = in.readLine();
-                  if(temp == null) break;
-                  else if(temp.equals("")) break;
-                }
-              }
-            }
-
-            else if(temp.equals("--" + boundary)) {
-              temp = in.readLine();
-              temp = in.readLine();
-              if(temp.indexOf("7bit") != -1) { temp = in.readLine(); continue; }
-              else break;
-            }
-            else if(temp.equals(".")) {
-              break;
-            }
-          }
-          break;
-        }
-      }
-      in.close();
-    }
-    catch(IOException ioe) {
-      System.out.println("Error: " + ioe);
-    }
-  }
-*/
 
   /**
    * Deletes the specified mail. Returns false if it fails.

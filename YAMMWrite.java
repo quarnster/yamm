@@ -268,7 +268,7 @@ public class YAMMWrite extends JFrame {
     myList.setBorder(ram);
 
 
-    JTPane.addTab(res.getString("button.attach"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
+    JTPane.addTab(res.getString("mail.attachment"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
    
     vert3.add(JTPane);
     getContentPane().add(vert3);

@@ -53,14 +53,13 @@ public class mainTable extends JTable implements DragGestureListener,
 
   public JPopupMenu             popup = null;
 
-  static protected ResourceBundle         res   = null;
 
   /**
    * Creates a new JTable
    * @param tm The TableModel to use
    * @param listOfMails the Maillist vector
    */
-  public mainTable(YAMM frame, ResourceBundle res, TableModel tm, Vector listOfMails) {
+  public mainTable(YAMM frame, TableModel tm, Vector listOfMails) {
 
     DragSource dragSource = DragSource.getDefaultDragSource();
 
@@ -72,7 +71,6 @@ public class mainTable extends JTable implements DragGestureListener,
 
     this.listOfMails = listOfMails;
     this.frame = frame;
-    this.res = res;
     setModel(tm);
 
     TableColumn column = null;
@@ -186,15 +184,15 @@ public class mainTable extends JTable implements DragGestureListener,
     fileList(list, new File(boxHome + YAMM.sep));
     fileList(list2, new File(boxHome + YAMM.sep));
     
-    JMenuItem row, delete = new JMenuItem(res.getString("button.delete")),
-              reply = new JMenuItem(res.getString("button.reply")); 
+    JMenuItem row, delete = new JMenuItem(YAMM.getString("button.delete")),
+              reply = new JMenuItem(YAMM.getString("button.reply")); 
     delete.addActionListener(OtherMListener);
     reply.addActionListener(OtherMListener);
 
     jpmenu.add(reply);
     jpmenu.addSeparator();
-    createPopCommand(jpmenu, res.getString("edit.copy"), list, boxHome, KMListener);
-    createPopCommand(jpmenu, res.getString("edit.move"), list2, boxHome, FMListener);
+    createPopCommand(jpmenu, YAMM.getString("edit.copy"), list, boxHome, KMListener);
+    createPopCommand(jpmenu, YAMM.getString("edit.move"), list2, boxHome, FMListener);
     jpmenu.add(delete);
   }
 
@@ -386,10 +384,18 @@ public class mainTable extends JTable implements DragGestureListener,
         String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes") + 6, frame.selectedbox.length()) + "/"; 
         frame.mailPage = new URL(frame.mailPageString + boxName + whatMail + ".html");
       }
-      catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
+      catch (MalformedURLException mue) { 
+        Object[] args = {mue.toString()};
+        new MsgDialog(frame, YAMM.getString("msg.error"), 
+                             YAMM.getString("msg.exception", args)); 
+      }
  
       try { frame.mail.setPage(frame.mailPage); }
-      catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
+      catch (IOException ioe) { 
+        Object[] args = {ioe.toString()};
+        new MsgDialog(frame, YAMM.getString("msg.error"), 
+                             YAMM.getString("msg.exception", args)); 
+      }
 
       frame.createAttachList();
       frame.myList.updateUI();
@@ -407,7 +413,7 @@ public class mainTable extends JTable implements DragGestureListener,
         i++;     
       }    
 
-      if(kommando.equals(res.getString("button.delete"))) {
+      if(kommando.equals(YAMM.getString("button.delete"))) {
         frame.delUnNeededFiles();
         int[] mlist = getSelectedRows();
         int[] deleteList = new int[mlist.length];
@@ -434,18 +440,25 @@ public class mainTable extends JTable implements DragGestureListener,
           String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes") + 6, frame.selectedbox.length()) + "/"; 
           frame.mailPage = new URL(frame.mailPageString + boxName + getSelectedRow()  + ".html"); 
         }
-        catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
+        catch (MalformedURLException mue) { 
+          Object[] args = {mue.toString()};
+          new MsgDialog(frame, YAMM.getString("msg.error"), 
+                               YAMM.getString("msg.exception", args)); 
+        }
 
         try { frame.mail.setPage(frame.mailPage); }
-        catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
+        catch (IOException ioe) { 
+          Object[] args = {ioe.toString()};
+          new MsgDialog(frame, YAMM.getString("msg.error"), 
+                               YAMM.getString("msg.exception", args)); }
       }
 
-      else if(kommando.equals(res.getString("button.reply"))) {
+      else if(kommando.equals(YAMM.getString("button.reply"))) {
                  
         String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, 
                                 Integer.parseInt(getValueAt(getSelectedRow(), i).toString()));
  
-        YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[0] + " " + res.getString("mail.wrote") + "\n");
+        YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[0] + " " + YAMM.getString("mail.wrote") + "\n");
         Mailbox.getMailForReply(frame.selectedbox, 
                                 Integer.parseInt(getValueAt(getSelectedRow(), i).toString()), 
                                 yam.myTextArea);
@@ -507,9 +520,18 @@ public class mainTable extends JTable implements DragGestureListener,
         String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes") + 6, frame.selectedbox.length()) + "/"; 
         frame.mailPage = new URL(frame.mailPageString + boxName + getSelectedRow() + "html"); 
       }
-      catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
+      catch (MalformedURLException mue) { 
+        Object[] args = {mue.toString()};
+        new MsgDialog(frame, YAMM.getString("msg.error"), 
+                             YAMM.getString("msg.exception", args)); 
+      }
 
       try { frame.mail.setPage(frame.mailPage); }
-      catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }    }
+      catch (IOException ioe) { 
+        Object[] args = {ioe.toString()};
+        new MsgDialog(frame, YAMM.getString("msg.error"),
+                             YAMM.getString("msg.exception", args)); 
+      }    
+    }
   };
 }

@@ -35,9 +35,6 @@ public class SHMail extends Thread {
    /** Properties for smtpserver etc */
   static protected Properties props = new Properties();
 
-  /** Language settings */
-  protected static ResourceBundle res;
-
   JButton knappen;
   YAMM frame;
 
@@ -47,9 +44,8 @@ public class SHMail extends Thread {
    * @param name the name of this thread.
    * @param knapp the button to disable.
    */
-  public SHMail(YAMM frame1, String name, JButton knapp, ResourceBundle res) {
+  public SHMail(YAMM frame1, String name, JButton knapp) {
     super(name);
-    this.res = res;
     knappen = knapp;
     knappen.setEnabled(false);
     frame = frame1;
@@ -83,30 +79,33 @@ public class SHMail extends Thread {
 
       if(type != null && server != null && username != null && password != null) {
         if(type.equals("pop3")) {
-          frame.status.setStatus(res.getString("server.contact") + server);
+          Object[] argstmp = {server};
+          frame.status.setStatus(YAMM.getString("server.contact", argstmp));
 
           try { 
             Pop3 pop = new Pop3(username, password, server, YAMM.home + "/boxes/.filter");
             int messages = pop.getMessageCount();
 
             for(int j = 1; j<=messages;j++) {
-              frame.status.setStatus(res.getString("server.get") + j + 
-                                     res.getString("server.get2") + messages);
+              Object[] args = {"" + j, "" + messages};
+              frame.status.setStatus(YAMM.getString("server.get", args));
 
               frame.status.progress(100-((100*messages-100*(j-1))/messages));
               pop.getMessage(j);
               if(del) pop.deleteMessage(j);
             }
-            frame.status.setStatus(res.getString("msg.done"));
+            frame.status.setStatus(YAMM.getString("msg.done"));
             frame.status.progress(100);
             pop.closeConnection();
           }
-          catch (IOException ioe) { 
-            new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); 
+          catch (IOException ioe) {
+            Object[] args = {ioe.toString()}; 
+            new MsgDialog(frame, YAMM.getString("msg.error"),
+                                 YAMM.getString("msg.exception", args)); 
           }
         }
-        else new MsgDialog(frame, res.getString("msg.error"), 
-                                  res.getString("server.bad"));
+        else new MsgDialog(frame, YAMM.getString("msg.error"), 
+                                  YAMM.getString("server.bad"));
       }
     }
 
@@ -119,7 +118,8 @@ public class SHMail extends Thread {
     } catch (IOException propsioe) { System.err.println(propsioe); }
 
     if(props.getProperty("smtpserver") != null && Mailbox.hasMail(YAMM.home + "/boxes/outbox")) {
-      frame.status.setStatus(res.getString("server.send"));
+      Object[] argstmp = {""};
+      frame.status.setStatus(YAMM.getString("server.send", argstmp));
       frame.status.progress(0);
       try { 
         Smtp smtp = new Smtp(props.getProperty("smtpserver"));
@@ -166,7 +166,8 @@ public class SHMail extends Thread {
 
               else if(temp.equals(".")) {
                 smtp.sendMessage();
-                frame.status.setStatus(res.getString("server.send") + i);
+                Object[] args = {"" + i};
+                frame.status.setStatus(YAMM.getString("server.send", args));
                 
                 i++;
                 break;
@@ -182,19 +183,27 @@ public class SHMail extends Thread {
         smtp.closeConnection();
 
       }
-      catch(IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
+      catch(IOException ioe) { 
+        Object[] args = {ioe.toString()};
+        new MsgDialog(frame, YAMM.getString("msg.error"),
+                             YAMM.getString("msg.exception", args)); 
+      }
     }
-    frame.status.setStatus(res.getString("msg.done"));
+    frame.status.setStatus(YAMM.getString("msg.done"));
     frame.status.progress(100);
 
     if(Mailbox.hasMail(YAMM.home + "/boxes/.filter")) {
-      frame.status.setStatus(res.getString("server.filter"));
+      frame.status.setStatus(YAMM.getString("server.filter"));
       frame.status.progress(0);
 
       try { new Filter(); }
-      catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
+      catch (IOException ioe) { 
+        Object[] args = {ioe.toString()};
+        new MsgDialog(frame, YAMM.getString("msg.error"),
+                             YAMM.getString("msg.exception", args)); 
+      }
 
-      frame.status.setStatus(res.getString("msg.done"));
+      frame.status.setStatus(YAMM.getString("msg.done"));
       frame.status.progress(100);
     }
     frame.status.setStatus("");

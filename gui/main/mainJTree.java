@@ -39,12 +39,6 @@ import org.gjt.fredde.util.gui.MsgDialog;
  */
 public class mainJTree extends JTree implements DropTargetListener {
 
-  /** The ResourceBundle to get menu names. */
-  static protected ResourceBundle res;
-
-  /** The Properties that loads and saves information. */
-  static protected Properties     props = new Properties();
-
   JPopupMenu treepop;
 
   DefaultMutableTreeNode top;
@@ -58,7 +52,7 @@ public class mainJTree extends JTree implements DropTargetListener {
    * @param top2 The TreeNode that this tree will use.
    * @param tbar2 The mainToolBar to disable/enable buttons on.
    */
-  public mainJTree(YAMM frame2, DefaultMutableTreeNode top2, mainToolBar tbar2) { 
+  public mainJTree(YAMM frame2,  DefaultMutableTreeNode top2, mainToolBar tbar2) { 
    frame = frame2;
    tbar = tbar2;
    top = top2;
@@ -67,20 +61,6 @@ public class mainJTree extends JTree implements DropTargetListener {
    new DropTarget(this, // component
      DnDConstants.ACTION_COPY_OR_MOVE, // actions
      this); //DropTargetListener
-
-   try {
-      InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-      props.load(in);
-      in.close();
-    } catch (IOException propsioe) { System.err.println(propsioe); }
-
-    try {
-      res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault());
-    }
-    catch (MissingResourceException mre) {
-      mre.printStackTrace();
-      System.exit(1);
-    }
 
     tm = new DefaultTreeModel(top);
     setModel(tm);
@@ -99,7 +79,7 @@ public class mainJTree extends JTree implements DropTargetListener {
            File box = new File(node.toString());
 
           if(node.toString().equals("deleted") || !box.exists()) {
-            frame.selectedbox = System.getProperty("user.home") + "/.yamm/boxes/inbox";
+            frame.selectedbox = YAMM.home + "/boxes/inbox";
             Mailbox.createList(frame.selectedbox, frame.listOfMails);
             ((JTable)frame.mailList).updateUI();
           }
@@ -110,34 +90,42 @@ public class mainJTree extends JTree implements DropTargetListener {
             ((JTable)frame.mailList).updateUI();
           }
         }
-       if(((mainTable)frame.mailList).getSelectedRow() != -1 && !(((JTable)frame.mailList).getSelectedRow() >= frame.listOfMails.size())) { ((JButton)tbar.reply).setEnabled(true); ((JButton)tbar.forward).setEnabled(true); ((JButton)tbar.print).setEnabled(true); }
-       else { ((JButton)tbar.reply).setEnabled(false); ((JButton)tbar.forward).setEnabled(false); ((JButton)tbar.print).setEnabled(false); }
+        if(((mainTable)frame.mailList).getSelectedRow() != -1 && 
+        !(((JTable)frame.mailList).getSelectedRow() >= frame.listOfMails.size())) { 
+          ((JButton)tbar.reply).setEnabled(true); 
+          ((JButton)tbar.forward).setEnabled(true); 
+          ((JButton)tbar.print).setEnabled(true); 
+        }
+        else { 
+          ((JButton)tbar.reply).setEnabled(false); 
+          ((JButton)tbar.forward).setEnabled(false); 
+          ((JButton)tbar.print).setEnabled(false); 
+        }
       }
     });
 
-    String sep = System.getProperty("file.separator");
+    String sep = YAMM.sep;
 
-    top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/inbox")));
-    top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
-    createNodes(top, new File(System.getProperty("user.home") + sep + ".yamm" + sep + "boxes" + sep));
-    top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash"))); 
+    top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/inbox")));
+    top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/outbox")));
+    createNodes(top, new File(YAMM.home + sep + "boxes" + sep));
+    top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/trash"))); 
     treepop = new JPopupMenu("Test");
     treepop.setInvoker(this);
     expandRow(0);
 
     // adds items to the myPopup JPopupMenu
-    JMenuItem mi = new JMenuItem(res.getString("tree.new.box")); //, delete = new JMenuItem(res.getString("button.delete"));
+    JMenuItem mi = new JMenuItem(YAMM.getString("tree.new.box"));
 
     mi.addActionListener(treepoplistener);
-//    delete.addActionListener(treepoplistener);
     treepop.add(mi);
  
-    mi = new JMenuItem(res.getString("tree.new.group"));
+    mi = new JMenuItem(YAMM.getString("tree.new.group"));
     mi.addActionListener(treepoplistener);
     treepop.add(mi);
     treepop.addSeparator();
 
-    mi = new JMenuItem(res.getString("button.delete"));
+    mi = new JMenuItem(YAMM.getString("button.delete"));
     mi.addActionListener(treepoplistener);
     treepop.add(mi);
   }
@@ -282,10 +270,10 @@ public class mainJTree extends JTree implements DropTargetListener {
   public void createNodes(DefaultMutableTreeNode top, File f) {
     DefaultMutableTreeNode dir = null;
     DefaultMutableTreeNode box  = null;
-    String sep = System.getProperty("file.separator");
-    String home = System.getProperty("user.home");
+    String sep = YAMM.sep;
+    String home = YAMM.home;
 
-    if((f.toString()).equals(home + sep + ".yamm" + sep + "boxes")) {
+    if((f.toString()).equals(home + sep + "boxes")) {
       String list[] = f.list();
       for(int i = 0; i < list.length; i++)
         createNodes(top, new File(f, list[i]));
@@ -299,9 +287,9 @@ public class mainJTree extends JTree implements DropTargetListener {
       for(int i = 0; i < list.length; i++)
         createNodes(dir, new File(f, list[i]));
     }
-    else if(!(f.toString()).equals(home + sep + ".yamm" + sep + "boxes" + sep + "outbox") &&
-            !(f.toString()).equals(home + sep + ".yamm" + sep + "boxes" + sep + "trash") &&
-	    !(f.toString()).equals(home + sep + ".yamm" + sep + "boxes" + sep + "inbox") &&
+    else if(!(f.toString()).equals(home + sep + "boxes" + sep + "outbox") &&
+            !(f.toString()).equals(home + sep + "boxes" + sep + "trash") &&
+	    !(f.toString()).equals(home + sep + "boxes" + sep + "inbox") &&
             (f.toString()).indexOf(sep + ".", (f.toString()).indexOf("boxes")) == -1) {
 
       box = new DefaultMutableTreeNode(f);
@@ -310,10 +298,10 @@ public class mainJTree extends JTree implements DropTargetListener {
   }
 
   public void createGroupList(Vector vect, File f) {
-    String sep = System.getProperty("file.separator");
-    String home = System.getProperty("user.home");
+    String sep = YAMM.sep;
+    String home = YAMM.home;
 
-    if((f.toString()).equals(home + sep + ".yamm" + sep + "boxes")) {
+    if((f.toString()).equals(home + sep + "boxes")) {
       vect.add(sep);
       String list[] = f.list();                                      
       for(int i = 0; i < list.length; i++)
@@ -321,7 +309,7 @@ public class mainJTree extends JTree implements DropTargetListener {
     }                                          
     else if(f.isDirectory() && f.toString().endsWith(".g")) {
       String dir = f.toString();
-      dir = dir.substring((home + sep + ".yamm" + sep + "boxes").length(), dir.length() -2);
+      dir = dir.substring((home + sep + "boxes").length(), dir.length() -2);
       vect.add(dir);                       
                    
       String list[] = f.list();
@@ -334,10 +322,10 @@ public class mainJTree extends JTree implements DropTargetListener {
     public void actionPerformed(ActionEvent ae) {
       String kommando = ((JMenuItem)ae.getSource()).getText();
       
-      if(kommando.equals(res.getString("tree.new.box"))) {
+      if(kommando.equals(YAMM.getString("tree.new.box"))) {
         new newBoxDialog(frame);
       }
-      else if(kommando.equals(res.getString("tree.new.group"))) {
+      else if(kommando.equals(YAMM.getString("tree.new.group"))) {
         new newGroupDialog(frame);
       }
       else {
@@ -348,7 +336,7 @@ public class mainJTree extends JTree implements DropTargetListener {
 
           if(!del.isDirectory() && del.exists()) {
             String file = getLastSelectedPathComponent().toString();
-            String sep  = System.getProperty("file.separator");
+            String sep  = YAMM.sep;
  
             if(!file.endsWith(sep + "inbox") && !file.endsWith(sep + "outbox") && !file.endsWith(sep + "trash")) {
               frame.selectedbox = "deleted";
@@ -356,10 +344,13 @@ public class mainJTree extends JTree implements DropTargetListener {
 
               del.delete();
 
-              top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/inbox")));
-              top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
-              createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
-              top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash"))); 
+              top.add(new DefaultMutableTreeNode(new File(YAMM.home +
+                                                          "/boxes/inbox")));
+              top.add(new DefaultMutableTreeNode(new File(YAMM.home +
+                                                          "/boxes/outbox")));
+              createNodes(top, new File(YAMM.home + "/boxes/"));
+              top.add(new DefaultMutableTreeNode(new File(YAMM.home +
+                                                          "/boxes/trash"))); 
               updateUI();
               expandRow(0);
 
@@ -369,16 +360,22 @@ public class mainJTree extends JTree implements DropTargetListener {
             }
           }
           else if(del.exists()) {
-            if(!del.delete()) 
-              new MsgDialog(frame, res.getString("msg.error"), res.getString("msg.file.delete-dir") + del.toString() + res.getString("msg.file.delete-dir2"));
+            if(!del.delete()) {
+              Object[] args = {del.toString()};
+              new MsgDialog(frame, YAMM.getString("msg.error"), 
+                                   YAMM.getString("msg.file.delete-dir", args));
+            }
             else {
               frame.selectedbox = "deleted";
               top.removeAllChildren();
 
-              top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/inbox")));
-              top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
-              createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
-              top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash")));
+              top.add(new DefaultMutableTreeNode(new File(YAMM.home + 
+                                                          "/boxes/inbox")));
+              top.add(new DefaultMutableTreeNode(new File(YAMM.home + 
+                                                          "/boxes/outbox")));
+              createNodes(top, new File(YAMM.home + "/boxes/"));
+              top.add(new DefaultMutableTreeNode(new File(YAMM.home +
+                                                          "/boxes/trash")));
               updateUI();
               expandRow(0);
 
@@ -423,29 +420,29 @@ public class mainJTree extends JTree implements DropTargetListener {
       super(frame, true);
       setBounds(0, 0, 300, 100);
 //      setResizable(false);
-      setTitle(res.getString("title.new.group"));
+      setTitle(YAMM.getString("title.new.group"));
 
       Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
       setLocation((screenSize.width - 300) / 2, (screenSize.height - 200) / 2);
       getContentPane().setLayout(new GridLayout(3, 2));
 
-      getContentPane().add(new JLabel(res.getString("options.group")));
+      getContentPane().add(new JLabel(YAMM.getString("options.group")));
       Vector vect = new Vector();
       createGroupList(vect, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
       removeDotG(vect);
       group = new JComboBox( vect );
       getContentPane().add(group);
 
-      getContentPane().add(new JLabel(res.getString("options.name")));
+      getContentPane().add(new JLabel(YAMM.getString("options.name")));
       jtfield = new JTextField();
       getContentPane().add(jtfield);
 
 
-      b = new JButton(res.getString("button.ok"));
+      b = new JButton(YAMM.getString("button.ok"));
       b.addActionListener(BListener2);
       getContentPane().add(b);
 
-      b = new JButton(res.getString("button.cancel"));
+      b = new JButton(YAMM.getString("button.cancel"));
       b.addActionListener(BListener2);
       getContentPane().add(b);
 
@@ -457,7 +454,7 @@ public class mainJTree extends JTree implements DropTargetListener {
         String arg = ((JButton)e.getSource()).getText();
         String sep = System.getProperty("file.separator");
 
-        if(arg.equals(res.getString("button.ok"))) {
+        if(arg.equals(YAMM.getString("button.ok"))) {
           String gName = group.getSelectedItem().toString();
           String temp = "";
 
@@ -477,23 +474,31 @@ public class mainJTree extends JTree implements DropTargetListener {
                               gName + 
                               jtfield.getText() + ".g");
 
-          if(box.exists()) new MsgDialog(frame, res.getString("msg.error"), res.getString("msg.file.exists"));
+          if(box.exists()) {
+            new MsgDialog(frame, YAMM.getString("msg.error"),
+                                 YAMM.getString("msg.file.exists"));
+          }
           else {
-            if(!box.mkdir()) 
-              new MsgDialog(frame, res.getString("msg.error"), res.getString("msg.file.create-error") + box.toString());
-
+            if(!box.mkdir()) {
+              Object[] args = { box.toString() };
+              new MsgDialog(frame, YAMM.getString("msg.error"), 
+                                  YAMM.getString("msg.file.create-error",args));
+            }
             top.removeAllChildren();
-            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/inbox")));
-            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
-            createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
-            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash")));
+            top.add(new DefaultMutableTreeNode(new File(YAMM.home + 
+                                                        "/boxes/inbox")));
+            top.add(new DefaultMutableTreeNode(new File(YAMM.home +
+                                                        "/boxes/outbox")));
+            createNodes(top, new File(YAMM.home + "/boxes/"));
+            top.add(new DefaultMutableTreeNode(new File(YAMM.home +
+                                                        "/boxes/trash")));
             updateUI();
 
             dispose();
           }
         }
 
-        else if(arg.equals(res.getString("button.cancel"))) {
+        else if(arg.equals(YAMM.getString("button.cancel"))) {
           dispose();
         }
       }  
@@ -509,29 +514,29 @@ public class mainJTree extends JTree implements DropTargetListener {
       super(frame, true);  
       setBounds(0, 0, 300, 100);
 //      setResizable(false);      
-      setTitle(res.getString("title.new.box"));
+      setTitle(YAMM.getString("title.new.box"));
  
       Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
       setLocation((screenSize.width - 300) / 2, (screenSize.height - 200) / 2);
       getContentPane().setLayout(new GridLayout(3, 2));
  
-      getContentPane().add(new JLabel(res.getString("options.group")));
+      getContentPane().add(new JLabel(YAMM.getString("options.group")));
       Vector vect = new Vector();
-      createGroupList(vect, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
+      createGroupList(vect, new File(YAMM.home + "/boxes/"));
       removeDotG(vect);
       group = new JComboBox(vect);
       getContentPane().add(group);
 
-      getContentPane().add(new JLabel(res.getString("options.name")));
+      getContentPane().add(new JLabel(YAMM.getString("options.name")));
       jtfield = new JTextField();
       getContentPane().add(jtfield);
  
 
-      b = new JButton(res.getString("button.ok"));
+      b = new JButton(YAMM.getString("button.ok"));
       b.addActionListener(BListener2);
       getContentPane().add(b);
  
-      b = new JButton(res.getString("button.cancel"));
+      b = new JButton(YAMM.getString("button.cancel"));
       b.addActionListener(BListener2);
       getContentPane().add(b);
  
@@ -543,7 +548,7 @@ public class mainJTree extends JTree implements DropTargetListener {
         String arg = ((JButton)e.getSource()).getText();
         String sep = System.getProperty("file.separator");
  
-        if(arg.equals(res.getString("button.ok"))) {
+        if(arg.equals(YAMM.getString("button.ok"))) {
           String gName = group.getSelectedItem().toString();
           String temp = "";
 
@@ -558,22 +563,32 @@ public class mainJTree extends JTree implements DropTargetListener {
           }
 
           System.out.println("gName: "  + gName);
-          File box = new File(System.getProperty("user.home") + 
-                              "/.yamm/boxes/" + 
+          File box = new File(YAMM.home + 
+                              "/boxes/" + 
                               gName + 
                               jtfield.getText());
 
-          if(box.exists()) new MsgDialog(frame, res.getString("msg.error"), res.getString("msg.file.exists"));
+          if(box.exists()) {
+            new MsgDialog(frame, YAMM.getString("msg.error"), 
+                                 YAMM.getString("msg.file.exists"));
+          }
           else {
             try {
               box.createNewFile();
-            } catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
+            } catch (IOException ioe) { 
+              Object[] args = {ioe.toString()};
+              new MsgDialog(frame, YAMM.getString("msg.error"), 
+                                   YAMM.getString("msg.exception", args)); 
+            }
 
             top.removeAllChildren();
-            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/inbox")));
-            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
-            createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
-            top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash")));
+            top.add(new DefaultMutableTreeNode(new File(YAMM.home +
+                                                        "/boxes/inbox")));
+            top.add(new DefaultMutableTreeNode(new File(YAMM.home +
+                                                        "/boxes/outbox")));
+            createNodes(top, new File(YAMM.home + "/boxes/"));
+            top.add(new DefaultMutableTreeNode(new File(YAMM.home +
+                                                        "/boxes/trash")));
             updateUI();
 
             ((mainTable)frame.mailList).popup = new JPopupMenu();
@@ -584,7 +599,7 @@ public class mainJTree extends JTree implements DropTargetListener {
           }
         }
 
-        else if(arg.equals(res.getString("button.cancel"))) {
+        else if(arg.equals(YAMM.getString("button.cancel"))) {
           dispose();
         }
       }
