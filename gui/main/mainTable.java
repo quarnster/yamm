@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.55 2003/06/06 10:49:38 fredde Exp $
+/*  $Id: mainTable.java,v 1.56 2003/06/06 13:13:42 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.55 $
+ * @version $Revision: 1.56 $
  */
 public class mainTable
 	extends JTable
@@ -485,6 +485,15 @@ public class mainTable
 					createPopCommand(m, flist, path, list);
 					j--;
 				} else {
+					if (fname.equals("trash")) {
+						fname = YAMM.getString("box.trash");
+					} else if (fname.equals("outbox")) {
+						fname = YAMM.getString("box.outbox");
+					} else if (fname.equals("inbox")) {
+						fname = YAMM.getString("box.inbox");
+					} else if (fname.equals("sent")) {
+						fname = YAMM.getString("box.sent");
+					}
 					extMItem mitem = new extMItem(fname);
 					mitem.setFullName(fpath);
 					mitem.setFont(new Font("SansSerif", Font.PLAIN, 10)
@@ -785,6 +794,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.56  2003/06/06 13:13:42  fredde
+ * now uses localized box names in the popup menu
+ *
  * Revision 1.55  2003/06/06 10:49:38  fredde
  * button.reply -> table.reply
  *
