@@ -27,7 +27,7 @@ import java.io.*;
 /**
  * This class parses attachments
  * @author Fredrik Ehnbom
- * @version $Id: Attachment.java,v 1.13 2003/03/08 13:56:21 fredde Exp $
+ * @version $Id: Attachment.java,v 1.14 2003/04/04 15:38:07 fredde Exp $
  */
 public class Attachment {
 
@@ -151,7 +151,7 @@ public class Attachment {
 
 			out = new PrintWriter(
 				new BufferedOutputStream(
-					new FileOutputStream(fileName)
+					new FileOutputStream(fileName, true)
 				)
 			);
 
@@ -207,6 +207,9 @@ public class Attachment {
 /*
  * Changes:
  * $Log: Attachment.java,v $
+ * Revision 1.14  2003/04/04 15:38:07  fredde
+ * now appends to the outputfile
+ *
  * Revision 1.13  2003/03/08 13:56:21  fredde
  * removed parsing of attachments in a thread
  *
