@@ -31,7 +31,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Id: YAMMWrite.java,v 1.21 2000/04/01 20:50:09 fredde Exp $
+ * @version $Id: YAMMWrite.java,v 1.22 2000/04/15 13:05:06 fredde Exp $
  */
 public class YAMMWrite extends JFrame {
 
@@ -167,7 +167,7 @@ public class YAMMWrite extends JFrame {
 
 			fromField.addItem(from);
 			fromField.setSelectedItem(prof);
-		} else {
+		} else if (fromField.getItemCount() != 0) {
 			fromField.setSelectedIndex(YAMM.profiler.getDefault());
 		}
 
@@ -276,6 +276,10 @@ public class YAMMWrite extends JFrame {
 
 	public void sign() {
 		FileInputStream in = null;
+		if (fromField.getSelectedItem() == null) {
+			return;
+		}
+
 		Profile prof = YAMM.profiler.getProfileFor(fromField.getSelectedItem().toString());
 
 		if (prof == null || prof.sign == null || prof.sign.trim().equals("")) {
@@ -628,6 +632,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.22  2000/04/15 13:05:06  fredde
+ * lots of fixes when there are no profiles
+ *
  * Revision 1.21  2000/04/01 20:50:09  fredde
  * fixed to make the profiling system work
  *
