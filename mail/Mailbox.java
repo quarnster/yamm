@@ -1,5 +1,5 @@
 /*  Mailbox.java - box handling system
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.29 2000/03/12 17:18:05 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.30 2000/03/14 21:19:12 fredde Exp $
  */
 public class Mailbox {
 
@@ -68,10 +68,11 @@ public class Mailbox {
 	 */
 	public static int viewSource(String whichBox, int whichmail, long skip,
 							JTextArea jtarea) {
+		BufferedReader in = null;
+
 		try {
 			int ret = 0;
-			BufferedReader in = new BufferedReader(
-						new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 						new FileInputStream(whichBox)));
 			String temp;
 
@@ -85,13 +86,16 @@ public class Mailbox {
 					break;
 				}
 			}
-			in.close();
 			return ret;
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 					ioe,
 					YAMM.exceptionNames);
 			return -1;
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException ioe) {}
 		}
 	}
 
@@ -129,13 +133,14 @@ public class Mailbox {
 				whichBox.substring(sep + 1, whichBox.length()) +
 				".index";
 
+		BufferedReader in = null;
+		PrintWriter out = null;
+
 		try {
-			BufferedReader in = new BufferedReader(
-						new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 						new FileInputStream(whichBox)));
 
-			PrintWriter out   = new PrintWriter(
-						new BufferedOutputStream(
+			out   = new PrintWriter(new BufferedOutputStream(
 						new FileOutputStream(target)));
 			int i = 0;
 
@@ -234,12 +239,15 @@ public class Mailbox {
 					from = removeQuote(from);
 				}
 			}
-			in.close();
-			out.close();
 		} catch(IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 					ioe,
 					YAMM.exceptionNames);
+		} finally {
+			try {
+				if (in != null) in.close();
+				if (out != null) out.close();
+			} catch (IOException ioe) {}
 		}
 	}
 
@@ -256,7 +264,7 @@ public class Mailbox {
 
 //		String temp = null;
 		mailList.clear();
-		Vector vec1 = new Vector();
+		Vector vec1 = new Vector(6);
 		int sep = whichBox.lastIndexOf(YAMM.sep);
 
 		String box = whichBox.substring(0, sep + 1) +
@@ -277,9 +285,11 @@ public class Mailbox {
 		if (!indexfile.exists() || boxdate.after(indexdate)) {
 			updateIndex(whichBox);
 		}
+
+		BufferedReader in = null;
+		
 		try {
-			BufferedReader in = new BufferedReader(
-						new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 						new FileInputStream(box)));
 
 			StreamTokenizer tok = new StreamTokenizer(in);
@@ -311,15 +321,18 @@ public class Mailbox {
 				vec1.insertElementAt("" + (long) tok.nval, 5);
 
 				mailList.insertElementAt(vec1, i);
-				vec1 = new Vector();
+				vec1 = new Vector(6);
 				i++;
 
 			}
-			in.close();
 		} catch(IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 					ioe,
 					YAMM.exceptionNames);
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException ioe) {}
 		}
 	}
 
@@ -335,14 +348,15 @@ public class Mailbox {
 
 		String temp = null;
 		list.clear();
-		Vector vec1 = new Vector();
+		Vector vec1 = new Vector(4);
 		boolean makeItem = false;
 
 		int i = 0;
 
+		BufferedReader in = null;
+
 		try {
-			BufferedReader in = new BufferedReader(
-					new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 					new FileInputStream(YAMM.home +
 							"/boxes/.filter")));
 
@@ -379,8 +393,7 @@ public class Mailbox {
 						vec1.insertElementAt("", 1);
 					}
 					if (subject != null) {
-						vec1.insertElementAt(subject,
-									2);
+						vec1.insertElementAt(subject, 2);
 					} else {
 						vec1.insertElementAt("", 2);
 					}
@@ -390,7 +403,7 @@ public class Mailbox {
 						vec1.insertElementAt("", 3);
 					}
 					list.insertElementAt(vec1, i);
-					vec1 = new Vector();
+					vec1 = new Vector(4);
 					makeItem = false;
 					i++;
 
@@ -407,11 +420,14 @@ public class Mailbox {
 
 				}
 			}
-			in.close();
 		} catch(IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 					ioe,
 					YAMM.exceptionNames);
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException ioe) {}
 		}
 	}
 
@@ -429,12 +445,13 @@ public class Mailbox {
 		File source = new File(box);
 		File target = new File(box + ".tmp");
 
+		BufferedReader in = null;
+		PrintWriter out = null;
+
 		try {
-			BufferedReader in = new BufferedReader(
-						new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 						new FileInputStream(source)));
-			PrintWriter out   = new PrintWriter(
-						new BufferedOutputStream(
+			out   = new PrintWriter(new BufferedOutputStream(
 						new FileOutputStream(target)));
 
 			StreamTokenizer tok = new StreamTokenizer(in);
@@ -492,17 +509,17 @@ public class Mailbox {
 					out.println(skip + "");
 				}
 			}
-					
-
-			in.close();
-			out.close();
-
 			source.delete();
 			target.renameTo(source);
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 					ioe,
 					YAMM.exceptionNames);
+		} finally {
+			try {
+				if (in != null) in.close();
+				if (out != null) out.close();
+			} catch (IOException ioe) {}
 		}
 	} 
 
@@ -520,12 +537,13 @@ public class Mailbox {
 		File target = new File(whichBox + ".tmp");
 		String temp = null;
 
+		BufferedReader in = null;
+		PrintWriter out = null;
+
 		try {
-			BufferedReader in = new BufferedReader(
-						new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 						new FileInputStream(source)));
-			PrintWriter out   = new PrintWriter(
-						new BufferedOutputStream(
+			out   = new PrintWriter(new BufferedOutputStream(
 						new FileOutputStream(target)));
 			int i = 0;
 
@@ -569,15 +587,17 @@ public class Mailbox {
 				}
 				out.println(temp);
 			}
-			in.close();
-			out.close();
-
 			source.delete();
 			target.renameTo(source);
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 				ioe,
 				YAMM.exceptionNames);
+		} finally {
+			try {
+				if (in != null) in.close();
+				if (out != null) out.close();
+			} catch (IOException ioe) {}
 		}
 		setIndexStatus(whichBox, whichmail, status);
 	}
@@ -612,12 +632,13 @@ public class Mailbox {
 			return;
 		}
 
+		BufferedReader in = null;
+		PrintWriter outFile = null;
+
 		try {
-			BufferedReader in = new BufferedReader(
-						new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 						new FileInputStream(whichBox)));
-			PrintWriter outFile = new PrintWriter(
-						new BufferedOutputStream(
+			outFile = new PrintWriter(new BufferedOutputStream(
 						new FileOutputStream(out)));
 
 			in.skip(skip);
@@ -625,8 +646,6 @@ public class Mailbox {
 			MessageParser mp = new MessageParser(in,
 						outFile, out.toString());
 
-			in.close();
-			outFile.close();
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 					ioe,
@@ -635,6 +654,11 @@ public class Mailbox {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 					mpe,
 					YAMM.exceptionNames);
+		} finally {
+			try {
+				if (in != null) in.close();
+				if (outFile != null) outFile.close();
+			} catch (IOException ioe) {}
 		}
 	}
 
@@ -650,9 +674,10 @@ public class Mailbox {
 		String  from = null;
 		String  subject = null;
 
+		BufferedReader in = null;
+
 		try {
-			BufferedReader in = new BufferedReader(
-						new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 						new FileInputStream(whichBox)));
 
 			in.skip(skip);
@@ -694,13 +719,16 @@ public class Mailbox {
 			if (subject == null) {
 				subject = "";
 			}
-
-			in.close();
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 				ioe,
 				YAMM.exceptionNames);
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException ioe) {}
 		}
+
 		String[] ret = {from,subject};
 
 		return ret;
@@ -716,8 +744,9 @@ public class Mailbox {
 							long skip,
 							JTextArea jtarea) {
 
+		BufferedReader in = null;
 		try {
-			BufferedReader in = new BufferedReader(
+			in = new BufferedReader(
 					new InputStreamReader(
 					new FileInputStream(whichBox)));
 
@@ -726,8 +755,6 @@ public class Mailbox {
 
 			ReplyMessageParser rmp = new ReplyMessageParser(in,
 									jtarea);
-
-			in.close();
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 					ioe,
@@ -736,6 +763,10 @@ public class Mailbox {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 					mpe,
 					YAMM.exceptionNames);
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException ioe) {}
 		}
 	}
 
@@ -753,22 +784,26 @@ public class Mailbox {
 
 		if (!whichBox.equals(YAMM.home + sep + "boxes" + sep +
 						YAMM.getString("box.trash"))) {
+
+			BufferedReader in = null;
+			PrintWriter outFile = null;
+			PrintWriter outFile2 = null;
+
 			try {
 				File inputFile = new File(whichBox);
 				File outputFile = new File(whichBox + ".tmp");
 
-				PrintWriter outFile = new PrintWriter(
+				outFile = new PrintWriter(
 					new BufferedOutputStream(
 					new FileOutputStream(outputFile)));
 
-				PrintWriter outFile2 = new PrintWriter(
+				outFile2 = new PrintWriter(
 					new BufferedOutputStream(
 					new FileOutputStream(YAMM.home +
 							"/boxes/" +
 						YAMM.getString("box.trash"),
 									true)));
-				BufferedReader in = new BufferedReader(
-					new InputStreamReader(
+				in = new BufferedReader(new InputStreamReader(
 					new FileInputStream(inputFile)));
 
 				int i = 0;
@@ -778,59 +813,48 @@ public class Mailbox {
 
 					if (temp == null) {
 						break;
-					} else if (firstmail &&
-							i != whichmail[next]) {
+					} else if (firstmail && i != whichmail[next]) {
 						for (;;) {
 							outFile.println(temp);
 							temp = in.readLine();
           
 							if (temp == null) {
 								break;
-							} else if(temp.equals
-									(".")) {
-								outFile.println
-									(temp);
+							} else if(temp.equals(".")) {
+								outFile.println(temp);
 								break;
 							}
 						} 
 						firstmail = false;
-					} else if (firstmail &&
-							i == whichmail[next]) {
+					} else if (firstmail && i == whichmail[next]) {
 						for (;;) {
 							outFile2.println(temp);
 							temp = in.readLine();
 
 							if (temp == null) {
 								break;
-							} else if(temp.equals
-									(".")) {
-								outFile2.println
-									(temp);
+							} else if(temp.equals(".")) {
+								outFile2.println(temp);
 								break;
 							}
 						}
-						if (!(next++ < whichmail.length
-									- 1)) {
+						if (!(next++ < whichmail.length	- 1)) {
 							break;
 						}
 						firstmail = false;
-					} else if (!firstmail &&
-							i != whichmail[next]) {
+					} else if (!firstmail && i != whichmail[next]) {
 						for (;;) {
 							outFile.println(temp);
 							temp = in.readLine();
 
 							if (temp == null) {
 								break;
-							} else if (temp.equals
-									(".")) {
-								outFile.println
-									(temp);
+							} else if (temp.equals(".")) {
+								outFile.println(temp);
 								break;
 							}
 						}
-					} else if(!firstmail &&
-							i == whichmail[next]) {
+					} else if(!firstmail && i == whichmail[next]) {
 
 						for (;;) {
 							outFile2.println(temp);
@@ -838,15 +862,12 @@ public class Mailbox {
 
 							if (temp == null) {
 								break;
-							} else if (temp.equals
-									(".")) {
-								outFile2.println
-									(temp);
+							} else if (temp.equals(".")) {
+								outFile2.println(temp);
 								break;
 							}
 						}
-						if (!(next++ < whichmail.length
-									- 1)) {
+						if (!(next++ < whichmail.length	- 1)) {
 							break;
 						}
 					}
@@ -861,10 +882,6 @@ public class Mailbox {
 						outFile.println(temp);
 					}
 				}
-				in.close();
-				outFile.close();
-				outFile2.close();
-
 				inputFile.delete();
 				if (!outputFile.renameTo(inputFile)) {
 					System.err.println("ERROR: Couldn't " +
@@ -876,21 +893,29 @@ public class Mailbox {
 						ioe,
 						YAMM.exceptionNames);
 				return false;
+			} finally {
+				try {
+					if (in != null) in.close();
+					if (outFile != null) outFile.close();
+					if (outFile2 != null) outFile2.close();
+				} catch (IOException ioe) {}
 			}
 		} else if (whichBox.equals(YAMM.home + sep + "boxes" + sep +
 						YAMM.getString("box.trash"))) {
+
+			BufferedReader in = null;
+			PrintWriter outFile = null;
+
 			try {
 				File inputFile = new File(YAMM.home + "/boxes/"
 						+ YAMM.getString("box.trash"));
-				File outputFile = new File(YAMM.home + "/boxes/"						+ YAMM.getString("box.trash") +
-									".tmp");
+				File outputFile = new File(YAMM.home + "/boxes/"
+					+ YAMM.getString("box.trash") +	".tmp");
 
-				BufferedReader in = new BufferedReader(
-					new InputStreamReader(
+				in = new BufferedReader(new InputStreamReader(
 					new FileInputStream(inputFile)));
 
-				PrintWriter outFile = new PrintWriter(
-					new BufferedOutputStream(
+				outFile = new PrintWriter(new BufferedOutputStream(
 					new FileOutputStream(outputFile)));
 
 				int i = 0;
@@ -900,69 +925,57 @@ public class Mailbox {
 
 					if (temp == null) {
 						break;
-					} else if (firstmail &&
-							i != whichmail[next]) {
+					} else if (firstmail && i != whichmail[next]) {
 						for (;;) {
 							outFile.println(temp);
 							temp = in.readLine();
 
 							if (temp == null) {
 								break;
-							} else if (temp.equals
-									(".")) {
-								outFile.println
-									(temp);
+							} else if (temp.equals(".")) {
+								outFile.println(temp);
 								break;
 							}
 						} 
 						firstmail = false;
-					} else if(firstmail &&
-							i == whichmail[next]) {
+					} else if(firstmail && i == whichmail[next]) {
 
 						for (;;) {
 							temp = in.readLine();
 
 							if (temp == null) {
 								break;
-							} else if (temp.equals
-									(".")) {
+							} else if (temp.equals(".")) {
 								break;
 							}
 						}
-						if (!(next++ < whichmail.length
-									- 1)) {
+						if (!(next++ < whichmail.length	- 1)) {
 							break;
 						}
 						firstmail = false;
-					} else if (!firstmail &&
-							i != whichmail[next]) {
+					} else if (!firstmail && i != whichmail[next]) {
 						for (;;) {
 							outFile.println(temp);
 							temp = in.readLine();
 
 							if (temp == null) {
 								break;
-							} else if (temp.equals
-									(".")) {
-								outFile.println
-									(temp);
+							} else if (temp.equals(".")) {
+								outFile.println(temp);
 								break;
 							}
 						}
-					} else if (!firstmail &&
-							i == whichmail[next]) {
+					} else if (!firstmail && i == whichmail[next]) {
 						for (;;) {
 							temp = in.readLine();
 
 							if (temp == null) {
 								break;
-							} else if (temp.equals
-									(".")) {
+							} else if (temp.equals(".")) {
 								break;
 							}
 						}
-						if (!(next++ < whichmail.length
-									- 1)) {
+						if (!(next++ < whichmail.length - 1)) {
 							break;
 						}
 					}
@@ -978,8 +991,6 @@ public class Mailbox {
 					}
 				}
 
-				in.close();
-				outFile.close();
 				inputFile.delete();
 
 				if (!outputFile.renameTo(inputFile)) {
@@ -992,6 +1003,11 @@ public class Mailbox {
 						ioe,
 						YAMM.exceptionNames);
 				return false;
+			} finally {
+				try {
+					if (in != null) in.close();
+					if (outFile != null) outFile.close();
+				} catch (IOException ioe) {}
 			}
 		}
 		return true;
@@ -1010,13 +1026,14 @@ public class Mailbox {
 		boolean firstmail = true;
 		int next = 0;
 
+		BufferedReader in = null;
+		PrintWriter outFile2 = null;
+
 		try {
-			BufferedReader in = new BufferedReader(
-					new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 					new FileInputStream(fromBox)));
 
-			PrintWriter outFile2 = new PrintWriter(
-					new BufferedOutputStream(
+			outFile2 = new PrintWriter(new BufferedOutputStream(
 					new FileOutputStream(toBox, true)));
 
 			int i = 0;
@@ -1081,13 +1098,16 @@ public class Mailbox {
 				}
 				i++;
 			}
-			in.close();
-			outFile2.close();
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 						ioe,
 						YAMM.exceptionNames);
 			return false;
+		} finally {
+			try {
+				if (in != null) in.close();
+				if (outFile2 != null) outFile2.close();
+			} catch (IOException ioe) {}
 		}
 		return true;
 	}
@@ -1109,21 +1129,22 @@ public class Mailbox {
 			return false;
 		}
 
+		BufferedReader in = null;
+		PrintWriter outFile = null;
+		PrintWriter outFile2 = null;
+
 		try {
 			File inputFile = new File(fromBox);
 
-			BufferedReader in = new BufferedReader(
-					new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 					new FileInputStream(inputFile)));
 
 			File outputFile = new File(fromBox + ".tmp");
 
-			PrintWriter outFile = new PrintWriter(
-					new BufferedOutputStream(
+			outFile = new PrintWriter(new BufferedOutputStream(
 					new FileOutputStream(outputFile)));
 
-			PrintWriter outFile2 = new PrintWriter(
-					new BufferedOutputStream(
+			outFile2 = new PrintWriter(new BufferedOutputStream(
 					new FileOutputStream(toBox, true)));
 
 			int i = 0;
@@ -1200,11 +1221,6 @@ public class Mailbox {
 					outFile.println(temp);
 				}
 			}
-
-			in.close();
-			outFile.close();
-			outFile2.close();
-
 			inputFile.delete();
 
 			if (!outputFile.renameTo(inputFile)) {
@@ -1217,6 +1233,12 @@ public class Mailbox {
 					ioe,
 					YAMM.exceptionNames);
 			return false;
+		} finally {
+			try {
+				if (in != null) in.close();
+				if (outFile != null) outFile.close();
+				if (outFile2 != null) outFile2.close();
+			} catch (IOException ioe) {}
 		}
 		return true;
 	}
@@ -1230,9 +1252,10 @@ public class Mailbox {
 
 		int i = 0;
 
+		BufferedReader in = null;
+
 		try {
-			BufferedReader in = new BufferedReader(
-						new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 						new FileInputStream(whichbox)));
 
 			for(;;) {
@@ -1248,6 +1271,10 @@ public class Mailbox {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 					ioe,
 					YAMM.exceptionNames);
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException ioe) {}
 		}
 		return i;
 	}
@@ -1260,9 +1287,9 @@ public class Mailbox {
 		String temp = null;
 		boolean mail = false;
 
+		BufferedReader in = null;
 		try {
-			BufferedReader in = new BufferedReader(
-					new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 					new FileInputStream(whichBox)));
 
 			for(;;) {
@@ -1275,13 +1302,16 @@ public class Mailbox {
 					break;
 				}
 			}
-			in.close();
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 						ioe,
 						YAMM.exceptionNames);
 
 			return false;
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException ioe) {}
 		}
 		return mail;
 	}
@@ -1289,6 +1319,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.30  2000/03/14 21:19:12  fredde
+ * better io-cleanup
+ *
  * Revision 1.29  2000/03/12 17:18:05  fredde
  * still creates index when there's no subject/from field
  *
