@@ -211,7 +211,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
     mail = new JEditorPane();
     mail.setContentType("text/html");
-    Mailbox.getMail(selectedbox, 0);
+    Mailbox.getMail(selectedbox, 0, 0);
     try { mail.setPage(mailPage); }
     catch (IOException ioe) { System.err.println(ioe); }
     mail.setEditable(false);
