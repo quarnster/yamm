@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.42 2003/06/06 10:48:40 fredde Exp $
+/*  $Id: mainJTree.java,v 1.43 2003/06/06 17:07:01 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.42 $
+ * @version $Revision: 1.43 $
  */
 public class mainJTree
 	extends JTable
@@ -57,7 +57,7 @@ public class mainJTree
 	private final AbstractTableModel dataModel = new AbstractTableModel() {
 		private final String headername[] = {
 	        	YAMM.getString("box.boxes"),
-			YAMM.getString("box.unread")
+			YAMM.getString("box.unread"),
 		};
 
 		public final int getColumnCount() {
@@ -75,11 +75,11 @@ public class mainJTree
 
 		public Object getValueAt(int row, int column) {
 			TreeNode node = nodeForRow(row);
+			int[] s = (int[]) unreadTable.get(node.toString());
 
 			if (column == 1) {
-				int[] s = (int[]) unreadTable.get(node.toString());
 				if (s == null) return "";
-				return s[2] + "/" + s[1];
+				return s[1] + "/" + s[0];
 			} else return node;
 		}
 
@@ -493,6 +493,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.43  2003/06/06 17:07:01  fredde
+ * now Unread/Total
+ *
  * Revision 1.42  2003/06/06 10:48:40  fredde
  * unread messages now in format new/unread. now saves column widths.
  *
