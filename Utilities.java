@@ -24,7 +24,7 @@ import java.util.StringTokenizer;
 /**
  * This Class provides some useful utilities
  * @author Fredrik Ehnbom
- * @version $Id: Utilities.java,v 1.4 2000/07/16 17:48:36 fredde Exp $
+ * @version $Id: Utilities.java,v 1.5 2000/08/10 21:56:05 fredde Exp $
  */
 public final class Utilities {
 
@@ -33,9 +33,11 @@ public final class Utilities {
 	 * @param str The string to do the replacement to
 	 */
 	public static String replace(String str) {
+		String sep = System.getProperty("file.separator");
+		if (sep.equals("/")) return str;
+
 		StringTokenizer tok = new StringTokenizer(str, "/");
 		String tmp = tok.nextToken();
-		String sep = System.getProperty("file.separator");
 
 		while (tok.hasMoreTokens()) {
 			tmp += sep + tok.nextToken();
@@ -143,6 +145,9 @@ public final class Utilities {
 /*
  * Changes:
  * $Log: Utilities.java,v $
+ * Revision 1.5  2000/08/10 21:56:05  fredde
+ * works in unix
+ *
  * Revision 1.4  2000/07/16 17:48:36  fredde
  * lots of Windows compatiblity fixes
  *
