@@ -30,7 +30,7 @@ public class MessageHeaderParser {
 	protected Hashtable headers = null;
 
 	public String getHeaderField(String header) {
-		Object tmp = headers.get(header);
+		Object tmp = headers.get(header.toLowerCase());
 		if (tmp == null) {
 			return null;
 		} else {
@@ -57,7 +57,7 @@ public class MessageHeaderParser {
 			}
 
 			if (temp.startsWith(" ") || temp.startsWith("\t")) {
-				value += temp.trim();
+				value += " " + temp.trim();
 			} else if (temp.indexOf(":") != -1) {
 				if (!headersStarted) {
 					headersStarted = true;
@@ -66,6 +66,7 @@ public class MessageHeaderParser {
 					headers.put(field, value);
 				}
 				field = temp.substring(0, temp.indexOf(":"));
+				field = field.toLowerCase();
 				value = temp.substring(temp.indexOf(":") + 1,
 							temp.length()).trim();
 			} else {
