@@ -1,4 +1,4 @@
-/*  $Id: MessageParser.java,v 1.21 2003/03/06 23:52:26 fredde Exp $
+/*  $Id: MessageParser.java,v 1.22 2003/03/07 10:53:29 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * Parses messages
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: MessageParser.java,v 1.21 2003/03/06 23:52:26 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.22 2003/03/07 10:53:29 fredde Exp $
  */
 public class MessageParser {
 
@@ -165,22 +165,22 @@ public class MessageParser {
 				"</b></td><td>" + date + "</td></tr>");
 		}
 		if (mhp.getHeaderField("From") != null) {
-			String from = Html.makeEmailLink(Html.makeHtml(mhp.getHeaderField("From")));
+			String from = Html.makeEmailLink(Html.makeHtml(Mailbox.unMime(mhp.getHeaderField("From"))));
 
 			out.println("<tr><td align=right><b>" + YAMM.getString("mail.from") +
 				"</b></td><td>" + from + "</td></tr>");
 		}
 		if (mhp.getHeaderField("To") != null) {
-			String to = Html.makeEmailLink(Html.makeHtml(mhp.getHeaderField("To")));
+			String to = Html.makeEmailLink(Html.makeHtml(Mailbox.unMime(mhp.getHeaderField("To"))));
 			out.println("<tr><td align=right><b>" + YAMM.getString("mail.to") +
 				"</b></td><td>" + to + "</td></tr>");
 		}
 		if (mhp.getHeaderField("cc") != null) {
-			String cc = Html.makeEmailLink(Html.makeHtml(mhp.getHeaderField("cc")));
+			String cc = Html.makeEmailLink(Html.makeHtml(Mailbox.unMime(mhp.getHeaderField("cc"))));
 			out.println("<tr><td align=right><b>cc:</b></td><td>" + cc + "</td></tr>");
 		}
 		if (mhp.getHeaderField("Reply-To") != null) {
-			String replyto = Html.makeEmailLink(Html.makeHtml(mhp.getHeaderField("Reply-To")));
+			String replyto = Html.makeEmailLink(Html.makeHtml(Mailbox.unMime(mhp.getHeaderField("Reply-To"))));
 
 			out.println("<tr><td align=right><b>" + 
 				YAMM.getString("mail.reply_to") + "</b></td><td>" +
@@ -290,40 +290,31 @@ public class MessageParser {
 
 		if (encoding == null) return;
 
-		if (fileName.indexOf(".attach.") != -1) {
-			// attached files are generally bigger than normal messages
-			// so we do the decoding (if needed) in a thread.
-			if (encoding.equalsIgnoreCase("base64")) {
-			
-			}
-		} else if (fileName.indexOf(".message.") != -1) {
-			File source = new File(fileName);
-			File target = new File(fileName + ".tmp");
+		File source = new File(fileName);
+		File target = new File(fileName + ".tmp");
 
-			if (encoding.equalsIgnoreCase("base64")) {
-				new Base64sun().decode(
-					new BufferedInputStream(new FileInputStream(source)),
-					new BufferedOutputStream(new FileOutputStream(target))
-				);
-				source.delete();
-				target.renameTo(source);
-			}
+		if (encoding.equalsIgnoreCase("base64")) {
+			new Base64sun().decode(
+				new BufferedInputStream(new FileInputStream(source)),
+				new BufferedOutputStream(new FileOutputStream(target))
+			);
+			source.delete();
+			target.renameTo(source);
+		}
 
-			if (encoding.equalsIgnoreCase("quoted-printable")/*fileName.indexOf(".message.") != -1*/) {
-				new Mime().decode(
-					new BufferedInputStream(new FileInputStream(source)),
-					new BufferedOutputStream(new FileOutputStream(target))
-				);
-				source.delete();
-				target.renameTo(source);
-			}
-			if (contentType == null || contentType.indexOf("text/html") == -1) {
-				new Html().encode(
-					new BufferedInputStream(new FileInputStream(source)),
-					new BufferedOutputStream(new FileOutputStream(source + ".html"))
-				);
-			}
-
+		if (encoding.equalsIgnoreCase("quoted-printable")/*fileName.indexOf(".message.") != -1*/) {
+			new Mime().decode(
+				new BufferedInputStream(new FileInputStream(source)),
+				new BufferedOutputStream(new FileOutputStream(target))
+			);
+			source.delete();
+			target.renameTo(source);
+		}
+		if (fileName.indexOf(".message.") != -1 && (contentType == null || contentType.indexOf("text/html") == -1)) {
+			new Html().encode(
+				new BufferedInputStream(new FileInputStream(source)),
+				new BufferedOutputStream(new FileOutputStream(source + ".html"))
+			);
 		}
 	}
 
@@ -331,6 +322,9 @@ public class MessageParser {
 /*
  * ChangeLog:
  * $Log: MessageParser.java,v $
+ * Revision 1.22  2003/03/07 10:53:29  fredde
+ * filter fixes
+ *
  * Revision 1.21  2003/03/06 23:52:26  fredde
  * encode text messages to *.message.txt.html instead of just .txt
  *
