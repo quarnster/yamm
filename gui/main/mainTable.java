@@ -30,7 +30,7 @@ import java.io.*;
 import java.net.*;
 
 import org.gjt.fredde.yamm.*;
-import org.gjt.fredde.yamm.gui.MailTableRenderer;
+import org.gjt.fredde.yamm.gui.*;
 import org.gjt.fredde.yamm.mail.Mailbox;
 import org.gjt.fredde.util.gui.ExceptionDialog;
 
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.39 2003/03/08 13:55:41 fredde Exp $
+ * @version $Id: mainTable.java,v 1.40 2003/03/08 16:56:03 fredde Exp $
  */
 public class mainTable
 	extends JTable
@@ -472,13 +472,13 @@ public class mainTable
 			} else if (getSelectedRow() != -1) {
 				get_mail();
 
-				Thread t = new Thread() {
-					public void run() {
-						String outbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
-						int row = getSelectedRow();
+				String outbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
+				final int row = getSelectedRow();
 
-						if (frame.listOfMails[frame.keyIndex[row]][4].equals("Unread") && !frame.selectedbox.equals(outbox)) {
-							long skip = Long.parseLong(frame.listOfMails[frame.keyIndex[row]][5]);
+				if (frame.listOfMails[frame.keyIndex[row]][4].equals("Unread") && !frame.selectedbox.equals(outbox)) {
+					Thread t = new Thread() {
+						public void run() {
+							long skip = Long.parseLong(frame.listOfMails[frame.keyIndex[row]][YAMM.INDEX_SKIP]);
 
 							Mailbox.setStatus(frame, frame.selectedbox, getSelectedMessage(), skip, "Read");
 
@@ -487,10 +487,11 @@ public class mainTable
 							frame.tree.dataModel.fireTableDataChanged();
 							setEditingRow(row);
 						}
-					}
-				};
-				SwingUtilities.invokeLater(t);
+					};
+					SwingUtilities.invokeLater(t);
+				}
 				changeButtonMode(true);
+				if (me.getClickCount() == 2) new MailReader(frame.mailPage);
 			} else {
 				changeButtonMode(false);
 			}
@@ -575,14 +576,6 @@ public class mainTable
 	private ActionListener OtherMListener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 			String kommando = ((JMenuItem)ae.getSource()).getText();
-			int i = 0;
-
-			while (i < 4) {
-				if (getColumnName(i).equals("#")) {
-					break;
-				}
-				i++;
-			}
 
 			if (kommando.equals(YAMM.getString("button.delete"))) {
 				if (getSelectedRow() == -1) {
@@ -594,7 +587,7 @@ public class mainTable
 				int[] deleteList = new int[mlist.length];
 
 				for (int j = 0; j < mlist.length; j++) {
-					deleteList[j] = Integer.parseInt(getValueAt(mlist[j], i).toString());
+					deleteList[j] = frame.keyIndex[mlist[j]];;
 				}
 
 				Arrays.sort(deleteList);
@@ -615,17 +608,17 @@ public class mainTable
 					return;
 				}
 
-				int msgnum = Integer.parseInt(getValueAt(getSelectedRow(), i).toString());
-				long skip = Long.parseLong(frame.listOfMails[msgnum][5]);
+				int msgnum = frame.keyIndex[getSelectedRow()];
+				long skip = Integer.parseInt(frame.listOfMails[msgnum][YAMM.INDEX_SKIP]);
 
 				String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, skip);
 
 
- 				if (!mail[3].startsWith(YAMM.getString("mail.re")) && !mail[3].startsWith("Re:")) {
-					mail[3] = YAMM.getString("mail.re") + " " + mail[3];
+ 				if (!mail[2].startsWith(YAMM.getString("mail.re")) && !mail[2].startsWith("Re:")) {
+					mail[2] = YAMM.getString("mail.re") + " " + mail[2];
 				}
 
-				YAMMWrite yam = new YAMMWrite(mail[2], mail[1], mail[3], mail[0] + YAMM.getString("mail.wrote") + "\n");
+				YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[2], mail[0] + YAMM.getString("mail.wrote") + "\n");
 
 				Mailbox.getMailForReply(frame.selectedbox, msgnum, skip, yam.myTextArea);
 			}
@@ -691,6 +684,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.40  2003/03/08 16:56:03  fredde
+ * added support for the MailReader. Updated for the new getMailForReplyHeaders
+ *
  * Revision 1.39  2003/03/08 13:55:41  fredde
  * updated for the new TreeTable stuff
  *
