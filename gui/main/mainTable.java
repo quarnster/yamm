@@ -375,7 +375,8 @@ public class mainTable extends JTable implements DragGestureListener,
       int column) 
     {
       setValue(value);
-      setForeground(Color.black);
+      if(((Vector)frame.listOfMails.elementAt(row)).elementAt(4) != null) setForeground(Color.black);
+      else setForeground(Color.blue);
       if(isSelected) setBackground(new Color(204, 204, 255));
       else setBackground(Color.white);
 
@@ -392,6 +393,12 @@ public class mainTable extends JTable implements DragGestureListener,
 
  
       if(getSelectedRow() != -1 && !(getSelectedRow() >= frame.listOfMails.size())) { 
+        if(((Vector)frame.listOfMails.elementAt(getSelectedRow())).elementAt(4) == null) {
+          System.out.println("box: " + frame.selectedbox);
+          Mailbox.setStatus(frame.selectedbox, getSelectedRow(), "Read");
+          Mailbox.createList(frame.selectedbox, frame.listOfMails);
+          System.out.println("box: " + frame.selectedbox);
+        }
         ((JButton)frame.tbar.reply).setEnabled(true); 
         ((JButton)frame.tbar.print).setEnabled(true); 
         ((JButton)frame.tbar.forward).setEnabled(true);
