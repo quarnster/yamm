@@ -30,40 +30,192 @@ import org.gjt.fredde.yamm.YAMM;
 public class Mailbox {
 
 	/**
+	 * removes mime from the subject
+	 * @param subject The subject to remove the mime tags from
+	 */
+	public static String unMime(String subject) {
+		if (subject == null) {
+			return null;
+		}
+
+		if (subject.indexOf("=?") == -1) {
+			return subject;
+		}
+
+		String start = subject.substring(0, subject.indexOf("=?")); 
+		String end   = subject.substring(subject.lastIndexOf("?=") + 2,
+							subject.length());
+		subject      = subject.substring(subject.indexOf("Q?") + 2,
+						subject.lastIndexOf("?="));
+
+		subject = subject.replace('_', ' ');
+		start = start.replace('_', ' ');
+		end = end.replace('_', ' ');
+		subject = MessageBodyParser.unMime(subject, false);
+
+		return start + subject + end;
+	}
+
+	/**
 	 * puts the source code in a JTextArea.
 	 * @param whichBox Which box the message to view is in
 	 * @param whichmail Which mail to view
 	 * @param jtarea Which JTextArea to append the source to
 	 */
-	public static void viewSource(String whichBox, int whichmail,
+	public static void viewSource(String whichBox, int whichmail, long skip,
 							JTextArea jtarea) {
 		try {
 			BufferedReader in = new BufferedReader(
 						new InputStreamReader(
 						new FileInputStream(whichBox)));
-			int i = 0;
 			String temp;
 
-			for (;;) {
-				temp = in.readLine();
+			in.skip(skip);
 
-				if (temp == null) {
+			while ((temp = in.readLine()) != null) {
+				if (!temp.equals(".")) {
+					jtarea.append(temp + "\n");
+				} else  {
 					break;
-				}
-
-				if (whichmail != i && temp.equals(".")) {
-					i++;
-				} else if(whichmail == i) {
-					if (!temp.equals(".")) {
-						jtarea.append(temp + "\n");
-					} else  {
-						break;
-					}
 				}
 			}
 			in.close();
 		} catch (IOException ioe) {
 			System.err.println(ioe);
+		}
+	}
+
+	private static String removeQuote(String quote) {
+		quote = quote.replace('\"', '|');
+
+		while (quote.indexOf("|") != -1) {
+			quote = quote.substring(0, quote.indexOf("|")) +
+				"\\\"" +
+				quote.substring(quote.indexOf("|") + 1,
+								quote.length());
+		}
+
+		return quote;
+	}
+
+	/**
+	 * Updates the index for the mails in the current box
+	 * @param whichBox The box to update the index for
+	 */
+	public static void updateIndex(String whichBox) {
+		long skipnum = 0;
+		long skipped = 0;
+
+		String subject = null;
+		String from = null;
+		String date = null;
+		String status = null;
+		String temp = null;
+		int sep = whichBox.lastIndexOf(YAMM.sep);
+
+		String target = whichBox.substring(0, sep + 1) +
+				"." + 
+				whichBox.substring(sep + 1, whichBox.length()) +
+				".index";
+
+		try {
+			BufferedReader in = new BufferedReader(
+						new InputStreamReader(
+						new FileInputStream(whichBox)));
+
+			PrintWriter out   = new PrintWriter(
+						new BufferedOutputStream(
+						new FileOutputStream(target)));
+			int i = 0;
+
+			MessageHeaderParser mhp = new MessageHeaderParser();
+			DateParser dp = new DateParser();
+			dp.setTargetFormat(YAMM.getString("shortdate"));
+
+			try {
+				skipnum = mhp.parse(in);
+			} catch (MessageParseException mpe) {
+				System.err.println(mpe);
+			}
+
+			subject = mhp.getHeaderField("Subject");
+			from    = mhp.getHeaderField("From");
+			date    = mhp.getHeaderField("Date");
+			status  = mhp.getHeaderField("YAMM-Status");
+
+			if (status == null) {
+				status = "Unread";
+			}
+
+			subject = removeQuote(subject);
+			subject = unMime(subject);
+			from = removeQuote(from);
+
+
+			for (;;) {
+				temp = in.readLine();
+				skipnum += temp.length() + 1;
+
+				if (temp == null) {
+					break;
+				} else if (temp.equals(".")) {
+					out.print(i + " ");
+
+					if (subject != null) {
+						out.print("\"" + subject +
+								"\" ");
+					} else {
+						out.print("\"\" ");
+					}
+                                         
+					if (from != null) {
+						out.print("\"" + from + "\" ");
+					} else {
+						out.print("\"\" ");
+					}
+
+					if (date != null) {
+						try {
+							date = dp.parse(date);
+						} catch (ParseException pe) {
+							date = mhp.
+							getHeaderField("Date");
+						}
+						out.print("\"" +date + "\" ");
+					} else {
+						out.print("\"\" ");
+					}                                   
+
+					out.print("\"" + status + "\" ");
+
+					out.println(skipped);
+					i++;
+
+					skipped = skipnum;
+
+					try {
+						skipnum += mhp.parse(in);
+					} catch (MessageParseException mpe) {
+						break;
+					}
+					subject = mhp.getHeaderField("Subject");
+					from    = mhp.getHeaderField("From");
+					date    = mhp.getHeaderField("Date");
+					status  = mhp.getHeaderField("YAMM-" +
+								"Status");
+					if (status == null) {
+						status = "Unread";
+					}
+
+					subject = removeQuote(subject);
+					subject = unMime(subject);
+					from = removeQuote(from);
+				}
+			}
+			in.close();
+			out.close();
+		} catch(IOException ioe) {
+			System.err.println("Error: " + ioe);
 		}
 	}
 
@@ -78,88 +230,66 @@ public class Mailbox {
 		String date = null;
 		String status = null;
 
-		String temp = null;
+//		String temp = null;
 		mailList.clear();
 		Vector vec1 = new Vector();
-		int makeItem = 0;
+		int sep = whichBox.lastIndexOf(YAMM.sep);
+
+		String box = whichBox.substring(0, sep + 1) +
+				"." + 
+				whichBox.substring(sep + 1, whichBox.length()) +
+				".index";
 
 		int i = 0;
 
 		if (!hasMail(whichBox)) {
 			return;
 		}
+		File indexfile = new File(box);
 
+		Date boxdate = new Date(new File(whichBox).lastModified());
+		Date indexdate = new Date(indexfile.lastModified());
+
+		if (!indexfile.exists() || boxdate.after(indexdate)) {
+			updateIndex(whichBox);
+		}
 		try {
 			BufferedReader in = new BufferedReader(
 						new InputStreamReader(
-						new FileInputStream(whichBox)));
+						new FileInputStream(box)));
 
-			MessageHeaderParser mhp = new MessageHeaderParser();
-			DateParser dp = new DateParser();
-			dp.setTargetFormat(YAMM.getString("shortdate"));
-
-			try {
-				mhp.parse(in);
-			} catch (MessageParseException mpe) {
-				System.err.println(mpe);
-			}
-
-			subject = mhp.getHeaderField("Subject");
-			from    = mhp.getHeaderField("From");
-			date    = mhp.getHeaderField("Date");
-			status  = mhp.getHeaderField("YAMM-Status");
+			StreamTokenizer tok = new StreamTokenizer(in);
 			
 			for (;;) {
-				temp = in.readLine();
-
-				if (temp == null) {
+				if (tok.nextToken() == StreamTokenizer.TT_EOF) {
 					break;
-				} else if (temp.equals(".")) {
-					vec1.insertElementAt(
-							Integer.toString(i), 0);
-
-					if (subject != null) {
-						vec1.insertElementAt(subject,
-									1);
-					} else {
-						vec1.insertElementAt("", 1);
-					}
-
-					if (from != null) {
-						vec1.insertElementAt(from, 2);
-					} else {
-						vec1.insertElementAt("", 2);
-					}
-
-					if (date != null) {
-						try {
-							date = dp.parse(date);
-						} catch (ParseException pe) {
-							date = mhp.
-							getHeaderField("Date");
-						}
-						vec1.insertElementAt(date, 3);
-					} else {
-						vec1.insertElementAt("", 3);
-					}
-
-					vec1.insertElementAt(status, 4);
-
-					mailList.insertElementAt(vec1, i);
-					vec1 = new Vector();
-					i++;
-
-					try {
-						mhp.parse(in);
-					} catch (MessageParseException mpe) {
-						break;
-					}
-					subject = mhp.getHeaderField("Subject");
-					from    = mhp.getHeaderField("From");
-					date    = mhp.getHeaderField("Date");
-					status  = mhp.getHeaderField("YAMM-" +
-								"Status");
 				}
+
+
+
+				int num = (int) tok.nval;
+				vec1.insertElementAt(
+					Integer.toString(num), 0);
+
+				tok.nextToken();
+				vec1.insertElementAt(tok.sval, 1);
+
+				tok.nextToken();
+				vec1.insertElementAt(tok.sval, 2);
+
+				tok.nextToken();
+				vec1.insertElementAt(tok.sval, 3);
+
+				tok.nextToken();
+				vec1.insertElementAt(tok.sval, 4);
+
+				tok.nextToken();
+				vec1.insertElementAt("" + (long) tok.nval, 5);
+
+				mailList.insertElementAt(vec1, i);
+				vec1 = new Vector();
+				i++;
+
 			}
 			in.close();
 		} catch(IOException ioe) {
@@ -202,6 +332,7 @@ public class Mailbox {
 			from    = mhp.getHeaderField("From");
 			to      = mhp.getHeaderField("To");
 			reply   = mhp.getHeaderField("Reply-To");
+			subject = unMime(subject);
 
 			for (;;) {
 				temp = in.readLine();
@@ -254,17 +385,104 @@ public class Mailbox {
 		}
 	}
 
+	private static void setIndexStatus(String whichBox, int whichmail,
+								String status) {
+
+		int sep = whichBox.lastIndexOf(YAMM.sep);
+		String box = whichBox.substring(0, sep + 1) +
+				"." + 
+				whichBox.substring(sep + 1, whichBox.length()) +
+				".index";
+
+		boolean add = false;
+
+		File source = new File(box);
+		File target = new File(box + ".tmp");
+
+		try {
+			BufferedReader in = new BufferedReader(
+						new InputStreamReader(
+						new FileInputStream(source)));
+			PrintWriter out   = new PrintWriter(
+						new BufferedOutputStream(
+						new FileOutputStream(target)));
+
+			StreamTokenizer tok = new StreamTokenizer(in);
+
+			for (int i = 0; i < whichmail; i++) {
+				out.println(in.readLine());
+			}
+
+			tok.nextToken();
+			out.print((int) tok.nval + " ");
+
+			tok.nextToken();
+			out.print("\"" + removeQuote(tok.sval) + "\" ");
+				
+			tok.nextToken();
+			out.print("\"" + removeQuote(tok.sval) + "\" ");
+
+			tok.nextToken();
+			out.print("\"" + tok.sval + "\" ");
+
+			tok.nextToken();
+			out.print("\"" + status + "\" ");
+			if (tok.sval.equals("Unread")) {
+				add = true;
+			}
+
+			tok.nextToken();
+			out.println((long) tok.nval + "");
+
+
+			String tmp = null;
+
+			if (!add) {
+				while ((tmp = in.readLine()) != null) {
+					out.println(tmp);
+				}
+			} else {
+				while ((tmp = in.readLine()) != null) {
+					long skip = Long.parseLong(
+						tmp.substring(
+						tmp.lastIndexOf(" ") + 1,
+						tmp.length()));
+
+					skip++;
+
+					tmp = tmp.substring(0,
+						tmp.lastIndexOf(" ") + 1);
+
+					out.print(tmp);
+					out.println(skip + "");
+				}
+			}
+					
+
+			in.close();
+			out.close();
+
+			source.delete();
+			target.renameTo(source);
+		} catch (IOException ioe) {
+			System.err.println(ioe);
+		}
+	} 
+
+		
+
 	/**
 	 * This function sets the status of the mail.
 	 * @param whichBox The box the message is in.
 	 * @param whichmail The mail to set the status for.
 	 * @param status The status string.
 	 */
-	public static void setStatus(String whichBox, int whichmail,
+	public static void setStatus(String whichBox, int whichmail, long skip,
 								String status) {
 		File source = new File(whichBox);
 		File target = new File(whichBox + ".tmp");
 		String temp = null;
+
 		try {
 			BufferedReader in = new BufferedReader(
 						new InputStreamReader(
@@ -292,28 +510,22 @@ public class Mailbox {
 
 						if (temp == null) {
 							break;
-						} else if (temp.equals(".")) {
-							i++;
-							out.println(temp);
-							break;
 						}
 
 						if (temp.startsWith("YAMM-" +
 								"Status:")) {
 							i++;
-							temp = "YAMM-Status: "
-								+ status;
+							temp = "YAMM-Status: " +
+									status;
 							break;
 						} else if (temp.equals("") &&
 								header) {
 							i++;
-							temp = "YAMM-Status: "
-								+ status + "\n";
+							temp = "YAMM-Status: " +
+								status + "\n";
 							break;
-						}
-
-						if (!temp.equals("")) {
-							header = true; 
+						} else if (!temp.equals("")) {
+							header = true;
 						}
 						out.println(temp);
 					}
@@ -328,6 +540,7 @@ public class Mailbox {
 		} catch (IOException ioe) {
 			System.err.println("test:" + ioe);
 		}
+		setIndexStatus(whichBox, whichmail, status);
 	}
  
 	/**
@@ -336,7 +549,7 @@ public class Mailbox {
 	 * @param whichmail Whichmail to export
 	 * @param attach Which vector to add attachments to
 	 */
-	public static void getMail(String whichBox, int whichmail) {
+	public static void getMail(String whichBox, int whichmail, long skip) {
 		String  temp = YAMM.home + YAMM.sep;
 		int attaches = 0;
 
@@ -364,23 +577,11 @@ public class Mailbox {
 						new BufferedOutputStream(
 						new FileOutputStream(out)));
 
-			int i = 0;
+			in.skip(skip);
 
-			for(;;) {
-				temp = in.readLine();
-
-				if (temp == null) {
-					break;
-				}
-
-				if (i == whichmail) {
-					MessageParser mp = new MessageParser(in,
+			MessageParser mp = new MessageParser(in,
 						outFile, out.toString());
-					break;
-				} else if(temp.equals(".")) {
-					 i++;
-				}
-			}
+
 			in.close();
 			outFile.close();
 		} catch (IOException ioe) {
@@ -396,7 +597,7 @@ public class Mailbox {
 	 * @param whichmail Which mail to get the headers from
 	 */
 	public static String[] getMailForReplyHeaders(String whichBox,
-								int whichmail) {
+						int whichmail, long skip) {
 
 		String  temp = null;
 		String  from = null;
@@ -406,62 +607,45 @@ public class Mailbox {
 			BufferedReader in = new BufferedReader(
 						new InputStreamReader(
 						new FileInputStream(whichBox)));
-			int i = 0;
 
-			for (;;) {
-				temp = in.readLine();
+			in.skip(skip);
 
-				if (temp == null) {
-					break;
-				} else if (i == whichmail) {
-					MessageHeaderParser mhp =
-						new MessageHeaderParser();
-					try {
-						mhp.parse(in);
-					} catch (MessageParseException mpe) {
-						System.err.println(mpe);
+			MessageHeaderParser mhp = new MessageHeaderParser();
+			try {
+				mhp.parse(in);
+			} catch (MessageParseException mpe) {
+				System.err.println(mpe);
+			}
+
+			if (mhp.getHeaderField("Reply-To") != null) {
+				from = mhp.getHeaderField("Reply-To");
+			} else {
+				from = mhp.getHeaderField("From");
+			}
+
+			subject = mhp.getHeaderField("Subject");
+			subject = unMime(subject);
+
+			if (from == null) {
+				from = "";
+			} else {
+				StringTokenizer tok = new StringTokenizer(from);
+
+				while (tok.hasMoreTokens()) {
+					from = tok.nextToken();
+
+					if (from.indexOf("@") != -1) {
+						from = MessageParser.
+							parseLink(from)[1];
+							break;
 					}
-
-					if (mhp.getHeaderField("Reply-To")
-								!= null) {
-						from = mhp.getHeaderField(
-								"Reply-To");
-					} else {
-						from = mhp.getHeaderField(
-									"From");
-					}
-
-					subject = mhp.getHeaderField("Subject");
-
-					if (from == null) {
-						from = "";
-					} else {
-						StringTokenizer tok = new
-							StringTokenizer(from);
-
-						while (tok.hasMoreTokens()) {
-							from = tok.nextToken();
-
-							if (from.indexOf("@")
-									!= -1) {
-								from =
-								MessageParser.
-								parseLink(from)
-									[1];
-								break;
-							}
-						}
-					}
-
-					if (subject == null) {
-						subject = "";
-					}
-
-					break;
-				} else if (temp.equals(".")) {
-					i++;
 				}
 			}
+
+			if (subject == null) {
+				subject = "";
+			}
+
 			in.close();
 		} catch (IOException ioe) {
 			System.out.println("Error: " + ioe);
@@ -478,75 +662,25 @@ public class Mailbox {
 	 * @param jtarea The JTextArea to append the message to
 	 */
 	public static void getMailForReply(String whichBox, int whichmail,
+							long skip,
 							JTextArea jtarea) {
-
-		String  temp = null, boundary = null;
-		boolean wait = true;
 
 		try {
 			BufferedReader in = new BufferedReader(
 					new InputStreamReader(
 					new FileInputStream(whichBox)));
-			int i = 0;
 
-			for (;;) {
-				temp = in.readLine();
+			in.skip(skip);
 
-				if (temp == null) {
-					break;
-				} else if (temp.equals(".")) {
-					i++;
-				} else if (temp.startsWith("From: ") &&
-							i == whichmail) {
-					wait = false;
-				} else if (temp.equals("") && i == whichmail
-								&& !wait) {
-					for (;;) {
-						jtarea.append(">" + temp +
-									"\n");
 
-						temp = in.readLine();
+			ReplyMessageParser rmp = new ReplyMessageParser(in,
+									jtarea);
 
-						if (temp == null) {
-							break;
-						}
-
-						if (temp.indexOf("=") != -1) {
-							temp = MessageBodyParser
-								.unMime(temp,
-									false);
-						} else if (temp.indexOf("MIME")
-							!= -1 || temp.indexOf(
-								"mime") != -1) {
-							temp = in.readLine();
-							temp = in.readLine();
-
-							if (temp.startsWith("--"
-								+ boundary)) {
-
-								for (;;) {
-									temp = in.readLine();
-									if(temp == null) break;
-									else if(temp.equals("")) break;
-								}
-							}
-						} else if (temp.startsWith("--"
-							+ boundary) &&
-							!temp.substring(14, 15).
-							equals("-") &&
-							!temp.substring(14,15).
-								equals(" ")) {
-									break;
-						} else if (temp.equals(".")) {
-							break;
-						}
-					}
-					break;
-				}
-			}
 			in.close();
 		} catch (IOException ioe) {
-			System.out.println(ioe);
+			System.err.println(ioe);
+		} catch (MessageParseException mpe) {
+			System.err.println(mpe);
 		}
 	}
 

@@ -151,8 +151,9 @@ public class MessageBodyParser {
 	public int parse(BufferedReader in, PrintWriter out,
 				String attachment) throws IOException,
 							MessageParseException {
+		String temp = in.readLine();
+
 		for (;;) {
-			String temp = in.readLine();
 
 			if (temp == null) {
 				throw new MessageParseException("Unexpected" +
@@ -171,6 +172,11 @@ public class MessageBodyParser {
 				}
 			}
 
+			if (temp.endsWith("=") && !temp.endsWith("==")) {
+				temp = temp.substring(0, temp.length() - 1);
+				temp += in.readLine();
+			}
+
 			if (temp.indexOf("=") != -1) {
 				temp = unMime(temp, html);
 			}
@@ -181,10 +187,6 @@ public class MessageBodyParser {
 				}
 			}
 
-			if (temp.endsWith("= ") && !temp.endsWith("== ")) {
-				temp = temp.substring(0, temp.length() - 2);
-			}
-
 			if (temp.indexOf("://") != -1) {
 				if (temp.toLowerCase().indexOf("href=") == -1) {
 					temp = makeLink(temp);
@@ -192,6 +194,7 @@ public class MessageBodyParser {
 			}
 
 			out.println(temp);
+			temp = in.readLine();
 		}
 //		return ERROR;
 	}

@@ -41,12 +41,13 @@ public class MessageHeaderParser {
 	public MessageHeaderParser() {
 	}
 
-	public void parse(BufferedReader in) throws IOException,
+	public long parse(BufferedReader in) throws IOException,
 							MessageParseException {
 		String field = null;
 		String value = null;
 		boolean headersStarted = false;
 		headers = new Hashtable();
+		long skipnum = 0;
 
 		for (;;) {
 			String temp = in.readLine();
@@ -55,6 +56,7 @@ public class MessageHeaderParser {
 				throw new MessageParseException("Unexpected " +
 							"end of message.");
 			}
+			skipnum += temp.length() + 1;
 
 			if (temp.startsWith(" ") || temp.startsWith("\t")) {
 				value += " " + temp.trim();
@@ -80,5 +82,8 @@ public class MessageHeaderParser {
 				}
 			}
 		}
+
+		return skipnum;
 	}
+
 }

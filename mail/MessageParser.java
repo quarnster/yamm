@@ -157,7 +157,8 @@ public class MessageParser {
 		if (mhp.getHeaderField("Subject") != null) {
 			out.println("<tr><td>" + 
 				YAMM.getString("mail.subject") + "</td><td>" +
-				mhp.getHeaderField("Subject") + "</td></tr>");
+				Mailbox.unMime(mhp.getHeaderField("Subject")) +
+				"</td></tr>");
 		}
 		out.println("</table>");
 		out.println("<br><pre>");
