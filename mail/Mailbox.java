@@ -740,7 +740,7 @@ public class Mailbox {
                   int htmlchar = Integer.parseInt(new String(hex), 16);
                   String begin = temp.substring(0, index -1);
                   String end = temp.substring(index + 2, temp.length());
-                  temp = begin + (int)htmlchar + end;
+                  temp = begin + (char) htmlchar + end;
                 }
               }
             }
