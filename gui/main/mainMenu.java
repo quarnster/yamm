@@ -1,4 +1,4 @@
-/*  $Id: mainMenu.java,v 1.41 2003/06/06 17:09:04 fredde Exp $
+/*  $Id: mainMenu.java,v 1.42 2003/06/07 11:30:49 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@ import org.gjt.fredde.util.gui.*;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.41 $
+ * @version $Revision: 1.42 $
  */
 public class mainMenu
 	extends JMenuBar
@@ -332,27 +332,13 @@ public class mainMenu
 					jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
 					jfs.setMultiSelectionEnabled(false);
 					jfs.setFileFilter(new filter());
-					jfs.setSelectedFile(new File("mail.html"));
+					jfs.setSelectedFile(new File("mail.txt"));
 					int ret = jfs.showSaveDialog(yamm);
 
 					if (ret == JFileChooser.APPROVE_OPTION) {
 						String tmp = yamm.getMailbox();
-						String boxName = tmp.substring(
-							tmp.indexOf("boxes") +
-							6,
-							tmp.length()
-						);
-						tmp = yamm.mailPageString;
-						boxName = tmp.substring(8,
-							tmp.length()) +
-							boxName + File.separator +
-							yamm.mailList.
-							getSelectedMessage() +
-							".html";
-
-						new File(boxName).renameTo(
-							jfs.getSelectedFile()
-						);
+						int msg = yamm.mailList.getSelectedMessage();
+						Mailbox.saveRaw(yamm.getMailbox(),jfs.getSelectedFile().toString(), msg, yamm.listOfMails[msg].skip);
 					}
 				}
 			} else if (kommando.equals(YAMM.getString("file.empty_trash"))) {
@@ -400,7 +386,7 @@ public class mainMenu
 
 			if (i > 0 &&  i < s.length() - 1) {
 				String extension = s.substring(i + 1).toLowerCase();
-				if ("htm".equals(extension) || "html".equals(extension)) {
+				if ("txt".equals(extension)) {
 					return true;
 				} else {
 					return false;
@@ -411,13 +397,16 @@ public class mainMenu
 
 		// The description of this filter
 		public String getDescription() {
-			return "HTML files";
+			return "Text files";
 		}
 	}
 }
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.42  2003/06/07 11:30:49  fredde
+ * fixed save as-function
+ *
  * Revision 1.41  2003/06/06 17:09:04  fredde
  * added Message menu
  *
