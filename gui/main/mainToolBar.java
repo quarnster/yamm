@@ -48,7 +48,7 @@ public class mainToolBar extends JToolBar {
   /** The print button */
   public JButton print;
 
-  protected static boolean text = true, ico = true;
+//  protected static boolean text = true, ico = true;
   protected static String content = YAMM.getProperty("button.content", "South");
   JButton b;
   YAMM frame;
@@ -59,14 +59,14 @@ public class mainToolBar extends JToolBar {
    */
   public mainToolBar(YAMM frame2) {
     frame = frame2;
-//    boolean text = true, ico = true;
-    if(YAMM.getProperty("button.icon", "true").equals("false")) ico = false;
-    if(YAMM.getProperty("button.text", "true").equals("false")) text = false;
+
+//    if(YAMM.getProperty("button.mode", "both").equals("text")) ico = false;
+//    else if(YAMM.getProperty("button.mode", "both").equals("icon")) text = false;
 
     /* send mails in outbox get mail to inbox */
     b = new JButton();
-    if(ico) b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/recycle.gif"));
-    if(text) b.setText(YAMM.getString("button.send_get"));
+    if(frame.ico) b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/recycle.gif"));
+    if(frame.text) b.setText(YAMM.getString("button.send_get"));
     b.setToolTipText(YAMM.getString("button.send_get.tooltip"));
     b.setFont(new Font("SansSerif", Font.PLAIN, 10));
     setAlign(b, content);
@@ -78,8 +78,8 @@ public class mainToolBar extends JToolBar {
 
     /* button to write a new mail */
     b = new JButton();
-    if(ico) b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/new_mail.gif"));
-    if(text) b.setText(YAMM.getString("button.new_mail"));
+    if(frame.ico) b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/new_mail.gif"));
+    if(frame.text) b.setText(YAMM.getString("button.new_mail"));
     b.setFont(new Font("SansSerif", Font.PLAIN, 10));
     setAlign(b, content);
     b.addActionListener(BListener);
@@ -89,8 +89,8 @@ public class mainToolBar extends JToolBar {
 
     /* reply button */
     reply = new JButton();
-    if(ico) reply.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/reply.gif"));
-    if(text) reply.setText(YAMM.getString("button.reply"));
+    if(frame.ico) reply.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/reply.gif"));
+    if(frame.text) reply.setText(YAMM.getString("button.reply"));
     reply.setFont(new Font("SansSerif", Font.PLAIN, 10));    
     setAlign(reply, content);                           
     reply.addActionListener(BListener);
@@ -101,8 +101,8 @@ public class mainToolBar extends JToolBar {
 
     /* forward button */
     forward = new JButton();
-    if(ico) forward.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/forward.gif"));
-    if(text) forward.setText(YAMM.getString("button.forward"));
+    if(frame.ico) forward.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/forward.gif"));
+    if(frame.text) forward.setText(YAMM.getString("button.forward"));
     forward.setFont(new Font("SansSerif", Font.PLAIN, 10));    
     setAlign(forward, content);                           
     forward.addActionListener(BListener);
@@ -113,8 +113,8 @@ public class mainToolBar extends JToolBar {
 
     /* button to print page */
     print = new JButton();
-    if(ico) print.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/print.gif"));
-    if(text) print.setText(YAMM.getString("button.print"));
+    if(frame.ico) print.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/print.gif"));
+    if(frame.text) print.setText(YAMM.getString("button.print"));
     print.setFont(new Font("SansSerif", Font.PLAIN, 10));    
     setAlign(print, content);                           
     print.setBorderPainted(false);
@@ -126,8 +126,8 @@ public class mainToolBar extends JToolBar {
 
     /* button to exit from program */
     b = new JButton();
-    if(ico) b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/exit.gif"));
-    if(text) b.setText(YAMM.getString("button.exit"));
+    if(frame.ico) b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/exit.gif"));
+    if(frame.text) b.setText(YAMM.getString("button.exit"));
     b.setFont(new Font("SansSerif", Font.PLAIN, 10));    
     setAlign(b, content);                           
     b.setBorderPainted(false);
