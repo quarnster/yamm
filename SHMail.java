@@ -1,4 +1,4 @@
-/*  $Id: SHMail.java,v 1.30 2003/03/07 20:20:58 fredde Exp $
+/*  $Id: SHMail.java,v 1.31 2003/03/09 14:09:05 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,11 +30,12 @@ import org.gjt.fredde.yamm.YAMM;
 
 /**
  * Sends and gets mail
- * @author Fredrik Ehnbom
- * @version $Id: SHMail.java,v 1.30 2003/03/07 20:20:58 fredde Exp $
+ * @author Fredrik Ehnbom <fredde@gjt.org>
+ * @version $Revision: 1.31 $
  */
-public class SHMail extends Thread {
-
+public class SHMail
+	extends Thread
+{
 	/** Properties for smtpserver etc */
 	static protected Properties props = new Properties();
 
@@ -56,19 +57,19 @@ public class SHMail extends Thread {
 
 
 	JButton knappen;
-	YAMM frame;
+	YAMM yamm;
 
 	/**
 	 * Disables the send/get-button and inits some stuff
-	 * @param frame1 the frame that will be used for error-msg etc.
+	 * @param yamm1 the yamm that will be used for error-msg etc.
 	 * @param name the name of this thread.
 	 * @param knapp the button to disable.
 	 */
-	public SHMail(YAMM frame1, String name, JButton knapp) {
+	public SHMail(YAMM yamm1, String name, JButton knapp) {
 		super(name);
 		knappen = knapp;
 		knappen.setEnabled(false);
-		frame = frame1;
+		yamm = yamm1;
 
 		popdebug	= YAMM.getProperty("debug.pop",  "false").equals("true");
 		smtpdebug	= YAMM.getProperty("debug.smtp", "false").equals("true");
@@ -81,8 +82,8 @@ public class SHMail extends Thread {
 	 * and connects to the servers with a config-file.
 	 */
 	public void run() {
-		frame.status.progress(0);
-		frame.status.setStatus("");
+		yamm.status.progress(0);
+		yamm.status.setStatus("");
 
 		File files[] = new File(YAMM.home + "/servers/").listFiles();
 
@@ -115,7 +116,7 @@ public class SHMail extends Thread {
 			if (type != null && server != null && username != null && password != null) {
 				if (type.equals("pop3")) {
 					Object[] argstmp = {server};
-					frame.status.setStatus(YAMM.getString("server.contact", argstmp));
+					yamm.status.setStatus(YAMM.getString("server.contact", argstmp));
 
 					YammPop3 pop = null;
 
@@ -124,12 +125,12 @@ public class SHMail extends Thread {
 						int messages = pop.getMessageCount();
 
 						for (int j = 1; j <= messages; j++) {
-							pop.getMessage(j, messages, frame);
+							pop.getMessage(j, messages, yamm);
 
 							if (del) pop.deleteMessage(j);
 						}
-						frame.status.setStatus(YAMM.getString("msg.done"));
-						frame.status.progress(100);
+						yamm.status.setStatus(YAMM.getString("msg.done"));
+						yamm.status.progress(100);
 					} catch (IOException ioe) {
 						new ExceptionDialog(YAMM.getString("msg.error"),
 							ioe, YAMM.exceptionNames);
@@ -188,8 +189,8 @@ public class SHMail extends Thread {
 
 				String mailStatus = YAMM.getString("server.send", new Object[] {"1"});
 
-	        		frame.status.setStatus(mailStatus);
-		        	frame.status.progress(0);
+	        		yamm.status.setStatus(mailStatus);
+		        	yamm.status.progress(0);
 
 
 				for (;;) {
@@ -199,8 +200,8 @@ public class SHMail extends Thread {
 
 					read += temp.length() + 1;
 
-					frame.status.setStatus(mailStatus + "  " + read + "/" + length);
-					frame.status.progress((int) (((float) read / length) * 100));
+					yamm.status.setStatus(mailStatus + "  " + read + "/" + length);
+					yamm.status.progress((int) (((float) read / length) * 100));
 
 					if (temp.startsWith("From:")) {
 						String from = MessageParser.getEmail(temp);
@@ -236,8 +237,8 @@ public class SHMail extends Thread {
 							if (temp == null) break;
 
 							read += temp.length() + 1;
-							frame.status.setStatus(mailStatus + "  " + read + "/" + length);
-							frame.status.progress((int) (((float) read / length) * 100));
+							yamm.status.setStatus(mailStatus + "  " + read + "/" + length);
+							yamm.status.progress((int) (((float) read / length) * 100));
 
 							if (sent) out.println(temp);
 
@@ -284,19 +285,21 @@ public class SHMail extends Thread {
 				} catch (IOException ioe) {}
 			}
 			if (sent) {
-				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.sent")));
-				frame.tree.repaint();
+				String box = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.sent"));
+				Mailbox.updateIndex(box);
+				yamm.tree.unreadTable.put(box, Mailbox.getUnread(box));
+				yamm.tree.dataModel.fireTableDataChanged();
 			}
 		}
-		frame.status.setStatus(YAMM.getString("msg.done"));
-		frame.status.progress(100);
+		yamm.status.setStatus(YAMM.getString("msg.done"));
+		yamm.status.progress(100);
 
-		frame.status.setStatus("");
-		frame.status.progress(0);
+		yamm.status.setStatus("");
+		yamm.status.progress(0);
 
 		if (Mailbox.hasMail(YAMM.home + "/boxes/.filter")) {
-			frame.status.setStatus(YAMM.getString("server.filter"));
-			frame.status.progress(0);
+			yamm.status.setStatus(YAMM.getString("server.filter"));
+			yamm.status.progress(0);
 
 			try {
 				new Filter();
@@ -308,12 +311,12 @@ public class SHMail extends Thread {
 				);
 			}
 
-			frame.status.setStatus(YAMM.getString("msg.done"));
-			frame.status.progress(100);
+			yamm.status.setStatus(YAMM.getString("msg.done"));
+			yamm.status.progress(100);
 
-			frame.tree.repaint();
-			frame.status.setStatus("You have new mail!");
-			frame.status.progress(0);
+			yamm.tree.repaint();
+			yamm.status.setStatus("You have new mail!");
+			yamm.status.progress(0);
 		}
 
 		knappen.setEnabled(true);
@@ -322,6 +325,9 @@ public class SHMail extends Thread {
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.31  2003/03/09 14:09:05  fredde
+ * variable frame renamed to yamm
+ *
  * Revision 1.30  2003/03/07 20:20:58  fredde
  * moved more getProperty stuff to init. Now tells the user that he got mail if he did
  *
