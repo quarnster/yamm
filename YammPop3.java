@@ -25,7 +25,7 @@ import org.gjt.fredde.yamm.YAMM;
  * This class gets mail from a server and prints out the debugging messages to
  * YAMM.debug.
  * @author Fredrik Ehnbom
- * @version $Id: YammPop3.java,v 1.2 2000/12/31 14:05:07 fredde Exp $
+ * @version $Id: YammPop3.java,v 1.3 2003/03/06 20:17:39 fredde Exp $
  */
 public class YammPop3 extends Pop3 {
 
@@ -46,6 +46,19 @@ public class YammPop3 extends Pop3 {
 		}
 	}
 
+	private int getLength(int msg)
+		throws IOException
+	{
+		sendCommand("LIST " + msg, false);
+		String answer = in.readLine();
+		Debug("Reply: " + answer);
+
+		if (!answer.toLowerCase().startsWith("-err")) {
+			return Integer.parseInt(answer.substring(answer.lastIndexOf(" ") + 1));
+		}
+		throw new IOException("Error Getting messagesize!! (" + answer + ")");
+	}
+
 	public boolean getMessage(int msg, int messages, YAMM frame)
 		throws IOException
 	{
@@ -53,12 +66,13 @@ public class YammPop3 extends Pop3 {
 		frame.status.setStatus(YAMM.getString("server.get", args));
 		frame.status.progress(0);
 
+		int length = getLength(msg);
+
 		sendCommand("RETR " + msg, false);
 		String answer = in.readLine();
 		Debug("Reply: " + answer);
 
 		if (!answer.toLowerCase().startsWith("-err")) {
-			int length = Integer.parseInt(answer.substring(4, answer.indexOf("octets")-1));
 			int read = 0;
 
 			while (!".".equals(answer)) {
@@ -77,6 +91,9 @@ public class YammPop3 extends Pop3 {
 /*
  * Changes:
  * $Log: YammPop3.java,v $
+ * Revision 1.3  2003/03/06 20:17:39  fredde
+ * Now getting message size with the pop3 command LIST
+ *
  * Revision 1.2  2000/12/31 14:05:07  fredde
  * better progressbars
  *
