@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.56 2003/03/05 14:59:29 fredde Exp $
+/*  $Id: YAMM.java,v 1.57 2003/03/06 20:16:28 fredde Exp $
  *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.56 2003/03/05 14:59:29 fredde Exp $
+ * @version $Id: YAMM.java,v 1.57 2003/03/06 20:16:28 fredde Exp $
  */
 public class YAMM
 	extends JFrame
@@ -433,24 +433,7 @@ public class YAMM
 	private void addinfo(String where, Vector attach) {
 		Vector tmp = new Vector();
 
-		try {
-			BufferedReader in = new BufferedReader(
-				new InputStreamReader(
-				new FileInputStream(where))
-			);
-
-			tmp.add(in.readLine()); // Name of the attachment
-			tmp.add(in.readLine()); // The attachments encoding
-
-			in.close();
-		} catch (IOException ioe) {
-			new ExceptionDialog(
-				YAMM.getString("msg.error"),
-				ioe,
-				YAMM.exceptionNames
-			);
-		}
-
+		tmp.add(where.substring(where.indexOf(".attach.") + 8));
 		tmp.add(where);
 		attach.add(tmp);
 	}
@@ -691,6 +674,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.57  2003/03/06 20:16:28  fredde
+ * A few fixes regarding attachments to work with the new mailparsing system
+ *
  * Revision 1.56  2003/03/05 14:59:29  fredde
  * Added INDEX_* constants. Added keyIndex variable. Updated Copyright info
  *
