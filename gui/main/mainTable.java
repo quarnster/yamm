@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.59 2003/06/07 09:41:05 fredde Exp $
+/*  $Id: mainTable.java,v 1.60 2003/06/08 08:55:52 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.59 $
+ * @version $Revision: 1.60 $
  */
 public class mainTable
 	extends JTable
@@ -695,6 +695,7 @@ public class mainTable
 		yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
 		yamm.tree.unreadTable.put(trash, Mailbox.getUnread(trash));
 		yamm.tree.fullUpdate();
+		yamm.mail.setText("");
 
 		changeButtonMode(false);
 		clearSelection();
@@ -767,6 +768,7 @@ public class mainTable
 			Mailbox.moveMail(yamm.getMailbox(), name, moveList);
 			Mailbox.createList(yamm.getMailbox(), yamm);
 			update();
+			yamm.mail.setText("");
 			yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
 			yamm.tree.unreadTable.put(name, Mailbox.getUnread(name));
 			yamm.tree.fullUpdate();
@@ -776,6 +778,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.60  2003/06/08 08:55:52  fredde
+ * sets a blank document when moving or deleting mail
+ *
  * Revision 1.59  2003/06/07 09:41:05  fredde
  * update trash when deleting mail
  *
