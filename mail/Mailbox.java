@@ -28,7 +28,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.33 2000/04/01 20:50:09 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.34 2000/04/15 13:05:44 fredde Exp $
  */
 public class Mailbox {
 
@@ -262,6 +262,9 @@ public class Mailbox {
 					if (tmp == null) break;
 					else out.println(tmp);
 				}
+
+				in.close();
+				out.close();
 
 				File tmp = new File(target + ".tmp");
 				File old = new File(target);
@@ -592,6 +595,10 @@ public class Mailbox {
 					out.println(skip + "");
 				}
 			}
+
+			in.close();
+			out.close();
+
 			source.delete();
 			target.renameTo(source);
 		} catch (IOException ioe) {
@@ -670,6 +677,10 @@ public class Mailbox {
 				}
 				out.println(temp);
 			}
+
+			in.close();
+			out.close();
+
 			source.delete();
 			target.renameTo(source);
 		} catch (IOException ioe) {
@@ -982,6 +993,11 @@ public class Mailbox {
 						outFile.println(temp);
 					}
 				}
+
+				in.close();
+				outFile.close();
+				outFile2.close();
+
 				inputFile.delete();
 				if (!outputFile.renameTo(inputFile)) {
 					System.err.println("ERROR: Couldn't " +
@@ -1091,8 +1107,10 @@ public class Mailbox {
 					}
 				}
 
-				inputFile.delete();
+				in.close();
+				outFile.close();
 
+				inputFile.delete();
 				if (!outputFile.renameTo(inputFile)) {
 					System.err.println("ERROR: Couldn't " +
 							"rename " + whichBox +
@@ -1321,8 +1339,12 @@ public class Mailbox {
 					outFile.println(temp);
 				}
 			}
-			inputFile.delete();
 
+			in.close();
+			outFile.close();
+			outFile2.close();
+
+			inputFile.delete();
 			if (!outputFile.renameTo(inputFile)) {
 				System.err.println("Couldn't rename " +
 							fromBox + ".tmp to " +
@@ -1419,6 +1441,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.34  2000/04/15 13:05:44  fredde
+ * close out-/inputstream before renaming file
+ *
  * Revision 1.33  2000/04/01 20:50:09  fredde
  * fixed to make the profiling system work
  *
