@@ -113,6 +113,9 @@ public class mainTable extends JTable implements DragGestureListener,
 
     addMouseListener(mouseListener);
 
+    registerKeyboardAction(keyListener, "Del",
+                            KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), 0);
+
     popup = new JPopupMenu();
     popup.setInvoker(this);
 
@@ -498,6 +501,59 @@ public class mainTable extends JTable implements DragGestureListener,
     }
   };
 
+  protected ActionListener keyListener = new ActionListener() {
+    public void actionPerformed(ActionEvent ae) {                 
+      String text = ae.getActionCommand();
+
+      int i = 0;                                              
+                
+      while(i<4) {
+        if(getColumnName(i).equals("#")) { break; }
+        i++;
+      }     
+       
+      if(text.equals("Del")) {
+        frame.delUnNeededFiles();
+        int[] mlist = getSelectedRows();
+        int[] deleteList = new int[mlist.length];
+
+        for(int j = 0;j < mlist.length;j++) {
+          deleteList[j] = Integer.parseInt(getValueAt(mlist[j], i).toString());
+        }
+         
+        Arrays.sort(deleteList);
+
+        Mailbox.deleteMail(frame.selectedbox, deleteList);
+
+        Mailbox.createList(frame.selectedbox, listOfMails);
+
+        updateUI();
+        frame.attach = new Vector();
+
+
+        Mailbox.getMail(frame.selectedbox, getSelectedRow());
+
+        try {
+          String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes") + 6, frame.selectedbox.length()) + "/";
+          frame.mailPage = new URL(frame.mailPageString + boxName + getSelectedRow()  + ".html");
+        }
+        catch (MalformedURLException mue) {
+          Object[] args = {mue.toString()};
+          new MsgDialog(frame, YAMM.getString("msg.error"),
+                               YAMM.getString("msg.exception", args));
+        }
+
+        try { frame.mail.setPage(frame.mailPage); }
+        catch (IOException ioe) {
+          Object[] args = {ioe.toString()};
+          new MsgDialog(frame, YAMM.getString("msg.error"),
+                               YAMM.getString("msg.exception", args));
+        }
+      }
+
+    }
+  };
+
   protected ActionListener OtherMListener = new ActionListener() {
     public void actionPerformed(ActionEvent ae) {       
       String kommando = ((JMenuItem)ae.getSource()).getText();
@@ -520,9 +576,7 @@ public class mainTable extends JTable implements DragGestureListener,
 
         Arrays.sort(deleteList);
 
-//        for (int a=deleteList.length -1; a>=0; a-- ) {
-          Mailbox.deleteMail(frame.selectedbox, deleteList);
-//        }
+        Mailbox.deleteMail(frame.selectedbox, deleteList);
          
         Mailbox.createList(frame.selectedbox, listOfMails);
 
@@ -530,7 +584,7 @@ public class mainTable extends JTable implements DragGestureListener,
         frame.attach = new Vector();
 
 
-        Mailbox.getMail(frame.selectedbox, getSelectedRow() /*, frame.attach, frame.mailName */);
+        Mailbox.getMail(frame.selectedbox, getSelectedRow());
 
         try { 
           String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes") + 6, frame.selectedbox.length()) + "/"; 
