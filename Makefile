@@ -51,7 +51,9 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/YAMM.class \
 	org/gjt/fredde/yamm/YammPop3.class \
 	org/gjt/fredde/yamm/YammSmtp.class \
-	org/gjt/fredde/yamm/Utilities.class
+	org/gjt/fredde/yamm/Utilities.class \
+	org/gjt/fredde/yamm/Profile.class \
+	org/gjt/fredde/yamm/Profiler.class
 
 
 all: YAMM
