@@ -23,7 +23,7 @@ import java.io.*;
 /**
  * This class parses attachments
  * @author Fredrik Ehnbom
- * @version $Id: Attachment.java,v 1.6 2001/04/21 09:33:37 fredde Exp $
+ * @version $Id: Attachment.java,v 1.7 2003/03/05 15:04:22 fredde Exp $
  */
 public class Attachment {
 
@@ -34,6 +34,7 @@ public class Attachment {
 	public static final int AMESSAGE 	=  3;
 
 	public String name = null;
+	public String contentType = null;
 
 	public Attachment() {
 	}
@@ -47,7 +48,7 @@ public class Attachment {
 		String encoding = null;  // Encoding used for this attachment
 
 		if (mhp.getHeaderField("Content-Type") != null) {
-			name = mhp.getHeaderField("Content-Type").trim();
+			contentType = name = mhp.getHeaderField("Content-Type").trim();
 
 			if (name.indexOf("name=") != -1) {
 				// remove unwanted info
@@ -122,6 +123,9 @@ public class Attachment {
 /*
  * Changes:
  * $Log: Attachment.java,v $
+ * Revision 1.7  2003/03/05 15:04:22  fredde
+ * added Variable contentType
+ *
  * Revision 1.6  2001/04/21 09:33:37  fredde
  * fixed for inlined messages
  *
