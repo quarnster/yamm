@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * The configurationtab for the profiles
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: IdentitiesConfTab.java,v 1.3 2000/04/01 20:51:21 fredde Exp $
+ * @version $Id: IdentitiesConfTab.java,v 1.4 2000/04/11 13:27:39 fredde Exp $
  */
 public class IdentitiesConfTab extends JPanel {
 
@@ -123,7 +123,7 @@ public class IdentitiesConfTab extends JPanel {
 				YAMM.profiler.save();
 			}
 		});
-		hori.add(new JLabel("confwiz.ident.default"));
+		hori.add(new JLabel(YAMM.getString("confwiz.ident.default")));
 		hori.add(def);
 		add("South", hori);
 	}
@@ -188,6 +188,9 @@ public class IdentitiesConfTab extends JPanel {
 /*
  * ChangeLog:
  * $Log: IdentitiesConfTab.java,v $
+ * Revision 1.4  2000/04/11 13:27:39  fredde
+ * confwiz.ident.default -> YAMM.getString("...
+ *
  * Revision 1.3  2000/04/01 20:51:21  fredde
  * fixed to make the profiling system work
  *
