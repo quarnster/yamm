@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.47 2003/06/08 18:49:56 fredde Exp $
+/*  $Id: mainJTree.java,v 1.48 2003/06/08 19:55:11 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.47 $
+ * @version $Revision: 1.48 $
  */
 public class mainJTree
 	extends JTable
@@ -348,7 +348,7 @@ public class mainJTree
 				Mailbox.moveMail(yamm.getMailbox(), box, list);
 				Mailbox.createList(yamm.getMailbox(), yamm);
 				yamm.mailList.update();
-				yamm.mail.setText("");
+				yamm.setNullPage();
 			} else {
 				Mailbox.copyMail(YAMM.getInstance().getMailbox(), box, list);
 			}
@@ -492,6 +492,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.48  2003/06/08 19:55:11  fredde
+ * uses setNullPage
+ *
  * Revision 1.47  2003/06/08 18:49:56  fredde
  * changeButtonMode moved to toolbar
  *
