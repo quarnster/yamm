@@ -94,6 +94,7 @@ public class ExceptionDialog extends JDialog {
 
 		getContentPane().add("South", buttonPanel);
 
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		show();
 	}
 
