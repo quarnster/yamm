@@ -56,9 +56,9 @@ public class YAMM extends JFrame implements HyperlinkListener
   public static    String                 compDate     = "1999-06-21";
 
   /** the file that contains the current mail */
-  public String		  mailPageString   = "file:///" + System.getProperty("user.home") + "/.yamm/tmp/";
+  public String		  mailPageString   = "file:///" + System.getProperty("user.home") + "/.yamm/tmp/cache/";
   public URL	          mailPage; //     = new URL("file:/" + System.getProperty("user.home") + "/.yamm/tmp/mail.html");
-  public boolean	  mailName = false;
+//  public boolean	  mailName = false;
 
   /** The encryption key */
   public static    char[]                 encKey       = "myKey".toCharArray();
@@ -140,8 +140,11 @@ public class YAMM extends JFrame implements HyperlinkListener
    * Creates the main-window and adds all the components in it.
    */
   public YAMM() {
-    Mailbox.getMail(selectedbox, 0, attach, mailName);
-    try { mailPage = new URL(mailPageString + mailName + ".html"); }
+    Mailbox.getMail(selectedbox, 0 /* , attach  , mailName */);
+    try { 
+      //String boxName = selectedBox
+      mailPage = new URL(mailPageString + "/inbox/" + "0.html"); 
+    }
     catch (MalformedURLException mue) { System.err.println(mue); }
 
     System.out.println("Locale: " + Locale.getDefault());
@@ -178,6 +181,7 @@ public class YAMM extends JFrame implements HyperlinkListener
 
     // if you want to redirekt the err stream to a file.
     // good for debugging
+/*
     try {
       FileOutputStream err = new FileOutputStream("stderr.log");
       PrintStream errPrintStream = new PrintStream(err);
@@ -186,7 +190,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     catch (IOException ioe) {
       System.out.println(ioe);
     }
-
+*/
 
     // get the resources to use
     try {
@@ -224,7 +228,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     mail = new JEditorPane();
     mail.setContentType("text/html");
     attach = new Vector();
-    Mailbox.getMail(selectedbox, 0, attach, mailName);
+    Mailbox.getMail(selectedbox, 0 /*, attach, mailName */);
     try { mail.setPage(mailPage); }
     catch (IOException ioe) { System.err.println(ioe); }
     mail.setEditable(false);
@@ -461,9 +465,42 @@ public class YAMM extends JFrame implements HyperlinkListener
     } catch(IOException propsioe) { System.err.println(propsioe); }
 
     dispose();
+    delUnNeededFiles();
     System.exit(0);
   }
 
+  public void delUnNeededFiles(){
+    Vector delFile = new Vector(), delDir = new Vector();
+    System.out.println("Creating list of unneeded files...");
+    createDelList(delFile, delDir, new File(System.getProperty("user.home") + "/.yamm/tmp/"));
+    System.out.println("\nDeleting unneeded files...");
+    delFiles(delFile);
+    delFiles(delDir);
+  }
+
+
+  protected void createDelList(Vector delFile, Vector delDir, File dir) {
+    String files[] = dir.list();
+
+    for(int i = 0; i < files.length;i++) {
+      System.out.println("added \"" + files[i]);
+      File dir2 = new File(dir, files[i]);
+      if(dir2.isDirectory()) {
+        delDir.add(dir2);
+        createDelList(delFile, delDir, dir2);
+      }
+      else delFile.add(dir2);
+    }
+  }
+
+  public void delFiles(Vector delFile) {
+    for(int i = 0; i < delFile.size(); i++) {
+      String file = delFile.elementAt(i).toString();
+      if(!new File(file).delete()) {
+        System.err.println("Couldn't delete \"" + file + "\"");
+      }
+    }
+  }
   class FLyssnare extends WindowAdapter {
     public void windowClosing(WindowEvent event) {
       Exit();
