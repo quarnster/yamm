@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom
- * @version $Id: SHMail.java,v 1.20 2000/03/12 19:37:02 fredde Exp $
+ * @version $Id: SHMail.java,v 1.21 2000/03/14 21:18:14 fredde Exp $
  */
 public class SHMail extends Thread {
 
@@ -138,9 +138,9 @@ public class SHMail extends Thread {
 								pop.close();
 							}
 						} catch (Exception e) {
-							new ExceptionDialog(YAMM.getString("msg.error"),
-								e,
-								YAMM.exceptionNames);
+//							new ExceptionDialog(YAMM.getString("msg.error"),
+//								e,
+//								YAMM.exceptionNames);
 						}
 					}
 				}
@@ -154,15 +154,20 @@ public class SHMail extends Thread {
 			frame.status.setStatus(YAMM.getString("server.send", argstmp));
 			frame.status.progress(0);
 
+			Smtp smtp = null;
+			BufferedReader in = null;
+			PrintWriter out = null;
+			PrintWriter mail = null;
+
 			try { 
-				Smtp smtp = new YammSmtp(YAMM.getProperty("smtpserver"), 25, smtpdebug);
-				BufferedReader in = new BufferedReader(
+				smtp = new YammSmtp(YAMM.getProperty("smtpserver"), 25, smtpdebug);
+				in = new BufferedReader(
 					new InputStreamReader(
 						new FileInputStream(YAMM.home + "/boxes/" +
 							YAMM.getString("box.outbox"))));
-				PrintWriter out = null;
+//				PrintWriter out = null;
 
-				PrintWriter mail = null; // = smtp.getOutputStream();
+//				PrintWriter mail = null; // = smtp.getOutputStream();
 
 				if (sent) { 
 					out = new PrintWriter(
@@ -238,16 +243,23 @@ public class SHMail extends Thread {
 							mail.println(temp);
 					}
 				}
-				in.close();
-				if (sent) out.close();
+//				in.close();
+//				if (sent) out.close();
 				File file = new File(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
 				file.delete();
 				file.createNewFile();
-				smtp.close();
+//				smtp.close();
 			} catch (IOException ioe) { 
 				new ExceptionDialog(YAMM.getString("msg.error"),
 							ioe,
 						YAMM.exceptionNames); 
+			} finally {
+				try {
+					if (in != null) in.close();
+					if (sent && out != null) out.close();
+					if (smtp != null) smtp.close();
+					if (mail != null) mail.close();
+				} catch (IOException ioe) {}
 			}
 		}
 		frame.status.setStatus(YAMM.getString("msg.done"));
@@ -276,6 +288,9 @@ public class SHMail extends Thread {
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.21  2000/03/14 21:18:14  fredde
+ * better network cleanup
+ *
  * Revision 1.20  2000/03/12 19:37:02  fredde
  * can now send attachments that other mail clients can view...
  *
