@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.42 2003/03/07 10:53:07 fredde Exp $
+/*  $Id: Mailbox.java,v 1.43 2003/03/07 20:22:00 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.42 2003/03/07 10:53:07 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.43 2003/03/07 20:22:00 fredde Exp $
  */
 public class Mailbox {
 
@@ -166,8 +166,8 @@ public class Mailbox {
 				if (from == null) from = "";
 				if (subject == null) subject = "";
 
-				subject = unMime(removeQuote(subject));
-				from = unMime(removeQuote(from));
+				subject = removeQuote(unMime(subject));
+				from = removeQuote(unMime(from));
 
 				for (;;) {
 					temp = in.readLine();
@@ -229,8 +229,8 @@ public class Mailbox {
 						if (subject == null)
 							subject = "";
 
-						subject = unMime(removeQuote(subject));
-						from = unMime(removeQuote(from));
+						subject = removeQuote(unMime(subject));
+						from = removeQuote(unMime(from));
 					}
 				}
 				in.close();
@@ -365,6 +365,7 @@ public class Mailbox {
 
 				// message number
 				int num = (int) tok.nval;
+
 				listOfMails[i][0] = Integer.toString(num);
 
 				// subject
@@ -702,6 +703,7 @@ public class Mailbox {
 		File   out   = new File(cache, whichmail + ".html");
 
 
+		if (out.exists()) return;
 		if (!new File(cache, whichmail + ".html").exists()) {
 			if (!cache.exists()) {
 				if (!cache.mkdirs()) {
@@ -1436,6 +1438,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.43  2003/03/07 20:22:00  fredde
+ * do not regenerate the message if it has allready been cached. unMime before removeQuote
+ *
  * Revision 1.42  2003/03/07 10:53:07  fredde
  * unMime fixes
  *
