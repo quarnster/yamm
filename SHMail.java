@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom
- * @version $Id: SHMail.java,v 1.18 2000/02/28 13:44:29 fredde Exp $
+ * @version $Id: SHMail.java,v 1.19 2000/03/12 17:20:28 fredde Exp $
  */
 public class SHMail extends Thread {
 
@@ -177,11 +177,11 @@ public class SHMail extends Thread {
 
 
 					if (temp == null) break;
-					if (sent) out.println(temp);
 
 					if (temp.startsWith("From:")) {
 						smtp.from(temp.substring(temp.indexOf("<") + 1, temp.indexOf(">")));
 						from2 = temp;
+						if (sent) out.println(from2);
 					} else if (temp.startsWith("To:")) {
 						to2 = temp;
 
@@ -196,13 +196,13 @@ public class SHMail extends Thread {
 								temp = in.readLine().trim();
 								to2 += "\n      " + temp;
 							}
-							smtp.to(temp.substring(0, temp.length()-1));
-							to2 += "\n      " + temp;
-							temp = in.readLine();
+							smtp.to(temp.substring(0, temp.length()));
 						}
+						if (sent) out.println(to2);
 					} else if (temp.startsWith("Subject:")) {
 						PrintWriter mail = smtp.getOutputStream();
 						mail.println(from2 + "\n" + to2 + "\n" + temp);
+						if (sent) out.println(temp);
 
 						for (;;) {
 							temp = in.readLine();
@@ -222,6 +222,8 @@ public class SHMail extends Thread {
 							}
 							mail.println(temp);
 						}
+					} else if (sent) {
+						out.println(temp);
 					}
 				}
 				in.close();
@@ -262,6 +264,9 @@ public class SHMail extends Thread {
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.19  2000/03/12 17:20:28  fredde
+ * now multiple receivers work... ARGH
+ *
  * Revision 1.18  2000/02/28 13:44:29  fredde
  * added new classes
  *
