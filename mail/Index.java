@@ -1,4 +1,4 @@
-/*  $Id: Index.java,v 1.4 2003/03/11 15:19:53 fredde Exp $
+/*  $Id: Index.java,v 1.5 2003/03/15 19:27:24 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -172,6 +172,7 @@ public class Index {
 
 				Date d = null;
 				String date = null;
+				boolean attachment = false;
 
 				for (;;) {
 					temp = in.readLine();
@@ -179,6 +180,9 @@ public class Index {
 
 					skipnum += temp.length() + System.getProperty("line.separator").length();
 
+					if (temp.startsWith("Content-Disposition") && temp.toLowerCase().indexOf("attachment") != -1) {
+						attachment = true;
+					}
 					if (temp.equals(".")) {
 						date = mhp.getHeaderField("Date");
 						if (date != null) {
@@ -195,6 +199,10 @@ public class Index {
 						e.skip = skip;
 						e.date = d.getTime();
 						e.id = messageNum++;
+						if (attachment)
+							e.status |= IndexEntry.STATUS_ATTACHMENT;
+						if ((e.status & IndexEntry.STATUS_READ) == 0)
+							newNum++;
 						e.write(raf);
 
 						skip = skipnum;
@@ -203,6 +211,7 @@ public class Index {
 						} catch (MessageParseException mpe) {
 							break;
 						}
+						attachment = false;
 					}
 				}
 				in.close();
@@ -213,7 +222,6 @@ public class Index {
 			}
 
 		}
-		newNum = messageNum;
 		raf.close();
 		raf = new RandomAccessFile(indexFile, "rw");
 		write();
