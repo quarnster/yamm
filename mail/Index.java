@@ -1,4 +1,4 @@
-/*  $Id: Index.java,v 1.2 2003/03/10 11:01:27 fredde Exp $
+/*  $Id: Index.java,v 1.3 2003/03/10 12:31:26 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -213,7 +213,7 @@ public class Index {
 			}
 
 		}
-		unreadNum = newNum = messageNum;
+		newNum = messageNum;
 		raf.close();
 		raf = new RandomAccessFile(indexFile, "rw");
 		write();
