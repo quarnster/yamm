@@ -17,7 +17,7 @@
  */
 package org.gjt.fredde.yamm.gui.confwiz;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.Properties;
@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * The configurationtab for the serversettings
  * @author Fredrik Ehnbom
- * @version $Id: ServersConfTab.java,v 1.3 2000/03/18 14:55:56 fredde Exp $
+ * @version $Id: ServersConfTab.java,v 1.4 2000/04/11 13:28:05 fredde Exp $
  */
 public class ServersConfTab extends JPanel {
 
@@ -55,11 +55,10 @@ public class ServersConfTab extends JPanel {
 	 */
 	public ServersConfTab(JDialog frame) {
 		super();
+		setLayout(new BorderLayout());
 
 		this.frame = frame;
 		Box vert = Box.createVerticalBox();
-		Box hori = Box.createHorizontalBox();
-		Box vert2 = Box.createVerticalBox();
     
 		JButton b = new JButton(YAMM.getString("button.add"), new ImageIcon(getClass().getResource("/images/buttons/new.gif")));
 		b.addActionListener(BListener);
@@ -75,6 +74,9 @@ public class ServersConfTab extends JPanel {
 		b.addActionListener(BListener);
 		vert.add(b);
 		vert.add(Box.createRigidArea(new Dimension(10, 10)));
+
+		add("East", vert);
+
 
 		Vector vect1 = new Vector();
 
@@ -110,21 +112,14 @@ public class ServersConfTab extends JPanel {
 		serverList = new JList(dataModel);
 
 		JScrollPane JSPane = new JScrollPane(serverList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		JSPane.setMaximumSize(new Dimension(300,300));
-		JSPane.setMinimumSize(new Dimension(300,300));
-    
-		hori.add(Box.createRigidArea(new Dimension(10, 10)));
-		hori.add(JSPane);
-		hori.add(Box.createRigidArea(new Dimension(10, 10)));
-		hori.add(vert);
-		vert2.add(hori);
+		add("Center", JSPane);
 
-		hori = Box.createHorizontalBox();
+		Box hori = Box.createHorizontalBox();
 		JLabel smtpserv = new JLabel(YAMM.getString("confwiz.servers.smtplabel"));
 		hori.add(smtpserv);
 
 		final JTextField jtf = new JTextField(YAMM.getProperty("smtpserver", ""));
-		jtf.setMaximumSize(new Dimension(300, 20));
+		jtf.setMaximumSize(new Dimension(1200, 20));
 		jtf.setMinimumSize(new Dimension(300,20));
 		jtf.addFocusListener(new FocusAdapter() {
 			public void focusLost(FocusEvent e) {
@@ -132,10 +127,7 @@ public class ServersConfTab extends JPanel {
 			}
 		});
 		hori.add(jtf);
-		vert2.add(Box.createRigidArea(new Dimension(10, 30)));
-		vert2.add(hori);
-
-		add(vert2);
+		add("South", hori);
 	}
 
 	/**
@@ -214,6 +206,9 @@ public class ServersConfTab extends JPanel {
 /*
  * Changes:
  * $Log: ServersConfTab.java,v $
+ * Revision 1.4  2000/04/11 13:28:05  fredde
+ * uses the same layout as IdentitiesConfTab
+ *
  * Revision 1.3  2000/03/18 14:55:56  fredde
  * the server editor now works
  *
