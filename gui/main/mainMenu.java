@@ -183,8 +183,8 @@ public class mainMenu extends JMenuBar {
                       "Copyright (C) 1999 Fredrik Ehnbom\n"
                     + "YAMM-version: " + YAMM.yammVersion + "\n"
                     + "Compiledate: " + YAMM.compDate + "\n"
-                    + "Homepage: http://home.swipnet.se/ehnbom/fredde/yamm/\n"
-                    + "E-mail: <fredrik.ehnbom@linux.nu>\n"
+                    + "Homepage: http://www.gjt.org/½fredde/\n"
+                    + "E-mail: <fredde@gjt.org>\n"
                     + "\n"
                     + "Most icons are made or based on icons made\n"
                     + "by Tuomas Kuosmanen <tigert@gimp.org>");

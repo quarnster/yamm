@@ -872,24 +872,26 @@ public class YAMM extends JFrame implements HyperlinkListener
     if(!(new File(System.getProperty("user.home") + "/.yamm/boxes")).exists()) {
       try {
         String home = System.getProperty("user.home");
+        String user = System.getProperty("user.name");
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
         InetAddress myInetaddr = InetAddress.getLocalHost();
         String host = myInetaddr.getHostName();
 
-        if(host == null) host = "unknown";
+        if(host == null) host = "localhost";
 
-        (new File(home + "/.yamm/boxes/servers")).mkdirs();
+        (new File(home + "/.yamm/servers")).mkdirs();
+        (new File(home + "/.yamm/boxes")).mkdirs();
         PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(home + "/.yamm/boxes/inbox")));
 
         out.println("Date: " + dateFormat.format(new Date()));
-        out.println("From: Fredrik Ehnbom <fredrik.ehnbom@linux.nu>");
-        out.println("To: new-user@" + host);
+        out.println("From: Fredrik Ehnbom <fredde@gjt.org>");
+        out.println("To: " + user + "@" + host);
         out.println("Subject: Welcome to YAMM " + yammVersion);
-        out.println("\nWelcome " + System.getProperty("user.name") + "!");
-        out.println("\nFeel free to <a href=\"mailto:fredrik.ehnbom@linux.nu\">mail me</a> your questions, comments, suggestions or bug-reports.");
+        out.println("\n<html>\nWelcome " + user + "!");
+        out.println("\nFeel free to <a href=\"mailto:fredde@gjt.org\">mail me</a> your questions, comments, suggestions or bug-reports.");
         out.println("For the bug-report, try to send me as much info as possible. (regarding the");
         out.println("bug, not what you had for breakfast that day! ;) )");
-        out.println("\nBest regards,\n\nFredrik Ehnbom\n.\n");
+        out.println("\nBest regards,\n\nFredrik Ehnbom\n</html>\n.\n");
         out.close();
 
         (new File(home + "/.yamm/boxes/outbox")).createNewFile();
