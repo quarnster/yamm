@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.63 2003/03/10 12:30:27 fredde Exp $
+/*  $Id: YAMM.java,v 1.64 2003/03/10 21:51:06 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.63 $
+ * @version $Revision: 1.64 $
  */
 public class YAMM
 	extends JFrame
@@ -555,6 +555,7 @@ public class YAMM
 			out.println("Date: " + dateFormat.format(new Date()));
 			out.println("From: Fredrik Ehnbom <fredde@gjt.org>");
 			out.println("To: " + user + "@" + host);
+			out.println("Content-Type: text/html");
 			Object[] args = {
 				YAMM.version,
 				user
@@ -686,6 +687,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.64  2003/03/10 21:51:06  fredde
+ * welcome message is of type text/html
+ *
  * Revision 1.63  2003/03/10 12:30:27  fredde
  * version stuff change
  *
