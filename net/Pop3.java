@@ -49,13 +49,13 @@ import java.util.*;
  *       }
  *
  *       // bye, bye server.
- *       pop.closeConnection();
+ *       pop.close();
  *     }
  *     catch (IOException ioe) { System.err.println(ioe); }
  *   }
  * }
  * </pre></code>
- * Now that wasn't to hard! Now go and make your own email client!
+ * That wasn't to hard! Now go and make your own email client!
  */
 public class Pop3 {
 
@@ -104,6 +104,7 @@ public class Pop3 {
 
   /**
    * Say goodbye to the server...
+   * @deprecated Replaced by <code>Pop3.close()</code>
    */
   public void closeConnection() throws IOException {
     sendCommand("QUIT");
@@ -112,6 +113,18 @@ public class Pop3 {
     outFile.close();
     socket.close();
   }
+
+  /**
+   * Say goodbye to the server...
+   */
+  public void close() throws IOException {
+    sendCommand("QUIT");                           
+    in.close();
+    out.close();
+    outFile.close();
+    socket.close();
+  }
+
 
   /**
    * Returns the numbers of messages for this user.

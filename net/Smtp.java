@@ -42,7 +42,7 @@ import java.io.*;
  *       out.println("I have a party next week!!!"); // the message
  *
  *       smtp.sendMessage();                         // sends the message
- *       smtp.closeConnection();                     // closes the connection
+ *       smtp.close();                               // closes the connection
  *     }
  *     catch (IOException ioe) { System.err.println(ioe); }
  *   }
@@ -61,7 +61,7 @@ public class Smtp {
   protected Socket socket;
 
   /**
-   * Connects to the specified server and sends the messages in ~home/.yamm/boxes/outbox
+   * Connects to the specified server
    * @param server The server to use
    * @param file The file to get messages from
    */
@@ -70,7 +70,7 @@ public class Smtp {
   }
 
   /**
-   * Connects to the specified server and sends the messages in ~home/.yamm/boxes/outbox
+   * Connects to the specified server
    * @param server The server to use
    * @param file The file to get messages from
    */
@@ -78,7 +78,8 @@ public class Smtp {
     socket = new Socket(server, port);
 
     in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-    out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+    out = new PrintWriter(new BufferedWriter(
+                   new OutputStreamWriter(socket.getOutputStream())), true);
 
     in.readLine();
     sendCommand("HELO " + InetAddress.getLocalHost().getHostName(), 250);
@@ -86,8 +87,19 @@ public class Smtp {
 
   /**
    * closes the connection
+   * @deprecated Replaced by <code>Smtp.close()</code>
    */
   public void closeConnection() throws IOException {
+    sendCommand("QUIT", 221);
+    in.close();
+    out.close();
+    socket.close();
+  }
+
+  /**
+   * closes the connection
+   */
+  public void close() throws IOException {
     sendCommand("QUIT", 221);
     in.close();
     out.close();
