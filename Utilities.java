@@ -25,7 +25,7 @@ import java.util.jar.*;
 /**
  * This Class provides some useful utilities
  * @author Fredrik Ehnbom
- * @version $Id: Utilities.java,v 1.9 2003/04/16 12:38:09 fredde Exp $
+ * @version $Id: Utilities.java,v 1.10 2003/05/24 08:43:59 fredde Exp $
  */
 public final class Utilities {
 
@@ -48,16 +48,31 @@ public final class Utilities {
 	public static String getCompileDate() {
 		String date = null;
 		try {
-			JarFile jf = new JarFile("yamm.jar");
-			JarEntry je = jf.getJarEntry("org/gjt/fredde/yamm/YAMM.class");
+			Date d = null;
+			Class mainClass = Class.forName("org.gjt.fredde.yamm.YAMM");
+			String filenameString = mainClass.getProtectionDomain().getCodeSource().getLocation().getFile();
+			String jarnameString = "yamm.jar";
+			File jarFile = new File(filenameString);
 
-			Date d = new Date(je.getTime());
-			SimpleDateFormat dateFormat = new SimpleDateFormat("EEEEEEE, MMMMMMMM dd yyyy HH:mm:ss", Locale.US);
+			if (!jarFile.isFile()) {
+				jarFile = new File(filenameString, jarnameString);
+				if (!jarFile.isFile()) {
+					jarFile = null;
+					d = new Date();
+				}
+			}
+
+			if (jarFile != null) {
+				JarFile jf = new JarFile(jarFile);
+				JarEntry je = jf.getJarEntry("org/gjt/fredde/yamm/YAMM.class");
+				d = new Date(je.getTime());
+				jf.close();
+			}
+
+			SimpleDateFormat dateFormat = new SimpleDateFormat("EEEEEEE, MMMMMMMM dd yyyy HH:mm:ss");
 			date = dateFormat.format(d);
-
-			jf.close();
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return date;
 	}
@@ -182,6 +197,9 @@ public final class Utilities {
 /*
  * Changes:
  * $Log: Utilities.java,v $
+ * Revision 1.10  2003/05/24 08:43:59  fredde
+ * getCompileDate() now works when not using executing the jar file. Thanks Ilane
+ *
  * Revision 1.9  2003/04/16 12:38:09  fredde
  * dateformat is now in Locale.US format
  *
