@@ -24,7 +24,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * The ConfigurationWizard is used to configure the settings in YAMM
  * @author Fredrik Ehnbom
- * @version $Id: ConfigurationWizard.java,v 1.1 2000/02/28 13:49:33 fredde Exp $
+ * @version $Id: ConfigurationWizard.java,v 1.2 2000/03/18 14:55:56 fredde Exp $
  */
 public class ConfigurationWizard extends JDialog {
 
@@ -40,7 +40,7 @@ public class ConfigurationWizard extends JDialog {
 		jtpane.addTab(YAMM.getString("confwiz.welcometab"), new JLabel(YAMM.getString("confwiz.welcome.message")));
 		jtpane.addTab(YAMM.getString("confwiz.generaltab"), new GeneralConfTab());
 		jtpane.addTab(YAMM.getString("confwiz.identitiestab"), new IdentitiesConfTab());
-		jtpane.addTab(YAMM.getString("confwiz.serverstab"), new ServersConfTab());
+		jtpane.addTab(YAMM.getString("confwiz.serverstab"), new ServersConfTab(this));
 		jtpane.addTab(YAMM.getString("confwiz.debugtab"), new DebugConfTab());
 		
 		getContentPane().add("Center", jtpane);		
@@ -53,6 +53,9 @@ public class ConfigurationWizard extends JDialog {
 /*
  * Changes:
  * $Log: ConfigurationWizard.java,v $
+ * Revision 1.2  2000/03/18 14:55:56  fredde
+ * the server editor now works
+ *
  * Revision 1.1  2000/02/28 13:49:33  fredde
  * files for the configuration wizard
  *

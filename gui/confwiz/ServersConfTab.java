@@ -25,12 +25,13 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.table.*;
 
+import org.gjt.fredde.util.gui.ExceptionDialog;
 import org.gjt.fredde.yamm.YAMM;
 
 /**
  * The configurationtab for the serversettings
  * @author Fredrik Ehnbom
- * @version $Id: ServersConfTab.java,v 1.2 2000/03/05 18:02:53 fredde Exp $
+ * @version $Id: ServersConfTab.java,v 1.3 2000/03/18 14:55:56 fredde Exp $
  */
 public class ServersConfTab extends JPanel {
 
@@ -45,10 +46,17 @@ public class ServersConfTab extends JPanel {
 	private JList serverList = null;
 
 	/**
+	 * The parent JDialog
+	 */
+	private JDialog frame;
+
+	/**
 	 * Creates a new ServersConfTab
 	 */
-	public ServersConfTab() {
+	public ServersConfTab(JDialog frame) {
 		super();
+
+		this.frame = frame;
 		Box vert = Box.createVerticalBox();
 		Box hori = Box.createHorizontalBox();
 		Box vert2 = Box.createVerticalBox();
@@ -81,7 +89,8 @@ public class ServersConfTab extends JPanel {
 				props.load(in);
 				in.close();
 			} catch (IOException propsioe) {
-				System.err.println(propsioe);
+				new ExceptionDialog(YAMM.getString("msg.error"),
+					propsioe, YAMM.exceptionNames);
 			}
 			vect1.add(props.getProperty("server"));
 			vect1.add(files[i]);
@@ -139,17 +148,65 @@ public class ServersConfTab extends JPanel {
 			int idx = serverList.getSelectedIndex();
 
 			if (text.equals(YAMM.getString("button.add"))) {
-				ServerEditor s = new ServerEditor();
-				if (s.result()) {
+				ServerEditor s = new ServerEditor(frame);
+				if (s.changed) {
+					vect2.clear();
+					Vector vect1 = new Vector();
+					File[] files = new File(YAMM.home + "/servers/").listFiles();
+
+					for (int i = 0; i < files.length; i++) {
+						Properties props = null;
+
+						try {
+							InputStream in = new FileInputStream(files[i]); //  + "/.config");
+							props = new Properties();
+							props.load(in);
+							in.close();
+						} catch (IOException propsioe) {
+							new ExceptionDialog(YAMM.getString("msg.error"),
+								propsioe, YAMM.exceptionNames);
+						}
+						vect1.add(props.getProperty("server"));
+						vect1.add(files[i]);
+						vect2.add(vect1);
+						vect1 = new Vector();
+					}
+					serverList.updateUI();
 				}
 			} else if (text.equals(YAMM.getString("edit")) && idx != -1) {
 				String file = ((Vector) vect2.elementAt(idx)).elementAt(1).toString();
-				new ServerEditor(file).result();
+
+				ServerEditor s = new ServerEditor(frame, file);
+				if (s.changed) {
+					vect2.clear();
+					Vector vect1 = new Vector();
+					File[] files = new File(YAMM.home + "/servers/").listFiles();
+
+					for (int i = 0; i < files.length; i++) {
+						Properties props = null;
+
+						try {
+							InputStream in = new FileInputStream(files[i]); //  + "/.config");
+							props = new Properties();
+							props.load(in);
+							in.close();
+						} catch (IOException propsioe) {
+							new ExceptionDialog(YAMM.getString("msg.error"),
+								propsioe, YAMM.exceptionNames);
+						}
+						vect1.add(props.getProperty("server"));
+						vect1.add(files[i]);
+						vect2.add(vect1);
+						vect1 = new Vector();
+					}
+					serverList.updateUI();
+				}
 			} else if (idx != -1) {
 				serverList.setSelectedIndex(-1);
 				String file = ((Vector) vect2.elementAt(idx)).elementAt(1).toString();
 				new File(file).delete();
 				vect2.remove(idx);
+				serverList.updateUI();
 			}
 		}
 	};
@@ -157,6 +214,9 @@ public class ServersConfTab extends JPanel {
 /*
  * Changes:
  * $Log: ServersConfTab.java,v $
+ * Revision 1.3  2000/03/18 14:55:56  fredde
+ * the server editor now works
+ *
  * Revision 1.2  2000/03/05 18:02:53  fredde
  * now gets the images used for the jar-file
  *
