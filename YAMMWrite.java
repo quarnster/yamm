@@ -25,6 +25,7 @@ import java.util.*;
 import java.text.SimpleDateFormat;
 import java.io.*;
 import org.gjt.fredde.yamm.encode.UUEncode;
+import org.gjt.fredde.yamm.gui.AttachListRenderer;
 
 /**
  * The class for writing mails
@@ -85,7 +86,6 @@ public class YAMMWrite extends JFrame {
     JMenuItem rad;
     Meny.add(arkiv);
 
-    // Arkiv menyn
     rad = new JMenuItem(YAMM.getString("button.cancel"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
     rad.addActionListener(MListener);
     arkiv.add(rad);
@@ -94,7 +94,6 @@ public class YAMMWrite extends JFrame {
 
     vert1 = Box.createHorizontalBox();
     vert2 = Box.createHorizontalBox();
-//    vert2 = Box.createVerticalBox();
     vert3 = Box.createVerticalBox();
     hori1 = Box.createHorizontalBox();
     hori2 = Box.createHorizontalBox();
@@ -108,7 +107,6 @@ public class YAMMWrite extends JFrame {
     hori1.add(myButton);
 
     myLabel = new JLabel(YAMM.getString("mail.to") + "  ");
-//    panel.add(myLabel);
     vert1.add(myLabel);
 
     myTextField1 = new JTextField();
@@ -116,11 +114,9 @@ public class YAMMWrite extends JFrame {
     myTextField1.setMinimumSize(new Dimension(75, 20));
     myTextField1.setText(to);
     myTextField1.setToolTipText(YAMM.getString("tofield.tooltip"));
-//    panel.add(myTextField1);
     vert1.add(myTextField1);
 
     myLabel = new JLabel(YAMM.getString("mail.subject") + "  ");
-//    panel.add(myLabel);
     vert2.add(myLabel);
 
     myTextField2 = new JTextField();
@@ -131,11 +127,7 @@ public class YAMMWrite extends JFrame {
     myTextField2.setMaximumSize(new Dimension(1200, 20));
     myTextField2.setMinimumSize(new Dimension(75, 20));
     myTextField2.setText(subject);
-//    panel.add(myTextField2);
     vert2.add(myTextField2);
-
-//    hori2.add(vert1);
-//    hori2.add(vert2);
 
     vert3.add(hori1);
     vert3.add(vert1);
@@ -159,68 +151,6 @@ public class YAMMWrite extends JFrame {
     JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
     JTPane.addTab(YAMM.getString("mail"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), new JScrollPane(myTextArea));
 
-    class MyCellRenderer extends JLabel implements ListCellRenderer {
-      protected boolean selected;
-
-      public Component getListCellRendererComponent(
-        JList   list,
-        Object  value,
-        int     index,
-        boolean selected,
-        boolean cellHasFocus) {
-
-        String s = value.toString();
-        setText(s);
-        String end = s.substring(s.lastIndexOf(System.getProperty("file.separator")), s.length());
-        if(end.indexOf(".") != -1) end = end.substring(end.lastIndexOf(".") + 1, end.length());
-
-        if(end.equalsIgnoreCase("gif") || end.equalsIgnoreCase("jpg") || end.equalsIgnoreCase("bmp") || end.equalsIgnoreCase("xpm") || end.equalsIgnoreCase("jpeg") || end.equalsIgnoreCase("xcf") || end.equalsIgnoreCase("png"))
-          setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/image.gif"));
-
-        else if(end.equalsIgnoreCase("htm") || end.equalsIgnoreCase("html") || end.equalsIgnoreCase("txt") || end.equalsIgnoreCase("doc") || end.equalsIgnoreCase("c") || end.equalsIgnoreCase("cc") || end.equalsIgnoreCase("cpp") || end.equalsIgnoreCase("h") || end.equalsIgnoreCase("java"))
-          setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/text.gif"));
-
-        else if(end.equalsIgnoreCase("wav") || end.equalsIgnoreCase("au") || end.equalsIgnoreCase("mp3") || end.equalsIgnoreCase("mod") || end.equalsIgnoreCase("xm") || end.equalsIgnoreCase("midi") || end.equalsIgnoreCase("mid"))
-          setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/sound.gif"));
-
-
-        else if(end.equalsIgnoreCase("zip") || end.equalsIgnoreCase("jar") || end.equalsIgnoreCase("rpm") || end.equalsIgnoreCase("deb") || end.equalsIgnoreCase("arj") || end.equalsIgnoreCase("gz") || end.equalsIgnoreCase("tar") || end.equalsIgnoreCase("tgz") || end.equalsIgnoreCase("z"))
-          setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/packed.gif"));
-
-        else setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/unknown.gif"));
-
-        this.selected = selected;
-        return this;
-      }
-    /**
-      * paint is subclassed to draw the background correctly.  JLabel
-      * currently does not allow backgrounds other than white, and it
-      * will also fill behind the icon.  Something that isn't desirable.
-      */
-    public void paint(Graphics g) {
-	Color            bColor;
-	Icon             currentI = getIcon();
-
-	if(selected)
-            bColor = new Color(204, 204, 255);
-	else if(getParent() != null)
-            // Pick background color up from parent (which will come from the JTree we're contained in).
-	    bColor = getParent().getBackground();
-	else
-	    bColor = getBackground();
-	g.setColor(bColor);
-
-	if(currentI != null && getText() != null) {
-	    int          offset = (currentI.getIconWidth() + getIconTextGap());
-
-	    g.fillRect(offset, 0, getWidth() - 1 - offset,
-		       getHeight() - 1);
-	}
-	else
-	    g.fillRect(0, 0, getWidth()-1, getHeight()-1);
-	super.paint(g);
-      }
-    }
 
     JPanel myPanel = new JPanel(new BorderLayout());
 
@@ -241,13 +171,11 @@ public class YAMMWrite extends JFrame {
     };
 
     myList = new JList(/* attach */ dataModel);
-    myList.setCellRenderer(new MyCellRenderer());
+    myList.setCellRenderer(new AttachListRenderer());
     myPanel.add("Center", myList);
     myPanel.add("South", hori1);
 
     Border ram = BorderFactory.createEtchedBorder();
-//    hori1.setBorder(ram);
-//    ram = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
     myList.setBorder(ram);
 
 

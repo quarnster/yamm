@@ -104,7 +104,6 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   /** The statusrow */
   public statusRow status;
 
-  int          mainx, mainy, mainw, mainh, hsplit, vsplit;
 
   /**
    * Encrypts the String provided with the key specified in encKey.
@@ -202,12 +201,12 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     System.out.println("sun.misc.BASE64Decoder: " + ((result) ? "yes" : "no"));
 
     // get the main window's settings and default them if an exception is caught 
-    mainx = Integer.parseInt(props.getProperty("mainx", "0"));
-    mainy = Integer.parseInt(props.getProperty("mainy", "0"));
-    mainw = Integer.parseInt(props.getProperty("mainw", "550"));
-    mainh = Integer.parseInt(props.getProperty("mainh", "400"));
-    hsplit = Integer.parseInt(props.getProperty("hsplit", "150"));
-    vsplit = Integer.parseInt(props.getProperty("vsplit", "125"));
+    int mainx = Integer.parseInt(props.getProperty("mainx", "0"));
+    int mainy = Integer.parseInt(props.getProperty("mainy", "0"));
+    int mainw = Integer.parseInt(props.getProperty("mainw", "550"));
+    int mainh = Integer.parseInt(props.getProperty("mainh", "400"));
+    int hsplit = Integer.parseInt(props.getProperty("hsplit", "150"));
+    int vsplit = Integer.parseInt(props.getProperty("vsplit", "125"));
 
     setBounds(mainx, mainy, mainw, mainh);
     getContentPane().setLayout(new BorderLayout());
@@ -258,95 +257,6 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     else
       JTPane.addTab(res.getString("mail"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), new JScrollPane(mail));
 
-    class MyCellRenderer extends JLabel implements ListCellRenderer {
-      protected boolean selected;
-
-      public Component getListCellRendererComponent(
-        JList   list,
-        Object  value,
-        int     index,
-        boolean selected,
-        boolean cellHasFocus) {
-
-        String s = value.toString();
-        setText(s);
-
-        String end = s;
-
-        if(end.indexOf(".") != -1) 
-          end = end.substring(end.lastIndexOf(".") + 1, end.length());
-
-        if(end.equalsIgnoreCase("gif") || 
-           end.equalsIgnoreCase("jpg") || 
-           end.equalsIgnoreCase("bmp") || 
-           end.equalsIgnoreCase("xpm") || 
-           end.equalsIgnoreCase("jpeg") || 
-           end.equalsIgnoreCase("xcf") || 
-           end.equalsIgnoreCase("png"))
-          setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/image.gif"));
-
-        else if(end.equalsIgnoreCase("htm") || 
-                end.equalsIgnoreCase("html") || 
-                end.equalsIgnoreCase("txt") || 
-                end.equalsIgnoreCase("doc") || 
-                end.equalsIgnoreCase("c") || 
-                end.equalsIgnoreCase("cc") || 
-                end.equalsIgnoreCase("cpp") || 
-                end.equalsIgnoreCase("h") || 
-                end.equalsIgnoreCase("java"))
-          setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/text.gif"));
-
-        else if(end.equalsIgnoreCase("wav") || 
-                end.equalsIgnoreCase("au") || 
-                end.equalsIgnoreCase("mp3") || 
-                end.equalsIgnoreCase("mod") || 
-                end.equalsIgnoreCase("xm") || 
-                end.equalsIgnoreCase("midi") || 
-                end.equalsIgnoreCase("mid"))
-          setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/sound.gif"));
-
-        else if(end.equalsIgnoreCase("zip") || 
-                end.equalsIgnoreCase("jar") || 
-                end.equalsIgnoreCase("rpm") || 
-                end.equalsIgnoreCase("deb") || 
-                end.equalsIgnoreCase("arj") || 
-                end.equalsIgnoreCase("gz") || 
-                end.equalsIgnoreCase("tar") || 
-                end.equalsIgnoreCase("tgz") || 
-                end.equalsIgnoreCase("z"))
-          setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/packed.gif"));
-
-        else setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/unknown.gif"));
-
-        this.selected = selected;
-        return this;
-      }
-    /**
-      * paint is subclassed to draw the background correctly.  JLabel
-      * currently does not allow backgrounds other than white, and it
-      * will also fill behind the icon.  Something that isn't desirable.
-      */
-    public void paint(Graphics g) {
-	Color            bColor;
-	Icon             currentI = getIcon();
-
-	if(selected)
-            bColor = new Color(204, 204, 255);
-	else if(getParent() != null)
-            // Pick background color up from parent (which will come from the JTree we're contained in).
-	    bColor = getParent().getBackground();
-	else bColor = getBackground();
-	g.setColor(bColor);
-
-	if(currentI != null && getText() != null) {
-	    int          offset = (currentI.getIconWidth() + getIconTextGap());
-	    g.fillRect(offset, 0, getWidth() - 1 - offset, getHeight() - 1);
-	}
-	else g.fillRect(0, 0, getWidth()-1, getHeight()-1);
-	super.paint(g);
-      }
-    }
-
     JPanel myPanel = new JPanel(new BorderLayout());
 
     Box hori1 = Box.createHorizontalBox();
@@ -366,7 +276,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     };
 
     myList = new JList(attachModel);
-    myList.setCellRenderer(new MyCellRenderer());
+    myList.setCellRenderer(new AttachListRenderer());
     myPanel.add("Center", myList);
     myPanel.add("South", hori1);
 
