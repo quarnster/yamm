@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.43 2003/06/06 17:07:01 fredde Exp $
+/*  $Id: mainJTree.java,v 1.44 2003/06/07 09:40:37 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.43 $
+ * @version $Revision: 1.44 $
  */
 public class mainJTree
 	extends JTable
@@ -335,6 +335,7 @@ public class mainJTree
 		}
 
 		if (box != null && !box.endsWith(".g") && !box.equals(YAMM.getString("box.boxes"))) {
+			YAMM yamm = YAMM.getInstance();
 			StringTokenizer tok = new StringTokenizer(mails);
 			int[] list = new int[tok.countTokens()];
 
@@ -344,7 +345,6 @@ public class mainJTree
 
 			if (list.length == 0) return;
 			if (action.equals("move")) {
-				YAMM yamm = YAMM.getInstance();
 				Mailbox.moveMail(yamm.getMailbox(), box, list);
 				Mailbox.createList(yamm.getMailbox(), yamm);
 				yamm.mailList.update();
@@ -354,6 +354,9 @@ public class mainJTree
 
 			Utilities.delUnNeededFiles();
 			dataModel.fireTableDataChanged();
+			yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
+			yamm.tree.unreadTable.put(box, Mailbox.getUnread(box));
+
 		}
 	}
 
@@ -493,6 +496,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.44  2003/06/07 09:40:37  fredde
+ * update unread/total-status when drag'n'dropping mail
+ *
  * Revision 1.43  2003/06/06 17:07:01  fredde
  * now Unread/Total
  *
