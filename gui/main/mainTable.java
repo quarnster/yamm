@@ -31,14 +31,14 @@ import java.net.*;
 
 import org.gjt.fredde.yamm.*;
 import org.gjt.fredde.yamm.gui.*;
-import org.gjt.fredde.yamm.mail.Mailbox;
+import org.gjt.fredde.yamm.mail.*;
 import org.gjt.fredde.util.gui.ExceptionDialog;
 
 /**
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.41 2003/03/08 18:11:41 fredde Exp $
+ * @version $Id: mainTable.java,v 1.42 2003/03/09 17:51:35 fredde Exp $
  */
 public class mainTable
 	extends JTable
@@ -51,11 +51,12 @@ public class mainTable
 	/** Which column that was sorted */
 	private static int		sortedCol = 0;
 
-	private static YAMM			frame = null;
+	private static YAMM			yamm = null;
 	protected JPopupMenu		popup = null;
 	private static DragSource	drag = null;
 
 	private final AbstractTableModel dataModel = new AbstractTableModel() {
+		DateParser dp = new DateParser(YAMM.getString("shortdate"));
 		private final String headername[] = {
 	        	"#",
 			YAMM.getString("table.subject"),
@@ -68,15 +69,27 @@ public class mainTable
 		}
 
 		public final int getRowCount() {
-			return  frame.listOfMails.length;
+			return  yamm.listOfMails.length;
 		}
 
 		public final Object getValueAt(int row, int col) {
-			if (row >= frame.listOfMails.length) {
+			if (row >= yamm.listOfMails.length) {
 				return null;
-			} else {
-				return  frame.listOfMails[frame.keyIndex[row]][col];
 			}
+			switch (col) {
+				case 0: return "" + yamm.listOfMails[yamm.keyIndex[row]].id;
+				case 1: return yamm.listOfMails[yamm.keyIndex[row]].subject;
+				case 2: return yamm.listOfMails[yamm.keyIndex[row]].from;
+				case 3:
+					String blah = "";
+					try {
+						blah = dp.parse(new Date(yamm.listOfMails[yamm.keyIndex[row]].date));
+					} catch (Exception e) {
+						blah = "";
+					}
+					return blah;
+			}
+			return null;
 		}
 
 		public final boolean isCellEditable(int col) {
@@ -91,9 +104,9 @@ public class mainTable
 	/**
 	 * Creates a new mainTable
 	 */
-	public mainTable(YAMM frame) {
+	public mainTable(YAMM yamm) {
 		super();
-		this.frame = frame;
+		this.yamm = yamm;
 		setModel(dataModel);
 
 		firstSort = YAMM.getProperty("sorting.type", "true").equals("true");
@@ -138,7 +151,7 @@ public class mainTable
 		setShowVerticalLines(false);
 		setIntercellSpacing(new Dimension(0, 0));
 
-		MailTableRenderer rend = new MailTableRenderer(frame);
+		MailTableRenderer rend = new MailTableRenderer(yamm);
 		rend.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		setDefaultRenderer(getColumnClass(0), rend);
 
@@ -172,37 +185,19 @@ public class mainTable
 	}
 
 	public int getSelectedMessage() {
-		int i = 0;
 		int sel = getSelectedRow();
 		if (sel == -1) return -1;
-
-		while (i < 4) {
-			if (getColumnName(i).equals("#")) {
-				break;
-			}
-			i++;
-		}
-
-		return Integer.parseInt(getValueAt(sel, i).toString());
+		return yamm.keyIndex[sel];
 	}
 
 	private String getSelected() {
 		String selected = "";
 
-		int i = 0;
-
-		while (i < 4) {
-			if (getColumnName(i).equals("#")) {
-				break;
-			}
-			i++;
-		}
-
 		int[] mlist = getSelectedRows();
 		int[] dragList = new int[mlist.length];
 
 		for (int j = 0; j < mlist.length; j++) {
-			dragList[j] = Integer.parseInt(getValueAt(mlist[j], i).toString());
+			dragList[j] = yamm.keyIndex[mlist[j]];
 		}
 
 		Arrays.sort(dragList);
@@ -242,72 +237,75 @@ public class mainTable
 	 * Sorts 1 -> 10
 	 */
 	private void SortFirst(int col) {
-		if (frame.listOfMails == null) return;
-
+		if (yamm.listOfMails == null) return;
+/*
 		int temp = -1;
 		if (col == 0) {
-			for (int i = 0; i < frame.listOfMails.length; i++) {
-				for (int j = 0; j < frame.listOfMails.length; j++) {
-					int one = Integer.parseInt(frame.listOfMails[frame.keyIndex[i]][col]);
-					int two = Integer.parseInt(frame.listOfMails[frame.keyIndex[j]][col]);
+			for (int i = 0; i < yamm.listOfMails.length; i++) {
+				for (int j = 0; j < yamm.listOfMails.length; j++) {
+					int one = Integer.parseInt(yamm.listOfMails[yamm.keyIndex[i]][col]);
+					int two = Integer.parseInt(yamm.listOfMails[yamm.keyIndex[j]][col]);
 
 					if (one < two) {
-						temp = frame.keyIndex[j];
-						frame.keyIndex[j] = frame.keyIndex[i];
-						frame.keyIndex[i] = temp;
+						temp = yamm.keyIndex[j];
+						yamm.keyIndex[j] = yamm.keyIndex[i];
+						yamm.keyIndex[i] = temp;
 					}
 				}
 			}
 		} else {
-			for (int i = 0; i < frame.listOfMails.length; i++) {
-				for (int j = 0; j < frame.listOfMails.length; j++) {
-					String s1 = frame.listOfMails[frame.keyIndex[i]][col].toLowerCase();
-					String s2 = frame.listOfMails[frame.keyIndex[j]][col].toLowerCase();
+			for (int i = 0; i < yamm.listOfMails.length; i++) {
+				for (int j = 0; j < yamm.listOfMails.length; j++) {
+					String s1 = yamm.listOfMails[yamm.keyIndex[i]][col].toLowerCase();
+					String s2 = yamm.listOfMails[yamm.keyIndex[j]][col].toLowerCase();
 
 					if (s1.compareTo(s2.toLowerCase()) < 0) {
-						temp = frame.keyIndex[j];
-						frame.keyIndex[j] = frame.keyIndex[i];
-						frame.keyIndex[i] = temp;
+						temp = yamm.keyIndex[j];
+						yamm.keyIndex[j] = yamm.keyIndex[i];
+						yamm.keyIndex[i] = temp;
 					}
 				}
 			}
 		}
+*/
 	}
 
 	/**
 	 * Sorts 10 -> 1
 	 */
 	private void SortLast(int col) {
-		if (frame.listOfMails == null) return;
+		if (yamm.listOfMails == null) return;
+/*
 		int temp = -1;
 
 		if (col == 0) {
-			for (int i = 0; i < frame.listOfMails.length; i++) {
-				for (int j = 0; j < frame.listOfMails.length; j++) {
-					int one = Integer.parseInt(frame.listOfMails[frame.keyIndex[i]][col]);
-					int two = Integer.parseInt(frame.listOfMails[frame.keyIndex[j]][col]);
+			for (int i = 0; i < yamm.listOfMails.length; i++) {
+				for (int j = 0; j < yamm.listOfMails.length; j++) {
+					int one = Integer.parseInt(yamm.listOfMails[yamm.keyIndex[i]][col]);
+					int two = Integer.parseInt(yamm.listOfMails[yamm.keyIndex[j]][col]);
 
 					if (one > two) {
-						temp = frame.keyIndex[j];
-						frame.keyIndex[j] = frame.keyIndex[i];
-						frame.keyIndex[i] = temp;
+						temp = yamm.keyIndex[j];
+						yamm.keyIndex[j] = yamm.keyIndex[i];
+						yamm.keyIndex[i] = temp;
 					}
 				}
 			}
 		}  else {
-			for (int i = 0; i < frame.listOfMails.length; i++) {
-				for (int j = 0; j < frame.listOfMails.length; j++) {
-					String s1 = frame.listOfMails[frame.keyIndex[i]][col].toLowerCase();
-					String s2 = frame.listOfMails[frame.keyIndex[j]][col].toLowerCase();
+			for (int i = 0; i < yamm.listOfMails.length; i++) {
+				for (int j = 0; j < yamm.listOfMails.length; j++) {
+					String s1 = yamm.listOfMails[yamm.keyIndex[i]][col].toLowerCase();
+					String s2 = yamm.listOfMails[yamm.keyIndex[j]][col].toLowerCase();
 
 					if (s1.toLowerCase().compareTo(s2.toLowerCase()) > 0) {
-						temp = frame.keyIndex[j];
-						frame.keyIndex[j] = frame.keyIndex[i];
-						frame.keyIndex[i] = temp;
+						temp = yamm.keyIndex[j];
+						yamm.keyIndex[j] = yamm.keyIndex[i];
+						yamm.keyIndex[i] = temp;
 					}
 				}
 			}
 		}
+*/
 	}
 
 	public void createPopup(JPopupMenu jpmenu) {
@@ -473,25 +471,20 @@ public class mainTable
 				get_mail();
 
 				String outbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
-				final int row = getSelectedRow();
+				int row = getSelectedRow();
+				int msg = yamm.keyIndex[row];
 
-				if (frame.listOfMails[frame.keyIndex[row]][4].equals("Unread") && !frame.selectedbox.equals(outbox)) {
-					Thread t = new Thread() {
-						public void run() {
-							long skip = Long.parseLong(frame.listOfMails[frame.keyIndex[row]][YAMM.INDEX_SKIP]);
+				if ((yamm.listOfMails[msg].status & IndexEntry.STATUS_READ) == 0 && !yamm.selectedbox.equals(outbox)) {
+					yamm.listOfMails[msg].status |= IndexEntry.STATUS_READ;
 
-							Mailbox.setStatus(frame, frame.selectedbox, getSelectedMessage(), skip, "Read");
+					Mailbox.setStatus(yamm, yamm.selectedbox, getSelectedMessage(), yamm.listOfMails[msg], IndexEntry.STATUS_READ);
 
-							update();
-							frame.tree.unreadTable.put(frame.selectedbox, Mailbox.getUnread(frame.selectedbox));
-							frame.tree.dataModel.fireTableDataChanged();
-							setEditingRow(row);
-						}
-					};
-					SwingUtilities.invokeLater(t);
+					update();
+					yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
+					yamm.tree.dataModel.fireTableDataChanged();
 				}
 				changeButtonMode(true);
-				if (me.getClickCount() == 2) new MailReader(frame.mailPage);
+				if (me.getClickCount() == 2) new MailReader(yamm.mailPage);
 			} else {
 				changeButtonMode(false);
 			}
@@ -503,41 +496,33 @@ public class mainTable
 		}
 
 		void get_mail() {
-			long skip = Long.parseLong(frame.listOfMails[frame.keyIndex[getSelectedRow()]][5]);
+			long skip = yamm.listOfMails[yamm.keyIndex[getSelectedRow()]].skip;
 
-			Mailbox.getMail(frame.selectedbox, getSelectedMessage(), skip);
+			Mailbox.getMail(yamm.selectedbox, getSelectedMessage(), skip);
 			try {
-				String boxName = frame.selectedbox.substring(
-					frame.selectedbox.indexOf("boxes") + 6,
-					frame.selectedbox.length()) + "/";
+				String boxName = yamm.selectedbox.substring(
+					yamm.selectedbox.indexOf("boxes") + 6,
+					yamm.selectedbox.length()) + "/";
 
-				frame.mailPage = new URL(frame.mailPageString +	boxName + getSelectedMessage() + ".html");
+				yamm.mailPage = new URL(yamm.mailPageString +	boxName + getSelectedMessage() + ".html");
 			} catch (MalformedURLException mue) {
 				new ExceptionDialog(YAMM.getString("msg.error"), mue, YAMM.exceptionNames);
 			}
 
 			try {
-				frame.mail.setPage(frame.mailPage);
+				yamm.mail.setPage(yamm.mailPage);
 			} catch (IOException ioe) {
 				new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
 			}
 
-			frame.createAttachList();
-			frame.myList.updateUI();
+			yamm.createAttachList();
+			yamm.myList.updateUI();
 		}
 	};
 
 	private ActionListener keyListener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 			String text = ae.getActionCommand();
-			int i = 0;
-
-			while (i < 4) {
-				if (getColumnName(i).equals("#")) {
-					break;
-				}
-				i++;
-			}
 
 			if (text.equals("Del")) {
 				if (getSelectedRow() == -1) {
@@ -549,20 +534,18 @@ public class mainTable
 				int[] deleteList = new int[mlist.length];
 
 				for (int j = 0; j < mlist.length; j++) {
-					deleteList[j] = Integer.parseInt(getValueAt(mlist[j], i).toString());
+					deleteList[j] = yamm.keyIndex[mlist[j]];
 				}
 
 				Arrays.sort(deleteList);
-				Mailbox.deleteMail(frame.selectedbox, deleteList);
-				Mailbox.createList(frame.selectedbox, frame);
+				Mailbox.deleteMail(yamm.selectedbox, deleteList);
+				Mailbox.createList(yamm.selectedbox, yamm);
 
-				Mailbox.updateIndex(frame.selectedbox);
-				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")));
 				update();
-				frame.tree.unreadTable.put(frame.selectedbox, Mailbox.getUnread(frame.selectedbox));
-				frame.tree.dataModel.fireTableDataChanged();
+				yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
+				yamm.tree.dataModel.fireTableDataChanged();
 
-				if (frame.listOfMails.length < 0) {
+				if (yamm.listOfMails.length < 0) {
 					return;
 				}
 
@@ -587,19 +570,17 @@ public class mainTable
 				int[] deleteList = new int[mlist.length];
 
 				for (int j = 0; j < mlist.length; j++) {
-					deleteList[j] = frame.keyIndex[mlist[j]];;
+					deleteList[j] = yamm.keyIndex[mlist[j]];;
 				}
 
 				Arrays.sort(deleteList);
 
-				Mailbox.deleteMail(frame.selectedbox, deleteList);
-				Mailbox.createList(frame.selectedbox, frame);
+				Mailbox.deleteMail(yamm.selectedbox, deleteList);
+				Mailbox.createList(yamm.selectedbox, yamm);
 
-				Mailbox.updateIndex(frame.selectedbox);
-				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")));
 				update();
-				frame.tree.unreadTable.put(frame.selectedbox, Mailbox.getUnread(frame.selectedbox));
-				frame.tree.dataModel.fireTableDataChanged();
+				yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
+				yamm.tree.dataModel.fireTableDataChanged();
 
 				changeButtonMode(false);
 				clearSelection();
@@ -608,10 +589,10 @@ public class mainTable
 					return;
 				}
 
-				int msgnum = frame.keyIndex[getSelectedRow()];
-				long skip = Integer.parseInt(frame.listOfMails[msgnum][YAMM.INDEX_SKIP]);
+				int msgnum = yamm.keyIndex[getSelectedRow()];
+				long skip = yamm.listOfMails[msgnum].skip;
 
-				String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, skip);
+				String[] mail = Mailbox.getMailForReplyHeaders(yamm.selectedbox, skip);
 
 
  				if (!mail[2].startsWith(YAMM.getString("mail.re")) && !mail[2].startsWith("Re:")) {
@@ -620,7 +601,7 @@ public class mainTable
 
 				YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[2], mail[0] + YAMM.getString("mail.wrote") + "\n");
 
-				Mailbox.getMailForReply(frame.selectedbox, msgnum, skip, yam.myTextArea);
+				Mailbox.getMailForReply(yamm.selectedbox, msgnum, skip, yam.myTextArea);
 				yam.sign();
 			}
 		}
@@ -628,9 +609,9 @@ public class mainTable
 
 
 	public void changeButtonMode(boolean b) {
-		frame.tbar.reply.setEnabled(b);
-		//((JButton)frame.tbar.print).setEnabled(b);
-		frame.tbar.forward.setEnabled(b);
+		yamm.tbar.reply.setEnabled(b);
+		//((JButton)yamm.tbar.print).setEnabled(b);
+		yamm.tbar.forward.setEnabled(b);
 	}
 
 	private ActionListener KMListener = new ActionListener() {
@@ -645,14 +626,13 @@ public class mainTable
 			int[] copyList = new int[mlist.length];
 
 			for (int j = 0; j < mlist.length; j++) {
-				copyList[j] = frame.keyIndex[mlist[j]];
+				copyList[j] = yamm.keyIndex[mlist[j]];
 			}
 			Arrays.sort(copyList);
-			Mailbox.copyMail(frame.selectedbox, name, copyList);
-			Mailbox.updateIndex(name);
+			Mailbox.copyMail(yamm.selectedbox, name, copyList);
 			update();
-			frame.tree.unreadTable.put(frame.selectedbox, Mailbox.getUnread(frame.selectedbox));
-			frame.tree.dataModel.fireTableDataChanged();
+			yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
+			yamm.tree.dataModel.fireTableDataChanged();
 		}
 	};
 
@@ -669,22 +649,24 @@ public class mainTable
 			int[] moveList = new int[mlist.length];
 
 			for (int j = 0; j < mlist.length; j++) {
-				moveList[j] = frame.keyIndex[mlist[j]];
+				moveList[j] = yamm.keyIndex[mlist[j]];
 			}
 
 			Arrays.sort(moveList);
-			Mailbox.moveMail(frame.selectedbox, name, moveList);
-			Mailbox.createList(frame.selectedbox, frame);
-			Mailbox.updateIndex(name);
+			Mailbox.moveMail(yamm.selectedbox, name, moveList);
+			Mailbox.createList(yamm.selectedbox, yamm);
 			update();
-			frame.tree.unreadTable.put(frame.selectedbox, Mailbox.getUnread(frame.selectedbox));
-			frame.tree.dataModel.fireTableDataChanged();
+			yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
+			yamm.tree.dataModel.fireTableDataChanged();
 		}
 	};
 }
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.42  2003/03/09 17:51:35  fredde
+ * now uses the new index system. variable frame renamed to yamm
+ *
  * Revision 1.41  2003/03/08 18:11:41  fredde
  * signs messages
  *
