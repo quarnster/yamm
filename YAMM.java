@@ -436,33 +436,37 @@ public class YAMM extends JFrame implements HyperlinkListener
     }
   };
 
+  public void Exit() {
+    Rectangle rv = new Rectangle();
+    getBounds(rv);
+
+    try {
+      InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
+      props.load(in);
+      in.close();
+    } catch (IOException propsioe) { System.err.println(propsioe); }
+
+    props.setProperty("mainx", new Integer(rv.x).toString());
+    props.setProperty("mainy", new Integer(rv.y).toString());
+    props.setProperty("mainw", new Integer(rv.width).toString());
+    props.setProperty("mainh", new Integer(rv.height).toString());
+    props.setProperty("vsplit", new Integer(SPane2.getDividerLocation()).toString());
+    props.setProperty("hsplit", new Integer(SPane.getDividerLocation()).toString());
+
+
+    try {
+      OutputStream out = new FileOutputStream(System.getProperty("user.home") + "/.yamm/.config");
+      props.store(out, "YAMM configuration file");
+      out.close();
+    } catch(IOException propsioe) { System.err.println(propsioe); }
+
+    dispose();
+    System.exit(0);
+  }
+
   class FLyssnare extends WindowAdapter {
     public void windowClosing(WindowEvent event) {
-        Rectangle rv = new Rectangle();
-        getBounds(rv);
-
-        try {
-          InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props.load(in);
-          in.close();
-        } catch (IOException propsioe) { System.err.println(propsioe); }
-
-        props.setProperty("mainx", new Integer(rv.x).toString());
-        props.setProperty("mainy", new Integer(rv.y).toString());
-        props.setProperty("mainw", new Integer(rv.width).toString());
-        props.setProperty("mainh", new Integer(rv.height).toString());
-        props.setProperty("vsplit", new Integer(SPane2.getDividerLocation()).toString());
-        props.setProperty("hsplit", new Integer(SPane.getDividerLocation()).toString());
-
-
-        try {
-          OutputStream out = new FileOutputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props.store(out, "YAMM configuration file");
-          out.close();
-        } catch(IOException propsioe) { System.err.println(propsioe); }
-
-        dispose();
-        System.exit(0);
+      Exit();
     }
   }
 
