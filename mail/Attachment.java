@@ -27,7 +27,7 @@ import java.io.*;
 /**
  * This class parses attachments
  * @author Fredrik Ehnbom
- * @version $Id: Attachment.java,v 1.11 2003/03/07 14:06:27 fredde Exp $
+ * @version $Id: Attachment.java,v 1.12 2003/03/07 20:23:45 fredde Exp $
  */
 public class Attachment {
 
@@ -134,7 +134,7 @@ public class Attachment {
 			fileName = baseFile;
 			boolean html = false;
 
-			if (contentDisposition != null) 
+			if (contentDisposition != null && (contentDisposition.indexOf("attachment") != -1 | contentType.indexOf("text") == -1)) 
 				fileName = baseFile + ".attach." + name;
 			else if (contentType.indexOf("text/html") != -1) {
 				fileName = baseFile + ".message.html";
@@ -155,11 +155,24 @@ public class Attachment {
 				)
 			);
 
+			String test = "--" + boundary;
 			while ((temp = in.readLine()) != null) {
-				if (temp.startsWith("--" + boundary)) {
+				if (temp.startsWith(test)) {
 					if (!temp.endsWith("--")) {
-						Attachment a = new Attachment();
-						a.parse(in, boundary, baseFile);
+						final BufferedReader i = in;
+						final String b = boundary;
+						final String bf = baseFile;
+						Thread t = new Thread() {
+							public void run() {
+								try {
+									Attachment a = new Attachment();
+									a.parse(i, b, bf);
+								} catch (Exception e) {
+								}
+							}
+						};
+						t.setPriority(Thread.MIN_PRIORITY);
+						t.start();
 						break;
 					} else {
 						break;
@@ -206,6 +219,9 @@ public class Attachment {
 /*
  * Changes:
  * $Log: Attachment.java,v $
+ * Revision 1.12  2003/03/07 20:23:45  fredde
+ * parse attachments in threads. some attachments fixes
+ *
  * Revision 1.11  2003/03/07 14:06:27  fredde
  * better attachment name parsing. also unmimes attachment names.
  *
