@@ -27,7 +27,7 @@ import java.io.*;
 /**
  * This class parses attachments
  * @author Fredrik Ehnbom
- * @version $Id: Attachment.java,v 1.12 2003/03/07 20:23:45 fredde Exp $
+ * @version $Id: Attachment.java,v 1.13 2003/03/08 13:56:21 fredde Exp $
  */
 public class Attachment {
 
@@ -159,20 +159,8 @@ public class Attachment {
 			while ((temp = in.readLine()) != null) {
 				if (temp.startsWith(test)) {
 					if (!temp.endsWith("--")) {
-						final BufferedReader i = in;
-						final String b = boundary;
-						final String bf = baseFile;
-						Thread t = new Thread() {
-							public void run() {
-								try {
-									Attachment a = new Attachment();
-									a.parse(i, b, bf);
-								} catch (Exception e) {
-								}
-							}
-						};
-						t.setPriority(Thread.MIN_PRIORITY);
-						t.start();
+						Attachment a = new Attachment();
+						a.parse(in, boundary, baseFile);
 						break;
 					} else {
 						break;
@@ -219,6 +207,9 @@ public class Attachment {
 /*
  * Changes:
  * $Log: Attachment.java,v $
+ * Revision 1.13  2003/03/08 13:56:21  fredde
+ * removed parsing of attachments in a thread
+ *
  * Revision 1.12  2003/03/07 20:23:45  fredde
  * parse attachments in threads. some attachments fixes
  *
