@@ -25,6 +25,7 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/gui/MailTableRenderer.class \
 	org/gjt/fredde/yamm/gui/MailReader.class \
 	org/gjt/fredde/yamm/gui/TreeTableCellRenderer.class \
+	org/gjt/fredde/yamm/gui/TreeTableSelectionModel.class \
 	org/gjt/fredde/yamm/gui/imageViewer.class \
 	org/gjt/fredde/yamm/gui/sourceViewer.class \
 	org/gjt/fredde/yamm/gui/confwiz/ConfigurationWizard.class \
