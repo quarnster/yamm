@@ -57,10 +57,10 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   public static String                 selectedbox  = home + "/boxes/";
 
   /** The version of YAMM */
-  public static    String                 version  = "0.7.3 CVS";
+  public static    String                 version  = "0.7.3";
 
   /** The compileDate of YAMM */
-  public static    String                 compDate     = "1999-09-04";
+  public static    String                 compDate     = "1999-11-06";
 
   /** the file that contains the current mail */
   public String		  mailPageString   = "file:///" + home + "/tmp/cache/";
