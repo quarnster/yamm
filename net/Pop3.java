@@ -34,7 +34,7 @@ import java.util.*;
  *				// Connect to server 'pop3.northpole.org' with
  *				// username 'santa' and password 'rudolf'.
  *				// Messages will be saved to '/inbox'
- *				Pop3 pop = new Pop3("santa", "rudolf", "pop3.northpole.org", "/inbox"); 
+ *				Pop3 pop = new Pop3("santa", "rudolf", "pop3.northpole.org", "/inbox");
  *
  *				// Get the number of messages on this server
  *				int messages = pop.getMessageCount();
@@ -57,52 +57,57 @@ import java.util.*;
  * </pre></code>
  * That wasn't to hard! Now go and make your own email client!
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: Pop3.java,v 1.4 2000/04/01 14:59:56 fredde Exp $
+ * @version $Id: Pop3.java,v 1.5 2000/12/31 14:15:17 fredde Exp $
  */
 public class Pop3 {
 
 	/** From server */
-	private BufferedReader in;
+	protected BufferedReader in;
 
 	/** To server */
-	private PrintWriter out;
+	protected PrintWriter out;
 
 	/** to write the message to a file */
-	private PrintWriter outFile;
+	protected PrintWriter outFile;
 
 	/** the socket to use for this connection */
-	private Socket socket;
+	protected Socket socket;
 
 	/** If the "conversation" between client and server should be showed */
 	protected boolean debug = false;
 
 	/**
 	 * Connects to the server.
+	 *
 	 * @param user The username
 	 * @param password The password for this user
 	 * @param server The server to connect to
 	 * @param box the file to download the messages to
 	 */
-	public Pop3(String user, String password, String server, String box) 
-			throws IOException {
+	public Pop3(String user, String password, String server, String box)
+		throws IOException
+	{
 		this(user, password, server, box, 110, false);
 	}
-  
+
 	/**
 	 * Connects to the server.
+	 *
 	 * @param user The username
 	 * @param password The password for this user
 	 * @param server The server to connect to
 	 * @param box The file to download messages to
 	 * @param port The port to use
 	 */
-	public Pop3(String user, String password, String server, 
-			String box, int port) throws IOException {
+	public Pop3(String user, String password, String server, String box, int port)
+		throws IOException
+	{
 		this(user, password, server, box, port, false);
 	}
 
 	/**
 	 * Connects to the server.
+	 *
 	 * @param user The username
 	 * @param password The password for this user
 	 * @param server The server to connect to
@@ -110,9 +115,9 @@ public class Pop3 {
 	 * @param port The port to use
 	 * @param debug Show the "conversation" between client and server
 	 */
-	public Pop3(String user, String password, String server, String box, 
-			int port, boolean debug) throws IOException {
-
+	public Pop3(String user, String password, String server, String box, int port, boolean debug)
+		throws IOException
+	{
 		this.debug = debug;
 
 		Debug("Creating socket... (" + server + ", " + port + ")");
@@ -142,8 +147,10 @@ public class Pop3 {
 	/**
 	 * Say goodbye to the server...
 	 */
-	public void close() throws IOException {
-		sendCommand("QUIT");                           
+	public void close()
+		throws IOException
+	{
+		sendCommand("QUIT");
 
 		Debug("Closing input stream...");
 		in.close();
@@ -152,16 +159,18 @@ public class Pop3 {
 		out.close();
 
 		Debug("Closing File output stream...");
-		outFile.close();                      
+		outFile.close();
 
 		Debug("Closing socket...");
-		socket.close();           
+		socket.close();
 	}
 
 	/**
 	 * Returns the numbers of messages for this user.
 	 */
-	public int getMessageCount() throws IOException {
+	public int getMessageCount()
+		throws IOException
+	{
 		sendCommand("STAT", false);
 		int messages = 0;
 		int i = 1;
@@ -174,10 +183,10 @@ public class Pop3 {
 		if ("-err".equalsIgnoreCase(tok.nextToken())) {
 			throw new IOException(answer);
 		} else {
-			try { 
+			try {
 				messages = Integer.parseInt(
 					tok.nextToken().trim());
-			} catch (Exception e) { 
+			} catch (Exception e) {
 				messages = -1;
 			}
 		}
@@ -187,20 +196,24 @@ public class Pop3 {
 
 	/**
 	 * Sends a command to the server
+	 *
 	 * @param command The command to send
 	 */
-	public void sendCommand(String command) throws IOException {
+	public void sendCommand(String command)
+		throws IOException
+	{
 		sendCommand(command, true);
 	}
 
 	/**
 	 * Sends a command to the server.
+	 *
 	 * @param command The command to send
 	 * @param showAnswer If it should get the answer or not
 	 */
 	public void sendCommand(String command, boolean showAnswer)
-						throws IOException {
-
+		throws IOException
+	{
 		Debug("Sending: " + command);
 		out.println(command);
 
@@ -218,10 +231,13 @@ public class Pop3 {
 	/**
 	 * Gets the first few lines of a message. Good if it's a big message
 	 * and you want to check if you want to download it or not.
+	 *
 	 * @param msg The message to get the intro from
 	 * @param lines How many lines to get after the header
 	 */
-	public String getIntro(int msg, int lines) throws IOException {
+	public String getIntro(int msg, int lines)
+		throws IOException
+	{
 		sendCommand("TOP " + msg + " " + lines, false);
 
 		String answer = in.readLine();
@@ -251,14 +267,17 @@ public class Pop3 {
 
 	/**
 	 * Gets the specified message from the server.
+	 *
 	 * @param msg The message to get
 	 */
-	public boolean getMessage(int msg) throws IOException {
+	public boolean getMessage(int msg)
+		throws IOException
+	{
 		sendCommand("RETR " + msg, false);
 		String answer = in.readLine();
 		Debug("Reply: " + answer);
 
-		if (!answer.toLowerCase().startsWith("-err")) {    
+		if (!answer.toLowerCase().startsWith("-err")) {
 			while (!".".equals(answer)) {
 				answer = in.readLine();
 				outFile.println(answer);
@@ -270,15 +289,19 @@ public class Pop3 {
 
 	/**
 	 * Deletes the specified message from the server.
+	 *
 	 * @param msg The message to delete
 	 */
-	public void deleteMessage(int msg) throws IOException {
+	public void deleteMessage(int msg)
+		throws IOException
+	{
 		sendCommand("DELE " + msg);
 	}
 
 
 	/**
 	 * Prints out debugging info.
+	 *
 	 * @param info The info to print out
 	 */
 	public void Debug(String info) {
@@ -290,6 +313,9 @@ public class Pop3 {
 /*
  * ChangeLog:
  * $Log: Pop3.java,v $
+ * Revision 1.5  2000/12/31 14:15:17  fredde
+ * some privated fields are now protected instead, cleaned up
+ *
  * Revision 1.4  2000/04/01 14:59:56  fredde
  * license for the package changed to LGPL
  *
