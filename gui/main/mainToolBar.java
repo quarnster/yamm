@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Id: mainToolBar.java,v 1.17 2000/03/05 18:02:53 fredde Exp $
+ * @version $Id: mainToolBar.java,v 1.18 2000/03/25 15:46:24 fredde Exp $
  */
 public class mainToolBar extends JToolBar {
 
@@ -210,18 +210,17 @@ public class mainToolBar extends JToolBar {
 					).elementAt(5).toString());
 
 				String[] mail = Mailbox.getMailForReplyHeaders(
-							frame.selectedbox,
-							selMail, skip);
+							frame.selectedbox, skip);
 
-				if (!mail[1].startsWith(
+				if (!mail[2].startsWith(
 						YAMM.getString("mail.re")) &&
-						!mail[1].startsWith("Re:")) {
-					mail[1] = YAMM.getString("mail.re") +
-								" " + mail[1];
+						!mail[2].startsWith("Re:")) {
+					mail[2] = YAMM.getString("mail.re") +
+								" " + mail[2];
 				}
 
-				YAMMWrite yam = new YAMMWrite(mail[0], mail[1],
-								mail[0] + " " +
+				YAMMWrite yam = new YAMMWrite(mail[1], mail[2],
+								mail[0] +
 						YAMM.getString("mail.wrote") +
 									"\n");
 				Mailbox.getMailForReply(frame.selectedbox,
@@ -251,8 +250,8 @@ public class mainToolBar extends JToolBar {
 					).elementAt(5).toString());
 
 				String mail[] = Mailbox.getMailForReplyHeaders(
-							frame.selectedbox,
-								selMail, skip);
+							frame.selectedbox, skip);
+
 				if (!mail[1].startsWith(
 						YAMM.getString("mail.fwd")) &&
 						!mail[1].startsWith("Fwd:")) {
@@ -261,7 +260,7 @@ public class mainToolBar extends JToolBar {
 				}
 
 				YAMMWrite yam = new YAMMWrite("", mail[1],
-								mail[0] + " " +
+								mail[0] +
 						YAMM.getString("mail.wrote") +
 									"\n");
 				Mailbox.getMailForReply(frame.selectedbox,
@@ -294,6 +293,9 @@ public class mainToolBar extends JToolBar {
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.18  2000/03/25 15:46:24  fredde
+ * uses the new getMailForReplyHeaders method
+ *
  * Revision 1.17  2000/03/05 18:02:53  fredde
  * now gets the images used for the jar-file
  *

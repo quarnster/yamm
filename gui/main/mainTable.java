@@ -39,7 +39,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * The Table for listing the mails subject, date and sender.
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.28 2000/03/19 17:20:16 fredde Exp $
+ * @version $Id: mainTable.java,v 1.29 2000/03/25 15:46:24 fredde Exp $
  */
 public class mainTable extends JTable implements DragGestureListener,
 							DragSourceListener {
@@ -671,8 +671,7 @@ public class mainTable extends JTable implements DragGestureListener,
 
 				changeButtonMode(false);
 				clearSelection();
-			} else if (kommando.equals(
-					YAMM.getString("button.reply"))) {
+			} else if (kommando.equals(YAMM.getString("button.reply"))) {
 
 				if (getSelectedRow() == -1) {
 					return;
@@ -688,10 +687,18 @@ public class mainTable extends JTable implements DragGestureListener,
 								toString());
                  
 				String[] mail = Mailbox.getMailForReplyHeaders(
-					frame.selectedbox, msgnum, skip);
- 
-				YAMMWrite yam = new YAMMWrite(mail[0], mail[1],
-						mail[0] + " " +
+						frame.selectedbox, skip);
+
+
+ 				if (!mail[2].startsWith(
+						YAMM.getString("mail.re")) &&
+						!mail[2].startsWith("Re:")) {
+					mail[2] = YAMM.getString("mail.re") +
+								" " + mail[2];
+				}
+
+				YAMMWrite yam = new YAMMWrite(mail[1], mail[2],
+						mail[0] +
 						YAMM.getString("mail.wrote") +
 						"\n");
 
@@ -777,6 +784,9 @@ public class mainTable extends JTable implements DragGestureListener,
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.29  2000/03/25 15:46:24  fredde
+ * uses the new getMailForReplyHeaders method
+ *
  * Revision 1.28  2000/03/19 17:20:16  fredde
  * moved the renderer to ../MailTableRenderer.java and cleaned up a little
  *
