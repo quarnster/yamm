@@ -1,5 +1,5 @@
-/*  ProfieEditor.java - Editor for profilesettings
- *  Copyright (C) 2000 Fredrik Ehnbom
+/*  $Id: ProfileEditor.java,v 1.2 2003/03/08 18:10:47 fredde Exp $
+ *  Copyright (C) 2000-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,9 +34,11 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Editor for profilesettings
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: ProfileEditor.java,v 1.1 2000/04/01 20:52:14 fredde Exp $
+ * @version $Revision: 1.2 $
  */
-public class ProfileEditor extends JDialog {
+public class ProfileEditor
+	extends JDialog
+{
 
 	/**
 	 * Wheter or not we made a change
@@ -190,6 +192,19 @@ public class ProfileEditor extends JDialog {
 				dispose();
 			} else if (which.equals(YAMM.getString("button.cancel"))) {
 				dispose();
+			} else {
+				JFileChooser jfs = new JFileChooser();
+				jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				int ret = jfs.showOpenDialog(ProfileEditor.this);
+
+				if (ret == JFileChooser.APPROVE_OPTION) {
+					File file = jfs.getSelectedFile();
+
+					if (file != null) {
+						signature.setText(file.toString());
+					}
+				}
+
 			}
 		}
 	};
@@ -197,6 +212,9 @@ public class ProfileEditor extends JDialog {
 /*
  * ChangeLog:
  * $Log: ProfileEditor.java,v $
+ * Revision 1.2  2003/03/08 18:10:47  fredde
+ * now the browse button actually does something :)
+ *
  * Revision 1.1  2000/04/01 20:52:14  fredde
  * the profile editor
  *
