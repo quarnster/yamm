@@ -1,4 +1,4 @@
-/*  $Id: YAMMWrite.java,v 1.31 2003/03/15 19:26:33 fredde Exp $
+/*  $Id: YAMMWrite.java,v 1.32 2003/03/16 11:02:50 fredde Exp $
  *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import org.gjt.fredde.yamm.mail.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public class YAMMWrite extends JFrame {
 
@@ -170,9 +170,19 @@ public class YAMMWrite extends JFrame {
 
 		if (!from.equals("")) {
 			String prof = YAMM.profiler.getProfileString(from);
-
+			if (prof == null) {
+				JOptionPane.showMessageDialog(
+					this,
+					YAMM.getString("yammwrite.profile"),
+					YAMM.getString("msg.warning"),
+					JOptionPane.ERROR_MESSAGE
+				);
+			}
 			fromField.addItem(from);
-			fromField.setSelectedItem(prof);
+			if (prof != null)
+				fromField.setSelectedItem(prof);
+			else
+				fromField.setSelectedItem(from);
 		} else if (fromField.getItemCount() != 0) {
 			fromField.setSelectedIndex(YAMM.profiler.getDefault());
 		}
@@ -518,6 +528,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.32  2003/03/16 11:02:50  fredde
+ * fixed bugs when no prefiles have been added
+ *
  * Revision 1.31  2003/03/15 19:26:33  fredde
  * .gif -> .png. also add attachment status to index
  *
