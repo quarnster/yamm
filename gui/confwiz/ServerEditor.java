@@ -1,5 +1,5 @@
-/*  ServerEditor.java - Editor for the serversettings
- *  Copyright (C) 2000 Fredrik Ehnbom
+/*  $Id: ServerEditor.java,v 1.4 2003/04/16 12:40:17 fredde Exp $
+ *  Copyright (C) 2000-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,12 +17,13 @@
  */
 package org.gjt.fredde.yamm.gui.confwiz;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.Properties;
 import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
 
 import org.gjt.fredde.util.SimpleCrypt;
 import org.gjt.fredde.util.gui.ExceptionDialog;
@@ -32,9 +33,11 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Editor for the serversettings
  * @author Fredrik Ehnbom
- * @version $Id: ServerEditor.java,v 1.3 2003/03/15 19:34:48 fredde Exp $
+ * @version $Revision: 1.4 $
  */
-public class ServerEditor extends JDialog {
+public class ServerEditor
+	extends JDialog
+{
 
 	/**
 	 * Wheter or not this is a new server
@@ -51,15 +54,25 @@ public class ServerEditor extends JDialog {
 	 */
 	private boolean done = false;
 
+	private JComboBox type;
+	private JComboBox profile;
+	private JCheckBox authentication;
+	private JPanel pop3Panel;
+	private JCheckBox delBox;
+
+	private JPanel cPanel;
+
 	/**
 	 * The textfield for the username
 	 */
 	private JTextField userField;
+	private JLabel userLabel;
 
 	/**
 	 * The textfield for the password
 	 */
 	private JPasswordField JPField;
+	private JLabel passwordLabel;
 
 	/**
 	 * The textfield for the address
@@ -97,51 +110,127 @@ public class ServerEditor extends JDialog {
 	public ServerEditor(JDialog owner, String file) {
 		super(owner, true);
 		Dimension screen = getToolkit().getScreenSize();
-		setBounds((screen.width - 300)/2, (screen.height - 175)/2, 300, 175);
+		setBounds((screen.width - 300)/2, (screen.height - 300)/2, 340, 340);
 
-		getContentPane().setLayout(new GridLayout(5, 2, 10, 10));
+		GridBagLayout gridbag = new GridBagLayout();
+		GridBagConstraints c1 = new GridBagConstraints();
 
+		getContentPane().setLayout(gridbag);
+
+		c1.fill = GridBagConstraints.HORIZONTAL;
+		c1.weightx = 1;
+		c1.gridwidth = GridBagConstraints.REMAINDER;
+
+		// Type
+		JPanel panel = new JPanel();
+		type = new JComboBox(new Object[] {"pop3", "smtp"});
+		type.addActionListener(ComboListener);
+		panel.add(type);
+		panel.setBorder(BorderFactory.createTitledBorder(new EtchedBorder(), YAMM.getString("confwiz.servers.type")));
+		gridbag.setConstraints(panel, c1);
+		getContentPane().add(panel);
+
+		// Address
+		panel = new JPanel(gridbag);
 		JLabel myLabel = new JLabel(YAMM.getString("options.address") + ":");
-		getContentPane().add(myLabel);
+		c1.gridwidth = GridBagConstraints.RELATIVE;
+		c1.weightx = 0;
+		gridbag.setConstraints(myLabel, c1);
+		panel.add(myLabel);
 
 		addrField = new JTextField();
-		addrField.setMaximumSize(new Dimension(200, 20));
-		addrField.setMinimumSize(new Dimension(200, 20));
-		getContentPane().add(addrField);
+		c1.gridwidth = GridBagConstraints.REMAINDER;
+		c1.weightx = 1;
+		gridbag.setConstraints(addrField, c1);
+		panel.add(addrField);
 
 		myLabel = new JLabel(YAMM.getString("options.port") + ":");
-		getContentPane().add(myLabel);
+		c1.gridwidth = GridBagConstraints.RELATIVE;
+		c1.weightx = 0;
+		gridbag.setConstraints(myLabel, c1);
+		panel.add(myLabel);
 
 		portField = new JTextField();
 		portField.setText("110");
-		portField.setMaximumSize(new Dimension(200, 20));
-		portField.setMinimumSize(new Dimension(200, 20));
-		getContentPane().add(portField);
+		c1.gridwidth = GridBagConstraints.REMAINDER;
+		c1.weightx = 1;
+		gridbag.setConstraints(portField, c1);
+		panel.add(portField);
+		panel.setBorder(BorderFactory.createTitledBorder(new EtchedBorder(), YAMM.getString("confwiz.servers.address")));
+		gridbag.setConstraints(panel, c1);
+		getContentPane().add(panel);
 
-		myLabel = new JLabel(YAMM.getString("options.username") + ": ");
-		getContentPane().add(myLabel);
+		// Authentication
+		panel = new JPanel(gridbag);
+		authentication = new JCheckBox(YAMM.getString("confwiz.servers.reqauth"), true);
+		authentication.setEnabled(false);
+		authentication.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (authentication.isSelected()) {
+					userField.setEnabled(true);
+					JPField.setEnabled(true);
+					passwordLabel.setEnabled(true);
+					userLabel.setEnabled(true);
+				} else {
+					userField.setEnabled(false);
+					JPField.setEnabled(false);
+					passwordLabel.setEnabled(false);
+					userLabel.setEnabled(false);
+				}
+			}
+		});
+		c1.gridwidth = GridBagConstraints.REMAINDER;
+		gridbag.setConstraints(authentication, c1);
+
+		panel.add(authentication);
+		userLabel = new JLabel(YAMM.getString("options.username") + ": ");
+		c1.gridwidth = GridBagConstraints.RELATIVE;
+		c1.weightx = 0;
+		gridbag.setConstraints(userLabel, c1);
+		panel.add(userLabel);
 
 		userField = new JTextField();
-		userField.setMaximumSize(new Dimension(200, 20));
-		userField.setMinimumSize(new Dimension(200, 20));
+		c1.gridwidth = GridBagConstraints.REMAINDER;
+		c1.weightx = 1;
+		gridbag.setConstraints(userField, c1);
+		panel.add(userField);
 
-		getContentPane().add(userField);
-
-		myLabel = new JLabel(YAMM.getString("options.password") + ":");
-		getContentPane().add(myLabel);
+		passwordLabel = new JLabel(YAMM.getString("options.password") + ":");
+		c1.gridwidth = GridBagConstraints.RELATIVE;
+		c1.weightx = 0;
+		gridbag.setConstraints(passwordLabel, c1);
+		panel.add(passwordLabel);
 
 		JPField = new JPasswordField();
-		JPField.setMaximumSize(new Dimension(200, 20));
-		JPField.setMinimumSize(new Dimension(200, 20));
+		c1.gridwidth = GridBagConstraints.REMAINDER;
+		c1.weightx = 1;
+		gridbag.setConstraints(JPField, c1);
+		panel.add(JPField);
+		panel.setBorder(BorderFactory.createTitledBorder(new EtchedBorder(), YAMM.getString("confwiz.servers.auth")));
+		gridbag.setConstraints(panel, c1);
+		getContentPane().add(panel);
 
-		getContentPane().add(JPField);
+		// pop3 specific stuff
+		pop3Panel = new JPanel(gridbag);
+		delBox = new JCheckBox(YAMM.getString("confwiz.servers.delete"), true);
+		pop3Panel.setBorder(BorderFactory.createTitledBorder(new EtchedBorder(), YAMM.getString("confwiz.servers.pop3")));	
+		gridbag.setConstraints(delBox, c1);
+		pop3Panel.add(delBox);
+		gridbag.setConstraints(pop3Panel, c1);
+		getContentPane().add(pop3Panel);
 
+		// OK / Cancel buttons
 		JButton b = new JButton(YAMM.getString("button.ok"), new ImageIcon(getClass().getResource("/images/buttons/ok.png")));
 		b.addActionListener(BListener);
+		c1.gridwidth = GridBagConstraints.RELATIVE;
+		c1.weightx = 1;
+		gridbag.setConstraints(b, c1);
 		getContentPane().add(b);
 
 		b = new JButton(YAMM.getString("button.cancel"), new ImageIcon(getClass().getResource("/images/buttons/cancel.png")));
 		b.addActionListener(BListener);
+		c1.gridwidth = GridBagConstraints.REMAINDER;
+		gridbag.setConstraints(b, c1);
 		getContentPane().add(b);
 
 		if (file != null) load(file);
@@ -181,6 +270,14 @@ public class ServerEditor extends JDialog {
 		portField.setText(props.getProperty("port", "110"));
 		userField.setText(props.getProperty("username"));
 		JPField.setText(crypt.decrypt(props.getProperty("password")));
+
+		String t = props.getProperty("type", "pop3");
+		type.setSelectedItem(t);
+		if (t.equals("pop3")) {
+			delBox.setSelected(props.getProperty("delete", "true").equals("true"));
+		} else {
+			authentication.setSelected(props.getProperty("authentication", "false").equals("true"));
+		}
 	}
 
 	/**
@@ -202,12 +299,20 @@ public class ServerEditor extends JDialog {
 		try {
 			out = new FileOutputStream(config);
 			props = new Properties();
+			String t = type.getSelectedItem().toString();
 
+			props.setProperty("type",	t);
 			props.setProperty("server",	addrField.getText());
 			props.setProperty("port",	portField.getText());
-			props.setProperty("username",	userField.getText());
-			props.setProperty("password",	crypt.encrypt(new String(JPField.getPassword())));
-			props.setProperty("type",	"pop3");
+
+			if (authentication.isSelected()) {
+				props.setProperty("authentication", "true");
+				props.setProperty("username",	userField.getText());
+				props.setProperty("password",	crypt.encrypt(new String(JPField.getPassword())));
+			}
+			if (t.equals("pop3")) {
+				props.setProperty("delete", "" + delBox.isSelected());
+			}
 
 			props.store(out, "Server Config file");
 		} catch (IOException propsioe) {
@@ -235,10 +340,31 @@ public class ServerEditor extends JDialog {
 			}
 		}
 	};
+
+	private ActionListener ComboListener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			if (type.getSelectedItem().toString().equals("pop3")) {
+				authentication.setEnabled(false);
+				authentication.setSelected(true);
+				portField.setText("110");
+				pop3Panel.setEnabled(true);
+				delBox.setEnabled(true);
+			} else if (type.getSelectedItem().toString().equals("smtp")) {
+				authentication.setEnabled(true);
+				pop3Panel.setEnabled(false);
+				delBox.setEnabled(false);
+				portField.setText("25");
+			}
+		}
+	};
+
 }
 /*
  * Changes:
  * $Log: ServerEditor.java,v $
+ * Revision 1.4  2003/04/16 12:40:17  fredde
+ * updated to include smtp-configuration also
+ *
  * Revision 1.3  2003/03/15 19:34:48  fredde
  * .gif -> .png
  *
