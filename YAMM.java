@@ -53,7 +53,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   static protected ResourceBundle         res;
 
   /** The box the user has selected. */
-  public static String                 selectedbox  = home + "/boxes/"; //+ res.getString("box.inbox");
+  public static String                 selectedbox  = home + "/boxes/";
 
   /** The version of YAMM */
   public static    String                 yammVersion  = "0.7.3 CVS";
@@ -83,23 +83,25 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   /** What's in the tree */
   static protected DefaultMutableTreeNode top;
 
-
   /** The Table that lists the mails in listOfMails */
   public mainTable      mailList;
 
+  /** If the buttons should be painted with icons, text or both */
   public static boolean ico = true, text = true;
 
   /** The JEditorPane for this frame */
   public JEditorPane  mail;
 
+  /** Attachment list */
   public JList        myList;
 
+  /** The toolbar */
   public mainToolBar  tbar;
 
-//  JButton      b;
+  /** The splitpanes */
   protected JSplitPane   SPane, SPane2;
-//  JTree        tree;
-//  JTabbedPane  JTPane;
+
+  /** The statusrow */
   public statusRow status;
 
   int          mainx, mainy, mainw, mainh, hsplit, vsplit;
@@ -700,6 +702,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
         (new File(home + "/boxes/" + YAMM.getString("box.outbox"))).createNewFile();
         (new File(home + "/boxes/" + YAMM.getString("box.trash"))).createNewFile();
+        (new File(home + "/boxes/" + YAMM.getString("box.sent"))).createNewFile();
         (new File(home + "/.config")).createNewFile();
         (new File(home + "/.filters")).createNewFile();
         (new File(home + "/tmp")).mkdirs();
