@@ -1,4 +1,4 @@
-/*  $Id: Index.java,v 1.3 2003/03/10 12:31:26 fredde Exp $
+/*  $Id: Index.java,v 1.4 2003/03/11 15:19:53 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -47,8 +47,8 @@ public class Index {
 		throws IOException
 	{
 		this.boxFile = boxFile;
-		int sep = boxFile.lastIndexOf(File.separator);
-		indexFile = boxFile.substring(0, sep + 1) + "." + boxFile.substring(sep + 1) + ".index";
+		indexFile = Mailbox.getIndexName(boxFile);
+
 
 		if (!checkVersion())
 			create();
