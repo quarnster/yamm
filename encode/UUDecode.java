@@ -81,7 +81,6 @@ public class UUDecode extends Thread{
       new MsgDialog(frame, "Error!", ioe.toString());
     }
 
-    System.out.println("view: " + view + " filename: " + filename);
     if(view) {
 /*
       if(filename.endsWith(".zip") || filename.endsWith(".jar")) {
@@ -103,7 +102,20 @@ public class UUDecode extends Thread{
     outputBuffer[count++] = char1;
     outputBuffer[count++] = char2;
     outputBuffer[count++] = char3;
-
-//    System.out.println("c1: " + (char)char1 + " c2: " + (char)char2 + " c3: " + (char)char3);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
