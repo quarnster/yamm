@@ -180,7 +180,11 @@ public class MessageBodyParser {
 			}
 
 			if (temp.startsWith("--" + attachment)) {
-				return ATTACHMENT;
+				if (temp.endsWith("-- ")) {
+					return END;
+				} else {
+					return ATTACHMENT;
+				}
 			}
 
 			if (temp.endsWith("= ") && !temp.endsWith("== ")) {
