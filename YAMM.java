@@ -19,6 +19,7 @@ package org.gjt.fredde.yamm;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.print.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -40,7 +41,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * The big Main-class of YAMM
  */
-public class YAMM extends JFrame implements HyperlinkListener
+public class YAMM extends JFrame implements HyperlinkListener, Printable
 {
 
   public static String sep = File.separator;
@@ -314,7 +315,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     attach = new Vector();
 
     ListModel attachModel = new AbstractListModel() {
-      public Object getElementAt(int index) { return attach.elementAt(index); }
+      public Object getElementAt(int index) { return ((Vector)attach.elementAt(index)).elementAt(0); }
       public int    getSize() { return attach.size(); }
     };
 
@@ -385,38 +386,27 @@ public class YAMM extends JFrame implements HyperlinkListener
       String arg = ((JButton)e.getSource()).getToolTipText();
      
       if(arg.equals(res.getString("button.view_extract"))) {
-
         int whichAtt = myList.getSelectedIndex();
 
         if(whichAtt != -1) {
-          String filename = ((Vector)attach.elementAt(whichAtt)).elementAt(1).toString();
-          String encode = ((Vector)attach.elementAt(whichAtt)).elementAt(0).toString();
-          String home = System.getProperty("user.home") + "/.yamm";
+          String filename = ((Vector)attach.elementAt(whichAtt)).elementAt(0).toString();
+          String encode = ((Vector)attach.elementAt(whichAtt)).elementAt(1).toString();
+          String file = ((Vector)attach.elementAt(whichAtt)).elementAt(2).toString();
+          String home = System.getProperty("user.home") + "/.yamm/tmp/" + filename;
 
           if(filename.endsWith(".jpg") || filename.endsWith(".gif") || filename.endsWith(".JPG") || filename.endsWith(".GIF")) {
-            new File("tmp").mkdir();
-
-/*
             if(encode.equalsIgnoreCase("base64")) {
               if(base64) {
-                Mailbox.export_attach(selectedbox, mailList.getSelectedRow(), filename);
-   
-                new Base64Decode("B64Decode " + filename, new File(home + "/tmp/" + filename)).start();
+                new Base64Decode("B64Decode " + filename, file, home).start();
               }
               else new MsgDialog("No Support for base64 encoded files..."); // System.out.println("No support for base64 encoded files...");
             }
-
             if(encode.equalsIgnoreCase("x-uuencode")) {
-              Mailbox.export_attach(selectedbox, mailList.getSelectedRow(), filename);
-            
-              new UUDecode(null, "UUDecode " + filename, home + "/tmp/" + filename, true).start();
+              new UUDecode(null, "UUDecode " + filename, file, home, true).start();
             }
-
           }
-
           else if(encode.equalsIgnoreCase("base64")) {
             if(base64) {
-              Mailbox.export_attach(selectedbox, mailList.getSelectedRow(), filename);
               JFileChooser jfs = new JFileChooser();
               jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
               jfs.setMultiSelectionEnabled(false);
@@ -425,14 +415,13 @@ public class YAMM extends JFrame implements HyperlinkListener
     
               if(ret == JFileChooser.APPROVE_OPTION) {
                 if(jfs.getSelectedFile() != null) {
-                  new Base64Decode("B64Decode " + filename, jfs.getSelectedFile()).start();
+                  new Base64Decode("B64Decode " + filename, file, jfs.getSelectedFile().toString()).start();
                 }
               }
             }
             else System.out.println("No support for base64 encoded files...");
           }
           else if(encode.equalsIgnoreCase("x-uuencode")) {
-            Mailbox.export_attach(selectedbox, mailList.getSelectedRow(), filename);
             JFileChooser jfs = new JFileChooser();
             jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
             jfs.setMultiSelectionEnabled(false);
@@ -441,10 +430,9 @@ public class YAMM extends JFrame implements HyperlinkListener
             
             if(ret == JFileChooser.APPROVE_OPTION) {
               if(jfs.getSelectedFile() != null) {
-                new UUDecode(null, "UUDecode " + filename, jfs.getSelectedFile().toString(), false).start();
+                new UUDecode(null, "UUDecode " + filename, file, jfs.getSelectedFile().toString(), false).start();
               }
             }
-*/
           }
         }
       }
@@ -453,16 +441,50 @@ public class YAMM extends JFrame implements HyperlinkListener
 
   public void createAttachList() {
     attach = new Vector();
+//    Vector tmp = new Vector();
     String boxName = selectedbox.substring(selectedbox.indexOf("boxes") + 6, 
                                            selectedbox.length()) + "/";
 
-    String[] test = new File(System.getProperty("user.home") + "/.yamm/tmp/cache/" + boxName).list();
+    String base = System.getProperty("user.home") + "/.yamm/tmp/cache/" + boxName;
+    int msgNum = mailList.getSelectedRow();
+//    if(msgNum == null) msgNum = 0;
+    String[] test = new File(base).list();
 
     for(int i = 0; i < test.length; i++ ) {
-      if(test[i].indexOf("0.attach.") != -1) attach.add(test[i]);
+      if(test[i].indexOf(msgNum + ".attach.") != -1) addinfo(base + test[i], attach); // tmp.add(test[i]);
     }
+
+//    for(int i = 0;
   }
 
+  protected void addinfo(String where, Vector attach) {
+//    System.out.println("where: "  + where);
+    Vector tmp = new Vector();
+    String temp = null;
+
+    try {
+      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(where)));
+
+      String name = null, encode = null;
+
+      for(int i = 0; i < 2; i++) {
+        temp = in.readLine();
+
+        if(temp.startsWith("Content-Transfer-Encoding: "))
+          encode = temp.substring(27, temp.length());
+        else if(temp.indexOf("name=\"") != -1)
+          name = temp.substring(temp.indexOf("name=\"") + 6, temp.lastIndexOf("\""));
+
+        
+        if(name != null && encode != null) { tmp.add(name); tmp.add(encode); }
+      }
+      in.close();
+    }
+    catch (IOException ioe) { System.err.println(ioe); }
+
+    tmp.add(where);
+    attach.add(tmp);
+  }
 /*
   protected void createAttachList(Vector list File dir) {
     String files[] = dir.list();
@@ -478,7 +500,15 @@ public class YAMM extends JFrame implements HyperlinkListener
     }
   }
 */
-    
+
+  public int print(Graphics g, PageFormat pageFormat,
+                        int pageIndex) throws PrinterException {
+    mail.paint(g);
+
+    return Printable.PAGE_EXISTS;
+  }
+
+
   public void Exit() {
     Rectangle rv = new Rectangle();
     getBounds(rv);
