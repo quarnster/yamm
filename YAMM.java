@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.57 2003/03/06 20:16:28 fredde Exp $
+/*  $Id: YAMM.java,v 1.58 2003/03/07 10:52:09 fredde Exp $
  *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.57 2003/03/06 20:16:28 fredde Exp $
+ * @version $Id: YAMM.java,v 1.58 2003/03/07 10:52:09 fredde Exp $
  */
 public class YAMM
 	extends JFrame
@@ -376,6 +376,7 @@ public class YAMM
 
 			if (whichAtt != -1) {
 				String filename	= ((Vector)attach.elementAt(whichAtt)).elementAt(0).toString();
+				String realFile = ((Vector)attach.elementAt(whichAtt)).elementAt(1).toString();
 
 				JFileChooser jfs = new JFileChooser();
 				jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -385,26 +386,37 @@ public class YAMM
 
 				if (ret == JFileChooser.APPROVE_OPTION) {
 					if (jfs.getSelectedFile() != null) {
-						extract(whichAtt, jfs.getSelectedFile().toString());
+						BufferedInputStream in = null;
+						BufferedOutputStream out = null;
+						byte[] buffer = new byte[65536];
+						try {
+							in = new BufferedInputStream(new FileInputStream(realFile));
+							out = new BufferedOutputStream(new FileOutputStream(jfs.getSelectedFile()));
+
+							while (true) {
+								int len = in.read(buffer);
+								if (len == -1) break;
+
+								out.write(buffer, 0, len);
+							}
+						} catch (IOException ioe) {
+							new ExceptionDialog(
+								YAMM.getString("msg.error"),
+								ioe,
+								YAMM.exceptionNames
+							);
+
+						} finally {
+							try {
+								if (in != null) in.close();
+								if (out != null) out.close();
+							} catch (IOException ioe) {}
+						}
 					}
 				}
 			}
 		}
 	};
-
-	public void extract(int whichAtt, String target) {
-		String filename	= ((Vector)attach.elementAt(whichAtt)).elementAt(0).toString();
-		String encode	= ((Vector)attach.elementAt(whichAtt)).elementAt(1).toString();
-		String file		= ((Vector)attach.elementAt(whichAtt)).elementAt(2).toString();
-
-		if (encode.equalsIgnoreCase("base64")) {
-			if (base64) {
-				new Base64Decode("B64Decode " + filename, file, target).start();
-			} else System.out.println("No support for base64 encoded files...");
-		} else if(encode.equalsIgnoreCase("x-uuencode")) {
-			new UUDecode(null, "UUDecode " + filename, file, target, false).start();
-		}
-	}
 
 	public void createAttachList() {
 		attach.clear();
@@ -425,7 +437,7 @@ public class YAMM
 		String[] test = new File(base).list();
 
 		for(int i = 0; i < test.length; i++ ) {
-			if (test[i].indexOf(msgNum + ".attach.") != -1) addinfo(base + test[i], attach);
+			if (test[i].indexOf(msgNum + ".attach.") != -1 && !test[i].endsWith(".tmp")) addinfo(base + test[i], attach);
 		}
 		JTPane.setEnabledAt(1, attach.size() != 0);
 	}
@@ -674,6 +686,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.58  2003/03/07 10:52:09  fredde
+ * Attachments work again now
+ *
  * Revision 1.57  2003/03/06 20:16:28  fredde
  * A few fixes regarding attachments to work with the new mailparsing system
  *
