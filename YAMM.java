@@ -57,7 +57,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   public static String                 selectedbox  = home + "/boxes/";
 
   /** The version of YAMM */
-  public static    String                 version  = "0.7.3";
+  public static    String                 version  = "0.7.4";
 
   /** The compileDate of YAMM */
   public static    String                 compDate     = "1999-11-06";
@@ -149,7 +149,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
    * Creates the main-window and adds all the components in it.
    */
   public YAMM() {
-    Mailbox.getMail(selectedbox, 0);
+//    Mailbox.getMail(selectedbox, 0);
     try { 
       mailPage=new URL(mailPageString + res.getString("box.inbox") + "/0.html");
     }
@@ -173,9 +173,9 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     // get the main window's settings and default them if an exception is caught 
     int mainx = Integer.parseInt(props.getProperty("mainx", "0"));
     int mainy = Integer.parseInt(props.getProperty("mainy", "0"));
-    int mainw = Integer.parseInt(props.getProperty("mainw", "550"));
-    int mainh = Integer.parseInt(props.getProperty("mainh", "400"));
-    int hsplit = Integer.parseInt(props.getProperty("hsplit", "150"));
+    int mainw = Integer.parseInt(props.getProperty("mainw", "650"));
+    int mainh = Integer.parseInt(props.getProperty("mainh", "380"));
+    int hsplit = Integer.parseInt(props.getProperty("hsplit", "80"));
     int vsplit = Integer.parseInt(props.getProperty("vsplit", "125"));
 
     setBounds(mainx, mainy, mainw, mainh);
