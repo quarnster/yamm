@@ -3,35 +3,50 @@ TODO list for YAMM
 ******** Visual stuff ********
 
   - More Drag and Drop
+
   - boxes should display how many unread messages they have
+
   - Maybe my own plaf-skin
 
 ********** General ***********
 
   - Address book
+
   - Get rid of sun.misc.Base64Decoder...
+
   - the ability to edit mails in the outbox
+
   - user should be able to send mails directly instead of keeping
     them in the outbox
+
   - Create a new up to date Configuration utility
+
   - Pack it all together in a jar-file
+
   - More debugging info.
+
   - Resend mails that is in the 'sent'-box
+
+  - Multiple identities (personal, work, school... autoselect when answering...)
 
 ********* Protocols **********
 
   - NNTP (news you know...)
+
   - Local mail on unix-systems (can anyone tell me how this works?)
 
 ******** Considering *********
 
   - IMAP (This is not as usual as pop3)
 
-Go ahead and mail me your opinions!
+Go ahead and mail me your opinion!
 
 ********* Known Bugs *********
 
   - It has problems with some dateformats
-  - DND in the JTable doesn't work in Linux
+
+  - DND in the JTable doesn't work in Linux. (this is a bug in swing)
+    *SOLUTION*: put "splashscreen=nope" in the "~/.yamm/.config"-file.
+
   - Last character in the uuencoded/uudecoded file always gets different than
     in the original file.

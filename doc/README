@@ -21,7 +21,7 @@ Filters:
 
     In other words this means:
 
-      If the subject contains test, then move to the box test-files.
+      If the subject contains test, then move the mail to the box test-files.
 
 Author:
     Fredrik Ehnbom <fredde@gjt.org>
