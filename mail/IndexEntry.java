@@ -1,4 +1,4 @@
-/*  $Id: IndexEntry.java,v 1.2 2003/03/09 18:04:56 fredde Exp $
+/*  $Id: IndexEntry.java,v 1.3 2003/03/10 11:01:27 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -57,6 +57,9 @@ public class IndexEntry {
 		from = Mailbox.unMime(from);
 	}
 
+	public IndexEntry() {
+	}
+
 	public IndexEntry(RandomAccessFile in)
 		throws IOException
 	{
@@ -64,7 +67,7 @@ public class IndexEntry {
 	}
 
 
-	protected void read(RandomAccessFile in)
+	public void read(RandomAccessFile in)
 		throws IOException
 	{
 		id = Index.read16(in);
@@ -83,7 +86,7 @@ public class IndexEntry {
 		status = (byte) (in.read());
 	}
 
-	protected void write(RandomAccessFile out)
+	public void write(RandomAccessFile out)
 		throws IOException
 	{
 		Index.write16(out, id);

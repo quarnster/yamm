@@ -1,4 +1,4 @@
-/*  $Id: Index.java,v 1.1 2003/03/09 17:42:24 fredde Exp $
+/*  $Id: Index.java,v 1.2 2003/03/10 11:01:27 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ public class Index {
 		2 +	// unread messages size
 		2;	// new unread messages size
 
-	protected RandomAccessFile raf = null;
+	public RandomAccessFile raf = null;
 	private String boxFile;
 	private String indexFile;
 
