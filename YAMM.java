@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.72 2003/06/08 19:54:42 fredde Exp $
+/*  $Id: YAMM.java,v 1.73 2003/10/01 10:03:09 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.72 $
+ * @version $Revision: 1.73 $
  */
 public class YAMM
 	extends JFrame
@@ -61,7 +61,7 @@ public class YAMM
 	private String currentMailbox = Utilities.replace(home + "/boxes/inbox");
 
 	/** The version of YAMM */
-	public static String version  = "0.9";
+	public static String version  = "0.9.1";
 
 	/** The compileDate of YAMM */
 	public static String compDate = Utilities.getCompileDate();
@@ -812,6 +812,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.73  2003/10/01 10:03:09  fredde
+ * version 0.9.1
+ *
  * Revision 1.72  2003/06/08 19:54:42  fredde
  * setNullPage added
  *
