@@ -163,22 +163,6 @@ public class MessageBodyParser {
 				return END;
 			}
 
-			if (temp.indexOf("=") != -1) {
-				temp = unMime(temp, html);
-			}
-
-			if (temp.indexOf("://") != -1) {
-				if (temp.toLowerCase().indexOf("href=") == -1) {
-					temp = makeLink(temp);
-				}
-			}
-
-			if (temp.indexOf("@") != -1) {
-				if (temp.toLowerCase().indexOf("href=") == -1) {
-					temp = makeEmailLink(temp);
-				}
-			}
-
 			if (temp.startsWith("--" + attachment)) {
 				if (temp.endsWith("-- ")) {
 					return END;
@@ -187,12 +171,27 @@ public class MessageBodyParser {
 				}
 			}
 
+			if (temp.indexOf("=") != -1) {
+				temp = unMime(temp, html);
+			}
+
+			if (temp.indexOf("@") != -1) {
+				if (temp.toLowerCase().indexOf("href=") == -1) {
+					temp = makeEmailLink(temp);
+				}
+			}
+
 			if (temp.endsWith("= ") && !temp.endsWith("== ")) {
 				temp = temp.substring(0, temp.length() - 2);
-				out.print(temp);
-			} else {
-				out.println(temp);
 			}
+
+			if (temp.indexOf("://") != -1) {
+				if (temp.toLowerCase().indexOf("href=") == -1) {
+					temp = makeLink(temp);
+				}
+			}
+
+			out.println(temp);
 		}
 //		return ERROR;
 	}

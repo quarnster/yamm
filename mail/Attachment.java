@@ -95,8 +95,9 @@ public class Attachment {
 		}
 
 		if (encoding != null) {
-			if (!encoding.equals("7bit") &&
-					!encoding.equals("quoted-printable")) {
+			if (encoding.equalsIgnoreCase("base64") ||
+				encoding.equalsIgnoreCase("x-uuencode")) {
+
 				String temp = null;
 				out.println(name);
 				out.flush();
@@ -119,6 +120,7 @@ public class Attachment {
 				return MESSAGE;
 			}
 		}
-		return ERROR;
+		return MESSAGE;
+		//return ERROR;
 	}
 }

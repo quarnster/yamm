@@ -125,15 +125,18 @@ public class mainJTree extends JTree implements DropTargetListener {
     // adds items to the myPopup JPopupMenu
     JMenuItem mi = new JMenuItem(YAMM.getString("tree.new.box"));
 
+    mi.setFont(new Font("SansSerif", Font.PLAIN, 10));
     mi.addActionListener(treepoplistener);
     treepop.add(mi);
  
     mi = new JMenuItem(YAMM.getString("tree.new.group"));
+    mi.setFont(new Font("SansSerif", Font.PLAIN, 10));
     mi.addActionListener(treepoplistener);
     treepop.add(mi);
     treepop.addSeparator();
 
     mi = new JMenuItem(YAMM.getString("button.delete"));
+    mi.setFont(new Font("SansSerif", Font.PLAIN, 10));
     mi.addActionListener(treepoplistener);
     treepop.add(mi);
   }

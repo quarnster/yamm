@@ -29,7 +29,7 @@ import org.gjt.fredde.yamm.YAMM;
 public class MessageParser {
 
 
-	protected int attachments = 1;
+	protected int attachments = 0;
 
 	public String makeClickable(String click) {
 		return MessageBodyParser.makeEmailLink(click);
@@ -165,6 +165,7 @@ public class MessageParser {
 		String boundary = null;
 
 		String temp = mhp.getHeaderField("Content-Type");
+		String contentType = temp.toLowerCase();
 		if (temp != null) {
 			if (temp.indexOf("boundary=\"") != -1) {
 				boundary = temp.substring(
@@ -195,22 +196,25 @@ public class MessageParser {
 		for (;;) {
 			int test = mbp.parse(in, out, boundary);
 
-			if (test == MessageBodyParser.ATTACHMENT) {
+			if (test == MessageBodyParser.ATTACHMENT &&
+							contentType.indexOf("multipart/alternative") == -1) {
 				Attachment a = new Attachment();
 				PrintWriter AtOut = new PrintWriter(
 						new BufferedOutputStream(
 						new FileOutputStream(file +
 							".attach." +
 							attachments)));
+
 				
 				for (;;) {
 					// Attachment found
 					test = a.parse(in, AtOut);
 
-					if (test == Attachment.MESSAGE) {
+					if (test == Attachment.MESSAGE &&
+							contentType.indexOf("multipart/alternative") == -1) {
 						break;
 					} else if (test == Attachment.
-								ATTACHMENT) {
+							ATTACHMENT) {
 						attachments++;
 						AtOut.close();
 						AtOut = new PrintWriter(new
@@ -220,12 +224,14 @@ public class MessageParser {
 								".attach." +
 								attachments)));
 						continue;
-					} else if ( test == Attachment.END) {
+					} else /* if (test == Attachment.END) */{
 						return;
 					}
 				}
 			} else if (test == MessageBodyParser.END) {
 				// end reached
+				break;
+			} else if (test == MessageBodyParser.ATTACHMENT) {
 				break;
 			}
 		}
