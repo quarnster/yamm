@@ -174,7 +174,14 @@ public class Mailbox {
           if(subject == null) subject = temp.substring(9, temp.length());
         }
         else if(temp.startsWith("To:")) {
-          if(to == null) to = temp.substring(4, temp.length());
+          if(to == null) {
+            to = temp.substring(4, temp.length());
+
+            while (temp.indexOf(",", temp.length() - 5) != -1) {
+              String temp2 = in.readLine();
+              temp += temp2.trim();
+            }
+	  }
         }
         else if(temp.startsWith("Reply-To:")) {
           if(reply == null) reply = temp.substring(10, temp.length());
