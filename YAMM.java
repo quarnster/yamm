@@ -253,8 +253,6 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
       public String getColumnName(int column) {  return headername[column]; }
     };
 
-    mailList = new mainTable(this, dataModel, listOfMails);
-
     mail = new JEditorPane();
     mail.setContentType("text/html");
     Mailbox.getMail(selectedbox, 0);
@@ -266,7 +264,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
     JTPane.setFont(new Font("SansSerif", Font.PLAIN, 10));
     if (text && !ico) {
-      JTPane.addTab(res.getString("mail"), new JScrollPane(mail));
+      JTPane.addTab(res.getString("mail"),  new JScrollPane(mail));
     }
     else if (ico && !text) {
       JTPane.addTab("", 
@@ -325,9 +323,14 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
           myPanel);
     }
 
-    JScrollPane jsp = new JScrollPane(mailList);
+    mailList = new mainTable(this, dataModel, listOfMails);
+    mailList.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
 
-    SPane = new JSplitPane(0, jsp, JTPane);
+    JPanel bgFix = new JPanel(new BorderLayout());
+    bgFix.add("Center", new JScrollPane(mailList));
+    bgFix.setBackground(mailList.getBackground());
+
+    SPane = new JSplitPane(0, bgFix, JTPane);
 
     SPane.setDividerLocation(hsplit);
     SPane.setBackground(Color.white);
