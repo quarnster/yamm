@@ -1,3 +1,14 @@
+0.7.8:
+	Added:
+		-Spanish translation thanks to Rafael Escovar
+		-The ability to encode Base64 with help from sun-classes
+
+	Fixed:
+		-lots of small bugfixes
+		-the sorting of the messages is much better
+		-lots of bugfixes when using icon-only mode for the buttons
+		-should work perfect in Windows now
+
 0.7.7:
 	Fixed:
 		-Now works in Windows 9x/NT
