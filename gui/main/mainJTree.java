@@ -39,7 +39,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Id: mainJTree.java,v 1.23 2000/07/16 17:48:36 fredde Exp $
+ * @version $Id: mainJTree.java,v 1.24 2000/08/09 16:31:56 fredde Exp $
  */
 public class mainJTree extends JTree implements DropTargetListener {
 
@@ -84,12 +84,12 @@ public class mainJTree extends JTree implements DropTargetListener {
 						frame.selectedbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox"));
 						Mailbox.createList(frame.selectedbox, frame.listOfMails);
 						frame.mailList.clearSelection();
-						frame.mailList.updateUI();
+						frame.mailList.update();
 					} else if (!box.isDirectory()) {
 						frame.selectedbox = node.toString();
 						Mailbox.createList(frame.selectedbox, frame.listOfMails);
 						frame.mailList.clearSelection();
-						frame.mailList.updateUI();
+						frame.mailList.update();
 					}
 				}
 
@@ -353,6 +353,9 @@ public class mainJTree extends JTree implements DropTargetListener {
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.24  2000/08/09 16:31:56  fredde
+ * calls mailList.update() instead of mailList.updateUI()
+ *
  * Revision 1.23  2000/07/16 17:48:36  fredde
  * lots of Windows compatiblity fixes
  *
