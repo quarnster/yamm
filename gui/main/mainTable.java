@@ -53,6 +53,7 @@ public class mainTable extends JTable implements DragGestureListener,
 
   public JPopupMenu             popup = null;
 
+  protected static DragSource drag = null;
 
   /**
    * Creates a new JTable
@@ -61,11 +62,11 @@ public class mainTable extends JTable implements DragGestureListener,
    */
   public mainTable(YAMM frame, TableModel tm, Vector listOfMails) {
 
-    DragSource dragSource = DragSource.getDefaultDragSource();
+    drag = DragSource.getDefaultDragSource();
 
-    dragSource.createDefaultDragGestureRecognizer(
+    drag.createDefaultDragGestureRecognizer(
       this, // drag component
-      DnDConstants.ACTION_COPY_OR_MOVE, // actions
+      DnDConstants.ACTION_MOVE, // actions
       this); // drag gesture listener
 
 
@@ -73,16 +74,6 @@ public class mainTable extends JTable implements DragGestureListener,
     this.frame = frame;
     setModel(tm);
 
-/*
-    TableColumn column = getColumnModel().getColumn(3);
-    column.setPreferredWidth(125);
-    column.setMaxWidth(140);
-    column.setMinWidth(10);
-    column = getColumnModel().getColumn(0);
-    column.setPreferredWidth(20);
-    column.setMinWidth(10);
-    column.setMaxWidth(50);
-*/
     TableColumn column = getColumnModel().getColumn(0);
     column.setIdentifier("num");
     column.setMinWidth(5);
@@ -165,28 +156,70 @@ public class mainTable extends JTable implements DragGestureListener,
   }
 
   public void dragGestureRecognized(DragGestureEvent e) {
-    e.startDrag(DragSource.DefaultMoveDrop, // cursor
-                new StringSelection(getSelected()), // transferable
-                this); // drag source listener
-   }
+    System.out.println("wanted to drag...");
+    StringSelection text = new StringSelection(getSelected());
 
-   public void dragDropEnd(DragSourceDropEvent e) {}
-   public void dragEnter(DragSourceDragEvent e) {}
-   public void dragExit(DragSourceEvent e) {}
-   public void dragOver(DragSourceDragEvent e) {}
-   public void dropActionChanged(DragSourceDragEvent e) {}
+    try {
+      drag.startDrag(e, DragSource.DefaultMoveDrop, // cursor
+                  text, // transferable
+                  this); // drag source listener
+    } catch (InvalidDnDOperationException idoe) {
+        System.err.println(idoe);
+    }
+  }
+
+  public void dragDropEnd(DragSourceDropEvent e) { System.out.println("end"); }
+  public void dragEnter(DragSourceDragEvent e) { System.out.println("enter"); }
+  public void dragExit(DragSourceEvent e) { System.out.println("exit"); }
+  public void dragOver(DragSourceDragEvent e) { System.out.println("over"); }
+  public void dropActionChanged(DragSourceDragEvent e) { System.out.println("changed"); }
+
 
   /**
    * Sorts 1 -> 10
    */
-  protected void SortFirst(int row) {
-    for(int i = 0; i<listOfMails.size();i++) {
-      Object temp = null;
-      for (int j=0; j<listOfMails.size(); j++) {
-        if (((Vector)listOfMails.elementAt(i)).elementAt(row).toString().compareTo(((Vector)listOfMails.elementAt(j)).elementAt(row)) > 0 ) {
-           temp = listOfMails.elementAt(j);
-           listOfMails.setElementAt(listOfMails.elementAt(i), j);
-           listOfMails.setElementAt(temp, i);
+  protected void SortFirst(int col) {
+    int numcol = 0;           
+              
+    while(numcol<4) {
+      if(getColumnName(numcol).equals("#")) { break; }
+      numcol++;                                       
+    }
+
+    if (col == numcol) {
+      for (int i = 0; i < listOfMails.size(); i++) {
+        Object temp = null;
+        for (int j = 0; j < listOfMails.size(); j++) {
+          int one = Integer.parseInt(
+              ((Vector)listOfMails.elementAt(i)).elementAt(col).toString());
+
+          int two = Integer.parseInt(
+              ((Vector)listOfMails.elementAt(j)).elementAt(col).toString());
+
+          if (one < two) {
+            temp = listOfMails.elementAt(j);
+            listOfMails.setElementAt(listOfMails.elementAt(i), j);
+            listOfMails.setElementAt(temp, i);
+          }
+        }
+      }
+    }
+
+    else {
+
+      for(int i = 0; i<listOfMails.size();i++) {
+        Object temp = null;
+        for (int j=0; j<listOfMails.size(); j++) {
+          String s1 = 
+              ((Vector)listOfMails.elementAt(i)).elementAt(col).toString();
+          String s2 = 
+              ((Vector)listOfMails.elementAt(j)).elementAt(col).toString();
+
+          if (s1.toLowerCase().compareTo(s2.toLowerCase()) < 0 ) {
+             temp = listOfMails.elementAt(j);
+             listOfMails.setElementAt(listOfMails.elementAt(i), j);
+             listOfMails.setElementAt(temp, i);
+          }
         }
       }
     }
@@ -196,21 +229,53 @@ public class mainTable extends JTable implements DragGestureListener,
   /**
    * Sorts 10 -> 1
    */
-  protected void SortLast(int row) {
-    for(int i = 0; i<listOfMails.size();i++) {
-      Object temp = null;
-      for (int j=0; j<listOfMails.size(); j++) {
-        if (((Vector)listOfMails.elementAt(i)).elementAt(row).toString().compareTo(((Vector)listOfMails.elementAt(j)).elementAt(row)) < 0 ) {
-           temp = listOfMails.elementAt(i);
-           listOfMails.setElementAt(listOfMails.elementAt(j), i);
-           listOfMails.setElementAt(temp, j);
-        }
+  protected void SortLast(int col) {
+    int numcol = 0;                  
+                   
+    while(numcol<4) {
+      if(getColumnName(numcol).equals("#")) { break; }
+      numcol++;                                       
+    }          
+     
+    if (col == numcol) {
+      for (int i = 0; i < listOfMails.size(); i++) {
+        Object temp = null;
+        for (int j = 0; j < listOfMails.size(); j++) {
+          int one = Integer.parseInt(
+              ((Vector)listOfMails.elementAt(i)).elementAt(col).toString());
+
+          int two = Integer.parseInt(
+              ((Vector)listOfMails.elementAt(j)).elementAt(col).toString());
+ 
+          if (one > two) {
+            temp = listOfMails.elementAt(j);
+            listOfMails.setElementAt(listOfMails.elementAt(i), j);
+            listOfMails.setElementAt(temp, i);
+          }
+        }  
+      }  
+    }  
+     
+    else {
+          
+      for(int i = 0; i<listOfMails.size();i++) {
+        Object temp = null;
+        for (int j=0; j<listOfMails.size(); j++) {
+          String s1 =
+              ((Vector)listOfMails.elementAt(i)).elementAt(col).toString();
+          String s2 =
+              ((Vector)listOfMails.elementAt(j)).elementAt(col).toString();
+
+          if (s1.toLowerCase().compareTo(s2.toLowerCase()) > 0 ) {
+             temp = listOfMails.elementAt(j);
+             listOfMails.setElementAt(listOfMails.elementAt(i), j);
+             listOfMails.setElementAt(temp, i);
+          }
+        }  
       }
     }
     updateUI();
   }
-
-
 
   public void createPopup(JPopupMenu jpmenu) {
     Vector list = new Vector(), list2 = new Vector();          
