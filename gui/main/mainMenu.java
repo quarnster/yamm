@@ -1,4 +1,4 @@
-/*  $Id: mainMenu.java,v 1.38 2003/04/27 08:02:32 fredde Exp $
+/*  $Id: mainMenu.java,v 1.39 2003/05/24 08:47:55 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.38 $
+ * @version $Revision: 1.39 $
  */
 public class mainMenu
 	extends JMenuBar
@@ -203,7 +203,8 @@ public class mainMenu
 					"Rafael Escovar\n" + 
 					"Ricardo A Mattar\n" + 
 					"Daniel Johnson\n" +
-					"Pablo Rodriguez",
+					"Pablo Rodriguez\n" +
+					"Ilane Marie Walberg",
 					YAMM.getString("help.about"),
 					JOptionPane.INFORMATION_MESSAGE
 				);
@@ -351,6 +352,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.39  2003/05/24 08:47:55  fredde
+ * added Ilane to credits list
+ *
  * Revision 1.38  2003/04/27 08:02:32  fredde
  * viewSource does no longer require skip argument
  *
