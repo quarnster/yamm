@@ -20,7 +20,6 @@ package org.gjt.fredde.yamm.encode;
 
 import sun.misc.*;
 import java.io.*;
-import org.gjt.fredde.yamm.gui.imageViewer;
 
 public class Base64Decode extends Thread {
 
@@ -40,20 +39,13 @@ public class Base64Decode extends Thread {
 		makeBase64(target);
 
 		try {
-			InputStream is = new BufferedInputStream(
-					new FileInputStream(target + ".tmp"));
-			OutputStream os = new BufferedOutputStream(
-					new FileOutputStream(target));
+			InputStream is = new BufferedInputStream(new FileInputStream(target + ".tmp"));
+			OutputStream os = new BufferedOutputStream(new FileOutputStream(target));
 			BASE64Decoder b64dc = new BASE64Decoder();
 			b64dc.decodeBuffer(is, os);
-			String end = target.substring(target.lastIndexOf("."),
-						target.length()).toLowerCase();
+
 			is.close();
 			os.close();
-
-			if (end.equals(".gif") || end.equals(".jpg")) {
-				new imageViewer(target);
-			}
 
 			new File(target + ".tmp").delete();
 		} catch (IOException e) {
@@ -65,11 +57,15 @@ public class Base64Decode extends Thread {
 		String temp;
 		 try {
 			BufferedReader in = new BufferedReader(
-					new InputStreamReader(
-					new FileInputStream(filename)));
+				new InputStreamReader(
+					new FileInputStream(filename)
+				)
+			);
 			PrintWriter out = new PrintWriter(
-					new BufferedOutputStream(
-					new FileOutputStream(target + ".tmp")));
+				new BufferedOutputStream(
+					new FileOutputStream(target + ".tmp")
+				)
+			);
 
 			in.readLine(); // Name of attachment
 			in.readLine(); // The attachment encoding

@@ -25,7 +25,7 @@ import java.util.jar.*;
 /**
  * This Class provides some useful utilities
  * @author Fredrik Ehnbom
- * @version $Id: Utilities.java,v 1.6 2001/03/18 17:04:44 fredde Exp $
+ * @version $Id: Utilities.java,v 1.7 2001/04/21 09:30:40 fredde Exp $
  */
 public final class Utilities {
 
@@ -63,6 +63,9 @@ public final class Utilities {
 		while (tok.hasMoreTokens()) {
 			tmp += sep + tok.nextToken();
 		}
+
+		if (str.endsWith("/")) 
+			tmp += sep;
 
 		return tmp;
 	}
@@ -166,6 +169,9 @@ public final class Utilities {
 /*
  * Changes:
  * $Log: Utilities.java,v $
+ * Revision 1.7  2001/04/21 09:30:40  fredde
+ * fixed
+ *
  * Revision 1.6  2001/03/18 17:04:44  fredde
  * added getCompileDate-method
  *
