@@ -23,12 +23,15 @@ import java.awt.event.*;
 import java.awt.BorderLayout;
 
 /**
- * A class to disply source code.
+ * A class to display the source of a message.
+ * @author Fredrik Ehnbom
+ * @version $Id: sourceViewer.java,v 1.3 2000/03/05 18:42:32 fredde Exp $
  */
 public class sourceViewer extends JFrame {
 
 	/** The JTextArea to be used when viewing the source */
-	public  JTextArea jtarea;
+	public JTextArea jtarea;
+	public JScrollPane jsp;
 
 	/**
 	 * Creates the window
@@ -39,7 +42,8 @@ public class sourceViewer extends JFrame {
 
 		jtarea = new JTextArea();
 		jtarea.setEditable(false);
-		getContentPane().add("Center", new JScrollPane(jtarea));
+		jsp = new JScrollPane(jtarea);
+		getContentPane().add("Center", jsp);
 
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent event) {
@@ -50,3 +54,10 @@ public class sourceViewer extends JFrame {
 		show();
 	}
 }
+/*
+ * Changes:
+ * $Log: sourceViewer.java,v $
+ * Revision 1.3  2000/03/05 18:42:32  fredde
+ * tried to make it go all the way up on fileload
+ *
+ */
