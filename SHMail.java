@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom
- * @version $Id: SHMail.java,v 1.27 2000/07/16 17:48:36 fredde Exp $
+ * @version $Id: SHMail.java,v 1.28 2000/12/31 14:05:07 fredde Exp $
  */
 public class SHMail extends Thread {
 
@@ -113,24 +113,19 @@ public class SHMail extends Thread {
 				port = 110;
 			}
 
-			if (type != null && server != null &&
-					username != null && password != null) {
+			if (type != null && server != null && username != null && password != null) {
 				if (type.equals("pop3")) {
 					Object[] argstmp = {server};
 					frame.status.setStatus(YAMM.getString("server.contact", argstmp));
 
-					Pop3 pop = null;
+					YammPop3 pop = null;
 
-					try { 
+					try {
 						pop = new YammPop3(username, password, server, YAMM.home + "/boxes/.filter", port, popdebug);
 						int messages = pop.getMessageCount();
 
 						for (int j = 1; j <= messages; j++) {
-							Object[] args = {"" + j, "" + messages};
-							frame.status.setStatus(YAMM.getString("server.get", args));
-
-							frame.status.progress(100-((100*messages-100*(j-1))/messages));
-							pop.getMessage(j);
+							pop.getMessage(j, messages, frame);
 
 							if (del) pop.deleteMessage(j);
 						}
@@ -138,7 +133,7 @@ public class SHMail extends Thread {
 						frame.status.progress(100);
 					} catch (IOException ioe) {
 						new ExceptionDialog(YAMM.getString("msg.error"),
-							ioe, YAMM.exceptionNames); 
+							ioe, YAMM.exceptionNames);
 					} finally {
 						try {
 							if (pop != null) {
@@ -151,36 +146,62 @@ public class SHMail extends Thread {
 		}
 
 
-		if (YAMM.getProperty("smtpserver") != null &&
-				Mailbox.hasMail(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"))) {
-			Object[] argstmp = {"1"};
-			frame.status.setStatus(YAMM.getString("server.send", argstmp));
-			frame.status.progress(0);
-
+		if (
+			YAMM.getProperty("smtpserver") != null &&
+			Mailbox.hasMail(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"))
+		) {
 			Smtp smtp = null;
 			BufferedReader in = null;
 			PrintWriter out = null;
 			PrintWriter mail = null;
 
 			try {
+				File boxFile = new File(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
 				smtp = new YammSmtp(YAMM.getProperty("smtpserver"), 25, smtpdebug);
 				in = new BufferedReader(
 					new InputStreamReader(
-						new FileInputStream(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"))));
+						new FileInputStream(boxFile)
+					)
+				);
 
 				if (sent) {
 					out = new PrintWriter(
-					new BufferedOutputStream(
-						new FileOutputStream(YAMM.home + "/boxes/" + YAMM.getString("box.sent"), true)));
+						new BufferedOutputStream(
+	        					new FileOutputStream(YAMM.home + "/boxes/" + YAMM.getString("box.sent"), true)
+						)
+					);
 				}
 
 				String temp = null, from2 = null, to2 = null;
+				String[][] listOfMails = Mailbox.createList(boxFile.toString());
+
+				long last = Long.parseLong(listOfMails[0][5]);
+				long length = 0;
+				long read = 0;
+
 				int i = 1;
+				if (i >= listOfMails.length) {
+					length = (boxFile.length() - last);
+				} else {
+					length = Long.parseLong(listOfMails[i][5]) - last;
+					last = Long.parseLong(listOfMails[i][5]);
+				}
+
+				String mailStatus = YAMM.getString("server.send", new Object[] {"1"});
+
+	        		frame.status.setStatus(mailStatus);
+		        	frame.status.progress(0);
+
 
 				for (;;) {
 					temp = in.readLine();
 
 					if (temp == null) break;
+
+					read += temp.length() + 1;
+
+					frame.status.setStatus(mailStatus + "  " + read + "/" + length);
+					frame.status.progress((int) (((float) read / length) * 100));
 
 					if (temp.startsWith("From:")) {
 						String from = MessageParser.getEmail(temp);
@@ -215,15 +236,27 @@ public class SHMail extends Thread {
 
 							if (temp == null) break;
 
+							read += temp.length() + 1;
+							frame.status.setStatus(mailStatus + "  " + read + "/" + length);
+							frame.status.progress((int) (((float) read / length) * 100));
+
 							if (sent) out.println(temp);
 
 							if (temp.equals(".")) {
 								smtp.sendMessage();
-								Object[] args = {"" + i};
-								frame.status.setStatus(YAMM.getString("server.send",
-														args));
 
 								i++;
+								read = 0;
+
+								mailStatus = YAMM.getString("server.send", new Object[] {"" + i});
+
+								if (i >= listOfMails.length) {
+										length = (boxFile.length() - last);
+								} else {
+									length = Long.parseLong(listOfMails[i][5]) - last;
+					        			last = Long.parseLong(listOfMails[i][5]);
+								}
+
 								break;
 							}
 							mail.println(temp);
@@ -241,8 +274,8 @@ public class SHMail extends Thread {
 				File file = new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox")));
 				file.delete();
 				file.createNewFile();
-			} catch (IOException ioe) { 
-				new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames); 
+			} catch (IOException ioe) {
+				new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
 			} finally {
 				try {
 					if (in != null) in.close();
@@ -253,7 +286,7 @@ public class SHMail extends Thread {
 			}
 			if (sent) {
 				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.sent")));
-				frame.tree.updateUI();
+				frame.tree.repaint();
 			}
 		}
 		frame.status.setStatus(YAMM.getString("msg.done"));
@@ -265,25 +298,31 @@ public class SHMail extends Thread {
 
 			try {
 				new Filter();
-			} catch (IOException ioe) { 
-				new ExceptionDialog(YAMM.getString("msg.error"),
-						ioe,
-						YAMM.exceptionNames); 
+			} catch (IOException ioe) {
+				new ExceptionDialog(
+					YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames
+				);
 			}
 
 			frame.status.setStatus(YAMM.getString("msg.done"));
 			frame.status.progress(100);
 
-			frame.tree.updateUI();
+			frame.tree.repaint();
 		}
 		frame.status.setStatus("");
-		frame.status.progress(0); 
+		frame.status.progress(0);
+
 		knappen.setEnabled(true);
 	}
 }
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.28  2000/12/31 14:05:07  fredde
+ * better progressbars
+ *
  * Revision 1.27  2000/07/16 17:48:36  fredde
  * lots of Windows compatiblity fixes
  *

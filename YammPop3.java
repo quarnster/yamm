@@ -25,11 +25,13 @@ import org.gjt.fredde.yamm.YAMM;
  * This class gets mail from a server and prints out the debugging messages to
  * YAMM.debug.
  * @author Fredrik Ehnbom
- * @version $Id: YammPop3.java,v 1.1 2000/02/28 13:51:24 fredde Exp $
+ * @version $Id: YammPop3.java,v 1.2 2000/12/31 14:05:07 fredde Exp $
  */
 public class YammPop3 extends Pop3 {
 
-	public YammPop3(String user, String password, String server, String file, int port, boolean debug) throws IOException {
+	public YammPop3(String user, String password, String server, String file, int port, boolean debug)
+		throws IOException
+	{
 		super(user, password, server, file, port, debug);
 	}
 
@@ -43,10 +45,41 @@ public class YammPop3 extends Pop3 {
 			YAMM.debug.flush();
 		}
 	}
+
+	public boolean getMessage(int msg, int messages, YAMM frame)
+		throws IOException
+	{
+		Object[] args = {"" + msg, "" + messages};
+		frame.status.setStatus(YAMM.getString("server.get", args));
+		frame.status.progress(0);
+
+		sendCommand("RETR " + msg, false);
+		String answer = in.readLine();
+		Debug("Reply: " + answer);
+
+		if (!answer.toLowerCase().startsWith("-err")) {
+			int length = Integer.parseInt(answer.substring(4, answer.indexOf("octets")-1));
+			int read = 0;
+
+			while (!".".equals(answer)) {
+				answer = in.readLine();
+				outFile.println(answer);
+				read += answer.length() + 1;
+
+				frame.status.setStatus(YAMM.getString("server.get", args) + "   " + read + "/" + length );
+				frame.status.progress( (int) (((float) read / length) * 100) );
+			}
+			return true;
+		}
+		return false;
+	}
 }
 /*
  * Changes:
  * $Log: YammPop3.java,v $
+ * Revision 1.2  2000/12/31 14:05:07  fredde
+ * better progressbars
+ *
  * Revision 1.1  2000/02/28 13:51:24  fredde
  * initial commit
  *
