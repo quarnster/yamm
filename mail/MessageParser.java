@@ -1,5 +1,5 @@
 /*  MessageParser.java - Parses messages
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+ *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Parses messages
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: MessageParser.java,v 1.14 2001/03/18 14:26:42 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.15 2001/03/18 17:08:42 fredde Exp $
  */
 public class MessageParser {
 
@@ -149,9 +149,8 @@ public class MessageParser {
 	}
 
 	public MessageParser(BufferedReader in, PrintWriter out, String file)
-							throws IOException,
-							MessageParseException {
-
+		throws IOException, MessageParseException
+	{
 		file = file.substring(0, file.length() - 5);
 		MessageHeaderParser mhp = new MessageHeaderParser();
 		mhp.parse(in);
@@ -213,26 +212,24 @@ public class MessageParser {
 		if (temp != null) {
 			contentType = temp.toLowerCase();
 			if (contentType.indexOf("boundary=") != -1) {
-				boundary = temp.substring(
-					contentType.indexOf("boundary=") + 9,
-					temp.length());
+				boundary = temp.substring(contentType.indexOf("boundary=") + 9, temp.length());
 				if (boundary.startsWith("\"")) {
 					boundary = boundary.substring(1, boundary.length() - 1);
+				}
+				if (boundary.indexOf("\"") != -1) {
+					boundary = boundary.substring(0, boundary.indexOf("\""));
 				}
 			}
 		}
 
 		if (mhp.getHeaderField("MIME-Version") != null) {
 			// expect a little mime message
-			for (;;) {
-				if (boundary != null) {
+			if (boundary != null) {
+				for (;;) {
 					if (in.readLine().equals("--" +	boundary)) {
-						new Attachment().parse(in,
-						null);
+						new Attachment().parse(in, null);
 						break;
 					}
-				} else {
-					break;
 				}
 			}
 		}
@@ -243,34 +240,33 @@ public class MessageParser {
 		for (;;) {
 			int test = mbp.parse(in, out, boundary);
 
-			if (test == MessageBodyParser.ATTACHMENT &&
-							contentType.indexOf("multipart/alternative") == -1) {
+			if (test == MessageBodyParser.ATTACHMENT && contentType.indexOf("multipart/alternative") == -1) {
 				Attachment a = new Attachment();
 				PrintWriter atOut = null;
 				try {
 					atOut = new PrintWriter(
 						new BufferedOutputStream(
-						new FileOutputStream(file +
-							".attach." +
-							attachments)));
+							new FileOutputStream(file +	".attach." + attachments)
+						)
+					);
 
 				
 					for (;;) {
 						// Attachment found
 						test = a.parse(in, atOut);
 
-						if (test == Attachment.MESSAGE &&
-								contentType.indexOf("multipart/alternative") == -1) {
+						if (test == Attachment.MESSAGE && contentType.indexOf("multipart/alternative") == -1) {
 							break;
 						} else if (test == Attachment.ATTACHMENT) {
 							attachments++;
 							atOut.close();
-							atOut = new PrintWriter(new
-								BufferedOutputStream(
-								new FileOutputStream(
-									file +
-									".attach." +
-									attachments)));
+							atOut = new PrintWriter(
+								new	BufferedOutputStream(
+									new FileOutputStream(
+										file + ".attach." +	attachments
+									)
+								)
+							);
 							continue;
 						} else /* if (test == Attachment.END) */{
 							break bigLoop;
