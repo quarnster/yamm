@@ -1,4 +1,4 @@
-/*  $Id: SHMail.java,v 1.31 2003/03/09 14:09:05 fredde Exp $
+/*  $Id: SHMail.java,v 1.32 2003/03/09 17:45:04 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public class SHMail
 	extends Thread
@@ -173,18 +173,21 @@ public class SHMail
 				}
 
 				String temp = null, from2 = null, to2 = null;
-				String[][] listOfMails = Mailbox.createList(boxFile.toString());
+				Index idx = new Index(boxFile.toString());
+				idx.open();
+				IndexEntry[] entries = idx.getEntries();
+				idx.close();
 
-				long last = Long.parseLong(listOfMails[0][5]);
+				long last = entries[0].skip;
 				long length = 0;
 				long read = 0;
 
 				int i = 1;
-				if (i >= listOfMails.length) {
+				if (i >= entries.length) {
 					length = (boxFile.length() - last);
 				} else {
-					length = Long.parseLong(listOfMails[i][5]) - last;
-					last = Long.parseLong(listOfMails[i][5]);
+					length = entries[i].skip - last;
+					last = entries[i].skip;
 				}
 
 				String mailStatus = YAMM.getString("server.send", new Object[] {"1"});
@@ -250,11 +253,11 @@ public class SHMail
 
 								mailStatus = YAMM.getString("server.send", new Object[] {"" + i});
 
-								if (i >= listOfMails.length) {
+								if (i >= entries.length) {
 										length = (boxFile.length() - last);
 								} else {
-									length = Long.parseLong(listOfMails[i][5]) - last;
-					        			last = Long.parseLong(listOfMails[i][5]);
+									length = entries[i].skip - last;
+					        			last = entries[i].skip;
 								}
 
 								break;
@@ -286,7 +289,6 @@ public class SHMail
 			}
 			if (sent) {
 				String box = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.sent"));
-				Mailbox.updateIndex(box);
 				yamm.tree.unreadTable.put(box, Mailbox.getUnread(box));
 				yamm.tree.dataModel.fireTableDataChanged();
 			}
@@ -325,6 +327,9 @@ public class SHMail
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.32  2003/03/09 17:45:04  fredde
+ * now uses the new index system
+ *
  * Revision 1.31  2003/03/09 14:09:05  fredde
  * variable frame renamed to yamm
  *

@@ -1,4 +1,4 @@
-/*  $Id: mainToolBar.java,v 1.25 2003/03/08 18:11:41 fredde Exp $
+/*  $Id: mainToolBar.java,v 1.26 2003/03/09 17:50:50 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Revision: 1.25 $
+ * @version $Revision: 1.26 $
  */
 public class mainToolBar
 	extends JToolBar
@@ -192,9 +192,7 @@ public class mainToolBar
 
 				int selMail = frame.keyIndex[frame.mailList.getSelectedRow()];
 
-				long skip = Long.parseLong(
-					frame.listOfMails[selMail][YAMM.INDEX_SKIP]
-				);
+				long skip = frame.listOfMails[selMail].skip;
 
 				String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, skip);
 
@@ -217,9 +215,7 @@ public class mainToolBar
 
 				int selMail = frame.keyIndex[frame.mailList.getSelectedRow()];
 
-				long skip = Long.parseLong(
-					frame.listOfMails[selMail][YAMM.INDEX_SKIP]
-				);
+				long skip = frame.listOfMails[selMail].skip;
 
 				String mail[] = Mailbox.getMailForReplyHeaders(
 					frame.selectedbox,
@@ -262,6 +258,9 @@ public class mainToolBar
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.26  2003/03/09 17:50:50  fredde
+ * now uses the new index system
+ *
  * Revision 1.25  2003/03/08 18:11:41  fredde
  * signs messages
  *

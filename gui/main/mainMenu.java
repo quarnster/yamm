@@ -1,4 +1,4 @@
-/*  $Id: mainMenu.java,v 1.30 2003/03/08 16:54:48 fredde Exp $
+/*  $Id: mainMenu.java,v 1.31 2003/03/09 17:51:08 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.30 $
+ * @version $Revision: 1.31 $
  */
 public class mainMenu
 	extends JMenuBar
@@ -239,7 +239,7 @@ public class mainMenu
 
 					int msg = tmp.getSelectedMessage();
 
-					long skip = Long.parseLong(frame.listOfMails[msg][5]);
+					long skip = frame.listOfMails[msg].skip;
 
 					if (msg != -1) {
 						sourceViewer sv = new sourceViewer();
@@ -332,6 +332,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.31  2003/03/09 17:51:08  fredde
+ * now uses the new index system
+ *
  * Revision 1.30  2003/03/08 16:54:48  fredde
  * added my name to the to-field when submitting bug reports
  *
