@@ -270,7 +270,7 @@ public class YAMMWrite extends JFrame {
 						YAMM.getProperty("username",
 							"Anonymous") +
 						" <" + YAMM.getProperty("email",
-							" ") +
+							" ") + ">"
 						"\nTo: " + to2 +
 						"\nSubject: " +
 						myTextField2.getText() +
@@ -286,8 +286,7 @@ public class YAMMWrite extends JFrame {
 						YAMM.getProperty("username",
 								"Anonymous") +
 						" <" + YAMM.getProperty("email",
-									" ") +
-						">" +
+								" ") + ">" +
 						"\nTo: " + to2 +
 						"\nSubject: " +
 						myTextField2.getText() +
