@@ -1,5 +1,5 @@
-/*  mainTable.java - The JTable for the main-window
- *  Copyright (C) 1999-2001 Fredrik Ehnbom
+/*  $Id: mainTable.java,v 1.45 2003/03/10 20:00:59 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.44 2003/03/10 11:02:42 fredde Exp $
+ * @version $Revision: 1.45 $
  */
 public class mainTable
 	extends JTable
@@ -233,113 +233,57 @@ public class mainTable
 	public void dropActionChanged(DragSourceDragEvent e) {}
 
 
-	/**
-	 * Sorts 1 -> 10
-	 */
-	private void SortFirst(int col) {
-		if (yamm.listOfMails == null) return;
-		int temp = -1;
+	private void mergeSort(int[] tmp, int start, int end, int col) {
+		if (start < end)  {
+			int mid = (start + end) / 2;
+			mergeSort(tmp, start, mid, col);
+			mergeSort(tmp, mid+1, end, col);
 
-		if (col == 3) {
-			for (int i = 0; i < yamm.listOfMails.length; i++) {
-				for (int j = 0; j < yamm.listOfMails.length; j++) {
-					long one = yamm.listOfMails[yamm.keyIndex[i]].date;
-					long two = yamm.listOfMails[yamm.keyIndex[j]].date;
-
-					if (one < two) {
-						temp = yamm.keyIndex[j];
-						yamm.keyIndex[j] = yamm.keyIndex[i];
-						yamm.keyIndex[i] = temp;
-					}
-				}
+			copy(tmp, start, mid, end);
+			switch (col) {
+				default: mergeDate(tmp, start, mid, end); break;
+				case 1:	 mergeSubject(tmp, start, mid, end); break;
+				case 2:  mergeFrom(tmp, start, mid, end); break;
 			}
 		}
-
-/*
-		int temp = -1;
-		if (col == 0) {
-			for (int i = 0; i < yamm.listOfMails.length; i++) {
-				for (int j = 0; j < yamm.listOfMails.length; j++) {
-					int one = Integer.parseInt(yamm.listOfMails[yamm.keyIndex[i]][col]);
-					int two = Integer.parseInt(yamm.listOfMails[yamm.keyIndex[j]][col]);
-
-					if (one < two) {
-						temp = yamm.keyIndex[j];
-						yamm.keyIndex[j] = yamm.keyIndex[i];
-						yamm.keyIndex[i] = temp;
-					}
-				}
-			}
-		} else {
-			for (int i = 0; i < yamm.listOfMails.length; i++) {
-				for (int j = 0; j < yamm.listOfMails.length; j++) {
-					String s1 = yamm.listOfMails[yamm.keyIndex[i]][col].toLowerCase();
-					String s2 = yamm.listOfMails[yamm.keyIndex[j]][col].toLowerCase();
-
-					if (s1.compareTo(s2.toLowerCase()) < 0) {
-						temp = yamm.keyIndex[j];
-						yamm.keyIndex[j] = yamm.keyIndex[i];
-						yamm.keyIndex[i] = temp;
-					}
-				}
-			}
-		}
-*/
 	}
 
-	/**
-	 * Sorts 10 -> 1
-	 */
-	private void SortLast(int col) {
-		if (yamm.listOfMails == null) return;
+	void copy(int[] tmp, int start, int mid, int end) {
+		System.arraycopy(yamm.keyIndex, start, tmp, 0, mid-start+1);
 
-		int temp = -1;
+		for (int i = end, pos = mid-start + 1; i >= mid + 1;)
+			tmp[pos++] = yamm.keyIndex[i--];
+	}
 
-		if (col == 3) {
-			for (int i = 0; i < yamm.listOfMails.length; i++) {
-				for (int j = 0; j < yamm.listOfMails.length; j++) {
-					long one = yamm.listOfMails[yamm.keyIndex[i]].date;
-					long two = yamm.listOfMails[yamm.keyIndex[j]].date;
 
-					if (one > two) {
-						temp = yamm.keyIndex[j];
-						yamm.keyIndex[j] = yamm.keyIndex[i];
-						yamm.keyIndex[i] = temp;
-					}
-				}
-			}
-		}
-/*
-		int temp = -1;
+	void mergeFrom(int[] tmp, int start, int mid, int end) {
+		int num = end - start;
 
-		if (col == 0) {
-			for (int i = 0; i < yamm.listOfMails.length; i++) {
-				for (int j = 0; j < yamm.listOfMails.length; j++) {
-					int one = Integer.parseInt(yamm.listOfMails[yamm.keyIndex[i]][col]);
-					int two = Integer.parseInt(yamm.listOfMails[yamm.keyIndex[j]][col]);
+		for (int i = 0, j = num, k = start; i <= j; )
+			if (yamm.listOfMails[tmp[i]].from.compareTo(yamm.listOfMails[tmp[j]].from) <= 0)
+				yamm.keyIndex[k++] = tmp[i++];
+			else
+				yamm.keyIndex[k++] = tmp[j--];
+	}
 
-					if (one > two) {
-						temp = yamm.keyIndex[j];
-						yamm.keyIndex[j] = yamm.keyIndex[i];
-						yamm.keyIndex[i] = temp;
-					}
-				}
-			}
-		}  else {
-			for (int i = 0; i < yamm.listOfMails.length; i++) {
-				for (int j = 0; j < yamm.listOfMails.length; j++) {
-					String s1 = yamm.listOfMails[yamm.keyIndex[i]][col].toLowerCase();
-					String s2 = yamm.listOfMails[yamm.keyIndex[j]][col].toLowerCase();
+	void mergeSubject(int[] tmp, int start, int mid, int end) {
+		int num = end - start;
 
-					if (s1.toLowerCase().compareTo(s2.toLowerCase()) > 0) {
-						temp = yamm.keyIndex[j];
-						yamm.keyIndex[j] = yamm.keyIndex[i];
-						yamm.keyIndex[i] = temp;
-					}
-				}
-			}
-		}
-*/
+		for (int i = 0, j = num, k = start; i <= j; )
+			if (yamm.listOfMails[tmp[i]].subject.compareTo(yamm.listOfMails[tmp[j]].subject) <= 0)
+				yamm.keyIndex[k++] = tmp[i++];
+			else
+				yamm.keyIndex[k++] = tmp[j--];
+	}
+
+	void mergeDate(int[] tmp, int start, int mid, int end) {
+		int num = end - start;
+
+		for (int i = 0, j = num, k = start; i <= j; )
+			if (yamm.listOfMails[tmp[i]].date <= yamm.listOfMails[tmp[j]].date)
+				yamm.keyIndex[k++] = tmp[i++];
+			else
+				yamm.keyIndex[k++] = tmp[j--];
 	}
 
 	public void createPopup(JPopupMenu jpmenu) {
@@ -488,8 +432,16 @@ public class mainTable
 	}
 
 	public void sort() {
-		if (!firstSort) SortFirst(sortedCol);
-		else SortLast(sortedCol);
+		if (yamm.listOfMails != null) {
+			int[] tmp = new int[yamm.keyIndex.length];
+			mergeSort(tmp, 0, tmp.length-1, sortedCol);
+			if (!firstSort) {
+				System.arraycopy(yamm.keyIndex, 0, tmp, 0, tmp.length);
+				for (int i = 0; i < tmp.length; i++) {
+					yamm.keyIndex[i] = tmp[tmp.length-1-i];
+				}
+			}
+		}
 	}
 
 	public void update() {
@@ -671,7 +623,6 @@ public class mainTable
 			}
 			Arrays.sort(copyList);
 			Mailbox.copyMail(yamm.selectedbox, name, copyList);
-			update();
 			yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
 			int row = yamm.tree.getSelectedRow();
 			if (row != -1)
@@ -709,6 +660,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.45  2003/03/10 20:00:59  fredde
+ * sorting now done by a mergesort routine
+ *
  * Revision 1.44  2003/03/10 11:02:42  fredde
  * added sorting for datecolumn. check if row != -1 before fireTableRowsUpdated on the boxtree
  *
