@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Id: mainToolBar.java,v 1.19 2000/03/25 16:02:00 fredde Exp $
+ * @version $Id: mainToolBar.java,v 1.20 2000/04/01 20:50:09 fredde Exp $
  */
 public class mainToolBar extends JToolBar {
 
@@ -212,15 +212,15 @@ public class mainToolBar extends JToolBar {
 				String[] mail = Mailbox.getMailForReplyHeaders(
 							frame.selectedbox, skip);
 
-				if (!mail[2].startsWith(
+				if (!mail[3].startsWith(
 						YAMM.getString("mail.re")) &&
-						!mail[2].startsWith("Re:")) {
-					mail[2] = YAMM.getString("mail.re") +
-								" " + mail[2];
+						!mail[3].startsWith("Re:")) {
+					mail[3] = YAMM.getString("mail.re") +
+								" " + mail[3];
 				}
 
-				YAMMWrite yam = new YAMMWrite(mail[1], mail[2],
-								mail[0] +
+				YAMMWrite yam = new YAMMWrite(mail[2], mail[1],
+							mail[3], mail[0] +
 						YAMM.getString("mail.wrote") +
 									"\n");
 				Mailbox.getMailForReply(frame.selectedbox,
@@ -252,15 +252,15 @@ public class mainToolBar extends JToolBar {
 				String mail[] = Mailbox.getMailForReplyHeaders(
 							frame.selectedbox, skip);
 
-				if (!mail[2].startsWith(
+				if (!mail[3].startsWith(
 						YAMM.getString("mail.fwd")) &&
-						!mail[2].startsWith("Fwd:")) {
-					mail[2] = YAMM.getString("mail.fwd") +
-								" " + mail[2];
+						!mail[3].startsWith("Fwd:")) {
+					mail[3] = YAMM.getString("mail.fwd") +
+								" " + mail[3];
 				}
 
-				YAMMWrite yam = new YAMMWrite("", mail[2],
-								mail[0] +
+				YAMMWrite yam = new YAMMWrite("", mail[1],
+							mail[3], mail[0] +
 						YAMM.getString("mail.wrote") +
 									"\n");
 				Mailbox.getMailForReply(frame.selectedbox,
@@ -282,8 +282,7 @@ public class mainToolBar extends JToolBar {
 					}
 					pj.end();
 				}
-			}
-			else if(arg.equals(YAMM.getString(
+			} else if(arg.equals(YAMM.getString(
 						"button.exit.tooltip"))) {
 				frame.Exit();
 			}
@@ -293,6 +292,9 @@ public class mainToolBar extends JToolBar {
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.20  2000/04/01 20:50:09  fredde
+ * fixed to make the profiling system work
+ *
  * Revision 1.19  2000/03/25 16:02:00  fredde
  * the email was in the subjectfield when forwarding...
  *

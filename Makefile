@@ -26,6 +26,7 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/gui/confwiz/DebugConfTab.class \
 	org/gjt/fredde/yamm/gui/confwiz/ControlPanel.class \
 	org/gjt/fredde/yamm/gui/confwiz/ServerEditor.class \
+	org/gjt/fredde/yamm/gui/confwiz/ProfileEditor.class \
 	org/gjt/fredde/yamm/encode/Base64Decode.class \
 	org/gjt/fredde/yamm/encode/UUDecode.class \
 	org/gjt/fredde/yamm/encode/UUEncode.class \

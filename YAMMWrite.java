@@ -31,7 +31,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Id: YAMMWrite.java,v 1.20 2000/03/26 15:27:08 fredde Exp $
+ * @version $Id: YAMMWrite.java,v 1.21 2000/04/01 20:50:09 fredde Exp $
  */
 public class YAMMWrite extends JFrame {
 
@@ -41,10 +41,10 @@ public class YAMMWrite extends JFrame {
 	/** The textarea for writing in the message */
 	public JTextArea      myTextArea;
 
-	private JTextField  toField = new JTextField();
+	private JTextField  toField      = new JTextField();
 	private JTextField  subjectField = new JTextField();
-	private JTextField  ccField = new JTextField();
-	private JComboBox   fromField = new JComboBox();
+	private JTextField  ccField      = new JTextField();
+	private JComboBox   fromField; // new JComboBox();
 	private JList       myList;
 
 
@@ -52,7 +52,7 @@ public class YAMMWrite extends JFrame {
 	 * Creates a new empty mail with no subject and recipent
 	 */
 	public YAMMWrite() {
-		this("","","");
+		this("", "", "","");
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class YAMMWrite extends JFrame {
 	 * @param to The recipents address
 	 */
 	public YAMMWrite(String to) {
-		this(to, "","");
+		this(to, "", "","");
 	}
 
 	/**
@@ -70,10 +70,10 @@ public class YAMMWrite extends JFrame {
 	 * @param subject The subject
 	 */
 	public YAMMWrite(String to, String subject) {
-		this(to,subject,"");
+		this(to, "", subject, "");
 	}
 
-	public YAMMWrite(String to, String subject, String body) {
+	public YAMMWrite(String to, String from, String subject, String body) {
 		super(subject);
 
 		setBounds(
@@ -155,11 +155,21 @@ public class YAMMWrite extends JFrame {
 		myLabel.setMinimumSize(size);
 		fields.add(myLabel);
 
+		fromField = new JComboBox(YAMM.profiler.getProfileList());
 		fromField.setMaximumSize(new Dimension(1200, height));
 		fromField.setMinimumSize(new Dimension(75, height));
 		fromField.setFont(toField.getFont());
 		fromField.setEditable(true);
 		fields.add(fromField);
+
+		if (!from.equals("")) {
+			String prof = YAMM.profiler.getProfileString(from);
+
+			fromField.addItem(from);
+			fromField.setSelectedItem(prof);
+		} else {
+			fromField.setSelectedIndex(YAMM.profiler.getDefault());
+		}
 
 		vert3.add(fields);
 		fields = Box.createHorizontalBox();
@@ -198,22 +208,8 @@ public class YAMMWrite extends JFrame {
 		myTextArea = new JTextArea();
 		myTextArea.setText(body);
 
-		if (YAMM.getProperty("signatur") != null &&
-				!YAMM.getProperty("signatur").equals("")) {
-			try {
-				FileInputStream in = new FileInputStream(
-						YAMM.getProperty("signatur"));
-				String tmp = null;
-				byte[] singb = new byte[in.available()];
-
-				in.read(singb);
-				myTextArea.append(new String(singb));  
-				in.close();
-			} catch (IOException ioe) {
-				new ExceptionDialog(YAMM.getString("msg.error"),
-							ioe,
-							YAMM.exceptionNames);
-			}
+		if (body.equals("")) {
+			sign();
 		}
 
 		JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
@@ -276,6 +272,35 @@ public class YAMMWrite extends JFrame {
 
 		addWindowListener(new FLyssnare());
 		show();
+	}
+
+	public void sign() {
+		FileInputStream in = null;
+		Profile prof = YAMM.profiler.getProfileFor(fromField.getSelectedItem().toString());
+
+		if (prof == null || prof.sign == null || prof.sign.trim().equals("")) {
+			return;
+		}
+
+		try {
+			in = new FileInputStream(YAMM.getProperty("signatur"));
+			String tmp = null;
+			byte[] singb = new byte[in.available()];
+
+			in.read(singb);
+			myTextArea.append(new String(singb));  
+			in.close();
+		} catch (IOException ioe) {
+			new ExceptionDialog(YAMM.getString("msg.error"),
+						ioe,
+						YAMM.exceptionNames);
+		} finally {
+			try {
+				if (in != null) {
+					in.close();
+				}
+			} catch (IOException ioe) {}
+		}
 	}
 
 	boolean isSendReady() {
@@ -603,6 +628,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.21  2000/04/01 20:50:09  fredde
+ * fixed to make the profiling system work
+ *
  * Revision 1.20  2000/03/26 15:27:08  fredde
  * added cc- and fromfields among other fixes
  *

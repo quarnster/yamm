@@ -20,23 +20,53 @@ package org.gjt.fredde.yamm;
 /**
  * The profile class
  * @author Fredrik Ehnbom
- * @version $Id: Profile.java,v 1.1 2000/03/26 15:26:00 fredde Exp $
+ * @version $Id: Profile.java,v 1.2 2000/04/01 20:50:09 fredde Exp $
  */
 public class Profile {
 
+	/**
+	 * This profiles name
+	 */
 	public String name;
+
+	/**
+	 * This profiles email-address
+	 */
 	public String email;
+
+	/**
+	 * This profiles reply-address
+	 */
 	public String reply;
+
+	/**
+	 * This profiles signatur
+	 */
 	public String sign;
 
+	/**
+	 * Creates a new empty profile
+	 */
 	public Profile() {
 		this("", "", "", "");
 	}
 
+	/**
+	 * Creates a new profile with the specified name and email
+	 * @param name The name for the profile
+	 * @param email The email for the profile
+	 */
 	public Profile(String name, String email) {
 		this(name, email, "", "");
 	}
 
+	/**
+	 * Creates a new profile
+	 * @param name The name for the profile
+	 * @param email The email for the profile
+	 * @param reply The reply-address for the profile
+	 * @param sign The signatur for the profile
+	 */
 	public Profile(String name, String email, String reply, String sign) {
 		this.name = name;
 		this.email = email;
@@ -47,6 +77,9 @@ public class Profile {
 /*
  * Changes:
  * $Log: Profile.java,v $
+ * Revision 1.2  2000/04/01 20:50:09  fredde
+ * fixed to make the profiling system work
+ *
  * Revision 1.1  2000/03/26 15:26:00  fredde
  * Files for the new profiling system
  *

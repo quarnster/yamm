@@ -1,4 +1,4 @@
-/*  IdentitiesConfTab.java - The configurationtab for identitiessettings
+/*  IdentitiesConfTab.java - The configurationtab for the profiles
  *  Copyright (C) 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -19,118 +19,176 @@ package org.gjt.fredde.yamm.gui.confwiz;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.net.*;
+import java.io.*;
+import java.util.Properties;
+import java.util.Vector;
 import javax.swing.*;
+import javax.swing.table.*;
 
+import org.gjt.fredde.util.gui.ExceptionDialog;
+import org.gjt.fredde.yamm.Profile;
 import org.gjt.fredde.yamm.YAMM;
 
 /**
- * The configurationtab for the identitessettings
- * @author Fredrik Ehnbom
- * @version $Id: IdentitiesConfTab.java,v 1.2 2000/03/18 17:07:13 fredde Exp $
+ * The configurationtab for the profiles
+ * @author Fredrik Ehnbom <fredde@gjt.org>
+ * @version $Id: IdentitiesConfTab.java,v 1.3 2000/04/01 20:51:21 fredde Exp $
  */
 public class IdentitiesConfTab extends JPanel {
 
 	/**
-	 * The name textfield
+	 * The profilelist in Vector form
 	 */
-	private JTextField name;
+	private Vector vect2 = new Vector();
 
 	/**
-	 * The email textfield
+	 * The list of profiles
 	 */
-	private JTextField email;
+	private JList profileList = null;
 
 	/**
-	 * The signature textfield
+	 * The parent JDialog
 	 */
-	private JTextField signatur;
+	private JDialog frame;
 
 	/**
-	 * Creates a new IdentitesConfTab
+	 * Creates a new IdentitiesConfTab
 	 */
-	public IdentitiesConfTab() {
-		super(new GridLayout(6, 1, 2, 2));
+	public IdentitiesConfTab(JDialog frame) {
+		super(new BorderLayout());
 
-		add(new JLabel(YAMM.getString("options.name") + ":"));
+		this.frame = frame;
+		Box vert = Box.createVerticalBox();
+    
+		JButton b = new JButton(YAMM.getString("button.add"), new ImageIcon(getClass().getResource("/images/buttons/new.gif")));
+		b.addActionListener(BListener);
+		vert.add(b);
+		vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-		name = new JTextField(YAMM.getProperty("username", System.getProperty("user.name")));
-		name.setMaximumSize(new Dimension(400, 20));
-		name.setMinimumSize(new Dimension(200, 20));
-		name.addFocusListener(new FocusAdapter() {
-			public void focusLost(FocusEvent e) {
-				YAMM.setProperty("username", name.getText());
-			}
-		});
-		add(name);
+		b = new JButton(YAMM.getString("edit"), new ImageIcon(getClass().getResource("/images/buttons/edit.gif")));
+		b.addActionListener(BListener);
+		vert.add(b);
+		vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-		String host;
-		try {
-			host = InetAddress.getLocalHost().getHostName();
-		} catch(UnknownHostException uhe) {
-			host = "unknown.org";
+		b = new JButton(YAMM.getString("button.delete"), new ImageIcon(getClass().getResource("/images/buttons/delete.gif")));
+		b.addActionListener(BListener);
+		vert.add(b);
+		vert.add(Box.createRigidArea(new Dimension(10, 10)));
+
+		Vector vect1 = new Vector();
+
+		Profile[] profiles = YAMM.profiler.getProfiles();
+
+		for (int i = 0; i < profiles.length; i++) {
+			vect1.add(profiles[i].email);
+			vect1.add("" + i);
+			vect2.add(vect1);
+			vect1 = new Vector();
 		}
 
-		add(new JLabel("Email:"));
-
-		email = new JTextField(YAMM.getProperty("email", System.getProperty("user.name") + "@" + host));
-		email.setMaximumSize(new Dimension(400, 20));
-		email.setMinimumSize(new Dimension(200, 20));
-		email.addFocusListener(new FocusAdapter() {
-			public void focusLost(FocusEvent e) {
-				YAMM.setProperty("email", email.getText());
+		ListModel dataModel = new AbstractListModel() {
+			public int getSize() {
+				return vect2.size();
 			}
-		});
-		add(email);
+			public Object getElementAt(int index) {
+				return ((Vector)vect2.elementAt(index)).elementAt(0);
+			}
+		};
+
+		profileList = new JList(dataModel);
+
+		JScrollPane JSPane = new JScrollPane(profileList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		JSPane.setMaximumSize(new Dimension(300,300));
+		JSPane.setMinimumSize(new Dimension(300,300));
+
+		add("Center", JSPane);
+		add("East", vert);
+
+		ComboBoxModel cmodel = new DefaultComboBoxModel() {
+			public int getSize() {
+				return vect2.size();
+			}
+			public Object getElementAt(int index) {
+				return ((Vector)vect2.elementAt(index)).elementAt(0);
+			}
+		};
 
 		Box hori = Box.createHorizontalBox();
 
-		add(new JLabel(YAMM.getString("options.signatur") + ":"));
-		signatur = new JTextField();
-		signatur.setMaximumSize(new Dimension(400, 90));
-		signatur.setMinimumSize(new Dimension(190, 90));
-		signatur.addFocusListener(new FocusAdapter() {
-			public void focusLost(FocusEvent e) {
-				YAMM.setProperty("signatur", signatur.getText());
+		final JComboBox def = new JComboBox(cmodel);
+		def.setSelectedIndex(YAMM.profiler.getDefault());
+		def.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				YAMM.profiler.props.setProperty("profile.default", "" + def.getSelectedIndex());
+				YAMM.profiler.save();
 			}
 		});
-		signatur.setText(YAMM.getProperty("signatur"));
-
-		hori.add(signatur);
-
-		hori.add(Box.createRigidArea(new Dimension(5, 5)));
-
-		JButton b = new JButton(YAMM.getString("button.browse"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
-		b.setMaximumSize(new Dimension(230, 1000)); 
-		b.setMinimumSize(new Dimension(115, 1000));
-		b.addActionListener(BListener);                                    
-		hori.add(b);
-		add(hori);
+		hori.add(new JLabel("confwiz.ident.default"));
+		hori.add(def);
+		add("South", hori);
 	}
 
-	private ActionListener BListener = new ActionListener() {
+	/**
+	 * The ActionListener for the buttons
+	 */
+	ActionListener BListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser jfs = new JFileChooser();
-			jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			jfs.setMultiSelectionEnabled(false);
-			int ret = jfs.showOpenDialog(IdentitiesConfTab.this);
+			String text = ((JButton) e.getSource()).getText();
 
-			if (ret == JFileChooser.APPROVE_OPTION) {
-				if (jfs.getSelectedFile() != null) {
-					signatur.setText(jfs.getSelectedFile().toString());
-					YAMM.setProperty("signatur", jfs.getSelectedFile().toString());
+			int idx = profileList.getSelectedIndex();
+
+			if (text.equals(YAMM.getString("button.add"))) {
+				ProfileEditor s = new ProfileEditor(frame);
+	
+				if (s.changed) {
+
+					vect2.clear();
+					Vector vect1 = new Vector();
+
+					Profile[] profiles = YAMM.profiler.getProfiles();
+
+					for (int i = 0; i < profiles.length; i++) {
+						vect1.add(profiles[i].email);
+						vect1.add("" + i);
+						vect2.add(vect1);
+						vect1 = new Vector();
+					}
+
+					profileList.updateUI();
 				}
+			} else if (text.equals(YAMM.getString("edit")) && idx != -1) {
+				String file = ((Vector) vect2.elementAt(idx)).elementAt(1).toString();
+
+				ProfileEditor s = new ProfileEditor(frame, file);
+				if (s.changed) {
+
+					vect2.clear();
+					Vector vect1 = new Vector();
+					Profile[] profiles = YAMM.profiler.getProfiles();
+
+					for (int i = 0; i < profiles.length; i++) {
+						vect1.add(profiles[i].email);
+						vect1.add("" + i);
+						vect2.add(vect1);
+						vect1 = new Vector();
+					}
+
+					profileList.updateUI();
+				}
+			} else if (idx != -1) {
+				profileList.setSelectedIndex(-1);
+				String file = ((Vector) vect2.elementAt(idx)).elementAt(1).toString();
+				YAMM.profiler.remove(file);
+				vect2.remove(idx);
+				profileList.updateUI();
 			}
 		}
 	};
 }
 /*
- * Changes:
+ * ChangeLog:
  * $Log: IdentitiesConfTab.java,v $
- * Revision 1.2  2000/03/18 17:07:13  fredde
- * Now works...
- *
- * Revision 1.1  2000/02/28 13:49:33  fredde
- * files for the configuration wizard
+ * Revision 1.3  2000/04/01 20:51:21  fredde
+ * fixed to make the profiling system work
  *
  */

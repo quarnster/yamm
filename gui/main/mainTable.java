@@ -39,7 +39,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * The Table for listing the mails subject, date and sender.
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.29 2000/03/25 15:46:24 fredde Exp $
+ * @version $Id: mainTable.java,v 1.30 2000/04/01 20:50:09 fredde Exp $
  */
 public class mainTable extends JTable implements DragGestureListener,
 							DragSourceListener {
@@ -690,15 +690,15 @@ public class mainTable extends JTable implements DragGestureListener,
 						frame.selectedbox, skip);
 
 
- 				if (!mail[2].startsWith(
+ 				if (!mail[3].startsWith(
 						YAMM.getString("mail.re")) &&
-						!mail[2].startsWith("Re:")) {
-					mail[2] = YAMM.getString("mail.re") +
-								" " + mail[2];
+						!mail[3].startsWith("Re:")) {
+					mail[3] = YAMM.getString("mail.re") +
+								" " + mail[3];
 				}
 
-				YAMMWrite yam = new YAMMWrite(mail[1], mail[2],
-						mail[0] +
+				YAMMWrite yam = new YAMMWrite(mail[2], mail[1],
+							mail[3], mail[0] +
 						YAMM.getString("mail.wrote") +
 						"\n");
 
@@ -784,6 +784,9 @@ public class mainTable extends JTable implements DragGestureListener,
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.30  2000/04/01 20:50:09  fredde
+ * fixed to make the profiling system work
+ *
  * Revision 1.29  2000/03/25 15:46:24  fredde
  * uses the new getMailForReplyHeaders method
  *

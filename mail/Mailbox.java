@@ -28,7 +28,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.32 2000/03/25 15:46:52 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.33 2000/04/01 20:50:09 fredde Exp $
  */
 public class Mailbox {
 
@@ -162,8 +162,10 @@ public class Mailbox {
 				date    = mhp.getHeaderField("Date");
 				status  = mhp.getHeaderField("YAMM-Status");
 
-				if (status == null)
+				if (status == null) {
 					status = "Unread";
+					unread++;
+				}
 				if (from == null)
 					from = "";
 				if (subject == null)
@@ -754,6 +756,7 @@ public class Mailbox {
 		String  finalFrom = "";
 		String  email = null;
 		String  subject = null;
+		String  to = null;
 
 		BufferedReader in = null;
 
@@ -797,13 +800,19 @@ public class Mailbox {
 						finalFrom += email + " ";
 					}
 				}
-				if (from.trim().equals("")) {
-					from = email;
+				if (finalFrom.trim().equals("")) {
+					finalFrom = email + " ";
 				}
 			}
 
 			if (subject == null) {
 				subject = "";
+			}
+
+			to = mhp.getHeaderField("To");
+
+			if (to == null) {
+				to = "";
 			}
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
@@ -817,6 +826,7 @@ public class Mailbox {
 
 		String[] ret = {
 				finalFrom,
+				to,
 				email,
 				subject
 		};
@@ -1409,6 +1419,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.33  2000/04/01 20:50:09  fredde
+ * fixed to make the profiling system work
+ *
  * Revision 1.32  2000/03/25 15:46:52  fredde
  * updated the getMailForReplyHeaders method
  *

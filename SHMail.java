@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom
- * @version $Id: SHMail.java,v 1.24 2000/03/18 17:43:03 fredde Exp $
+ * @version $Id: SHMail.java,v 1.25 2000/04/01 20:50:09 fredde Exp $
  */
 public class SHMail extends Thread {
 
@@ -187,7 +187,7 @@ public class SHMail extends Thread {
 					if (temp == null) break;
 
 					if (temp.startsWith("From:")) {
-						smtp.from(temp.substring(temp.indexOf("<") + 1, temp.indexOf(">")));
+						smtp.from(MessageParser.parseLink(temp)[1]);
 						from2 = temp;
 						if (sent) out.println(from2);
 					} else if (temp.startsWith("To:")) {
@@ -286,6 +286,9 @@ public class SHMail extends Thread {
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.25  2000/04/01 20:50:09  fredde
+ * fixed to make the profiling system work
+ *
  * Revision 1.24  2000/03/18 17:43:03  fredde
  * forgot a ")"... ofcourse...
  *

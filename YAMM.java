@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * The big Main-class of YAMM
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.45 2000/03/18 17:36:20 fredde Exp $
+ * @version $Id: YAMM.java,v 1.46 2000/04/01 20:50:09 fredde Exp $
  */
 public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
@@ -62,7 +62,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	public static String version  = "0.7.5";
 
 	/** The compileDate of YAMM */
-	public static String compDate = Utilities.cvsToDate("$Date: 2000/03/18 17:36:20 $");
+	public static String compDate = Utilities.cvsToDate("$Date: 2000/04/01 20:50:09 $");
 
 	/** the file that contains the current mail */
 	public String mailPageString = "file:///" + home + "/tmp/cache/";
@@ -111,6 +111,11 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 	public static String[] exceptionNames = null;
 
 	public static PrintStream debug = null;
+
+	/**
+	 * The profile manager
+	 */
+	public static Profiler profiler = null;
 
 	/**
 	 * Returns the translated string.
@@ -554,16 +559,18 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			firstRun = true;
 
 			try {
-				(new File(home + "/servers")).mkdirs();
-				(new File(home + "/boxes")).mkdirs();
-				(new File(home + "/.config")).createNewFile();
-				(new File(home + "/.filters")).createNewFile();
-				(new File(home + "/tmp")).mkdirs();
+				new File(home + "/servers").mkdirs();
+				new File(home + "/boxes").mkdirs();
+				new File(home + "/.config").createNewFile();
+				new File(home + "/.profiles").createNewFile();
+				new File(home + "/.filters").createNewFile();
+				new File(home + "/tmp").mkdirs();
 			} catch (IOException ioe) {
 				ioe.printStackTrace();
 				System.exit(1);
 			}
 		}
+
 
 		try {             
 			InputStream in = new FileInputStream(home + "/.config");
@@ -573,6 +580,32 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			propsioe.printStackTrace();
 			System.exit(1);
 		}
+
+		// convert the old profile format to the new
+		if (new File(home + "/.config").exists() && !new File(home + "/.profiles").exists()) {
+			OutputStream out = null;
+			Properties newProps = new Properties();
+
+			newProps.setProperty("profile.num", "1");
+			newProps.setProperty("profile.0.name", props.getProperty("username"));
+			newProps.setProperty("profile.0.email", props.getProperty("email"));
+			newProps.setProperty("profile.0.sign", props.getProperty("signatur"));
+
+			try {
+				out = new FileOutputStream(home + "/.profiles");
+
+				newProps.store(out, "YAMM profiles");
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			} finally {
+				try {
+					if (out != null) {
+						out.close();
+					}
+				} catch (IOException ioe) {}
+			}
+		}
+
 		Locale l = Locale.getDefault();
 		String resLanguage = l.getLanguage();
 		String resCountry = l.getCountry();
@@ -633,7 +666,6 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
 		exceptionNames = tmp;
 
-
 		if (firstRun) {
 			try {
 				String user = System.getProperty("user.name");
@@ -682,6 +714,7 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 			text = false;
 		}
 
+		profiler = new Profiler();
 		nFrame = new YAMM();
 		nFrame.setTitle("Yet Another Mail Manager " + version);
 		if (splash != null) splash.dispose();
@@ -691,6 +724,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.46  2000/04/01 20:50:09  fredde
+ * fixed to make the profiling system work
+ *
  * Revision 1.45  2000/03/18 17:36:20  fredde
  * changed the version form cvs-tag to 0.7.5....
  *
