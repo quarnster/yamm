@@ -1,3 +1,14 @@
+0.8.1:
+	Added:
+		-Nicer looking "message-info" panel
+		-You can drop files in the write attachment list from your desktop
+		-You can drag files from the mail attachment list to your desktop
+
+	Fixed:
+		-Shows name of textfile-attachments that are inlined
+		-The *.index files are no longer shown when choosing browse
+		 in the filter configuration dialog
+
 0.8:
 	Added:
 		-Spanish translation thanks to Rafael Escovar
