@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.38 2003/03/05 15:07:02 fredde Exp $
+ * @version $Id: mainTable.java,v 1.39 2003/03/08 13:55:41 fredde Exp $
  */
 public class mainTable
 	extends JTable
@@ -58,7 +58,7 @@ public class mainTable
 	private final AbstractTableModel dataModel = new AbstractTableModel() {
 		private final String headername[] = {
 	        	"#",
-				YAMM.getString("table.subject"),
+			YAMM.getString("table.subject"),
 		        YAMM.getString("table.from"),
 	        	YAMM.getString("table.date")
 		};
@@ -482,10 +482,9 @@ public class mainTable
 
 							Mailbox.setStatus(frame, frame.selectedbox, getSelectedMessage(), skip, "Read");
 
-							sort();
-							dataModel.fireTableRowsUpdated(row, row);
-//							update();
-							frame.tree.updateUI();
+							update();
+							frame.tree.unreadTable.put(frame.selectedbox, Mailbox.getUnread(frame.selectedbox));
+							frame.tree.dataModel.fireTableDataChanged();
 							setEditingRow(row);
 						}
 					}
@@ -559,7 +558,8 @@ public class mainTable
 				Mailbox.updateIndex(frame.selectedbox);
 				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")));
 				update();
-				frame.tree.updateUI();
+				frame.tree.unreadTable.put(frame.selectedbox, Mailbox.getUnread(frame.selectedbox));
+				frame.tree.dataModel.fireTableDataChanged();
 
 				if (frame.listOfMails.length < 0) {
 					return;
@@ -605,7 +605,8 @@ public class mainTable
 				Mailbox.updateIndex(frame.selectedbox);
 				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")));
 				update();
-				frame.tree.updateUI();
+				frame.tree.unreadTable.put(frame.selectedbox, Mailbox.getUnread(frame.selectedbox));
+				frame.tree.dataModel.fireTableDataChanged();
 
 				changeButtonMode(false);
 				clearSelection();
@@ -641,14 +642,6 @@ public class mainTable
 	private ActionListener KMListener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 			String name = ((extMItem)ae.getSource()).getFullName();
-			int i = 0;
-
-			while (i < 4) {
-				if (getColumnName(i).equals("#")) {
-					break;
-				}
-				i++;
-			}
 
 			if (getSelectedRow() == -1) {
 				return;
@@ -658,13 +651,14 @@ public class mainTable
 			int[] copyList = new int[mlist.length];
 
 			for (int j = 0; j < mlist.length; j++) {
-				copyList[j] = Integer.parseInt(getValueAt(mlist[j], i).toString());
+				copyList[j] = frame.keyIndex[mlist[j]];
 			}
 			Arrays.sort(copyList);
 			Mailbox.copyMail(frame.selectedbox, name, copyList);
 			Mailbox.updateIndex(name);
 			update();
-			frame.tree.updateUI();
+			frame.tree.unreadTable.put(frame.selectedbox, Mailbox.getUnread(frame.selectedbox));
+			frame.tree.dataModel.fireTableDataChanged();
 		}
 	};
 
@@ -672,14 +666,6 @@ public class mainTable
 		public void actionPerformed(ActionEvent ae) {
 			String name = ((extMItem)ae.getSource()).getFullName();
 
-			int i = 0;
-
-			while (i < 4) {
-				if (getColumnName(i).equals("#")) {
-					break;
-				}
-				i++;
-			}
 
 			if (getSelectedRow() == -1) {
 				return;
@@ -689,7 +675,7 @@ public class mainTable
 			int[] moveList = new int[mlist.length];
 
 			for (int j = 0; j < mlist.length; j++) {
-				moveList[j] = Integer.parseInt(getValueAt(mlist[j], i).toString());
+				moveList[j] = frame.keyIndex[mlist[j]];
 			}
 
 			Arrays.sort(moveList);
@@ -697,13 +683,17 @@ public class mainTable
 			Mailbox.createList(frame.selectedbox, frame);
 			Mailbox.updateIndex(name);
 			update();
-			frame.tree.updateUI();
+			frame.tree.unreadTable.put(frame.selectedbox, Mailbox.getUnread(frame.selectedbox));
+			frame.tree.dataModel.fireTableDataChanged();
 		}
 	};
 }
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.39  2003/03/08 13:55:41  fredde
+ * updated for the new TreeTable stuff
+ *
  * Revision 1.38  2003/03/05 15:07:02  fredde
  * Now uses YAMM.keyIndex. Uses a thread to update Mailstatus for previously unread mail.
  *

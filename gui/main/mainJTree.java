@@ -1,5 +1,5 @@
-/*  mainJTree.java - The JTree for the main-window
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+/*  $Id: mainJTree.java,v 1.27 2003/03/08 13:55:41 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,26 +29,74 @@ import java.io.File;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.tree.*;
+import javax.swing.table.*;
 import javax.swing.event.*;
 import org.gjt.fredde.yamm.Utilities;
 import org.gjt.fredde.yamm.YAMM;
 import org.gjt.fredde.yamm.mail.Mailbox;
-import org.gjt.fredde.yamm.gui.BoxTreeRenderer;
+import org.gjt.fredde.yamm.gui.*;
 import org.gjt.fredde.util.gui.*;
 
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Id: mainJTree.java,v 1.26 2000/12/26 11:22:55 fredde Exp $
+ * @version $Revision: 1.27 $
  */
-public class mainJTree extends JTree implements DropTargetListener {
+public class mainJTree
+	extends JTable
+//	implements DropTargetListener
+{
 
 	private JPopupMenu treepop;
 	private DefaultMutableTreeNode top = new DefaultMutableTreeNode(YAMM.getString("box.boxes"));
 	private static YAMM frame;
 	private static mainToolBar tbar;
-	private DefaultTreeModel tm;
 	private boolean sentbox = false;
+	private TreeTableCellRenderer tree;
+
+	protected Hashtable unreadTable = new Hashtable();
+
+	protected final AbstractTableModel dataModel = new AbstractTableModel() {
+		private final String headername[] = {
+	        	"box",
+			"unread"
+		};
+
+		public final int getColumnCount() {
+	        	return 2;
+		}
+
+		public final int getRowCount() {
+			return tree.getRowCount();
+		}
+
+		protected TreeNode nodeForRow(int row) {
+			TreePath treePath = tree.getPathForRow(row);
+			return (TreeNode)treePath.getLastPathComponent();
+		}
+
+		public Object getValueAt(int row, int column) {
+			TreeNode node = nodeForRow(row);
+
+			if (column == 1) {
+				int[] s = (int[]) unreadTable.get(node.toString());
+				if (s == null) return "";
+				return s[1] + " ";
+			} else return node;
+		}
+
+		public final boolean isCellEditable(int col) {
+			return false;
+		}
+
+		public final String getColumnName(int column) {
+			return headername[column];
+		}
+		public final Class getColumnClass(int column) {
+			if (column == 0) return TreeTableCellRenderer.class;
+			else return int.class;
+		}
+	};
 
 	/**
 	 * Creates the tree and adds all the treestuff to the tree.
@@ -60,66 +108,47 @@ public class mainJTree extends JTree implements DropTargetListener {
 		this.frame = frame2;
 		this.tbar = tbar2;
 		sentbox = YAMM.getProperty("sentbox", "true").equals("true");
-
+/*
 		new DropTarget(this, // component
 				DnDConstants.ACTION_COPY_OR_MOVE, // actions
 				this); //DropTargetListener
+*/ 
+		setModel(dataModel);
 
-		tm = new DefaultTreeModel(top);
-		setModel(tm);
-		BoxTreeRenderer rend = new BoxTreeRenderer();
-		rend.setFont(new Font("SansSerif", Font.PLAIN, 12));
-		setCellRenderer(rend); //new myTreeRenderer());
-		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		addMouseListener(mouseListener2);
+		setColumnSelectionAllowed(false);
+		setShowHorizontalLines(false);
+		setShowVerticalLines(false);
+		setIntercellSpacing(new Dimension(0, 0));
 
-		addTreeSelectionListener(new TreeSelectionListener() {
-			public void valueChanged(TreeSelectionEvent e) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode)(e.getPath().getLastPathComponent());
+		TableColumn column = getColumnModel().getColumn(1);
+		column.setIdentifier("num");
+		column.setMinWidth(5);
+		column.setMaxWidth(50);
+		column.setPreferredWidth(50);
 
-				if (!(node.toString()).equals(YAMM.getString("box.boxes"))) {
-					File box = new File(node.toString());
-
-					if (node.toString().equals("deleted") || !box.exists()) {
-						frame.selectedbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox"));
-						Mailbox.createList(frame.selectedbox, frame);
-						frame.mailList.clearSelection();
-						frame.mailList.update();
-					} else if (!box.isDirectory()) {
-						frame.selectedbox = node.toString();
-						Mailbox.createList(frame.selectedbox, frame);
-						frame.mailList.clearSelection();
-						frame.mailList.update();
-					}
-				}
-
-				if ( ((mainTable)frame.mailList).getSelectedRow() != -1 &&
-						!(((JTable)frame.mailList).getSelectedRow() >= frame.listOfMails.length)) {
-					tbar.reply.setEnabled(true);
-					tbar.forward.setEnabled(true);
-					//tbar.print.setEnabled(true);
-				} else {
-					tbar.reply.setEnabled(false);
-					tbar.forward.setEnabled(false);
-					//tbar.print.setEnabled(false);
-				}
+//		BoxTreeRenderer rend = new BoxTreeRenderer();
+//		setCellRenderer(rend); //new myTreeRenderer());
+		tree = new TreeTableCellRenderer(this);
+		tree.setModel(new DefaultTreeModel(top));
+		BoxTreeRenderer brend = new BoxTreeRenderer();
+		brend.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		tree.setCellRenderer(brend);
+		updateNodes();
+		setDefaultRenderer(TreeTableCellRenderer.class, tree);
+		DefaultTableCellRenderer rend = new DefaultTableCellRenderer();
+		rend.setHorizontalAlignment(JLabel.RIGHT);
+		setDefaultRenderer(int.class, rend);
+		tree.setSelectionModel(new DefaultTreeSelectionModel() {
+			// Extend the implementation of the constructor, as if:
+			/* public this() */ {
+				setSelectionModel(listSelectionModel);
 			}
 		});
 
-		updateNodes();
-//		String sep = YAMM.sep;
-/*
-		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox")))));
-		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox")))));
 
-		if (sentbox) {
-			top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.sent")))));
-		}
+		getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		addMouseListener(mouseListener2);
 
-		createNodes(top, new File(Utilities.replace(YAMM.home + "/boxes/")));
-		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")))));
-		expandRow(0);
-*/
 		treepop = new JPopupMenu("Test");
 		treepop.setInvoker(this);
 
@@ -140,12 +169,14 @@ public class mainJTree extends JTree implements DropTargetListener {
 		mi.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		mi.addActionListener(treepoplistener);
 		treepop.add(mi);
+		tree.setRowHeight(getRowHeight());
 	}
 
 	/**
 	 * Updates the box list
 	 */
 	public void updateNodes() {
+		unreadTable.clear();
 		top.removeAllChildren();
 		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox")))));
 		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox")))));
@@ -158,9 +189,9 @@ public class mainJTree extends JTree implements DropTargetListener {
 		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")))));
 
 		updateUI();
-		expandRow(0);
+		tree.expandRow(0);
 	}
-
+/*
 	public void drop(DropTargetDropEvent e) {
 		try {
 			DataFlavor stringFlavor = DataFlavor.stringFlavor;
@@ -223,12 +254,11 @@ public class mainJTree extends JTree implements DropTargetListener {
 			frame.mailList.updateUI();
 		}
 	}
-
+*/
 
 	public void createNodes(DefaultMutableTreeNode top, File f) {
 		DefaultMutableTreeNode dir = null;
 		DefaultMutableTreeNode box  = null;
-//		String sep = YAMM.sep;
 		String home = YAMM.home;
 
 		if ((f.toString()).equals(Utilities.replace(home + "/boxes"))) {
@@ -245,14 +275,19 @@ public class mainJTree extends JTree implements DropTargetListener {
 			for (int i = 0; i < list.length; i++) {
 				createNodes(dir, new File(f, list[i]));
 			}
-		} else if (	!(f.toString()).equals(Utilities.replace(home + "/boxes/" + YAMM.getString("box.outbox"))) &&
+		} else {
+			if (	!(f.toString()).equals(Utilities.replace(home + "/boxes/" + YAMM.getString("box.outbox"))) &&
 				!(f.toString()).equals(Utilities.replace(home +	"/boxes/" + YAMM.getString("box.trash"))) &&
 				!(f.toString()).equals(Utilities.replace(home + "/boxes/" + YAMM.getString("box.inbox"))) &&
 				!(f.toString()).equals(Utilities.replace(home + "/boxes/" + YAMM.getString("box.sent"))) &&
-				 (f.toString()).indexOf(File.separator + ".", (f.toString()).indexOf("boxes")) == -1) {
-
-			box = new DefaultMutableTreeNode(f);
-			top.add(box);
+				 (f.toString()).indexOf(File.separator + ".", (f.toString()).indexOf("boxes")) == -1)
+			{
+				box = new DefaultMutableTreeNode(f);
+				top.add(box);
+			}
+			if ((f.toString()).indexOf(File.separator + ".", (f.toString()).indexOf("boxes")) == -1) {
+				unreadTable.put(f.toString(), Mailbox.getUnread(f.toString()));
+			}
 		}
 	}
 
@@ -264,77 +299,33 @@ public class mainJTree extends JTree implements DropTargetListener {
 				new NewBoxDialog(frame);
 			} else if (kommando.equals(YAMM.getString("tree.new.group"))) {
 				new NewGroupDialog(frame);
-			} else {
-				if (getLastSelectedPathComponent() != null) {
-					File del = new File(getLastSelectedPathComponent().toString());
+			} else 	if (getSelectedRow() != -1) {
+				File del = new File(tree.getPathForRow(getSelectedRow()).getLastPathComponent().toString());
 
-					if (!del.isDirectory() && del.exists()) {
-						String file = getLastSelectedPathComponent().toString();
-//						String sep  = YAMM.sep;
+				if (!del.isDirectory() && del.exists()) {
+					String file = del.toString();
 
-						if (		!file.endsWith(Utilities.replace("/" + YAMM.getString("box.inbox"))) &&
-								!file.endsWith(Utilities.replace("/" + YAMM.getString("box.outbox"))) &&
-								!file.endsWith(Utilities.replace("/" + YAMM.getString("box.sent"))) &&
-								!file.endsWith(Utilities.replace("/" + YAMM.getString("box.trash")))) {
+					if (		!file.endsWith(Utilities.replace("/" + YAMM.getString("box.inbox"))) &&
+							!file.endsWith(Utilities.replace("/" + YAMM.getString("box.outbox"))) &&
+							!file.endsWith(Utilities.replace("/" + YAMM.getString("box.sent"))) &&
+							!file.endsWith(Utilities.replace("/" + YAMM.getString("box.trash")))) {
 
-							frame.selectedbox = "deleted";
-							del.delete();
-							updateNodes();
-/*
-							top.removeAllChildren();
+						frame.selectedbox = "deleted";
+						del.delete();
+						updateNodes();
 
-							top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-								+ YAMM.getString("box.inbox"))));
-							top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-								+ YAMM.getString("box.outbox"))));
-
-							if (sentbox) {
-								top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-									+ YAMM.getString("box.sent"))));
-							}
-
-							createNodes(top, new File(YAMM.home + "/boxes/"));
-							top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-								+ YAMM.getString("box.trash"))));
-
-							updateUI();
-
-							expandRow(0);
-*/
-							frame.mailList.popup = new JPopupMenu();
-							frame.mailList.popup.setInvoker(frame.mailList);
-							frame.mailList.createPopup(((mainTable)frame.mailList).popup);
-						}
-					} else if(del.exists()) {
-						if (!del.delete()) {
-							Object[] args = {del.toString()};
-							new MsgDialog(frame, YAMM.getString("msg.error"),
-								YAMM.getString("msg.file.delete-dir", args));
-						} else {
-							frame.selectedbox = "deleted";
-							updateNodes();
-/*
-							top.removeAllChildren();
-
-							top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-									+ YAMM.getString("box.inbox"))));
-							top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-								+ YAMM.getString("box.outbox"))));
-
-							if (sentbox) {
-								top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-									+ YAMM.getString("box.sent"))));
-							}
-
-							createNodes(top, new File(YAMM.home + "/boxes/"));
-							top.add(new DefaultMutableTreeNode(new File(YAMM.home + "/boxes/"
-								+ YAMM.getString("box.trash"))));
-
-							updateUI();
-
-							expandRow(0);
-*/
-						}
+						frame.mailList.popup = new JPopupMenu();
+						frame.mailList.popup.setInvoker(frame.mailList);
+						frame.mailList.createPopup(((mainTable)frame.mailList).popup);
+					}
+				} else if(del.exists()) {
+					if (!del.delete()) {
+						Object[] args = {del.toString()};
+						new MsgDialog(frame, YAMM.getString("msg.error"),
+							YAMM.getString("msg.file.delete-dir", args));
+					} else {
+						frame.selectedbox = "deleted";
+						updateNodes();
 					}
 				}
 			}
@@ -344,6 +335,45 @@ public class mainJTree extends JTree implements DropTargetListener {
 	private MouseListener mouseListener2 = new MouseAdapter() {
 		public void mouseReleased(MouseEvent me) {
 			if (me.isPopupTrigger()) treepop.show(getParent(), me.getX(), me.getY());
+			else if (getSelectedRow() != -1) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode)(tree.getPathForRow(getSelectedRow()).getLastPathComponent());
+
+				if (!(node.toString()).equals(YAMM.getString("box.boxes"))) {
+					File box = new File(node.toString());
+
+					if (node.toString().equals("deleted") || !box.exists()) {
+						frame.selectedbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox"));
+						Mailbox.createList(frame.selectedbox, frame);
+						frame.mailList.clearSelection();
+						frame.mailList.update();
+					} else if (!box.isDirectory()) {
+						frame.selectedbox = node.toString();
+						Mailbox.createList(frame.selectedbox, frame);
+						frame.mailList.clearSelection();
+						frame.mailList.update();
+					}
+					if (box.isDirectory()) {
+						int row = getSelectedRow();
+						if (tree.isCollapsed(row))
+							tree.expandRow(row);
+						else
+							tree.collapseRow(row);
+						dataModel.fireTableDataChanged();
+					}
+				}
+
+				if ( ((mainTable)frame.mailList).getSelectedRow() != -1 &&
+						!(((JTable)frame.mailList).getSelectedRow() >= frame.listOfMails.length)) {
+					tbar.reply.setEnabled(true);
+					tbar.forward.setEnabled(true);
+					//tbar.print.setEnabled(true);
+				} else {
+					tbar.reply.setEnabled(false);
+					tbar.forward.setEnabled(false);
+					//tbar.print.setEnabled(false);
+				}
+
+			}
 		}
 		public void mousePressed(MouseEvent me) {
 			if (me.isPopupTrigger()) treepop.show(getParent(), me.getX(), me.getY());
@@ -353,6 +383,9 @@ public class mainJTree extends JTree implements DropTargetListener {
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.27  2003/03/08 13:55:41  fredde
+ * updated for the new TreeTable stuff
+ *
  * Revision 1.26  2000/12/26 11:22:55  fredde
  * YAMM.listOfMails is now of type String[][]
  *

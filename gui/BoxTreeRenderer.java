@@ -1,5 +1,5 @@
-/*  BoxTreeRenderer.java - The renderer for the boxtree
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+/*  $Id: BoxTreeRenderer.java,v 1.8 2003/03/08 13:55:04 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import org.gjt.fredde.yamm.mail.Mailbox;
 /**
  * The renderer for the mailbox tree
  * @author Fredrik Ehnbom
- * @version $Id: BoxTreeRenderer.java,v 1.7 2000/12/26 11:22:00 fredde Exp $
+ * @version $Revision: 1.8 $
  */
 public class BoxTreeRenderer
 	extends JLabel
@@ -64,12 +64,10 @@ public class BoxTreeRenderer
 		int     row,
 		boolean hasFocus
 	) {
-		String s = value.toString();
-		StringTokenizer tok = new StringTokenizer(s, System.getProperty("file.separator"));
-		String thisbox = null;
+		String thisbox = value.toString();
 
-		while (tok.hasMoreTokens()) {
-			thisbox = tok.nextToken();
+		if (thisbox.indexOf(System.getProperty("file.separator")) != -1) {
+			thisbox = thisbox.substring(thisbox.lastIndexOf(System.getProperty("file.separator")) + System.getProperty("file.separator").length());
 		}
 
 		if (leaf && !thisbox.endsWith(".g")) {
@@ -88,10 +86,6 @@ public class BoxTreeRenderer
 
 		if (thisbox.endsWith(".g")) {
 			setText(thisbox.substring(0, thisbox.length() -2));
-		} else if (!thisbox.equals(YAMM.getString("box.boxes")) && !thisbox.equals(YAMM.getString("box.outbox"))) {
-			int unread[] = Mailbox.getUnread(s);
-			if (unread[1] != -1 && unread[1] != 0 && YAMM.getProperty("showunread", "true").equals("true")) thisbox += " " + unread[1] + "/" + unread[0];
-			setText(thisbox);
 		} else {
 			setText(thisbox);
 		}
@@ -100,43 +94,13 @@ public class BoxTreeRenderer
 		this.selected = selected;
 		return this;
 	}
-
-	/**
-	 * paint is subclassed to draw the background correctly.  JLabel
-	 * currently does not allow backgrounds other than white, and it
-	 * will also fill behind the icon.  Something that isn't desirable.
-	 */
-	public void paint(Graphics g) {
-		Color            bColor;
-		Icon             currentI = getIcon();
-
-		if (selected) {
-			bColor = new Color(204, 204, 255);
-		} else if (getParent() != null) {
-			// Pick background color up from parent (which will
-			// come from the JTree we're contained in).
-			bColor = getParent().getBackground();
-		} else {
-			bColor = getBackground();
-		}
-
-		g.setColor(bColor);
-
-		if (currentI != null && getText() != null) {
-			int offset = (currentI.getIconWidth() +
-							getIconTextGap());
-
-			g.fillRect(offset, 0, getWidth() - 1 - offset,
-							getHeight() - 1);
-		} else {
-			g.fillRect(0, 0, getWidth()-1, getHeight()-1);
-		}
-		super.paint(g);
-	}
 }
 /*
  * Changes:
  * $Log: BoxTreeRenderer.java,v $
+ * Revision 1.8  2003/03/08 13:55:04  fredde
+ * updated for the new TreeTable stuff
+ *
  * Revision 1.7  2000/12/26 11:22:00  fredde
  * cleaned up a little
  *
