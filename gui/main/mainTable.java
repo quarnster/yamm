@@ -24,7 +24,15 @@ import java.awt.event.*;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Component;
-import java.util.Vector;
+import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.MalformedURLException;
+import org.gjt.fredde.yamm.YAMM;
+import org.gjt.fredde.yamm.YAMMWrite;
+import org.gjt.fredde.yamm.mail.Mailbox;
+import org.gjt.fredde.util.gui.MsgDialog;
 
 /**
  * The Table for listing the mails subject, date and sender.
@@ -40,14 +48,21 @@ public class mainTable extends JTable {
   /** The list of mails */
   static protected Vector		  listOfMails = null;
 
+  static protected YAMM                   frame = null;
+
+  static protected JPopupMenu             popup = null;
+
+  static protected ResourceBundle         res   = null;
+
   /**
    * Creates a new JTable
    * @param tm The TableModel to use
    * @param listOfMails the Maillist vector
    */
-  public mainTable(TableModel tm, Vector listOfMails) {
+  public mainTable(YAMM frame, ResourceBundle res, TableModel tm, Vector listOfMails) {
     this.listOfMails = listOfMails;
-
+    this.frame = frame;
+    this.res = res;
     setModel(tm);
 
     TableColumn column = null;
@@ -69,6 +84,13 @@ public class mainTable extends JTable {
     setDefaultRenderer(getColumnClass(0), new myRenderer());
 
     TMListener(this);
+
+    addMouseListener(mouseListener);
+
+    popup = new JPopupMenu();
+    popup.setInvoker(this);
+
+    createPopup(popup);
   }
 
   /**
@@ -104,6 +126,64 @@ public class mainTable extends JTable {
     }
     updateUI();
   }
+
+
+
+  protected void createPopup(JPopupMenu jpmenu) {
+    Vector list = new Vector();          
+    
+    fileList(list, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
+    StringTokenizer tok;
+    
+    JMenu copy = new JMenu(res.getString("edit.copy")), move = new JMenu(res.getString("edit.move"));
+    JMenuItem row, delete = new JMenuItem(res.getString("button.delete")), reply = new JMenuItem(res.getString("button.reply")); 
+    delete.addActionListener(OtherMListener);
+    reply.addActionListener(OtherMListener);
+
+    for(int i = 0;i<list.size();i++) {
+      String temp = list.get(i).toString();
+
+      tok = new StringTokenizer(temp, System.getProperty("file.separator"));
+      String name = null;
+      while(tok.hasMoreTokens()) name = tok.nextToken();
+      if(name.startsWith(".")) continue;
+
+      row = new JMenuItem(name);
+      row.addActionListener(KMListener);
+      copy.add(row);
+
+      row = new JMenuItem(name);
+      row.addActionListener(FMListener);
+      move.add(row);
+    }
+    jpmenu.add(reply);
+    jpmenu.addSeparator();
+    jpmenu.add(copy);
+    jpmenu.add(move);
+    jpmenu.add(delete);
+  }
+
+   private void fileList(Vector vect, File f) {
+    if((f.toString()).equals(System.getProperty("user.home") + "/.yamm/boxes")) {
+      String list[] = f.list();                                                  
+      for(int i = 0; i < list.length; i++)
+        fileList(vect, new File(f, list[i]));
+    }                                     
+    
+    else if(f.isDirectory()) {
+      String list[] = f.list();
+      for(int i = 0; i < list.length; i++)
+        fileList(vect, new File(f, list[i]));
+    }
+    else {
+      String file = f.toString();
+//      file = file.subString(file.listIndexOf(System.getProperty("file.separator")), file.length());
+
+      vect.add(file);
+    }
+  }
+ 
+
 
   /**
    * Adds the sorting listener to the table header
@@ -164,4 +244,175 @@ public class mainTable extends JTable {
       return this;
     }
   }
+
+
+
+  protected MouseListener mouseListener = new MouseAdapter() {
+    public void mouseReleased(MouseEvent me) {
+      if(me.isPopupTrigger()) popup.show(frame.mailList, me.getX(), me.getY());
+      else if(frame.mailList.getSelectedRow() != -1) get_mail();
+
+ 
+      if(frame.mailList.getSelectedRow() != -1 && !(frame.mailList.getSelectedRow() >= frame.listOfMails.size())) { 
+        ((JButton)frame.tbar.reply).setEnabled(true); 
+        ((JButton)frame.tbar.print).setEnabled(true); 
+        ((JButton)frame.tbar.forward).setEnabled(true);
+      }
+      else { 
+        ((JButton)frame.tbar.reply).setEnabled(false); 
+        ((JButton)frame.tbar.forward).setEnabled(false); 
+        ((JButton)frame.tbar.print).setEnabled(false); 
+      }
+    }
+    public void mousePressed(MouseEvent me) {
+      if(me.isPopupTrigger()) popup.show(getParent(), me.getX(), me.getY());
+    }
+ 
+    void get_mail() {
+      int i = 0;
+ 
+      while(i<4) {
+        if(frame.mailList.getColumnName(i).equals("#")) { break; }
+        i++;
+      }
+      int whatMail = Integer.parseInt(frame.mailList.getValueAt(frame.mailList.getSelectedRow(), i).toString());
+ 
+
+      frame.attach = new Vector();
+      if(frame.mailName) frame.mailName = false;
+      else frame.mailName = true;
+ 
+      Mailbox.getMail(frame.selectedbox,whatMail, frame.attach, frame.mailName);
+      try { frame.mailPage = new URL(frame.mailPageString + frame.mailName + ".html"); }
+      catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
+ 
+      try { frame.mail.setPage(frame.mailPage); }
+      catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
+
+      frame.myList.updateUI();
+    }
+  };
+
+  protected ActionListener OtherMListener = new ActionListener() {
+    public void actionPerformed(ActionEvent ae) {       
+      String kommando = ((JMenuItem)ae.getSource()).getText();
+                                                              
+      int i = 0;
+      
+      while(i<4) {
+        if(frame.mailList.getColumnName(i).equals("#")) { break; }
+        i++;     
+      }    
+
+      if(kommando.equals(res.getString("button.delete"))) {
+
+        int[] mlist = frame.mailList.getSelectedRows();
+        int[] deleteList = new int[mlist.length];
+
+        for(int j = 0;j < mlist.length;j++) {
+          deleteList[j] = Integer.parseInt(frame.mailList.getValueAt(mlist[j], i).toString());
+        }
+
+        Arrays.sort(deleteList);
+
+        for (int a=deleteList.length -1; a>=0; a-- ) {
+          Mailbox.deleteMail(frame.selectedbox, deleteList[a]);
+        }
+         
+        Mailbox.createList(frame.selectedbox, listOfMails);
+
+        frame.mailList.updateUI();
+        frame.attach = new Vector();
+
+        if(frame.mailName) frame.mailName = false;
+        else frame.mailName = true;
+
+        Mailbox.getMail(frame.selectedbox, frame.mailList.getSelectedRow(), frame.attach, frame.mailName);
+
+        try { frame.mailPage = new URL(frame.mailPageString + frame.mailName + ".html"); }
+        catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
+
+        try { frame.mail.setPage(frame.mailPage); }
+        catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
+      }
+
+      else if(kommando.equals(res.getString("button.reply"))) {
+                 
+        String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, 
+                                Integer.parseInt(frame.mailList.getValueAt(frame.mailList.getSelectedRow(), i).toString()));
+ 
+        YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[0] + " " + res.getString("mail.wrote") + "\n");
+        Mailbox.getMailForReply(frame.selectedbox, 
+                                Integer.parseInt(frame.mailList.getValueAt(frame.mailList.getSelectedRow(), i).toString()), 
+                                yam.myTextArea);
+      }
+    }
+  };
+
+  protected ActionListener KMListener = new ActionListener() {
+    public void actionPerformed(ActionEvent ae) {
+      String kommando = ((JMenuItem)ae.getSource()).getText();
+                                                              
+      int i = 0;                                              
+                
+      while(i<4) {
+        if(frame.mailList.getColumnName(i).equals("#")) { break; }
+        i++;
+      }     
+       
+      int[] mlist = frame.mailList.getSelectedRows();
+      int[] copyList = new int[mlist.length];  
+                                             
+      for(int j = 0;j < mlist.length;j++) {  
+        copyList[j] = Integer.parseInt(frame.mailList.getValueAt(mlist[j], i).toString());
+      }                                                                             
+      String ybox = System.getProperty("user.home") + "/.yamm/boxes/";
+       
+      for (int a=0; a<copyList.length; a++ ) {
+        Mailbox.copyMail(frame.selectedbox, ybox + kommando, copyList[a]);
+      }                                                      
+    }
+  };
+
+  protected ActionListener FMListener = new ActionListener() {
+    public void actionPerformed(ActionEvent ae) {
+      String kommando = ((JMenuItem)ae.getSource()).getText();
+
+      int i = 0;
+
+      while(i<4) {
+        if(frame.mailList.getColumnName(i).equals("#")) { break; }
+        i++;
+      }
+
+
+      int[] mlist = frame.mailList.getSelectedRows();
+      int[] moveList = new int[mlist.length];
+
+      for(int j = 0;j < mlist.length;j++) {
+        moveList[j] = Integer.parseInt(frame.mailList.getValueAt(mlist[j], i).toString());
+      }
+
+      String ybox = System.getProperty("user.home") + "/.yamm/boxes/";
+
+      for (int a=moveList.length -1; a>=0; a-- ) {
+        Mailbox.moveMail(frame.selectedbox, ybox + kommando, moveList[a]);
+      }
+
+      Mailbox.createList(frame.selectedbox, frame.listOfMails);
+
+      frame.mailList.updateUI();
+      frame.attach = new Vector();
+
+      if(frame.mailName) frame.mailName = false;
+      else frame.mailName = true;
+
+      Mailbox.getMail(frame.selectedbox, frame.mailList.getSelectedRow(), frame.attach, frame.mailName);
+
+      try { frame.mailPage = new URL(frame.mailPageString + frame.mailName + ".html"); }
+      catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
+
+      try { frame.mail.setPage(frame.mailPage); }
+      catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }    }
+  };
 }
