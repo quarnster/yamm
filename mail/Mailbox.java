@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.56 2003/04/19 12:07:17 fredde Exp $
+/*  $Id: Mailbox.java,v 1.57 2003/04/27 07:59:13 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@ package org.gjt.fredde.yamm.mail;
 import java.text.ParseException;
 import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 
 import javax.swing.JTextArea;
 import org.gjt.fredde.yamm.YAMM;
@@ -30,7 +31,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.56 $
+ * @version $Revision: 1.57 $
  */
 public class Mailbox {
 
@@ -221,9 +222,7 @@ public class Mailbox {
 			for (;;) {
 				temp = in.readLine();
 
-				if (temp == null) {
-					break;
-				} else if(temp.equals(".")) {
+				if (temp == null || Pattern.matches("From .* [a-zA-Z]{3} [a-zA-Z]{3} {1,2}[0-9]{1,2} [0-9]{2}:[0-9]{2}:[0-9]{2} [0-9]{4}", temp)) {
 					if (from != null) {
 						vec1.insertElementAt(from, 0);
 					} else {
@@ -259,7 +258,6 @@ public class Mailbox {
 					from = mhp.getHeaderField("From");
 					to = mhp.getHeaderField("To");
 					reply = mhp.getHeaderField("Reply-To");
-
 				}
 			}
 		} catch(IOException ioe) {
@@ -880,6 +878,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.57  2003/04/27 07:59:13  fredde
+ * updated getFilterList to work with the new mbox format
+ *
  * Revision 1.56  2003/04/19 12:07:17  fredde
  * fixed unMime to work with strings containing multiple =?-entries
  *
