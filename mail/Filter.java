@@ -1,4 +1,4 @@
-/*  $Id: Filter.java,v 1.11 2003/03/10 09:51:00 fredde Exp $
+/*  $Id: Filter.java,v 1.12 2003/03/10 10:14:27 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -41,6 +41,7 @@ public class Filter {
 		BufferedReader in = null;
 		String filterBox = Utilities.replace(YAMM.home + "/boxes/.filter");
 		String inBox = Utilities.replace(YAMM.home + "/boxes/inbox");
+		new File(Utilities.replace(YAMM.home + "/boxes/..filter.index")).delete();
 
 		Mailbox.createFilterList(list);
 
