@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * The configurationtab for the profiles
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: IdentitiesConfTab.java,v 1.5 2000/04/15 13:06:13 fredde Exp $
+ * @version $Id: IdentitiesConfTab.java,v 1.6 2000/04/15 13:08:05 fredde Exp $
  */
 public class IdentitiesConfTab extends JPanel {
 
@@ -49,7 +49,7 @@ public class IdentitiesConfTab extends JPanel {
 	/**
 	 * The Combobox with the profiles
 	 */
-	private final JComboBox def;
+	private JComboBox def = null;
 
 	/**
 	 * The parent JDialog
@@ -120,7 +120,7 @@ public class IdentitiesConfTab extends JPanel {
 
 		Box hori = Box.createHorizontalBox();
 
-		/* final JComboBox */def = new JComboBox(cmodel);
+		def = new JComboBox(cmodel);
 		if (vect2.size() != 0) {
 			def.setSelectedIndex(YAMM.profiler.getDefault());
 		}
@@ -198,6 +198,9 @@ public class IdentitiesConfTab extends JPanel {
 /*
  * ChangeLog:
  * $Log: IdentitiesConfTab.java,v $
+ * Revision 1.6  2000/04/15 13:08:05  fredde
+ * now compiles with javac
+ *
  * Revision 1.5  2000/04/15 13:06:13  fredde
  * now works when there are no profiles
  *
