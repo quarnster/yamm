@@ -11,6 +11,8 @@ CLASSES = org/gjt/fredde/yamm/YAMM.class \
 	org/gjt/fredde/yamm/Print.class \
 	org/gjt/fredde/yamm/gui/imageViewer.class \
 	org/gjt/fredde/yamm/gui/sourceViewer.class \
+	org/gjt/fredde/yamm/gui/BoxTreeRenderer.class \
+	org/gjt/fredde/yamm/gui/AttachListRenderer.class \
 	org/gjt/fredde/yamm/gui/main/mainMenu.class \
 	org/gjt/fredde/yamm/gui/main/mainToolBar.class \
 	org/gjt/fredde/yamm/gui/main/mainJTree.class \
