@@ -1,4 +1,4 @@
-/*  $Id: YAMMWrite.java,v 1.36 2003/06/07 09:06:42 fredde Exp $
+/*  $Id: YAMMWrite.java,v 1.37 2003/10/01 10:02:30 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import org.gjt.fredde.yamm.mail.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Revision: 1.36 $
+ * @version $Revision: 1.37 $
  */
 public class YAMMWrite
 	extends JFrame
@@ -340,7 +340,7 @@ public class YAMMWrite
 			from = mhp.getHeaderField("Reply-To");
 		}
 
-		toField.setText(from);
+		toField.setText(Mailbox.unMime(from));
 
 		Mailbox.getMailForReply(
 			frame.getMailbox(),
@@ -613,6 +613,9 @@ public class YAMMWrite
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.37  2003/10/01 10:02:30  fredde
+ * unmime 'from'-field
+ *
  * Revision 1.36  2003/06/07 09:06:42  fredde
  * BorderButton
  *
