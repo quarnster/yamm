@@ -57,7 +57,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   public static String                 selectedbox  = home + "/boxes/";
 
   /** The version of YAMM */
-  public static    String                 yammVersion  = "0.7.3 CVS";
+  public static    String                 version  = "0.7.3 CVS";
 
   /** The compileDate of YAMM */
   public static    String                 compDate     = "1999-09-04";
@@ -65,9 +65,6 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   /** the file that contains the current mail */
   public String		  mailPageString   = "file:///" + home + "/tmp/cache/";
   public URL	          mailPage;
-
-  /** The encryption key */
-  public static    char[]                 encKey       = "myKey".toCharArray();
 
   /** The vector containing the attaced files. */
   public Vector                 attach;
@@ -104,47 +101,6 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
   /** The statusrow */
   public statusRow status;
-
-
-  /**
-   * Encrypts the String provided with the key specified in encKey.
-   * @param encs The String to Encrypt
-   */
-  public static String encrypt(String encs) {
-    int i, j=0, c;
-    char enc[] = encs.toCharArray();
-
-    for(i=0;i < enc.length;i++) {
-      c = (enc[i]-32)+(encKey[j]-32);
-
-      if(c >= 0 && c <= 94) enc[i] = (char)(c+32);
-      else enc[i] = (char)((c%95)+32);
-
-      if((j +1) == encKey.length) j = 0;
-      else j++;
-    }
-    return new String(enc);
-  }
-
-  /**
-   * Decrypts the String provided with the key specified in encKey.
-   * @param encs The String to decrypt
-   */
-  public static String decrypt(String encs) {
-    int i, j=0, c;
-    char enc[] = encs.toCharArray();
-
-    for(i=0;i < enc.length;i++) {
-      c = (enc[i] - encKey[j]);
-
-      if(c < 0) enc[i] = (char)(c+95+32);
-      else enc[i] = (char)(c+32);
-
-      if(encKey.length == (j+1)) j = 0;
-      else j++;
-    }
-    return new String(enc);
-  }
 
   /**
    * Returns the translated string.
@@ -605,7 +561,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
 
     if (props.getProperty("splashscreen", "yes").equals("yes")) {
-      splash = new SplashScreen("YAMM " + yammVersion + 
+      splash = new SplashScreen("YAMM " + version + 
                                 " Copyright (c) 1999 Fredrik Ehnbom",
                                 "org/gjt/fredde/yamm/images/logo.gif");
     }
@@ -632,7 +588,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
         out.println("Date: " + dateFormat.format(new Date()));
         out.println("From: Fredrik Ehnbom <fredde@gjt.org>");
         out.println("To: " + user + "@" + host);
-        Object[] args = {YAMM.yammVersion, user}; 
+        Object[] args = {YAMM.version, user}; 
         out.println(YAMM.getString("msg.welcome", args));
 
         out.close();
@@ -655,7 +611,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     }
 
     nFrame = new YAMM();
-    nFrame.setTitle("Yet Another Mail Manager " + yammVersion);
+    nFrame.setTitle("Yet Another Mail Manager " + version);
     if(splash != null) splash.dispose();
   }
 }
