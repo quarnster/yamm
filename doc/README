@@ -1,0 +1,32 @@
+YAMM 0.7.2
+
+Copyright (C) 1999 Fredrik Ehnbom
+See 'COPYING' for licence information.
+
+Filters:
+    Right now you have to hack the filters manually...
+    The file can look like this:
+
+      subject;contains;test;test-files;testing
+
+    subject means that it is the subject that should be checked. It can also be from, to or reply.
+    contains is the condition. It can also be is.
+    test is the argument. It can be whatever you want.
+    test-files is the box. It can be whatever you want.
+    testing is the name of this filter. It can be whatever you want.
+
+    In other words this means:
+
+      If the subject contains test, then move to the box test-files.
+
+Author:
+    Fredrik Ehnbom <fredrik.ehnbom@linux.nu>
+
+Thanks to:
+    Most icons are made or based on icons made by Tuomas Kuosmanen <tigert@gimp.org>
+
+Website:
+    http://home.swipnet.se/ehnbom/fredde/yamm/
+
+Description:
+    Yet Another Mail Manager (YAMM) is a mail client.

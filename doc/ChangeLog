@@ -1,0 +1,44 @@
+0.7.2:
+    Added:
+      -Installer
+      -Splitted YAMM.java
+      -some javadoc things to sourcecode
+      -YAMMWrite's title is now set to what's typed in the subject field
+      -sourceViewer
+      -Print button
+      -You can now save your messages
+      -Filters
+      -merged the inboxes into one
+      -made email addresses clickable
+
+    Fixed/changed:
+      -Huge code cleanup
+      -Made the mailhandling as it was supposed to be from the beginning
+      -Trash bug
+      -some home stuff bugs
+      -Speed of base64 decoding (forgot to buffer the in- and outputstreams...)
+      -package changing to suit the gjt
+      -rewrite of Pop3.java
+      -rewrite of Smtp.java
+
+0.7.1:
+    Added:
+      -All links are now displayed as links
+      -imageviewer
+      -Config files and boxes are now stored in users home
+      -Passwords are now encrypted
+      -Reply button
+      -Forward button
+      -Progress dialog
+      -Made Tuomas Kuosmanens icons the default icons
+      -Multiple receivers!
+
+    Fixed:
+      -Options not showing changes until it was restarted
+      -Config save bug (saved servers config in boxes\<server>\.config AND in .config)
+      -Created attached files sometimes got the wrong name
+      -Attached files in the list in the write window still there from old letters
+      -changed dateformat in the maillist from 'yyMMdd' to 'yyyy-MM-dd'. (y2k-bug)
+      -lots of visual stuff
+
+    plus much, much more that I have forgot to put here!

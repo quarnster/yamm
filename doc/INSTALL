@@ -1,0 +1,12 @@
+YAMM 0.7.2
+
+Copyright (C) 1999 Fredrik Ehnbom
+See 'COPYING' for licence information.
+
+Please make sure you have jre or jdk 1.2 installed.
+If you do not have one of these, goto http://java.sun.com:80/products/jdk/1.2
+
+Just run java -jar install.jar or java -jar installsrc.jar (which did you download?)
+And then go to the directory where you installed it to and run java -cp yamm.jar;. YAMM
+
+Have fun!

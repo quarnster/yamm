@@ -1,0 +1,31 @@
+TODO list for YAMM
+
+******** Visual stuff ********
+
+  - Drag and Drop!!!
+  - Maybe my own plaf-skin
+
+********** General ***********
+
+  - Address book
+  - Get rid of sun.misc.Base64Decoder...
+  - the ability to edit mails in the outbox (if i keep the outbox...)
+  - Plugins (ex. clock, spellchecker, content-viewer etc...)
+
+********* Protocols **********
+
+  - NNTP (news you know...)
+  - Local mail on unix-systems (can anyone tell me how this works?)
+
+******** Considering *********
+
+  - IMAP (This is not as usual as pop3)
+  - Kill the outbox and instead send the mails directly
+
+Go ahead and mail me your opinions!
+
+********* Known Bugs *********
+
+  - UUEncoder encodes the last line wrongly... Any ideas?
+  - The code has some stuff than only works under Windows 95/98/NT...
+  - sorting sorts 1, 10, 11, etc, 2, 20, 21, etc, 3, 30, 31 etc...
