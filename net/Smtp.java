@@ -66,7 +66,7 @@ import java.io.*;
  * }
  * </pre></code>
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: Smtp.java,v 1.5 2000/04/01 14:59:56 fredde Exp $
+ * @version $Id: Smtp.java,v 1.6 2000/04/11 13:32:12 fredde Exp $
  */
 public class Smtp {
 
@@ -97,7 +97,7 @@ public class Smtp {
 	 * @param file The file to get messages from
 	 */
 	public Smtp(String server, int port) throws IOException {
-		this(server, 25, false);
+		this(server, port, false);
 	}
 
 	public Smtp(String server, int port, boolean debug) throws IOException {
@@ -208,6 +208,9 @@ public class Smtp {
 /*
  * ChangeLog:
  * $Log: Smtp.java,v $
+ * Revision 1.6  2000/04/11 13:32:12  fredde
+ * one can now specify the port...
+ *
  * Revision 1.5  2000/04/01 14:59:56  fredde
  * license for the package changed to LGPL
  *
