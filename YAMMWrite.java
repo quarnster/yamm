@@ -408,9 +408,13 @@ public class YAMMWrite extends JFrame {
     int ret = jfs.showOpenDialog(this);
 
     if(ret == JFileChooser.APPROVE_OPTION) {
-      if(jfs.getSelectedFile() != null) {
+      // well, jfs.getSelectedFiles() don't work...
+      File[] file = {jfs.getSelectedFile()};
+      if(file != null) {
 
-        attach.add(jfs.getSelectedFile());
+        for(int i = 0; i < file.length;i++) {
+          attach.add(file[i]);
+        }
         myList.updateUI();
       }
     }

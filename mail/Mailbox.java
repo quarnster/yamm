@@ -295,6 +295,7 @@ public class Mailbox {
           else if(temp.indexOf("boundary=\"") != -1) {
             if(i == whichmail) {
               boundary = temp.substring(temp.indexOf("boundary=\"") + 10, temp.indexOf("\"", temp.indexOf("boundary=\"") + 11));
+              System.out.println("boundary: " + boundary);
             }
           }
 
@@ -393,30 +394,44 @@ public class Mailbox {
                 else if(temp.startsWith("--" + boundary) && temp.endsWith("--")) break;
                 else if(temp.startsWith("--" + boundary) && !temp.endsWith("--")) {
                   attaches++;
+                  boolean Break = false;
+                  File f = new File(cache, whichmail + ".attach." + attaches);
 
                   try {
                     PrintWriter out = new PrintWriter(
                                       new BufferedOutputStream(
-                                      new FileOutputStream(new File(cache, whichmail + ".attach." + attaches))));
-                    for(int four = 0; four < 4; four++) {
+                                      new FileOutputStream(f)));
+//                    for(int four = 0; four < 4; four++) {
+                    for(;;) {
                       temp = in.readLine();
                       if(temp == null) break;
+                      if(temp.equals("")) { out.println(temp); break; }
+                      if(temp.startsWith("Content-Transfer-Encoding: quoted-printable")) { Break = true; }
 
                       out.println(temp);
                     }
 
-                    for(;;) {
-                      temp =  in.readLine();
+                    if(!Break) {
+                      for(;;) {
+                        temp =  in.readLine();
 
-                      if(temp == null) break;
-                      if(temp.equals(".")) return;
-                      if(temp.equals("")) break;
+                        if(temp == null) break;
+                        if(temp.equals(".")) return;
+                        if(temp.equals("")) break;
 
-                      out.println(temp);
+                        out.println(temp);
+                      }
                     }
+                      
                     out.close();
+                    if(Break) {
+                      attaches--;
+                      f.delete();
+                    }
                   }
-                  catch(IOException ioe) { System.out.println("Error!: " + ioe); }
+                  catch(IOException ioe) { 
+                    System.out.println("Error!: " + ioe); 
+                  }
                 }
 /* 
                 else if(temp.startsWith("--" + boundary)) {

@@ -233,8 +233,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
     mail = new JEditorPane();
     mail.setContentType("text/html");
-    attach = new Vector();
-    Mailbox.getMail(selectedbox, 0 /*, attach, mailName */);
+    Mailbox.getMail(selectedbox, 0);
     try { mail.setPage(mailPage); }
     catch (IOException ioe) { System.err.println(ioe); }
     mail.setEditable(false);
@@ -534,7 +533,8 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
       String name = null, encode = null;
 
-      for(int i = 0; i < 2; i++) {
+//      for(int i = 0; i < 2; i++) {
+      for(;;) {
         temp = in.readLine();
 
         if(temp.startsWith("Content-Transfer-Encoding: "))
@@ -543,7 +543,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
           name = temp.substring(temp.indexOf("name=\"") + 6, temp.lastIndexOf("\""));
 
         
-        if(name != null && encode != null) { tmp.add(name); tmp.add(encode); }
+        if(name != null && encode != null) { tmp.add(name); tmp.add(encode); break;}
       }
       in.close();
     }

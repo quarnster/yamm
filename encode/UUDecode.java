@@ -57,7 +57,11 @@ public class UUDecode extends Thread{
       BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
       DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(target)));
 
-      for(int i = 0; i < 5; i++) in.readLine();
+      for(;;) {
+        temp = in.readLine();
+
+        if(temp.equals("")) { in.readLine(); break; }
+      }
 
       for(;;) {
         temp = in.readLine();
