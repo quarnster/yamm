@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom
- * @version $Id: SHMail.java,v 1.23 2000/03/18 17:04:49 fredde Exp $
+ * @version $Id: SHMail.java,v 1.24 2000/03/18 17:43:03 fredde Exp $
  */
 public class SHMail extends Thread {
 
@@ -254,7 +254,7 @@ public class SHMail extends Thread {
 				} catch (IOException ioe) {}
 			}
 			if (sent) {
-				Mailbox.updateIndex(YAMM.home + "/boxes/" + YAMM.getString("box.sent");
+				Mailbox.updateIndex(YAMM.home + "/boxes/" + YAMM.getString("box.sent"));
 				frame.tree.updateUI();
 			}
 		}
@@ -286,6 +286,9 @@ public class SHMail extends Thread {
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.24  2000/03/18 17:43:03  fredde
+ * forgot a ")"... ofcourse...
+ *
  * Revision 1.23  2000/03/18 17:04:49  fredde
  * updates the tree when sending/getting mail
  *
