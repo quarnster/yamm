@@ -26,7 +26,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Parses messages
  * @author Fredrik Ehnbom
- * @version $Id: MessageParser.java,v 1.11 2000/03/17 17:12:10 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.12 2000/03/25 15:45:54 fredde Exp $
  */
 public class MessageParser {
 
@@ -171,6 +171,10 @@ public class MessageParser {
 			out.println("<tr><td>" + YAMM.getString("mail.to") +
 				"</td><td>" + to + "</td></tr>");
 		}
+		if (mhp.getHeaderField("cc") != null) {
+			String cc = makeClickable(mhp.getHeaderField("cc"));
+			out.println("<tr><td>cc:</td><td>" + cc + "</td></tr>");
+		}
 		if (mhp.getHeaderField("Reply-To") != null) {
 			String replyto = makeClickable(
 						mhp.getHeaderField("Reply-To"));
@@ -194,11 +198,13 @@ public class MessageParser {
 		String contentType = "";
 		if (temp != null) {
 			contentType = temp.toLowerCase();
-			if (temp.indexOf("boundary=\"") != -1) {
+			if (temp.indexOf("boundary=") != -1) {
 				boundary = temp.substring(
-					temp.indexOf("boundary=\"") + 10,
-					temp.indexOf("\"",
-					temp.indexOf("boundary=\"") + 11));
+					temp.indexOf("boundary=") + 9,
+					temp.length());
+				if (boundary.startsWith("\"")) {
+					boundary = boundary.substring(1, boundary.length() - 1);
+				}
 			}
 		}
 
