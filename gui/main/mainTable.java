@@ -39,7 +39,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * The Table for listing the mails subject, date and sender.
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.30 2000/04/01 20:50:09 fredde Exp $
+ * @version $Id: mainTable.java,v 1.31 2000/04/11 13:28:43 fredde Exp $
  */
 public class mainTable extends JTable implements DragGestureListener,
 							DragSourceListener {
@@ -524,7 +524,7 @@ public class mainTable extends JTable implements DragGestureListener,
 					Mailbox.createList(frame.selectedbox,
 							frame.listOfMails);
 
-					frame.tree.updateUI();
+					frame.tree.repaint();
 				}
 				changeButtonMode(true);
 			} else { 
@@ -784,6 +784,9 @@ public class mainTable extends JTable implements DragGestureListener,
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.31  2000/04/11 13:28:43  fredde
+ * fixed the nullpointer when selecting unread mails
+ *
  * Revision 1.30  2000/04/01 20:50:09  fredde
  * fixed to make the profiling system work
  *
