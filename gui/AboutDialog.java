@@ -23,8 +23,17 @@ import javax.swing.*;
 import javax.swing.event.*;
 import org.gjt.fredde.util.net.Browser;
 
+/**
+ * Displays information about an application in a JEditerPane.
+ */
 public class AboutDialog extends JDialog implements HyperlinkListener {
 
+	/**
+	 * Creates a new AboutDialog.
+	 * @param text The text to display. If it begins with &lt;html&gt; it'll
+	 * 		display directly what you wrote or else it asumes that
+	 *		you wanted it to display a location.
+	 */
 	public AboutDialog(String text) {
 		setTitle("About");
 		setSize(300, 200);
@@ -49,6 +58,9 @@ public class AboutDialog extends JDialog implements HyperlinkListener {
 		show();
 	}
 
+	/**
+	 * Launch a browser when you click on a link
+	 */
 	public void hyperlinkUpdate(HyperlinkEvent e) {
 		if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 			try {
