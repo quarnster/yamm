@@ -1,7 +1,5 @@
 JAVAC = javac
 
-PRE = org/gjt/fredde/yamm/
-
 .SUFFIXES: .class .java
 .java.class:
 	$(JAVAC) $<
@@ -18,6 +16,7 @@ CLASSES = org/gjt/fredde/yamm/YAMM.class \
 	org/gjt/fredde/yamm/gui/main/mainToolBar.class \
 	org/gjt/fredde/yamm/gui/main/mainJTree.class \
 	org/gjt/fredde/yamm/gui/main/mainTable.class \
+	org/gjt/fredde/yamm/gui/main/extMItem.class \
 	org/gjt/fredde/yamm/mail/Mailbox.class \
 	org/gjt/fredde/yamm/mail/Filter.class \
 	org/gjt/fredde/yamm/encode/Base64Decode.class \
@@ -31,7 +30,7 @@ CLASSES = org/gjt/fredde/yamm/YAMM.class \
 all: YAMM
 
 clean:
-	rm -f org/gjt/fredde/yamm/*.class org/gjt/fredde/yamm/*~
+	rm -f org/gjt/fredde/yamm/*.class          org/gjt/fredde/yamm/*~
 	rm -f org/gjt/fredde/yamm/encode/*.class   org/gjt/fredde/yamm/encode/*~
 	rm -f org/gjt/fredde/yamm/mail/*.class     org/gjt/fredde/yamm/mail/*~
 	rm -f org/gjt/fredde/yamm/gui/*.class      org/gjt/fredde/yamm/gui/*~
@@ -39,4 +38,4 @@ clean:
 	rm -f org/gjt/fredde/util/net/*.class      org/gjt/fredde/util/net/*~
 	rm -f org/gjt/fredde/util/gui/*.class      org/gjt/fredde/util/gui/*~
 
-YAMM: $(CLASSES) $(OTHERCLASSES)
+YAMM: $(CLASSES)
