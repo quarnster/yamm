@@ -174,15 +174,17 @@ public class SHMail extends Thread {
     pd.setString("done!");
     pd.progress(100);
 
-    pd.setString("Applying filters...");
-    pd.progress(0);
+    if(Mailbox.hasMail(System.getProperty("user.home") + "/.yamm/boxes/.filter")) {
+      pd.setString("Applying filters...");
+      pd.progress(0);
 
-    try { new Filter(); }
-    catch (IOException ioe) { new MsgDialog(frame, "Error!", ioe.toString()); }
+      try { new Filter(); }
+      catch (IOException ioe) { new MsgDialog(frame, "Error!", ioe.toString()); }
 
-    pd.setString("done!");
-    pd.progress(100);
-
+      pd.setString("done!");
+      pd.progress(100);
+    }
+    
     knappen.setEnabled(true);
     pd.dispose();
   }
