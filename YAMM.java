@@ -149,174 +149,190 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     props.setProperty(property, value);
   }
 
-  /**
-   * Creates the main-window and adds all the components in it.
-   */
-  public YAMM() {
-//    Mailbox.getMail(selectedbox, 0);
-    try { 
-      mailPage=new URL(mailPageString + res.getString("box.inbox") + "/0.html");
-    }
-    catch (MalformedURLException mue) { System.err.println(mue); }
+	/**
+	 * Creates the main-window and adds all the components in it.
+	 */
+	public YAMM() {
+		try { 
+			mailPage=new URL(mailPageString +
+				res.getString("box.inbox") + "/0.html");
+		} catch (MalformedURLException mue) {
+			System.err.println(mue);
+		}
 
-    System.out.println("Locale: " + Locale.getDefault());
+		System.out.println("Locale: " + getProperty("locale",
+							Locale.getDefault().toString()));
 
-    boolean result = false;
-    System.out.println("Checking for sun classes...");
+		boolean result = false;
+		System.out.println("Checking for sun classes...");
 
-    // check for sun classes
-    if (ClassLoader.getSystemResource("sun/misc/BASE64Decoder.class") == null) {
-      result = false;
-    }
-    else { 
-      result = true; 
-      base64 = true;
-    }
-    System.out.println("sun.misc.BASE64Decoder: " + (result ? "yes" : "no"));
+		if (ClassLoader.getSystemResource(
+				"sun/misc/BASE64Decoder.class") != null) {
+			result = true;
+			base64 = true;
+		}
+		System.out.println("sun.misc.BASE64Decoder: " +
+						(result ? "yes" : "no"));
 
-    // get the main window's settings and default them if an exception is caught 
-    int mainx = Integer.parseInt(props.getProperty("mainx", "0"));
-    int mainy = Integer.parseInt(props.getProperty("mainy", "0"));
-    int mainw = Integer.parseInt(props.getProperty("mainw", "650"));
-    int mainh = Integer.parseInt(props.getProperty("mainh", "380"));
-    int hsplit = Integer.parseInt(props.getProperty("hsplit", "80"));
-    int vsplit = Integer.parseInt(props.getProperty("vsplit", "125"));
+		// get the main window's settings and default them if they
+		// don't exist 
+		int mainx = Integer.parseInt(props.getProperty("mainx", "0"));
+		int mainy = Integer.parseInt(props.getProperty("mainy", "0"));
+		int mainw = Integer.parseInt(props.getProperty("mainw", "650"));
+		int mainh = Integer.parseInt(props.getProperty("mainh", "380"));
+		int hsplit = Integer.parseInt(props.getProperty("hsplit", "80"));
+		int vsplit = Integer.parseInt(props.getProperty("vsplit", "125"));
 
-    setBounds(mainx, mainy, mainw, mainh);
-    getContentPane().setLayout(new BorderLayout());
+		setBounds(mainx, mainy, mainw, mainh);
+		getContentPane().setLayout(new BorderLayout());
 
-    // the menubar
-    setJMenuBar(new mainMenu(this));
+		// the menubar
+		setJMenuBar(new mainMenu(this));
 
-    // the toolbar
-    tbar = new mainToolBar(this);
-    getContentPane().add("North", tbar);
+		// the toolbar
+		tbar = new mainToolBar(this);
+		getContentPane().add("North", tbar);
 
-    // create a list of mails in the selected box
-    Mailbox.createList(selectedbox, listOfMails);
+		// create a list of mails in the selected box
+		Mailbox.createList(selectedbox, listOfMails);
 
-    // handles some stuff for the table
-    TableModel dataModel = new AbstractTableModel() {
-      final String headername[] = { 
-          "#", 
-          res.getString("table.subject"), 
-          res.getString("table.from"), 
-          res.getString("table.date")
-      };
+		// the tablemodel for the maillist table
+		TableModel dataModel = new AbstractTableModel() {
+			final String headername[] = { 
+				"#",
+				res.getString("table.subject"),
+				res.getString("table.from"),
+				res.getString("table.date")
+			};
 
-      public int getColumnCount() { return 4; }
-      public int getRowCount() {  return  listOfMails.size(); }
-      public Object getValueAt(int row, int col) { 
-        return  ((Vector)listOfMails.elementAt(row)).elementAt(col);
-      } 
-      public boolean isCellEditable(int col) { return false; }
-      public String getColumnName(int column) {  return headername[column]; }
-    };
+			public int getColumnCount() {
+				return 4;
+			}
+			public int getRowCount() {
+				return  listOfMails.size();
+			}
+			public Object getValueAt(int row, int col) {
+				return  ((Vector)listOfMails.elementAt(row)).
+							elementAt(col);
+			}
+			public boolean isCellEditable(int col) {
+				return false;
+			}
+			public String getColumnName(int column) {
+				return headername[column];
+			}
+		};
 
-    mail = new JEditorPane();
-    mail.setContentType("text/html");
-    Mailbox.getMail(selectedbox, 0, 0);
-    try { mail.setPage(mailPage); }
-    catch (IOException ioe) { System.err.println(ioe); }
-    mail.setEditable(false);
-    mail.addHyperlinkListener(this);
+		mail = new JEditorPane();
+		mail.setContentType("text/html");
+		Mailbox.getMail(selectedbox, 0, 0);
+		try {
+			mail.setPage(mailPage);
+		} catch (IOException ioe) {
+			System.err.println(ioe);
+		}
+		mail.setEditable(false);
+		mail.addHyperlinkListener(this);
 
-    /* JTabbedPane */ JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
-    JTPane.setFont(new Font("SansSerif", Font.PLAIN, 10));
-    if (text && !ico) {
-      JTPane.addTab(res.getString("mail"),  new JScrollPane(mail));
-    }
-    else if (ico && !text) {
-      JTPane.addTab("", 
-          new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), 
-          new JScrollPane(mail));
-    }
-    else {
-      JTPane.addTab(res.getString("mail"),
-          new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"),
-          new JScrollPane(mail));
-    }
+		JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
+		JTPane.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		if (text && !ico) {
+			JTPane.addTab(res.getString("mail"),
+					new JScrollPane(mail));
+		} else if (ico && !text) {
+			JTPane.addTab("", 
+			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
+								"mail.gif"), 
+			new JScrollPane(mail));
+		} else {
+			JTPane.addTab(res.getString("mail"),
+			new ImageIcon("org/gjt/fredde/yamm/images/buttons/" +
+								"mail.gif"),
+			new JScrollPane(mail));
+		}
 
-    JPanel myPanel = new JPanel(new BorderLayout());
+		JPanel myPanel = new JPanel(new BorderLayout());
 
-    Box hori1 = Box.createHorizontalBox();
+		Box hori1 = Box.createHorizontalBox();
 
-    JButton b = new JButton();
-    b.setFont(new Font("SansSerif", Font.PLAIN, 10));
-    if (text) {
-      b.setText(res.getString("button.view_extract"));
-    }
-    if (ico) {
-      b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
-    }
-    b.setToolTipText(res.getString("button.view_extract"));
-    b.addActionListener(BListener);
-    hori1.add(b);
+		JButton b = new JButton();
+		b.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		if (text) {
+			b.setText(res.getString("button.view_extract"));
+		}
+		if (ico) {
+			b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/" +
+							"buttons/search.gif"));
+		}
+		b.setToolTipText(res.getString("button.view_extract"));
+		b.addActionListener(BListener);
+		hori1.add(b);
 
-    attach = new Vector();
+		attach = new Vector();
 
-    ListModel attachModel = new AbstractListModel() {
-      public Object getElementAt(int index) {
-        return ((Vector)attach.elementAt(index)).elementAt(0);
-      }
-      public int    getSize() { return attach.size(); }
-    };
+		// The ListModel for the attachment list
+		ListModel attachModel = new AbstractListModel() {
+			public Object getElementAt(int index) {
+				return ((Vector)attach.elementAt(index)).
+								elementAt(0);
+			}
+			public int getSize() {
+				return attach.size();
+			}
+		};
 
-    myList = new JList(attachModel);
-    myList.setCellRenderer(new AttachListRenderer());
-    myPanel.add("Center", myList);
-    myPanel.add("South", hori1);
+		myList = new JList(attachModel);
+		myList.setCellRenderer(new AttachListRenderer());
+		myPanel.add("Center", myList);
+		myPanel.add("South", hori1);
 
-    Border ram = BorderFactory.createEtchedBorder();
-    myList.setBorder(ram);
+		Border ram = BorderFactory.createEtchedBorder();
+		myList.setBorder(ram);
 
-    if (ico && !text) {
-      JTPane.addTab("",
-          new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"),
-          myPanel);
-    }
-    else if (text && !ico) {
-      JTPane.addTab(res.getString("mail.attachment"), myPanel);
-    }
-    else {
-      JTPane.addTab(res.getString("mail.attachment"),
-          new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"),
-          myPanel);
-    }
+		if (ico && !text) {
+			JTPane.addTab("", new ImageIcon("org/gjt/fredde/yamm/" +
+						"images/buttons/attach.gif"),
+			myPanel);
+		} else if (text && !ico) {
+			JTPane.addTab(res.getString("mail.attachment"),myPanel);
+		} else {
+			JTPane.addTab(res.getString("mail.attachment"),
+				new ImageIcon("org/gjt/fredde/yamm/images/" +
+							"buttons/attach.gif"),
+				myPanel);
+		}
 
-    mailList = new mainTable(this, dataModel, listOfMails);
-    mailList.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
-    createAttachList();
+		mailList = new mainTable(this, dataModel, listOfMails);
+		mailList.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
+		createAttachList();
 
-    JPanel bgFix = new JPanel(new BorderLayout());
-    bgFix.add("Center", new JScrollPane(mailList));
-    bgFix.setBackground(mailList.getBackground());
+		// When the mails in the maillist doesn't take all the
+		// maillists space, this fix still paints the background
+		// in the maillists background color.
+		JPanel bgFix = new JPanel(new BorderLayout());
+		bgFix.add("Center", new JScrollPane(mailList));
+		bgFix.setBackground(mailList.getBackground());
 
-    SPane = new JSplitPane(0, bgFix, JTPane);
+		SPane = new JSplitPane(0, bgFix, JTPane);
+		SPane.setDividerLocation(hsplit);
+		SPane.setMinimumSize(new Dimension(0, 0));
+		SPane.setPreferredSize(new Dimension(300, 50));
+		SPane.setOneTouchExpandable(true);
 
-    SPane.setDividerLocation(hsplit);
-    SPane.setBackground(Color.white);
-    SPane.setMinimumSize(new Dimension(0, 0));
-    SPane.setPreferredSize(new Dimension(300, 50));
-    SPane.setOneTouchExpandable(true);
-    
-//    SPane.setOpaque(true);  // makes it look nicer/uglier
+		top = new DefaultMutableTreeNode(YAMM.getString("box.boxes"));
+		mainJTree tree = new mainJTree(this, top, tbar);
 
+		SPane2 = new JSplitPane(1, tree, SPane);
+		SPane2.setDividerLocation(vsplit);
+		SPane2.setOneTouchExpandable(true);
+		getContentPane().add("Center", SPane2);
 
-    top = new DefaultMutableTreeNode(YAMM.getString("box.boxes"));
-    mainJTree tree = new mainJTree(this, top, tbar);
-
-    SPane2 = new JSplitPane(1, tree, SPane);
-    SPane2.setDividerLocation(vsplit);
-    SPane2.setOneTouchExpandable(true);
-    getContentPane().add("Center", SPane2);
-
-    status = new statusRow();
-    status.button.setText(res.getString("button.cancel"));
-    getContentPane().add("South", status);
-    addWindowListener(new FLyssnare());
-    show();
-  }
+		status = new statusRow();
+		status.button.setText(res.getString("button.cancel"));
+		getContentPane().add("South", status);
+		addWindowListener(new FLyssnare());
+		show();
+	}
 
 
   /**
@@ -553,96 +569,121 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     }
   }
 
-  /**
-   * Shows a SplashScreen while starting the program.
-   * It checks if the user has config-files, if not it'll
-   * create such and write a little welcome message in
-   * ~home/.yamm/boxes/local/inbox.
-   */
-  public static void main(String argv[])
-  {
-    YAMM nFrame = null;
-    SplashScreen splash = null;
+	/**
+	 * Shows a SplashScreen while starting the program.
+	 * It checks if the user has config-files, if not it'll
+	 * create such and write a little welcome message in
+	 * ~home/.yamm/boxes/local/inbox.
+	 */
+	public static void main(String argv[]) {
+		YAMM nFrame = null;
+		SplashScreen splash = null;
 
-    try {        
-      res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM",
-                                     Locale.getDefault());
-    } catch (MissingResourceException mre) {
-        mre.printStackTrace();
-        System.exit(1);
-    }
+		try {             
+			InputStream in = new FileInputStream(home + "/.config");
+			props.load(in);
+			in.close();    
+		} catch (IOException propsioe) {
+			System.err.println(propsioe);
+		}
+		Locale l = Locale.getDefault();
+		String resLanguage = l.getLanguage();
+		String resCountry = l.getCountry();
 
-    try {             
-      InputStream in = new FileInputStream(home + "/.config");
-      props.load(in);
-      in.close();    
-    } catch (IOException propsioe) { System.err.println(propsioe); }
+		if (props.getProperty("locale.language") != null) {
+			resLanguage = props.getProperty("locale.language");
+		}
 
-	if (props.getProperty("plaf") != null) {
+		if (props.getProperty("locale.country") != null) {
+			resCountry = props.getProperty("locale.country");
+		}
+
+		l = new Locale(resLanguage, resCountry);
+		Locale.setDefault(l);
+		
 		try {
-			UIManager.setLookAndFeel(props.getProperty("plaf"));
-		} catch (Exception e) {};
-	} else {
-		try {
-			UIManager.setLookAndFeel(
-				UIManager.getSystemLookAndFeelClassName()
-			);
-		} catch (Exception e) {};
+			res = ResourceBundle.getBundle("org.gjt.fredde.yamm." +
+						"resources.YAMM", l);
+		} catch (MissingResourceException mre) {
+			mre.printStackTrace();
+			System.exit(1);
+		}
+
+		if (props.getProperty("plaf") != null) {
+			try {
+				UIManager.setLookAndFeel(props.getProperty("plaf"));
+			} catch (Exception e) {};
+		} else {
+			try {
+				UIManager.setLookAndFeel(
+					UIManager.getSystemLookAndFeelClassName()
+				);
+			} catch (Exception e) {};
+		}
+
+		if (props.getProperty("splashscreen", "yes").equals("yes")) {
+			splash = new SplashScreen("YAMM " + version + 
+				" Copyright (c) 1999 Fredrik Ehnbom",
+				"org/gjt/fredde/yamm/images/logo.gif");
+		}
+
+		selectedbox += res.getString("box.inbox");
+		if (!(new File(home + "/boxes")).exists()) {
+			try {
+				String user = System.getProperty("user.name");
+				SimpleDateFormat dateFormat =
+					new SimpleDateFormat("EEE, dd MMM yyyy"+						" HH:mm:ss zzz", Locale.US);
+
+				InetAddress myInetaddr =
+						InetAddress.getLocalHost();
+				String host = myInetaddr.getHostName();
+				if (host == null) host = "localhost";
+
+				(new File(home + "/servers")).mkdirs();
+				(new File(home + "/boxes")).mkdirs();
+				PrintWriter out = new PrintWriter(
+					new BufferedOutputStream(
+					new FileOutputStream(home + "/boxes/" + 
+					YAMM.getString("box.inbox"))));
+
+				out.println("Date: " + dateFormat.format(
+								new Date()));
+				out.println("From: Fredrik Ehnbom " +
+							"<fredde@gjt.org>");
+				out.println("To: " + user + "@" + host);
+				Object[] args = {
+					YAMM.version,
+					user
+				}; 
+				out.println(YAMM.getString("msg.welcome", args));
+
+				out.close();
+
+				(new File(home + "/boxes/" +
+					getString("box.outbox"))).createNewFile();
+				(new File(home + "/boxes/" +
+					getString("box.trash"))).createNewFile();
+				(new File(home + "/boxes/" +
+					getString("box.sent"))).createNewFile();
+				(new File(home + "/.config")).createNewFile();
+				(new File(home + "/.filters")).createNewFile();
+				(new File(home + "/tmp")).mkdirs();
+			} catch(IOException ioe) { 
+				new MsgDialog(nFrame,
+					YAMM.getString("msg.error"),
+					ioe.toString());
+			}
+		}
+
+		if (props.getProperty("button.mode", "both").equals("text")) {
+			ico = false;
+		} else if (props.getProperty("button.mode", "both").equals("icon")) {
+			text = false;
+		}
+
+		nFrame = new YAMM();
+		nFrame.setTitle("Yet Another Mail Manager " + version);
+		if (splash != null) splash.dispose();
 	}
-
-    if (props.getProperty("splashscreen", "yes").equals("yes")) {
-      splash = new SplashScreen("YAMM " + version + 
-                                " Copyright (c) 1999 Fredrik Ehnbom",
-                                "org/gjt/fredde/yamm/images/logo.gif");
-    }
-
-    selectedbox += res.getString("box.inbox");
-    if (!(new File(home + "/boxes")).exists()) {
-      try {
-        String user = System.getProperty("user.name");
-        SimpleDateFormat dateFormat = 
-               new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-
-        InetAddress myInetaddr = InetAddress.getLocalHost();
-        String host = myInetaddr.getHostName();
-
-        if(host == null) host = "localhost";
-
-        (new File(home + "/servers")).mkdirs();
-        (new File(home + "/boxes")).mkdirs();
-        PrintWriter out = new PrintWriter(
-                          new BufferedOutputStream(
-                          new FileOutputStream(home + "/boxes/" + 
-                                               YAMM.getString("box.inbox"))));
-
-        out.println("Date: " + dateFormat.format(new Date()));
-        out.println("From: Fredrik Ehnbom <fredde@gjt.org>");
-        out.println("To: " + user + "@" + host);
-        Object[] args = {YAMM.version, user}; 
-        out.println(YAMM.getString("msg.welcome", args));
-
-        out.close();
-
-        (new File(home + "/boxes/" + getString("box.outbox"))).createNewFile();
-        (new File(home + "/boxes/" + getString("box.trash"))).createNewFile();
-        (new File(home + "/boxes/" + getString("box.sent"))).createNewFile();
-        (new File(home + "/.config")).createNewFile();
-        (new File(home + "/.filters")).createNewFile();
-        (new File(home + "/tmp")).mkdirs();
-      } catch(IOException ioe) { 
-        new MsgDialog(nFrame, YAMM.getString("msg.error"), ioe.toString()); }
-    }
-
-    if (props.getProperty("button.mode", "both").equals("text")) {
-      ico = false;
-    }
-    else if (props.getProperty("button.mode", "both").equals("icon")) {
-      text = false;
-    }
-
-    nFrame = new YAMM();
-    nFrame.setTitle("Yet Another Mail Manager " + version);
-    if(splash != null) splash.dispose();
-  }
 }
 
