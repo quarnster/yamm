@@ -56,8 +56,6 @@ public class Filter {
         con3 = tok.nextToken();
         exec = tok.nextToken();
 
-        System.out.println("if " + con1 + " " + con2 +  " " + con3 + " then move to " + exec);
-
         if(con1.equals("from")) type = 0;
         else if(con1.equals("to")) type = 1;
         else if(con1.equals("subject")) type = 2;
@@ -66,9 +64,7 @@ public class Filter {
         if(con2.equals("is")) {
           for(int i=0; i < list.size();i++) {
             temp2 = ((Vector)list.elementAt(i)).elementAt(type).toString();
-            System.out.println("temp2: " + temp2);
             if(temp2.equalsIgnoreCase(con3)) {
-              System.out.println("mail " + i + "'s " + con1 + " equals " + con3 + ". Will move to " + exec);
               list.remove(i);
               Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" + exec, i);
               i--;
@@ -78,11 +74,9 @@ public class Filter {
         else if(con2.equals("contains")) {
           for(int i=0; i < list.size();i++) {
             temp2 = ((Vector)list.elementAt(i)).elementAt(type).toString();
-            System.out.println("temp2: " + temp2);
             if(temp2.toLowerCase().indexOf(con3.toLowerCase()) != -1) {
-              System.out.println("mail " + i + "'s " + con1 + " contains " + con3 + ". Will move to " + exec);
               list.remove(i);
-              Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" + exec, i - 1);
+              Mailbox.moveMail(confHome + "boxes/.filter", confHome + "boxes/" + exec, i);
               i--;
             }
           }
