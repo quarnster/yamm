@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.50 2003/04/04 15:39:23 fredde Exp $
+/*  $Id: mainTable.java,v 1.51 2003/04/13 16:40:09 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.50 $
+ * @version $Revision: 1.51 $
  */
 public class mainTable
 	extends JTable
@@ -94,7 +94,7 @@ public class mainTable
 				return null;
 			}
 			switch (col) {
-				case COLUMN_NUM: return "" + yamm.keyIndex[row];
+				case COLUMN_NUM: return "" + (yamm.keyIndex[row] + 1);
 				case COLUMN_INFO:
 					if ((status & IndexEntry.STATUS_READ) != 0) {
 						return iread;
@@ -126,6 +126,10 @@ public class mainTable
 		}
 
 		public final String getColumnName(int column) {
+			YAMM yamm = YAMM.getInstance();
+			if (column == COLUMN_FROM && (yamm.getMailbox().endsWith(Utilities.replace("/sent")) || yamm.getMailbox().endsWith(Utilities.replace("/outbox")))) {
+				return YAMM.getString("table.to");
+			}
 			return headername[column];
 		}
 		public final Class getColumnClass(int column) {
@@ -152,6 +156,36 @@ public class mainTable
 			this
 		);
 
+		load();
+
+		setRowHeight(16);
+		setAutoResizeMode(AUTO_RESIZE_LAST_COLUMN);
+		setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		setColumnSelectionAllowed(false);
+		setShowHorizontalLines(false);
+		setShowVerticalLines(false);
+		setIntercellSpacing(new Dimension(0, 0));
+
+		MailTableRenderer rend = new MailTableRenderer(yamm);
+		rend.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		setDefaultRenderer(getColumnClass(0), rend);
+
+		TMListener(this);
+
+		addMouseListener(mouseListener);
+
+		registerKeyboardAction(
+			keyListener, "Del",
+			KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), 0
+		);
+
+		popup = new JPopupMenu();
+		popup.setInvoker(this);
+		createPopup(popup);
+		update();
+	}
+
+	public void load() {
 		TableColumnModel model = getColumnModel();
 		TableColumn column = model.getColumn(COLUMN_NUM);
 		column.setIdentifier("num");
@@ -208,32 +242,6 @@ public class mainTable
 
 		index = model.getColumnIndex("date");
 		model.moveColumn(index, Integer.parseInt(YAMM.getProperty("date.index", "" + COLUMN_DATE)));
-
-		setRowHeight(16);
-		setAutoResizeMode(AUTO_RESIZE_LAST_COLUMN);
-		setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		setColumnSelectionAllowed(false);
-		setShowHorizontalLines(false);
-		setShowVerticalLines(false);
-		setIntercellSpacing(new Dimension(0, 0));
-
-		MailTableRenderer rend = new MailTableRenderer(yamm);
-		rend.setFont(new Font("SansSerif", Font.PLAIN, 12));
-		setDefaultRenderer(getColumnClass(0), rend);
-
-		TMListener(this);
-
-		addMouseListener(mouseListener);
-
-		registerKeyboardAction(
-			keyListener, "Del",
-			KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), 0
-		);
-
-		popup = new JPopupMenu();
-		popup.setInvoker(this);
-		createPopup(popup);
-		update();
 	}
 
 	public void save() {
@@ -547,6 +555,13 @@ public class mainTable
 		sort();
 		dataModel.fireTableDataChanged();
 	}
+	public void updateFull() {
+		// this is a bit of a hack.. but it's all I can think of at the moment
+		save();
+		sort();
+		dataModel.fireTableStructureChanged();
+		load();
+	}
 
 	private MouseListener mouseListener = new MouseAdapter() {
 		public void mouseReleased(MouseEvent me) {
@@ -559,13 +574,13 @@ public class mainTable
 				int row = getSelectedRow();
 				int msg = yamm.keyIndex[row];
 
-				if ((yamm.listOfMails[msg].status & IndexEntry.STATUS_READ) == 0 && !yamm.selectedbox.equals(outbox)) {
+				if ((yamm.listOfMails[msg].status & IndexEntry.STATUS_READ) == 0/* && !yamm.selectedbox.equals(outbox)*/) {
 					yamm.listOfMails[msg].status |= IndexEntry.STATUS_READ;
 
-					Mailbox.setStatus(yamm, yamm.selectedbox, getSelectedMessage(), yamm.listOfMails[msg], IndexEntry.STATUS_READ);
+					Mailbox.setStatus(yamm, yamm.getMailbox(), getSelectedMessage(), yamm.listOfMails[msg], IndexEntry.STATUS_READ);
 
 					dataModel.fireTableRowsUpdated(row, row);
-					yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
+					yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
 					yamm.tree.update();
 					yamm.status.setStatus("");
 				}
@@ -583,12 +598,13 @@ public class mainTable
 
 		void get_mail() {
 			long skip = yamm.listOfMails[yamm.keyIndex[getSelectedRow()]].skip;
+			String box = yamm.getMailbox();
 
-			Mailbox.getMail(yamm.selectedbox, getSelectedMessage(), skip);
+			Mailbox.getMail(box, getSelectedMessage(), skip);
 			try {
-				String boxName = yamm.selectedbox.substring(
-					yamm.selectedbox.indexOf("boxes") + 6,
-					yamm.selectedbox.length()) + "/";
+				String boxName = box.substring(
+					box.indexOf("boxes") + 6,
+					box.length()) + "/";
 
 				yamm.mailPage = new URL(yamm.mailPageString +	boxName + getSelectedMessage() + ".html");
 			} catch (MalformedURLException mue) {
@@ -624,11 +640,11 @@ public class mainTable
 				}
 
 				Arrays.sort(deleteList);
-				Mailbox.deleteMail(yamm.selectedbox, deleteList);
-				Mailbox.createList(yamm.selectedbox, yamm);
+				Mailbox.deleteMail(yamm.getMailbox(), deleteList);
+				Mailbox.createList(yamm.getMailbox(), yamm);
 
 				update();
-				yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
+				yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
 				yamm.tree.fullUpdate();
 
 				if (yamm.listOfMails.length < 0) {
@@ -661,11 +677,11 @@ public class mainTable
 
 				Arrays.sort(deleteList);
 
-				Mailbox.deleteMail(yamm.selectedbox, deleteList);
-				Mailbox.createList(yamm.selectedbox, yamm);
+				Mailbox.deleteMail(yamm.getMailbox(), deleteList);
+				Mailbox.createList(yamm.getMailbox(), yamm);
 
 				update();
-				yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
+				yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
 				yamm.tree.fullUpdate();
 
 				changeButtonMode(false);
@@ -678,7 +694,7 @@ public class mainTable
 				int msgnum = yamm.keyIndex[getSelectedRow()];
 				long skip = yamm.listOfMails[msgnum].skip;
 
-				String[] mail = Mailbox.getMailForReplyHeaders(yamm.selectedbox, skip);
+				String[] mail = Mailbox.getMailForReplyHeaders(yamm.getMailbox(), skip);
 
 
  				if (!mail[2].startsWith(YAMM.getString("mail.re")) && !mail[2].startsWith("Re:")) {
@@ -687,7 +703,7 @@ public class mainTable
 
 				YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[2], mail[0] + " " + YAMM.getString("mail.wrote") + "\n");
 
-				Mailbox.getMailForReply(yamm.selectedbox, msgnum, skip, yam.myTextArea);
+				Mailbox.getMailForReply(yamm.getMailbox(), msgnum, skip, yam.myTextArea);
 				yam.sign();
 			}
 		}
@@ -715,8 +731,8 @@ public class mainTable
 				copyList[j] = yamm.keyIndex[mlist[j]];
 			}
 			Arrays.sort(copyList);
-			Mailbox.copyMail(yamm.selectedbox, name, copyList);
-			yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
+			Mailbox.copyMail(yamm.getMailbox(), name, copyList);
+			yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
 			yamm.tree.unreadTable.put(name, Mailbox.getUnread(name));
 			yamm.tree.fullUpdate();
 		}
@@ -739,10 +755,10 @@ public class mainTable
 			}
 
 			Arrays.sort(moveList);
-			Mailbox.moveMail(yamm.selectedbox, name, moveList);
-			Mailbox.createList(yamm.selectedbox, yamm);
+			Mailbox.moveMail(yamm.getMailbox(), name, moveList);
+			Mailbox.createList(yamm.getMailbox(), yamm);
 			update();
-			yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
+			yamm.tree.unreadTable.put(yamm.getMailbox(), Mailbox.getUnread(yamm.getMailbox()));
 			yamm.tree.unreadTable.put(name, Mailbox.getUnread(name));
 			yamm.tree.fullUpdate();
 		}
@@ -751,6 +767,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.51  2003/04/13 16:40:09  fredde
+ * now uses yamm.set/getMailbox. sets tableheader name to To for outbox and sent
+ *
  * Revision 1.50  2003/04/04 15:39:23  fredde
  * added space before mail.wrote
  *
