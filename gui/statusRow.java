@@ -23,7 +23,7 @@ import java.awt.GridLayout;
 import java.awt.Font;
 import javax.swing.border.*;
 
-public class statusRow extends JPanel {
+public class statusRow extends JComponent {
 
   protected JLabel status;
   protected JProgressBar progress;
