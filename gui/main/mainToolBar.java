@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Id: mainToolBar.java,v 1.22 2000/12/26 11:24:13 fredde Exp $
+ * @version $Id: mainToolBar.java,v 1.23 2003/03/06 23:05:42 fredde Exp $
  */
 public class mainToolBar extends JToolBar {
 
@@ -187,20 +187,10 @@ public class mainToolBar extends JToolBar {
 			} else if (arg.equals(YAMM.getString("button.reply.tooltip"))) {
 				int i = 0;
 
-				while (i < 4) {
-					if (frame.mailList.getColumnName(i).equals("#")) {
-						break;
-					}
-					i++;
-				}
-
-				int selMail = Integer.parseInt(
-						frame.mailList.getValueAt(
-						frame.mailList.getSelectedRow(),
-								i).toString());
+				int selMail = frame.keyIndex[frame.mailList.getSelectedRow()];
 
 				long skip = Long.parseLong(
-					frame.listOfMails[frame.mailList.getSelectedRow()][5]
+					frame.listOfMails[selMail][YAMM.INDEX_SKIP]
 				);
 
 				String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, skip);
@@ -221,20 +211,10 @@ public class mainToolBar extends JToolBar {
 			} else if (arg.equals(YAMM.getString("button.forward.tooltip"))) {
 				int i = 0;
 
-				while (i < 4) {
-					if (frame.mailList.getColumnName(i).equals("#")) {
-						break;
-					}
-					i++;
-				}
-
-				int selMail = Integer.parseInt(
-						frame.mailList.getValueAt(
-						frame.mailList.getSelectedRow(),
-								i).toString());
+				int selMail = frame.keyIndex[frame.mailList.getSelectedRow()];
 
 				long skip = Long.parseLong(
-					frame.listOfMails[frame.mailList.getSelectedRow()][5]
+					frame.listOfMails[selMail][YAMM.INDEX_SKIP]
 				);
 
 				String mail[] = Mailbox.getMailForReplyHeaders(
@@ -279,6 +259,9 @@ public class mainToolBar extends JToolBar {
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.23  2003/03/06 23:05:42  fredde
+ * now gets the correct message when replying/forwarding
+ *
  * Revision 1.22  2000/12/26 11:24:13  fredde
  * YAMM.listOfMails is now of type String[][]
  *
