@@ -28,7 +28,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.31 2000/03/15 11:13:45 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.32 2000/03/25 15:46:52 fredde Exp $
  */
 public class Mailbox {
 
@@ -100,7 +100,6 @@ public class Mailbox {
 	}
 
 	private static String removeQuote(String quote) {
-//		System.out.println("quote: " + quote);
 		quote = quote.replace('\"', '|');
 
 		while (quote.indexOf("|") != -1) {
@@ -749,11 +748,11 @@ public class Mailbox {
 	 * @param whichBox Which box the message is in
 	 * @param whichmail Which mail to get the headers from
 	 */
-	public static String[] getMailForReplyHeaders(String whichBox,
-						int whichmail, long skip) {
-
+	public static String[] getMailForReplyHeaders(String whichBox, long skip) {
 		String  temp = null;
 		String  from = null;
+		String  finalFrom = "";
+		String  email = null;
 		String  subject = null;
 
 		BufferedReader in = null;
@@ -788,13 +787,18 @@ public class Mailbox {
 				StringTokenizer tok = new StringTokenizer(from);
 
 				while (tok.hasMoreTokens()) {
-					from = tok.nextToken();
+					email = tok.nextToken();
 
-					if (from.indexOf("@") != -1) {
-						from = MessageParser.
-							parseLink(from)[1];
-							break;
+					if (email.indexOf("@") != -1) {
+						email = MessageParser.
+							parseLink(email)[1];
+					//		break;
+					} else {
+						finalFrom += email + " ";
 					}
+				}
+				if (from.trim().equals("")) {
+					from = email;
 				}
 			}
 
@@ -811,7 +815,11 @@ public class Mailbox {
 			} catch (IOException ioe) {}
 		}
 
-		String[] ret = {from,subject};
+		String[] ret = {
+				finalFrom,
+				email,
+				subject
+		};
 
 		return ret;
 	}
@@ -1401,6 +1409,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.32  2000/03/25 15:46:52  fredde
+ * updated the getMailForReplyHeaders method
+ *
  * Revision 1.31  2000/03/15 11:13:45  fredde
  * boxes now show if and how many unread messages they have
  *
