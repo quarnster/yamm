@@ -1,0 +1,19 @@
+Some cvs-information:
+
+Mode       : pserver
+Hostname   : cvs.gjt.org
+Repository : /gjt/cvsroot
+Directory  : /java/org/gjt/fredde
+Username   : anoncvs
+Password   : anoncvs
+
+
+To get the cvs-version to work you need to copy the following files/directories to the directory java:
+
+java/org/gjt/fredde/yamm/Makefile (you don't have to though.. use make -f org/gjt...)
+java/org/gjt/fredde/yamm/images
+java/org/gjt/fredde/yamm/resources/YAMM*.properties
+java/org/gjt/fredde/yamm/MANIFEST.MF
+
+
+that should be all...
