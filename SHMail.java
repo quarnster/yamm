@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom
- * @version $Id: SHMail.java,v 1.22 2000/03/18 14:51:29 fredde Exp $
+ * @version $Id: SHMail.java,v 1.23 2000/03/18 17:04:49 fredde Exp $
  */
 public class SHMail extends Thread {
 
@@ -253,6 +253,10 @@ public class SHMail extends Thread {
 					if (mail != null) mail.close();
 				} catch (IOException ioe) {}
 			}
+			if (sent) {
+				Mailbox.updateIndex(YAMM.home + "/boxes/" + YAMM.getString("box.sent");
+				frame.tree.updateUI();
+			}
 		}
 		frame.status.setStatus(YAMM.getString("msg.done"));
 		frame.status.progress(100);
@@ -271,6 +275,8 @@ public class SHMail extends Thread {
 
 			frame.status.setStatus(YAMM.getString("msg.done"));
 			frame.status.progress(100);
+
+			frame.tree.updateUI();
 		}
 		frame.status.setStatus("");
 		frame.status.progress(0); 
@@ -280,6 +286,9 @@ public class SHMail extends Thread {
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.23  2000/03/18 17:04:49  fredde
+ * updates the tree when sending/getting mail
+ *
  * Revision 1.22  2000/03/18 14:51:29  fredde
  * removed unused code, gets the port-number for pop3 from config
  *
