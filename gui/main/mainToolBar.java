@@ -1,4 +1,4 @@
-/*  $Id: mainToolBar.java,v 1.31 2003/04/16 12:42:32 fredde Exp $
+/*  $Id: mainToolBar.java,v 1.32 2003/06/07 09:08:16 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -24,28 +24,29 @@ import java.awt.*;
 // import java.awt.print.PrinterJob;
 import java.io.*;
 import java.util.*;
-import org.gjt.fredde.yamm.YAMM;
-import org.gjt.fredde.yamm.mail.Mailbox;
-import org.gjt.fredde.yamm.YAMMWrite;
-import org.gjt.fredde.yamm.SHMail;
+import org.gjt.fredde.yamm.*;
+import org.gjt.fredde.util.gui.*;
 
 /**
  * The toolbar for the main class
  * @author
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public class mainToolBar
 	extends JToolBar
 {
 
 	/** The forward button */
-	public JButton forward;
+	public BorderButton forward;
 
 	/** The reply button */
-	public JButton reply;
+	public BorderButton reply;
+
+	/** The delete button */
+	public BorderButton delete;
 
 	/** The print button */
-//	public JButton print;
+//	public BorderButton print;
 
 	private String content = YAMM.getProperty("button.content", "South");
 
@@ -59,7 +60,7 @@ public class mainToolBar
 		}
 
 		/* send mails in outbox get mail to inbox */
-		JButton b = new JButton();
+		BorderButton b = new BorderButton();
 		if (yamm.ico) {
 			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/recycle.png")));
 		}
@@ -76,7 +77,7 @@ public class mainToolBar
 
 
 		/* button to write a new mail */
-		b = new JButton();
+		b = new BorderButton();
 		if (yamm.ico) {
 			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/new_mail.png")));
 		}
@@ -91,7 +92,7 @@ public class mainToolBar
 		add(b);
 
 		/* reply button */
-		reply = new JButton();
+		reply = new BorderButton();
 		if (yamm.ico) {
 			reply.setIcon(new ImageIcon(getClass().getResource("/images/buttons/reply.png")));
 		}
@@ -107,7 +108,7 @@ public class mainToolBar
 		add(reply);
 
 		/* forward button */
-		forward = new JButton();
+		forward = new BorderButton();
 		if (yamm.ico) {
 			forward.setIcon(new ImageIcon(getClass().getResource("/images/buttons/forward.png")));
 		}
@@ -125,7 +126,7 @@ public class mainToolBar
 
 		/* button to print page */
 /*
-		print = new JButton();
+		print = new BorderButton();
 		if (frame.ico) {
 			print.setIcon(new ImageIcon("org/gjt/fredde/yamm/" +
 						"images/buttons/print.png"));
@@ -141,8 +142,25 @@ public class mainToolBar
 		print.setEnabled(false);
 		add(print);
 */
+		/* delete button */
+		delete = new BorderButton();
+		if (yamm.ico) {
+			delete.setIcon(new ImageIcon(getClass().getResource("/images/buttons/delete.png")));
+		}
+		if (yamm.text) {
+			delete.setText(YAMM.getString("button.delete"));
+		}
+		delete.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		setAlign(delete, content);
+		delete.addActionListener(BListener);
+		delete.setBorderPainted(false);
+		delete.setToolTipText(YAMM.getString("button.delete.tooltip"));
+		delete.setEnabled(false);
+		add(delete);
+		addSeparator();
+
 		/* button to exit from program */
-		b = new JButton();
+		b = new BorderButton();
 		if (yamm.ico) {
 			b.setIcon(new ImageIcon(getClass().getResource("/images/buttons/exit.png")));
 		}
@@ -158,7 +176,7 @@ public class mainToolBar
 		add(b);
 	}
 
-	protected void setAlign(JButton b, String content) {
+	protected void setAlign(BorderButton b, String content) {
 		if (content.equals("North"))  {
 			b.setHorizontalTextPosition(AbstractButton.CENTER);
 			b.setVerticalTextPosition(AbstractButton.TOP);
@@ -177,13 +195,13 @@ public class mainToolBar
 
 	ActionListener BListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			String arg = ((JButton)e.getSource()).getToolTipText();
+			String arg = ((BorderButton)e.getSource()).getToolTipText();
 
 			if (arg.equals(YAMM.getString("button.new_mail.tooltip"))) {
 				YAMMWrite yam = new YAMMWrite();
 				yam.sign();
 			} else if (arg.equals(YAMM.getString("button.send_get.tooltip"))) {
-				new SHMail(YAMM.getInstance(), "mailthread", (JButton)e.getSource()).start();
+				new SHMail(YAMM.getInstance(), "mailthread", (BorderButton)e.getSource()).start();
 			} else if (arg.equals(YAMM.getString("button.reply.tooltip"))) {
 				YAMMWrite yam = new YAMMWrite();
 				yam.reply();
@@ -205,6 +223,8 @@ public class mainToolBar
 					pj.end();
 				}
 */
+			} else if (arg.equals(YAMM.getString("button.delete.tooltip"))) {
+				YAMM.getInstance().mailList.deleteSelected();
 			} else if(arg.equals(YAMM.getString("button.exit.tooltip"))) {
 				YAMM.getInstance().exit();
 			}
@@ -214,6 +234,9 @@ public class mainToolBar
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.32  2003/06/07 09:08:16  fredde
+ * BorderButton + delete button
+ *
  * Revision 1.31  2003/04/16 12:42:32  fredde
  * now uses YAMMWrite.reply/forward
  *
