@@ -25,7 +25,7 @@ import java.util.jar.*;
 /**
  * This Class provides some useful utilities
  * @author Fredrik Ehnbom
- * @version $Id: Utilities.java,v 1.8 2003/03/14 23:16:37 fredde Exp $
+ * @version $Id: Utilities.java,v 1.9 2003/04/16 12:38:09 fredde Exp $
  */
 public final class Utilities {
 
@@ -52,7 +52,7 @@ public final class Utilities {
 			JarEntry je = jf.getJarEntry("org/gjt/fredde/yamm/YAMM.class");
 
 			Date d = new Date(je.getTime());
-			SimpleDateFormat dateFormat = new SimpleDateFormat("EEEEEEE, MMMMMMMM dd yyyy HH:mm:ss");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("EEEEEEE, MMMMMMMM dd yyyy HH:mm:ss", Locale.US);
 			date = dateFormat.format(d);
 
 			jf.close();
@@ -182,6 +182,9 @@ public final class Utilities {
 /*
  * Changes:
  * $Log: Utilities.java,v $
+ * Revision 1.9  2003/04/16 12:38:09  fredde
+ * dateformat is now in Locale.US format
+ *
  * Revision 1.8  2003/03/14 23:16:37  fredde
  * added parseIntSafe
  *
