@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.27 2003/03/08 13:55:41 fredde Exp $
+/*  $Id: mainJTree.java,v 1.28 2003/03/08 15:21:12 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 public class mainJTree
 	extends JTable
@@ -54,9 +54,9 @@ public class mainJTree
 	private boolean sentbox = false;
 	private TreeTableCellRenderer tree;
 
-	protected Hashtable unreadTable = new Hashtable();
+	public Hashtable unreadTable = new Hashtable();
 
-	protected final AbstractTableModel dataModel = new AbstractTableModel() {
+	public final AbstractTableModel dataModel = new AbstractTableModel() {
 		private final String headername[] = {
 	        	"box",
 			"unread"
@@ -188,8 +188,9 @@ public class mainJTree
 		createNodes(top, new File(Utilities.replace(YAMM.home + "/boxes/")));
 		top.add(new DefaultMutableTreeNode(new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")))));
 
-		updateUI();
 		tree.expandRow(0);
+		((DefaultTreeModel) tree.getModel()).reload();
+		dataModel.fireTableDataChanged();
 	}
 /*
 	public void drop(DropTargetDropEvent e) {
@@ -383,6 +384,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.28  2003/03/08 15:21:12  fredde
+ * unreadTable and dataModel made public. Update models instead of updateUI
+ *
  * Revision 1.27  2003/03/08 13:55:41  fredde
  * updated for the new TreeTable stuff
  *
