@@ -249,7 +249,8 @@ public class mainMenu extends JMenuBar {
           int ret = jfs.showSaveDialog(frame);
 
           if(ret == JFileChooser.APPROVE_OPTION) {
-              new File(System.getProperty("user.home") + "/.yamm/tmp/" + frame.mailName + ".html").renameTo(jfs.getSelectedFile());
+            String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes/") + 6, frame.selectedbox.length());
+            new File(frame.mailPageString + boxName + frame.mailList.getSelectedRow() + ".html").renameTo(jfs.getSelectedFile());
           }
         }
       }

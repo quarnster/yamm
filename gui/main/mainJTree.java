@@ -312,10 +312,9 @@ public class mainJTree extends JTree {
               tree.updateUI();
               tree.expandRow(0);
 
-              ((mainTable)frame.mailList).popup = new JPopupMenu();
-              ((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
-              ((mainTable)frame.mailList).createPopup(((mainTable)frame.mailList).popup);
-
+//              ((mainTable)frame.mailList).popup = new JPopupMenu();
+//              ((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
+//              ((mainTable)frame.mailList).createPopup(((mainTable)frame.mailList).popup);
             }
           }
         }
@@ -333,6 +332,18 @@ public class mainJTree extends JTree {
 
   };
 
+  protected void removeDotG(Vector vect) {
+    for(int i = 0; i < vect.size(); i++) {
+      String temp = vect.elementAt(i).toString();
+
+      while(temp.indexOf(".g") != -1) {
+        temp = temp.substring(0, temp.indexOf(".g")) + temp.substring(temp.indexOf(".g") + 2, temp.length());
+      }
+      System.out.println("temp: " + temp);
+      vect.setElementAt(temp, i);
+    }
+  }
+
   class newGroupDialog extends JDialog {
     JButton    b;
     JComboBox  group;
@@ -341,7 +352,7 @@ public class mainJTree extends JTree {
     public newGroupDialog(JFrame frame) {
       super(frame, true);
       setBounds(0, 0, 300, 100);
-      setResizable(false);
+//      setResizable(false);
       setTitle(res.getString("title.new.group"));
 
       Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -351,6 +362,7 @@ public class mainJTree extends JTree {
       getContentPane().add(new JLabel(res.getString("options.group")));
       Vector vect = new Vector();
       createGroupList(vect, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
+      removeDotG(vect);
       group = new JComboBox( vect );
       getContentPane().add(group);
 
@@ -374,13 +386,26 @@ public class mainJTree extends JTree {
       public void actionPerformed(ActionEvent e) {
         String arg = ((JButton)e.getSource()).getText();
         String sep = System.getProperty("file.separator");
-        if(!group.getSelectedItem().equals(sep)) sep = ".g" + sep;
 
         if(arg.equals(res.getString("button.ok"))) {
+          String gName = group.getSelectedItem().toString();
+          String temp = "";
+
+          if(!gName.equals(sep)) {
+            StringTokenizer tok = new StringTokenizer(gName, sep);
+
+            while(tok.hasMoreTokens()) {
+              temp +=  tok.nextToken() + ".g" + sep;
+            }
+            gName = temp;
+ 
+          }
+          System.out.println("gName: "  + gName);
+
           File box = new File(System.getProperty("user.home") + 
-                              "/.yamm/boxes" + 
-                              group.getSelectedItem() + 
-                              sep + jtfield.getText() + ".g");
+                              "/.yamm/boxes/" + 
+                              gName + 
+                              jtfield.getText() + ".g");
 
           if(box.exists()) new MsgDialog(frame, res.getString("msg.error"), res.getString("msg.file.exists"));
           else {
@@ -394,10 +419,6 @@ public class mainJTree extends JTree {
             top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash")));
             tree.updateUI();
 
-            ((mainTable)frame.mailList).popup = new JPopupMenu();
-            ((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
-            ((mainTable)frame.mailList).createPopup(((mainTable)frame.mailList).popup);
-
             dispose();
           }
         }
@@ -409,7 +430,6 @@ public class mainJTree extends JTree {
     }; 
   }
 
-
   class newBoxDialog extends JDialog {
     JButton    b;
     JComboBox  group;
@@ -418,7 +438,7 @@ public class mainJTree extends JTree {
     public newBoxDialog(JFrame frame) {
       super(frame, true);  
       setBounds(0, 0, 300, 100);
-      setResizable(false);      
+//      setResizable(false);      
       setTitle(res.getString("title.new.box"));
  
       Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -428,6 +448,7 @@ public class mainJTree extends JTree {
       getContentPane().add(new JLabel(res.getString("options.group")));
       Vector vect = new Vector();
       createGroupList(vect, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
+      removeDotG(vect);
       group = new JComboBox(vect);
       getContentPane().add(group);
 
@@ -451,10 +472,26 @@ public class mainJTree extends JTree {
       public void actionPerformed(ActionEvent e) {
         String arg = ((JButton)e.getSource()).getText();
         String sep = System.getProperty("file.separator");
-        if(!group.getSelectedItem().equals(sep)) sep = ".g" + sep;
  
         if(arg.equals(res.getString("button.ok"))) {
-          File box = new File(System.getProperty("user.home") + "/.yamm/boxes/" + group.getSelectedItem() + sep + jtfield.getText());
+          String gName = group.getSelectedItem().toString();
+          String temp = "";
+
+          if(!gName.equals(sep)) {
+            StringTokenizer tok = new StringTokenizer(gName, sep);
+
+            while(tok.hasMoreTokens()) {
+              temp +=  tok.nextToken() + ".g" + sep;
+            }
+            gName = temp;
+
+          }
+
+          System.out.println("gName: "  + gName);
+          File box = new File(System.getProperty("user.home") + 
+                              "/.yamm/boxes/" + 
+                              gName + 
+                              jtfield.getText());
 
           if(box.exists()) new MsgDialog(frame, res.getString("msg.error"), res.getString("msg.file.exists"));
           else {
