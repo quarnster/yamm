@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.51 2003/03/11 15:20:13 fredde Exp $
+/*  $Id: Mailbox.java,v 1.52 2003/03/15 19:28:35 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.51 $
+ * @version $Revision: 1.52 $
  */
 public class Mailbox {
 
@@ -473,7 +473,105 @@ public class Mailbox {
 		if (!whichBox.equals(trash)) {
 			moveMail(whichBox, trash, whichmail);
 		} else if (whichBox.equals(trash)) {
-			System.err.println("not implemented yet");
+			BufferedInputStream in = null;
+			BufferedOutputStream outSrc = null;
+
+			long skipSub = 0;
+
+			long lastPosition = 0;
+			long copyLen = 0;
+			long skipLen = 0;
+
+			try {
+				byte[] buffer = new byte[BUFFERSIZE];
+
+				File inFile = new File(whichBox);
+				File outSrcFile = new File(whichBox + ".tmp");
+				Index srcIndex = new Index(whichBox);
+				srcIndex.open();
+
+				in = new BufferedInputStream(new FileInputStream(inFile));
+				outSrc = new BufferedOutputStream(new FileOutputStream(outSrcFile));
+
+				// copy everything up to the first message to be deleted
+				copyLen = lastPosition = srcIndex.getEntry(whichmail[0]).skip;
+				while (copyLen > 0) {
+					int read = in.read(buffer, 0, (int)Math.min(BUFFERSIZE, copyLen));
+					copyLen -= read;
+					outSrc.write(buffer, 0, read);
+				}
+
+				for (int i = 0; i < whichmail.length; i++) {
+					IndexEntry entry = srcIndex.getEntry(whichmail[i]);
+					skipLen = entry.skip;
+
+					if (whichmail[i]+1 < srcIndex.messageNum) {
+						lastPosition = srcIndex.getEntry(whichmail[i]+1).skip;
+					} else {
+						lastPosition = inFile.length();
+					}
+					skipLen = lastPosition - skipLen;
+
+					if (i + 1 < whichmail.length) {
+						copyLen = srcIndex.getEntry(whichmail[i+1]).skip;
+					} else {
+						copyLen = inFile.length();
+					}
+					copyLen -= lastPosition;
+
+					if ((entry.status & IndexEntry.STATUS_READ) == 0) {
+						srcIndex.unreadNum--;
+						srcIndex.newNum = 0;
+					}
+					skipSub += skipLen;
+
+					int lastMessage = srcIndex.messageNum;
+					if (i + 1 < whichmail.length) {
+						lastMessage = whichmail[i+1];
+					}
+					for (int j = whichmail[i] + 1; j < lastMessage; j++) {
+						IndexEntry ie = srcIndex.getEntry(j);
+						srcIndex.raf.seek(Index.HEADERSIZE + (j - (i+1)) * IndexEntry.SIZE);
+						ie.skip -= skipSub;
+						ie.write(srcIndex.raf);
+					}
+
+					while (skipLen > 0) {
+						skipLen -= in.skip(Math.min(BUFFERSIZE, skipLen));
+					}
+					while (copyLen > 0) {
+						int read = in.read(buffer, 0, (int)Math.min(BUFFERSIZE, copyLen));
+						copyLen -= read;
+						outSrc.write(buffer, 0, read);
+					}
+				}
+
+
+				srcIndex.messageNum -= whichmail.length;
+				srcIndex.rewrite();
+
+				srcIndex.close();
+
+				in.close();
+				outSrc.close();
+
+				inFile.delete();
+				if (!outSrcFile.renameTo(inFile)) {
+					System.err.println("Couldn't rename " + outSrcFile + " to " + inFile);
+				}
+			} catch (IOException ioe) {
+				new ExceptionDialog(
+					YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames
+				);
+				return false;
+			} finally {
+				try {
+					if (in != null) in.close();
+					if (outSrc != null) outSrc.close();
+				} catch (IOException ioe) {}
+			}
 		}
 		return true;
 	}
@@ -745,6 +843,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.52  2003/03/15 19:28:35  fredde
+ * implemented deleteMail
+ *
  * Revision 1.51  2003/03/11 15:20:13  fredde
  * Added getIndexName
  *
