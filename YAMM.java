@@ -361,13 +361,16 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
     JTPane.addTab(res.getString("mail.attachment"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
 
-    SPane = new JSplitPane(0, new JScrollPane(mailList), JTPane);
+    JScrollPane jsp = new JScrollPane(mailList);
+
+    SPane = new JSplitPane(0, jsp, JTPane);
 
     SPane.setDividerLocation(hsplit);
     SPane.setBackground(Color.white);
     SPane.setMinimumSize(new Dimension(0, 0));
     SPane.setPreferredSize(new Dimension(300, 50));
     SPane.setOneTouchExpandable(true);
+    
 //    SPane.setOpaque(true);  // makes it look nicer/uglier
 
 
