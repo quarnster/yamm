@@ -21,6 +21,7 @@ package org.gjt.fredde.yamm.gui.main;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.Rectangle;
+import java.awt.print.PrinterJob;
 import java.io.*;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -163,14 +164,24 @@ public class mainToolBar extends JToolBar {
         Mailbox.getMailForReply(frame.selectedbox, Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString()), yam.myTextArea);
       }
       else if(arg.equals(res.getString("button.print"))) {
+/*
         int i = 0;
 
         while(i<4) {
           if(((JTable)frame.mailList).getColumnName(i).equals("#")) { break; }
           i++;
         }
+*/
 
-        new Print(frame, i);
+        PrinterJob pj=PrinterJob.getPrinterJob();
+
+        pj.setPrintable(frame);
+        if(pj.printDialog()) {
+          try{
+            pj.print();
+          }catch (Exception PrintException) {}
+        }
+//        new Print(frame, i);
       }
       else if(arg.equals(res.getString("button.exit"))) {
         frame.Exit();
