@@ -422,12 +422,37 @@ public class Mailbox {
 						System.err.println(mpe);
 					}
 
-					from = mhp.getHeaderField("From");
+					if (mhp.getHeaderField("Reply-To")
+								!= null) {
+						from = mhp.getHeaderField(
+								"Reply-To");
+					} else {
+						from = mhp.getHeaderField(
+									"From");
+					}
+
 					subject = mhp.getHeaderField("Subject");
 
 					if (from == null) {
 						from = "";
+					} else {
+						StringTokenizer tok = new
+							StringTokenizer(from);
+
+						while (tok.hasMoreTokens()) {
+							from = tok.nextToken();
+
+							if (from.indexOf("@")
+									!= -1) {
+								from =
+								MessageParser.
+								parseLink(from)
+									[1];
+								break;
+							}
+						}
 					}
+
 					if (subject == null) {
 						subject = "";
 					}
