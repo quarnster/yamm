@@ -19,6 +19,8 @@
 package org.gjt.fredde.yamm.gui.main;
 
 import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +37,7 @@ import org.gjt.fredde.util.gui.MsgDialog;
 /**
  * The tree for the main window
  */
-public class mainJTree extends JTree {
+public class mainJTree extends JTree implements DropTargetListener {
 
   /** The ResourceBundle to get menu names. */
   static protected ResourceBundle res;
@@ -43,12 +45,12 @@ public class mainJTree extends JTree {
   /** The Properties that loads and saves information. */
   static protected Properties     props = new Properties();
 
-  JTree tree;
   JPopupMenu treepop;
 
   DefaultMutableTreeNode top;
-  YAMM frame;
-  mainToolBar tbar;
+  protected static YAMM frame;
+  protected static mainToolBar tbar;
+  DefaultTreeModel tm;
 
   /**
    * Creates the tree and adds all the treestuff to the tree.
@@ -56,11 +58,15 @@ public class mainJTree extends JTree {
    * @param top2 The TreeNode that this tree will use.
    * @param tbar2 The mainToolBar to disable/enable buttons on.
    */
-  public mainJTree(JFrame frame2, DefaultMutableTreeNode top2, mainToolBar tbar2) { 
-   frame = (YAMM)frame2;
+  public mainJTree(YAMM frame2, DefaultMutableTreeNode top2, mainToolBar tbar2) { 
+   frame = frame2;
    tbar = tbar2;
    top = top2;
-   tree = this;
+  // tree = this;
+
+   new DropTarget(this, // component
+     DnDConstants.ACTION_COPY_OR_MOVE, // actions
+     this); //DropTargetListener
 
    try {
       InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
@@ -76,7 +82,8 @@ public class mainJTree extends JTree {
       System.exit(1);
     }
 
-    setModel(new DefaultTreeModel(top));
+    tm = new DefaultTreeModel(top);
+    setModel(tm);
     myTreeRenderer rend = new myTreeRenderer();
     rend.setFont(new Font("SansSerif", Font.PLAIN, 12));
     setCellRenderer(rend); //new myTreeRenderer());
@@ -133,6 +140,68 @@ public class mainJTree extends JTree {
     mi = new JMenuItem(res.getString("button.delete"));
     mi.addActionListener(treepoplistener);
     treepop.add(mi);
+  }
+
+  public void drop(DropTargetDropEvent e) {
+    try {
+      DataFlavor stringFlavor = DataFlavor.stringFlavor;
+      Transferable tr = e.getTransferable();
+
+      if(e.isDataFlavorSupported(stringFlavor)) {
+        String mails = (String)tr.getTransferData(stringFlavor);
+
+        e.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+        doAction(mails, e.getLocation(), e.getDropAction());
+        e.dropComplete(true);
+      }
+      else {
+        e.rejectDrop();
+      }
+    } catch (IOException ioe) {
+        ioe.printStackTrace();
+    } catch (UnsupportedFlavorException ufe) {
+        ufe.printStackTrace();
+    }
+  }
+
+  public void dragEnter(DropTargetDragEvent e) { }
+  public void dragExit(DropTargetEvent e) { }
+  public void dragOver(DropTargetDragEvent e) { }
+  public void dropActionChanged(DropTargetDragEvent e) { }
+
+  protected void doAction(String mails, Point p, int act) {
+    String action = (act == DnDConstants.ACTION_MOVE ? "move" : "copy");
+    System.out.println("Wanted to " + action + ": " + mails);
+    System.out.println("from " + frame.selectedbox);
+
+    TreePath tp = getPathForLocation(p.x, p.y);
+    String box = null; // = tp.getLastPathComponent().toString();
+    if(tp != null) {
+      box = tp.getLastPathComponent().toString();
+      System.out.println("to " + box);
+    }
+    else {
+      System.out.println("to box was null ");
+      box = null;
+    }
+
+    if(!box.endsWith(".g") && !box.equals("Mail Boxes") && box != null) {
+      StringTokenizer tok = new StringTokenizer(mails);
+      int[] list = new int[tok.countTokens()];
+
+      for(int i = 0; tok.hasMoreTokens(); i++) {
+        list[i] = Integer.parseInt(tok.nextToken());
+      }
+
+      if(list.length == 0) return;
+      if(action.equals("move"))
+        Mailbox.moveMail(frame.selectedbox, box, list);
+      else
+        Mailbox.copyMail(frame.selectedbox, box, list);
+
+      Mailbox.createList(frame.selectedbox, frame.listOfMails);
+      frame.mailList.updateUI();
+    }
   }
 
   /**
@@ -271,13 +340,13 @@ public class mainJTree extends JTree {
         new newGroupDialog(frame);
       }
       else {
-        if(tree.getLastSelectedPathComponent() != null) {
+        if(getLastSelectedPathComponent() != null) {
 
-          File del = new File(tree.getLastSelectedPathComponent().toString());
+          File del = new File(getLastSelectedPathComponent().toString());
 
 
           if(!del.isDirectory() && del.exists()) {
-            String file = tree.getLastSelectedPathComponent().toString();
+            String file = getLastSelectedPathComponent().toString();
             String sep  = System.getProperty("file.separator");
  
             if(!file.endsWith(sep + "inbox") && !file.endsWith(sep + "outbox") && !file.endsWith(sep + "trash")) {
@@ -290,8 +359,8 @@ public class mainJTree extends JTree {
               top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
               createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
               top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash"))); 
-              tree.updateUI();
-              tree.expandRow(0);
+              updateUI();
+              expandRow(0);
 
               ((mainTable)frame.mailList).popup = new JPopupMenu();
               ((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
@@ -309,8 +378,8 @@ public class mainJTree extends JTree {
               top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
               createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
               top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash")));
-              tree.updateUI();
-              tree.expandRow(0);
+              updateUI();
+              expandRow(0);
 
 //              ((mainTable)frame.mailList).popup = new JPopupMenu();
 //              ((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
@@ -417,7 +486,7 @@ public class mainJTree extends JTree {
             top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
             createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
             top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash")));
-            tree.updateUI();
+            updateUI();
 
             dispose();
           }
@@ -504,7 +573,7 @@ public class mainJTree extends JTree {
             top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/outbox")));
             createNodes(top, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
             top.add(new DefaultMutableTreeNode(new File(System.getProperty("user.home") + "/.yamm/boxes/trash")));
-            tree.updateUI();
+            updateUI();
 
             ((mainTable)frame.mailList).popup = new JPopupMenu();
             ((mainTable)frame.mailList).popup.setInvoker(frame.mailList);
