@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.45 2003/06/07 11:30:15 fredde Exp $
+/*  $Id: mainJTree.java,v 1.46 2003/06/08 08:55:31 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.45 $
+ * @version $Revision: 1.46 $
  */
 public class mainJTree
 	extends JTable
@@ -348,6 +348,7 @@ public class mainJTree
 				Mailbox.moveMail(yamm.getMailbox(), box, list);
 				Mailbox.createList(yamm.getMailbox(), yamm);
 				yamm.mailList.update();
+				yamm.mail.setText("");
 			} else {
 				Mailbox.copyMail(YAMM.getInstance().getMailbox(), box, list);
 			}
@@ -492,6 +493,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.46  2003/06/08 08:55:31  fredde
+ * sets a blank document when moving mail
+ *
  * Revision 1.45  2003/06/07 11:30:15  fredde
  * now uses changeButtonMode
  *
