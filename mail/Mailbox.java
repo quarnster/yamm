@@ -320,7 +320,7 @@ public class Mailbox {
 
           else if(temp.startsWith("Subject:")) {
             if(i == whichmail) {
-              outFile.println("<tr></td>" + YAMM.getString("mail.subject") + 
+              outFile.println("<tr><td>" + YAMM.getString("mail.subject") + 
                               "</td><td> " + temp.substring(8, temp.length()) +
                               "</td></tr>");
             }
