@@ -23,7 +23,7 @@ import java.io.*;
 /**
  * This class parses attachments
  * @author Fredrik Ehnbom
- * @version $Id: Attachment.java,v 1.7 2003/03/05 15:04:22 fredde Exp $
+ * @version $Id: Attachment.java,v 1.8 2003/03/05 21:36:23 fredde Exp $
  */
 public class Attachment {
 
@@ -89,7 +89,7 @@ public class Attachment {
 			encoding = mhp.getHeaderField("Content-Transfer-Encoding").trim();
 		}
 
-		if (encoding != null) {
+		if (contentType.indexOf("text") == -1 && contentType.indexOf("multipart") == -1) {
 			if (encoding.equalsIgnoreCase("base64") ||
 				encoding.equalsIgnoreCase("x-uuencode")
 			) {
@@ -123,6 +123,9 @@ public class Attachment {
 /*
  * Changes:
  * $Log: Attachment.java,v $
+ * Revision 1.8  2003/03/05 21:36:23  fredde
+ * Huge improvements for html, mime and multipart messages
+ *
  * Revision 1.7  2003/03/05 15:04:22  fredde
  * added Variable contentType
  *

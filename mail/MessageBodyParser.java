@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Parses the body of a message
  * @author Fredrik Ehnbom
- * @version $Id: MessageBodyParser.java,v 1.12 2003/03/05 16:00:27 fredde Exp $
+ * @version $Id: MessageBodyParser.java,v 1.13 2003/03/05 21:36:23 fredde Exp $
  */
 public class MessageBodyParser {
 
@@ -34,8 +34,7 @@ public class MessageBodyParser {
 	public static final int ATTACHMENT = 2;
 
 	protected boolean html = false;
-
-	protected boolean htmlMsg = false;
+	protected boolean mime = false;
 
 	public static String unMime(String m, boolean html) {
 		char[] check = "0123456789ABCDEF".toCharArray();
@@ -46,12 +45,6 @@ public class MessageBodyParser {
 			String mime = tok.nextToken();
 
 			if (mime.indexOf("=") != -1) {
-
-				if (mime.toLowerCase().indexOf("://") != -1) {
-					mime2 += mime + " ";
-					continue;
-				}
-
 				for (int index = mime.indexOf("=") + 1;;
 					index = mime.indexOf("=", index) + 1) {
 
@@ -184,9 +177,9 @@ public class MessageBodyParser {
 	public MessageBodyParser(boolean html) {
 		this(html, false);
 	}
-	public MessageBodyParser(boolean html, boolean htmlMsg) {
+	public MessageBodyParser(boolean html, boolean mime) {
 		this.html = html;
-		this.htmlMsg = htmlMsg;
+		this.mime = mime;
 	}
 
 	public int parse(BufferedReader in, PrintWriter out, String attachment)
@@ -197,10 +190,6 @@ public class MessageBodyParser {
 		for (;;) {
 			if (temp == null) {
 				throw new MessageParseException("Unexpected end of message.");
-			}
-
-			if (!htmlMsg && temp.toLowerCase().indexOf("html") != -1 && temp.indexOf("<") != -1 && temp.indexOf(".") == -1) {
-				htmlMsg = true;
 			}
 
 			if (temp.equals(".")) {
@@ -221,22 +210,21 @@ public class MessageBodyParser {
 				continue;
 			}
 
-			if (temp.indexOf("=") != -1 && temp.indexOf("://") == -1 && temp.indexOf("www") == -1) {
-				temp = unMime(temp, html);
+			if (mime && temp.indexOf("=") != -1) {
+				temp = unMime(temp, false);
 			}
 
-			if (!htmlMsg && (temp.indexOf("<") != -1 ||
-						temp.indexOf(">") != -1)) {
+			if (!html && (temp.indexOf("<") != -1 || temp.indexOf(">") != -1)) {
 				temp = makeHtml(temp);
 			}
 
-			if (temp.indexOf("@") != -1) {
+			if (!html && temp.indexOf("@") != -1) {
 				if (temp.toLowerCase().indexOf("href=") == -1) {
 					temp = makeEmailLink(temp);
 				}
 			}
 
-			if (temp.indexOf("://") != -1 || temp.indexOf("www.") != -1) {
+			if (!html && (temp.indexOf("://") != -1 || temp.indexOf("www.") != -1)) {
 				if (temp.toLowerCase().indexOf("href=") == -1) {
 					temp = makeLink(temp);
 				}
@@ -250,6 +238,9 @@ public class MessageBodyParser {
 /*
  * Changes:
  * $Log: MessageBodyParser.java,v $
+ * Revision 1.13  2003/03/05 21:36:23  fredde
+ * Huge improvements for html, mime and multipart messages
+ *
  * Revision 1.12  2003/03/05 16:00:27  fredde
  * Layout fixes
  *

@@ -26,7 +26,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Parses messages
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: MessageParser.java,v 1.18 2003/03/05 15:59:54 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.19 2003/03/05 21:36:23 fredde Exp $
  */
 public class MessageParser {
 
@@ -127,15 +127,48 @@ public class MessageParser {
 				stuff = false;
 			}
 		}
-		System.out.println("temp: " + temp);
 		String[] tmp = { begin, temp, end };
 		return tmp;
+	}
+
+	private boolean skipMultipart(BufferedReader in, String boundary)
+		throws IOException, MessageParseException
+	{
+		// parse to the html-message
+		for (;;) {
+			String temp = in.readLine();
+			if (temp == null || temp.equals(".")) {
+				throw new MessageParseException("html-part of multipart message not found!");
+			} else if (temp.equals("--" + boundary)) {
+				Attachment a = new Attachment();
+				a.parse(in, null);
+				if (a.contentType != null) {
+					if (a.contentType.indexOf("text/html") != -1) {
+						return true;
+					} else if (a.contentType.indexOf("multipart/alternative") != -1) {
+						String boundary2 = "";
+						if (a.contentType.indexOf("boundary=") != -1) {
+							boundary2 = a.contentType.substring(a.contentType.indexOf("boundary=") + 9, a.contentType.length());
+							if (boundary2.startsWith("\"")) {
+								boundary2 = boundary2.substring(1, boundary2.length() - 1);
+							}
+							if (boundary2.indexOf("\"") != -1) {
+								boundary2 = boundary2.substring(0, boundary2.indexOf("\""));
+							}
+						}
+						return skipMultipart(in, boundary2);
+					}
+				}
+			}
+		}
+//		return false;
 	}
 
 	public MessageParser(BufferedReader in, PrintWriter out, String file)
 		throws IOException, MessageParseException
 	{
 		boolean html = false;
+		boolean mime = false;
 		file = file.substring(0, file.length() - 5);
 		MessageHeaderParser mhp = new MessageHeaderParser();
 		mhp.parse(in);
@@ -210,24 +243,48 @@ public class MessageParser {
 			}
 		}
 
+		if (contentType.indexOf("multipart/alternative") != -1 && boundary != null) {
+			html = skipMultipart(in, boundary);
+		}
+		if (contentType.indexOf("text/html") != -1) html = true;
+
 		if (mhp.getHeaderField("MIME-Version") != null) {
 			// expect a little mime message
-			if (boundary != null) {
+			if (!html && boundary != null) {
 				for (;;) {
 					if (in.readLine().equals("--" +	boundary)) {
 						Attachment a = new Attachment();
 						a.parse(in, null);
-						if (a.contentType != null && a.contentType.indexOf("text/html") != -1) html = true;
+						if (a.contentType != null) {
+							if (a.contentType.indexOf("text/html") != -1) {
+								html = true;
+							} else if (a.contentType.indexOf("multipart/alternative") != -1) {
+								String boundary2 = "";
+								if (a.contentType.indexOf("boundary=") != -1) {
+									boundary2 = a.contentType.substring(a.contentType.indexOf("boundary=") + 9, a.contentType.length());
+									if (boundary2.startsWith("\"")) {
+										boundary2 = boundary2.substring(1, boundary2.length() - 1);
+									}
+									if (boundary2.indexOf("\"") != -1) {
+										boundary2 = boundary2.substring(0, boundary2.indexOf("\""));
+									}
+								}
+
+								html = skipMultipart(in, boundary2);
+							}
+						}
+
 						break;
 					}
 				}
 			}
+			mime = true;
 		}
 
 		if (!html)
 			out.println("<br><pre>");
 
-		MessageBodyParser mbp = new MessageBodyParser(true, html);
+		MessageBodyParser mbp = new MessageBodyParser(html, mime);
 
 		bigLoop:
 		for (;;) {
