@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * This class is used for launching the current platforms browser.
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: Browser.java,v 1.2 2000/04/01 14:59:56 fredde Exp $
+ * @version $Id: Browser.java,v 1.3 2000/07/13 19:03:32 fredde Exp $
  */
 public class Browser {
 
@@ -34,7 +34,7 @@ public class Browser {
 		String cmd = null;
 
 		if (isWindows()) {
-			cmd = "start " + url;
+			cmd = "rundll32 url.dll,FileProtocolHandler " + url;
 			Runtime.getRuntime().exec(cmd);
 		} else {
 			cmd = "netscape -remote openURL(" + url + ")";
@@ -66,6 +66,9 @@ public class Browser {
 /*
  * ChangeLog:
  * $Log: Browser.java,v $
+ * Revision 1.3  2000/07/13 19:03:32  fredde
+ * updated the command to startup browsers in windows
+ *
  * Revision 1.2  2000/04/01 14:59:56  fredde
  * license for the package changed to LGPL
  *
