@@ -28,7 +28,7 @@ import org.gjt.fredde.yamm.mail.Mailbox;
 /**
  * The renderer for the mailbox tree
  * @author Fredrik Ehnbom
- * @version $Id: BoxTreeRenderer.java,v 1.5 2000/07/16 17:48:36 fredde Exp $
+ * @version $Id: BoxTreeRenderer.java,v 1.6 2000/08/09 16:29:44 fredde Exp $
  */
 public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
                                                                    
@@ -56,10 +56,10 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 	public Component getTreeCellRendererComponent(
 				JTree   tree,
 				Object  value,
-				boolean selected,      
+				boolean selected,
 				boolean expanded,
 				boolean leaf,
-				int     row,     
+				int     row,
 				boolean hasFocus) {
 		String s = value.toString();
 		StringTokenizer tok = new StringTokenizer(s, System.getProperty("file.separator"));
@@ -86,7 +86,7 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 
 		if (thisbox.endsWith(".g")) {
 			setText(thisbox.substring(0, thisbox.length() -2));
-		} else if (!thisbox.equals(YAMM.getString("box.boxes"))) {
+		} else if (!thisbox.equals(YAMM.getString("box.boxes")) && !thisbox.equals(YAMM.getString("box.outbox"))) {
 			int unread[] = Mailbox.getUnread(s);
 			if (unread[1] != -1 && unread[1] != 0 && YAMM.getProperty("showunread", "true").equals("true")) thisbox += " " + unread[1] + "/" + unread[0];
 			setText(thisbox);
@@ -135,6 +135,9 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 /*
  * Changes:
  * $Log: BoxTreeRenderer.java,v $
+ * Revision 1.6  2000/08/09 16:29:44  fredde
+ * don't show unread messages for the outbox
+ *
  * Revision 1.5  2000/07/16 17:48:36  fredde
  * lots of Windows compatiblity fixes
  *
