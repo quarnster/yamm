@@ -1,5 +1,5 @@
-/*  YAMMWrite.java - Writing mail
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+/*  $Id: YAMMWrite.java,v 1.25 2001/05/27 08:57:00 fredde Exp $
+ *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ import org.gjt.fredde.yamm.gui.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Id: YAMMWrite.java,v 1.24 2001/04/21 09:31:26 fredde Exp $
+ * @version $Revision: 1.25 $
  */
 public class YAMMWrite extends JFrame {
 
@@ -290,7 +290,7 @@ public class YAMMWrite extends JFrame {
 		}
 
 		try {
-			in = new FileInputStream(YAMM.getProperty("signatur"));
+			in = new FileInputStream(prof.sign);
 			String tmp = null;
 			byte[] singb = new byte[in.available()];
 
@@ -494,6 +494,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.25  2001/05/27 08:57:00  fredde
+ * Fixed signature stuff thanks to wYRd
+ *
  * Revision 1.24  2001/04/21 09:31:26  fredde
  * drag and drop from attachlist
  *
