@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.48 2003/03/15 19:36:38 fredde Exp $
+/*  $Id: mainTable.java,v 1.49 2003/03/16 11:03:39 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.48 $
+ * @version $Revision: 1.49 $
  */
 public class mainTable
 	extends JTable
@@ -163,12 +163,14 @@ public class mainTable
 		column.setIdentifier("info");
 		column.setMinWidth(16);
 		column.setMaxWidth(16);
+		column.setResizable(false);
 		column.setPreferredWidth(16);
 
 		column = model.getColumn(COLUMN_ATTACHMENT);
 		column.setIdentifier("attachment");
 		column.setMinWidth(16);
 		column.setMaxWidth(16);
+		column.setResizable(false);
 		column.setPreferredWidth(16);
 
 		column = model.getColumn(COLUMN_SUBJECT);
@@ -208,7 +210,8 @@ public class mainTable
 		model.moveColumn(index, Integer.parseInt(YAMM.getProperty("date.index", "" + COLUMN_DATE)));
 
 		setRowHeight(16);
-		setSelectionMode(2);
+		setAutoResizeMode(AUTO_RESIZE_LAST_COLUMN);
+		setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		setColumnSelectionAllowed(false);
 		setShowHorizontalLines(false);
 		setShowVerticalLines(false);
@@ -748,6 +751,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.49  2003/03/16 11:03:39  fredde
+ * resizable false for imageicon columns
+ *
  * Revision 1.48  2003/03/15 19:36:38  fredde
  * added attachment column. added sorting by status and sorting by attachment
  *
