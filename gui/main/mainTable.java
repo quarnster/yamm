@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * The Table for listing the mails subject, date and sender.
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.24 2000/02/28 13:47:35 fredde Exp $
+ * @version $Id: mainTable.java,v 1.25 2000/03/12 17:23:17 fredde Exp $
  */
 public class mainTable extends JTable implements DragGestureListener,
 							DragSourceListener {
@@ -657,49 +657,8 @@ public class mainTable extends JTable implements DragGestureListener,
 					return;
 				}
 
-				if (getSelectedRow() >=
-					 	frame.listOfMails.size()) {
-					changeButtonMode(false);
-					clearSelection();
-					return;
-				}
-
-				frame.attach = new Vector();
-
-				long skip = Long.parseLong(
-					((Vector) listOfMails.elementAt(
-						getSelectedRow())).
-						elementAt(5).toString());
-
-				Mailbox.getMail(frame.selectedbox,
-							getSelectedRow(), skip);
-
-				try {
-					String boxName = frame.selectedbox.
-						substring(
-						frame.selectedbox.indexOf(
-						"boxes") + 6,
-						frame.selectedbox.length()) +
-						 "/";
-
-					frame.mailPage = new URL(
-							frame.mailPageString +
-							boxName +
-							getSelectedRow() +
-							".html");
-				} catch (MalformedURLException mue) {
-					new ExceptionDialog(YAMM.getString("msg.error"),
-						mue,
-						YAMM.exceptionNames);
-				}
-
-				try {
-					frame.mail.setPage(frame.mailPage);
-				} catch (IOException ioe) {
-					new ExceptionDialog(YAMM.getString("msg.error"),
-							ioe,
-							YAMM.exceptionNames);
-				}
+				changeButtonMode(false);
+				clearSelection();
 			}
 
 		}
@@ -742,49 +701,8 @@ public class mainTable extends JTable implements DragGestureListener,
 
 				updateUI();
 
-				if (getSelectedRow() >=
-						frame.listOfMails.size()) {
-					changeButtonMode(false);
-					clearSelection();
-					return;
-				}
-
-				frame.attach = new Vector();
-
-				long skip = Long.parseLong(
-					((Vector) listOfMails.elementAt(
-						getSelectedRow())).
-						elementAt(5).toString());
-
-				Mailbox.getMail(frame.selectedbox,
-						getSelectedRow(), skip);
-
-				try { 
-					String boxName = frame.selectedbox.
-						substring(
-							frame.selectedbox.
-							indexOf("boxes") + 6,
-							frame.selectedbox.
-								length()
-						) + "/"; 
-					frame.mailPage = new URL(
-							frame.mailPageString +
-							boxName +
-							getSelectedRow() +
-							".html"); 
-				} catch (MalformedURLException mue) { 
-					new ExceptionDialog(YAMM.getString("msg.error"), 
-							mue,
-							YAMM.exceptionNames);
-				}
-
-				try {
-					frame.mail.setPage(frame.mailPage);
-				} catch (IOException ioe) { 
-					new ExceptionDialog(YAMM.getString("msg.error"), 
-							ioe,
-							YAMM.exceptionNames);
-				}
+				changeButtonMode(false);
+				clearSelection();
 			} else if (kommando.equals(
 					YAMM.getString("button.reply"))) {
 
@@ -921,6 +839,9 @@ public class mainTable extends JTable implements DragGestureListener,
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.25  2000/03/12 17:23:17  fredde
+ * clear selection when deleting files
+ *
  * Revision 1.24  2000/02/28 13:47:35  fredde
  * Added changelog and some javadoc tags. Now uses the Utilities class for removing unneeded files
  *
