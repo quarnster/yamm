@@ -1,4 +1,4 @@
-/*  $Id: mainMenu.java,v 1.31 2003/03/09 17:51:08 fredde Exp $
+/*  $Id: mainMenu.java,v 1.32 2003/03/12 20:21:43 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,6 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import org.gjt.fredde.util.gui.MsgDialog;
 import org.gjt.fredde.yamm.gui.sourceViewer;
 import org.gjt.fredde.yamm.mail.Mailbox;
 import org.gjt.fredde.yamm.YAMMWrite;
@@ -38,23 +37,23 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public class mainMenu
 	extends JMenuBar
 {
 	/**
-	 * This frame is used to do som framestuff
+	 * This yamm is used to do som yammstuff
 	 */
-	static YAMM frame = null;
+	static YAMM yamm = null;
 
 	/**
 	 * Makes the menu, adds a menulistener etc...
-	 * @param frame2 The JFrame that will be used when displaying error
+	 * @param yamm2 The JFrame that will be used when displaying error
 	 * messages etc
 	 */
-	public mainMenu(YAMM frame2) {
-		frame = frame2;
+	public mainMenu(YAMM yamm2) {
+		yamm = yamm2;
 
 		JMenu file = new JMenu(YAMM.getString("file"));
 		file.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -137,7 +136,7 @@ public class mainMenu
 			String kommando = ((JMenuItem)ae.getSource()).getText();
 
 			if (kommando.equals(YAMM.getString("file.exit"))) {
-				frame.Exit();
+				yamm.Exit();
 			} else if (kommando.equals(YAMM.getString("help.about_you"))) {
 				String host = null;
 				String ipaddress = null;
@@ -166,12 +165,18 @@ public class mainMenu
 					System.getProperty("java.vendor"),
 					System.getProperty("java.vendor.url"),
 					System.getProperty("user.name"),
-					System.getProperty("user.home")
+					System.getProperty("user.home"),
+					YAMM.getProperty("stat.sentnum", "0"),
+					YAMM.getProperty("stat.receivednum", "0"),
+					YAMM.getProperty("stat.sentbytes", "0"),
+					YAMM.getProperty("stat.receivedbytes", "0"),
 				};
 
-				new MsgDialog(null,
+				JOptionPane.showMessageDialog(
+					yamm,
+					YAMM.getString("info.about.you", args),
 					YAMM.getString("help.about_you"),
-					YAMM.getString("info.about.you", args)
+					JOptionPane.INFORMATION_MESSAGE
 				);
 			} else if (kommando.equals(YAMM.getString("help.about"))) {
 
@@ -182,14 +187,15 @@ public class mainMenu
 					"<fredde@gjt.org>"
 				};
 
-				new MsgDialog(
-					null,
-					YAMM.getString("help.about"),
-					"Copyright (C) 1999-2001 Fredrik Ehnbom\n" +
-					YAMM.getString("info.about", args) +
+				JOptionPane.showMessageDialog(
+					yamm,
+					"Copyright (C) 1999-2003 Fredrik Ehnbom\n" +
+					YAMM.getString("info.about", args) + "\n" + 
 					"Tuomas Kuosmanen \n" +
 					"Rafael Escovar \n" + 
-					"Ricardo A Mattar "
+					"Ricardo A Mattar ",
+					YAMM.getString("help.about"),
+					JOptionPane.INFORMATION_MESSAGE
 				);
 			} else if (kommando.equals(YAMM.getString("help.bug_report"))) {
 				YAMMWrite yw = new YAMMWrite("\"Fredrik Ehnbom\" <fredde@gjt.org>", "Bug report");
@@ -219,32 +225,34 @@ public class mainMenu
 				jt.append("YAMM.version: " + YAMM.version + "\n");
 				jt.append("YAMM.compDate: " + YAMM.compDate);
 			} else if (kommando.equals(YAMM.getString("help.license"))) {
-				new MsgDialog(null,
-					YAMM.getString("help.license"),
+
+				JOptionPane.showMessageDialog(
+					yamm,
 					"Yet Another Mail Manager " +
 					YAMM.version + " E-Mail Client\n" +
-					"Copyright (C) 1999-2001 Fredrik Ehnbom\n" +
+					"Copyright (C) 1999-2003 Fredrik Ehnbom\n" +
 					YAMM.getString("license"),
-					MsgDialog.OK, JLabel.LEFT
+					YAMM.getString("help.license"),
+					JOptionPane.INFORMATION_MESSAGE
 				);
 			}  else if (kommando.equals(YAMM.getString("edit.settings"))) {
-				new ConfigurationWizard(frame);
+				new ConfigurationWizard(yamm);
 			} else if (kommando.equals(YAMM.getString("file.new"))) {
 				new YAMMWrite();
 			} else if (kommando.equals(YAMM.getString("edit.view_source"))) {
-				mainTable tmp = frame.mailList;
+				mainTable tmp = yamm.mailList;
 				int test = tmp.getSelectedRow();
 
-				if (test >= 0 && test < frame.listOfMails.length) {
+				if (test >= 0 && test < yamm.listOfMails.length) {
 
 					int msg = tmp.getSelectedMessage();
 
-					long skip = frame.listOfMails[msg].skip;
+					long skip = yamm.listOfMails[msg].skip;
 
 					if (msg != -1) {
 						sourceViewer sv = new sourceViewer();
 						int ret = Mailbox.viewSource(
-							frame.selectedbox, msg,
+							yamm.selectedbox, msg,
 							skip,
 							sv.jtarea
 						);
@@ -260,28 +268,28 @@ public class mainMenu
 					}
 				}
 			} else if (kommando.equals(YAMM.getString("file.save_as"))) {
-				int test = frame.mailList.getSelectedMessage();
+				int test = yamm.mailList.getSelectedMessage();
 
-				if (test != -1 && test <= frame.listOfMails.length) {
+				if (test != -1 && test <= yamm.listOfMails.length) {
 					JFileChooser jfs = new JFileChooser();
 					jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
 					jfs.setMultiSelectionEnabled(false);
 					jfs.setFileFilter(new filter());
 					jfs.setSelectedFile(new File("mail.html"));
-					int ret = jfs.showSaveDialog(frame);
+					int ret = jfs.showSaveDialog(yamm);
 
 					if (ret == JFileChooser.APPROVE_OPTION) {
-						String tmp = frame.selectedbox;
+						String tmp = yamm.selectedbox;
 						String boxName = tmp.substring(
 							tmp.indexOf("boxes") +
 							6,
 							tmp.length()
 						);
-						tmp = frame.mailPageString;
+						tmp = yamm.mailPageString;
 						boxName = tmp.substring(8,
 							tmp.length()) +
 							boxName + File.separator +
-							frame.mailList.
+							yamm.mailList.
 							getSelectedMessage() +
 							".html";
 
@@ -332,6 +340,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.32  2003/03/12 20:21:43  fredde
+ * removed MsgDialog. added sent/received stats. frame -> yamm
+ *
  * Revision 1.31  2003/03/09 17:51:08  fredde
  * now uses the new index system
  *
