@@ -1,5 +1,5 @@
-/*  Smtp.java - The Simple Mail Transfer Protocol class
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+/*  $Id: Smtp.java,v 1.7 2003/06/06 13:41:01 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -66,7 +66,7 @@ import java.io.*;
  * }
  * </pre></code>
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: Smtp.java,v 1.6 2000/04/11 13:32:12 fredde Exp $
+ * @version $Revision: 1.7 $
  */
 public class Smtp {
 
@@ -87,7 +87,9 @@ public class Smtp {
 	 * @param server The server to use
 	 * @param file The file to get messages from
 	 */
-	public Smtp(String server) throws IOException {
+	public Smtp(String server)
+		throws IOException
+	{
 		this(server, 25, false);
 	}
 
@@ -96,11 +98,15 @@ public class Smtp {
 	 * @param server The server to use
 	 * @param file The file to get messages from
 	 */
-	public Smtp(String server, int port) throws IOException {
+	public Smtp(String server, int port)
+		throws IOException
+	{
 		this(server, port, false);
 	}
 
-	public Smtp(String server, int port, boolean debug) throws IOException {
+	public Smtp(String server, int port, boolean debug)
+		throws IOException
+	{
 		this.debug = debug;
 
 		Debug("Creating socket... (" + server + ", " + port + ")");
@@ -124,7 +130,9 @@ public class Smtp {
 	 * closes the connection
 	 * @deprecated Replaced by <code>Smtp.close()</code>
 	 */
-	public void closeConnection() throws IOException {
+	public void closeConnection()
+		throws IOException
+	{
 		sendCommand("QUIT", 221);
 		in.close();
 		out.close();
@@ -134,7 +142,9 @@ public class Smtp {
 	/**
 	 * closes the connection
 	 */
-	public void close() throws IOException {
+	public void close()
+		throws IOException
+	{
 		sendCommand("QUIT", 221);
 
 		Debug("Closing input stream...");
@@ -150,21 +160,27 @@ public class Smtp {
 	/**
 	 * Who is this message from? specify with this command.
 	 */
-	public void from(String from) throws IOException {
+	public void from(String from)
+		throws IOException
+	{
 		sendCommand("MAIL FROM: <" + from + ">", 250);
 	}
 
 	/**
  	 * Who should this message go to? Specify with this command.
  	 */
-	public void to(String to) throws IOException {
+	public void to(String to)
+		throws IOException
+	{
 		sendCommand("RCPT TO: <" + to + ">", 250);
 	}
 
 	/**
  	 * gets the outputstream
 	 */
-	public PrintWriter getOutputStream() throws IOException {
+	public PrintWriter getOutputStream()
+		throws IOException
+	{
 		sendCommand("DATA", 354);
 
 		return out;
@@ -173,7 +189,9 @@ public class Smtp {
 	/**
 	 * Sends current message.
 	 */
-	public void sendMessage() throws IOException {
+	public void sendMessage()
+		throws IOException
+	{
 		sendCommand(".", 250);
 	}
 
@@ -182,16 +200,17 @@ public class Smtp {
 	 * @param c The command to send
 	 * @param reply The expected reply-code
 	 */
-	public void sendCommand(String c, int reply) throws IOException {
+	public void sendCommand(String c, int reply)
+		throws IOException
+	{
 		Debug("Sending: " + c);
 		out.println(c);
-   
+
 		String temp = in.readLine();
 		Debug("Reply: " + temp);
 
 		if (!temp.startsWith("" + reply)) {
-			throw new IOException ("Expected " + reply + 
-							", got " + temp);
+			throw new IOException ("Expected " + reply + ", got " + temp);
 		}
 	}
 
@@ -199,7 +218,7 @@ public class Smtp {
 	 * Prints out the debugging info
 	 * @param info The debuginfo to print out.
 	 */
-	private void Debug(String info) {
+	protected void Debug(String info) {
 		if (debug) {
 			System.err.println(info);
 		}
@@ -208,6 +227,9 @@ public class Smtp {
 /*
  * ChangeLog:
  * $Log: Smtp.java,v $
+ * Revision 1.7  2003/06/06 13:41:01  fredde
+ * made Debug protected instead of private
+ *
  * Revision 1.6  2000/04/11 13:32:12  fredde
  * one can now specify the port...
  *
