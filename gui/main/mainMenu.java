@@ -1,4 +1,4 @@
-/*  $Id: mainMenu.java,v 1.36 2003/04/13 16:38:28 fredde Exp $
+/*  $Id: mainMenu.java,v 1.37 2003/04/16 12:41:02 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.36 $
+ * @version $Revision: 1.37 $
  */
 public class mainMenu
 	extends JMenuBar
@@ -202,7 +202,8 @@ public class mainMenu
 					"Tuomas Kuosmanen\n" +
 					"Rafael Escovar\n" + 
 					"Ricardo A Mattar\n" + 
-					"Daniel Johnson",
+					"Daniel Johnson\n" +
+					"Pablo Rodriguez",
 					YAMM.getString("help.about"),
 					JOptionPane.INFORMATION_MESSAGE
 				);
@@ -351,6 +352,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.37  2003/04/16 12:41:02  fredde
+ * added Pablo Rodriguez to the credits list
+ *
  * Revision 1.36  2003/04/13 16:38:28  fredde
  * now uses yamm.set/getMailbox
  *
