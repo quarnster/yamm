@@ -87,6 +87,8 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   /** The Table that lists the mails in listOfMails */
   public mainTable      mailList;
 
+  public static boolean ico = true, text = true;
+
   /** The JEditorPane for this frame */
   public JEditorPane  mail;
 
@@ -94,10 +96,10 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
   public mainToolBar  tbar;
 
-  JButton      b;
-  JSplitPane   SPane, SPane2;
-  JTree        tree;
-  JTabbedPane  JTPane;
+//  JButton      b;
+  protected JSplitPane   SPane, SPane2;
+//  JTree        tree;
+//  JTabbedPane  JTPane;
   public statusRow status;
 
   int          mainx, mainy, mainw, mainh, hsplit, vsplit;
@@ -245,8 +247,14 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 //    mail.setLineWrap(true);
 //    mail.setWrapStyleWord(true);
 
-    JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
-    JTPane.addTab(res.getString("mail"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), new JScrollPane(mail, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+    JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
+    JTPane.setFont(new Font("SansSerif", Font.PLAIN, 10));
+    if(text && !ico) 
+      JTPane.addTab(res.getString("mail"), new JScrollPane(mail));
+    else if(ico && !text)
+      JTPane.addTab("", new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), new JScrollPane(mail));
+    else
+      JTPane.addTab(res.getString("mail"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), new JScrollPane(mail));
 
     class MyCellRenderer extends JLabel implements ListCellRenderer {
       protected boolean selected;
@@ -341,7 +349,9 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
     Box hori1 = Box.createHorizontalBox();
 
-    b = new JButton(res.getString("button.view_extract"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
+    JButton b = new JButton();
+    if(text) b.setText(res.getString("button.view_extract"));
+    if(ico) b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
     b.setToolTipText(res.getString("button.view_extract"));
     b.addActionListener(BListener);
     hori1.add(b);
@@ -361,7 +371,12 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     Border ram = BorderFactory.createEtchedBorder();
     myList.setBorder(ram);
 
-    JTPane.addTab(res.getString("mail.attachment"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
+    if(ico && !text)
+      JTPane.addTab("", new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
+    else if(text && !ico)
+      JTPane.addTab(res.getString("mail.attachment"), myPanel);
+    else
+      JTPane.addTab(res.getString("mail.attachment"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
 
     JScrollPane jsp = new JScrollPane(mailList);
 
@@ -377,7 +392,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
 
     top = new DefaultMutableTreeNode(YAMM.getString("box.boxes"));
-    tree = new mainJTree(this, top, tbar);
+    mainJTree tree = new mainJTree(this, top, tbar);
 
     SPane2 = new JSplitPane(1, tree, SPane);
     SPane2.setDividerLocation(vsplit);
@@ -638,8 +653,8 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
    */
   public static void main(String argv[])
   {
-    SplashScreen splash = new SplashScreen("YAMM " + yammVersion + " Copyright (c) 1999 Fredrik Ehnbom", "org/gjt/fredde/yamm/images/logo.gif");
     YAMM nFrame = null;
+    SplashScreen splash = null;
 
     try {        
       res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM",
@@ -656,6 +671,10 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
       in.close();    
     } catch (IOException propsioe) { System.err.println(propsioe); }
 
+
+    if(props.getProperty("splashscreen", "yes").equals("yes")) {
+      splash = new SplashScreen("YAMM " + yammVersion + " Copyright (c) 1999 Fredrik Ehnbom", "org/gjt/fredde/yamm/images/logo.gif");
+    }
 
     selectedbox += res.getString("box.inbox");
     if(!(new File(System.getProperty("user.home") + "/.yamm/boxes")).exists()) {
@@ -687,11 +706,13 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
       } catch(IOException ioe) { 
         new MsgDialog(nFrame, YAMM.getString("msg.error"), ioe.toString()); }
     }
-    String result;
+
+    if(props.getProperty("button.mode", "both").equals("text")) ico = false;
+    else if(props.getProperty("button.mode", "both").equals("icon")) text = false;
 
     nFrame = new YAMM();
     nFrame.setTitle("Yet Another Mail Manager " + yammVersion);
-    splash.dispose();
+    if(splash != null) splash.dispose();
   }
 }
 
