@@ -1,5 +1,5 @@
-/*  Filter.java - A class that filters incoming messages
- *  Copyright (C) 1999 Fredrik Ehnbom
+/*  $Id: Filter.java,v 1.10 2003/03/09 17:43:51 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,12 +31,16 @@ public class Filter {
 	/**
 	 * Starts the filtering
 	 */
-	public Filter() throws IOException {
+	public Filter()
+		throws IOException
+	{
 		Hashtable changedBoxes = new Hashtable();
 		int type = 0;
 		int cheat[] = new int[1];
 		Vector list = new Vector();
 		BufferedReader in = null;
+		String filterBox = Utilities.replace(YAMM.home + "/boxes/.filter");
+		String inBox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox"));
 
 		Mailbox.createFilterList(list);
 
@@ -76,7 +80,7 @@ public class Filter {
 							list.remove(i);
 							cheat[0] = i;
 							String target = Utilities.replace(YAMM.home + "/boxes/" + exec);
-							Mailbox.moveMail(Utilities.replace(YAMM.home + "/boxes/.filter"), target , cheat);
+							Mailbox.moveMail(filterBox, target , cheat);
 							changedBoxes.put(target, target);
 							i--;
 						}
@@ -92,7 +96,7 @@ public class Filter {
 
 							String target = Utilities.replace(YAMM.home + "/boxes/" + exec);
 
-							Mailbox.moveMail(Utilities.replace(YAMM.home + "/boxes/.filter"), target, cheat);
+							Mailbox.moveMail(filterBox, target, cheat);
 							changedBoxes.put(target, target);
 							i--;
 						}
@@ -104,14 +108,10 @@ public class Filter {
 		}
 
 		cheat[0] = 0;
-		if (Mailbox.hasMail(Utilities.replace(YAMM.home + "/boxes/.filter"))) {
-			changedBoxes.put(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox")), Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox")));
-		}
-		while (Mailbox.hasMail(Utilities.replace(YAMM.home + "/boxes/.filter"))) {
-			Mailbox.moveMail(Utilities.replace(YAMM.home + "/boxes/.filter"), Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox")), cheat);
-		}
-		for (Enumeration e = changedBoxes.elements(); e.hasMoreElements(); ) {
-			Mailbox.updateIndex(e.nextElement().toString());
+		if (Mailbox.hasMail(filterBox)) {
+			int[] msg = new int[Mailbox.getUnread(filterBox)[0]];
+			for (int i = 0; i < msg.length; i++) msg[i] = i;
+			Mailbox.moveMail(filterBox, inBox, msg);
 		}
 	}
 }
