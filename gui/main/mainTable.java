@@ -32,31 +32,32 @@ import java.net.MalformedURLException;
 import org.gjt.fredde.yamm.Utilities;
 import org.gjt.fredde.yamm.YAMM;
 import org.gjt.fredde.yamm.YAMMWrite;
+import org.gjt.fredde.yamm.gui.MailTableRenderer;
 import org.gjt.fredde.yamm.mail.Mailbox;
 import org.gjt.fredde.util.gui.ExceptionDialog;
 
 /**
  * The Table for listing the mails subject, date and sender.
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.27 2000/03/18 14:54:46 fredde Exp $
+ * @version $Id: mainTable.java,v 1.28 2000/03/19 17:20:16 fredde Exp $
  */
 public class mainTable extends JTable implements DragGestureListener,
 							DragSourceListener {
 
 	/** If it should sort 1 to 10 or 10 to 1*/
-	static protected boolean	firstSort = true;
+	private static boolean	firstSort = true;
 
 	/** Which column that was sorted */
-	static protected int		sortedCol = 0;
+	private static int		sortedCol = 0;
 
 	/** The list of mails */
-	static protected Vector		listOfMails = null;
+	private static Vector		listOfMails = null;
 
-	static protected YAMM		frame = null;
+	private static YAMM		frame = null;
 
-	public JPopupMenu		popup = null;
+	protected JPopupMenu		popup = null;
 
-	protected static DragSource	drag = null;
+	private static DragSource	drag = null;
 
 	/**
 	 * Creates a new JTable
@@ -112,7 +113,7 @@ public class mainTable extends JTable implements DragGestureListener,
 		setShowVerticalLines(false);
 		setIntercellSpacing(new Dimension(0, 0));
 
-		myRenderer rend = new myRenderer();
+		MailTableRenderer rend = new MailTableRenderer(frame);
 		rend.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		setDefaultRenderer(getColumnClass(0), rend);
 
@@ -143,7 +144,7 @@ public class mainTable extends JTable implements DragGestureListener,
 							c.getWidth()+"");
 	}
 
-	protected String getSelected() {
+	private String getSelected() {
 		String selected = "";
 
 		int i = 0;
@@ -200,7 +201,7 @@ public class mainTable extends JTable implements DragGestureListener,
 	/**
 	 * Sorts 1 -> 10
 	 */
-	protected void SortFirst(int col) {
+	private void SortFirst(int col) {
 		if (col == 0) {
 			for (int i = 0; i < listOfMails.size(); i++) {
 				Object temp = null;
@@ -257,7 +258,7 @@ public class mainTable extends JTable implements DragGestureListener,
 	/**
 	 * Sorts 10 -> 1
 	 */
-	protected void SortLast(int col) {
+	private void SortLast(int col) {
 		if (col == 0) {
 			for (int i = 0; i < listOfMails.size(); i++) {
 				Object temp = null;
@@ -455,7 +456,7 @@ public class mainTable extends JTable implements DragGestureListener,
 	 * Adds the sorting listener to the table header
 	 * @param table The JTable to add the sorting listener to
 	 */
-	protected void TMListener(JTable table) {
+	private void TMListener(JTable table) {
 		final JTable tableView = table;
 		tableView.setColumnSelectionAllowed(false);
 
@@ -490,44 +491,7 @@ public class mainTable extends JTable implements DragGestureListener,
 		th.addMouseListener(lmListener);
 	}
 
-	/**
-	 * The renderer for the table
-	 */
-	protected class myRenderer extends DefaultTableCellRenderer {
-		public Component getTableCellRendererComponent(
-					JTable table,
-					Object value,
-					boolean isSelected,
-					boolean hasFocus,
-					int row,
-					int column) {
-
-			setValue(value);
-
-			Vector v = (Vector) frame.listOfMails.elementAt(row);
-			String outbox = YAMM.home + YAMM.sep + "boxes" +
-					YAMM.sep + YAMM.getString("box.outbox");
-
-			if (!v.elementAt(4).toString().equals("Unread") ||
-					outbox.equals(frame.selectedbox)) {
-				setForeground(Color.black);
-			} else {
-				setForeground(Color.blue);
-			}
-
-			if (isSelected) {
-				setBackground(new Color(204, 204, 255));
-			} else {
-				setBackground(Color.white);
-			}
-
-			return this;
-		}
-	}
-
-
-
-	protected MouseListener mouseListener = new MouseAdapter() {
+	private MouseListener mouseListener = new MouseAdapter() {
 		public void mouseReleased(MouseEvent me) {
 			if (me.isPopupTrigger()) {
 				popup.show(mainTable.this, me.getX(),
@@ -619,7 +583,7 @@ public class mainTable extends JTable implements DragGestureListener,
 		}
 	};
 
-	protected ActionListener keyListener = new ActionListener() {
+	private ActionListener keyListener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {                 
 			String text = ae.getActionCommand();
 
@@ -667,7 +631,7 @@ public class mainTable extends JTable implements DragGestureListener,
 		}
 	};
 
-	protected ActionListener OtherMListener = new ActionListener() {
+	private ActionListener OtherMListener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {       
 			String kommando = ((JMenuItem)ae.getSource()).getText();
                                                               
@@ -745,7 +709,7 @@ public class mainTable extends JTable implements DragGestureListener,
 		((JButton)frame.tbar.forward).setEnabled(b); 
 	}
 
-	protected ActionListener KMListener = new ActionListener() {
+	private ActionListener KMListener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 			String name = ((extMItem)ae.getSource()).getFullName();
                                                               
@@ -775,7 +739,7 @@ public class mainTable extends JTable implements DragGestureListener,
 		}
 	};
 
-	protected ActionListener FMListener = new ActionListener() {
+	private ActionListener FMListener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 			String name = ((extMItem)ae.getSource()).getFullName();
 
@@ -813,6 +777,9 @@ public class mainTable extends JTable implements DragGestureListener,
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.28  2000/03/19 17:20:16  fredde
+ * moved the renderer to ../MailTableRenderer.java and cleaned up a little
+ *
  * Revision 1.27  2000/03/18 14:54:46  fredde
  * updates the tree and mailindex on mail- move/copy/delete
  *
