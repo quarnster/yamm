@@ -21,14 +21,16 @@ package org.gjt.fredde.yamm.mail;
 import java.text.ParseException;
 import java.io.*;
 import java.util.*;
+
 import javax.swing.JTextArea;
 import org.gjt.fredde.yamm.YAMM;
 import org.gjt.fredde.util.gui.ExceptionDialog;
+import org.gjt.fredde.yamm.encode.*;
 
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.39 2003/03/05 15:59:08 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.40 2003/03/06 20:14:32 fredde Exp $
  */
 public class Mailbox {
 
@@ -56,7 +58,7 @@ public class Mailbox {
 		subject = subject.replace('_', ' ');
 		start = start.replace('_', ' ');
 		end = end.replace('_', ' ');
-		subject = MessageBodyParser.unMime(subject, false);
+		subject = Mime.unMime(subject, false);
 
 		return start + subject + end;
 	}
@@ -1430,6 +1432,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.40  2003/03/06 20:14:32  fredde
+ * rewrote mailparsing system
+ *
  * Revision 1.39  2003/03/05 15:59:08  fredde
  * createList fixes
  *

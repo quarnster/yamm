@@ -18,12 +18,14 @@
 
 package org.gjt.fredde.yamm.mail;
 
+import org.gjt.fredde.yamm.encode.*;
+
 import java.io.*;
 
 /**
  * This class parses attachments
  * @author Fredrik Ehnbom
- * @version $Id: Attachment.java,v 1.8 2003/03/05 21:36:23 fredde Exp $
+ * @version $Id: Attachment.java,v 1.9 2003/03/06 20:14:32 fredde Exp $
  */
 public class Attachment {
 
@@ -35,17 +37,19 @@ public class Attachment {
 
 	public String name = null;
 	public String contentType = null;
+	public String contentDisposition = null;
 
 	public Attachment() {
 	}
 
-	public int parse(BufferedReader in, PrintWriter out)
+	public void parse(BufferedReader in, String boundary, String baseFile)
 		throws IOException, MessageParseException
 	{
 		MessageHeaderParser mhp = new MessageHeaderParser();
 		mhp.parse(in);
 
 		String encoding = null;  // Encoding used for this attachment
+		String fileName = null; // the file we write the data to
 
 		if (mhp.getHeaderField("Content-Type") != null) {
 			contentType = name = mhp.getHeaderField("Content-Type").trim();
@@ -66,63 +70,116 @@ public class Attachment {
 			}
 		}
 
-		if (mhp.getHeaderField("Content-Disposition") != null && name == null) {
-			name = mhp.getHeaderField("Content-Disposition");
+		if (mhp.getHeaderField("Content-Disposition") != null) {
+			contentDisposition = mhp.getHeaderField("Content-Disposition");
 
-			if (name.indexOf("filename=") != -1) {
-				name = name.substring(name.indexOf("filename=") + 9, name.length()).trim();
+			if (name == null) {
+				name = contentDisposition;
+				if (name.indexOf("filename=") != -1) {
+					name = name.substring(name.indexOf("filename=") + 9, name.length()).trim();
 
-				if (name.indexOf(";") != -1) {
-					name = name.substring(0, name.indexOf(";"));
+					if (name.indexOf(";") != -1) {
+						name = name.substring(0, name.indexOf(";"));
+					}
+
+					if (name.startsWith("\"") && name.endsWith("\"")) {
+						name = name.substring(1, name.length() - 1);
+					}
+				} else {
+					name = null;
 				}
-
-				if (name.startsWith("\"") && name.endsWith("\"")) {
-					name = name.substring(1, name.length() - 1);
-				}
-			} else {
-				name = null;
 			}
-
 		}
 
 		if (mhp.getHeaderField("Content-Transfer-Encoding") != null) {
 			encoding = mhp.getHeaderField("Content-Transfer-Encoding").trim();
 		}
 
-		if (contentType.indexOf("text") == -1 && contentType.indexOf("multipart") == -1) {
-			if (encoding.equalsIgnoreCase("base64") ||
-				encoding.equalsIgnoreCase("x-uuencode")
-			) {
-				String temp = null;
+		if (contentType.indexOf("multipart/alternative") != -1) {
+			String temp = contentType.toLowerCase();
+			if (temp.indexOf("boundary=") != -1) {
+				temp = contentType.substring(temp.indexOf("boundary=") + 9, contentType.length());
+				if (temp.startsWith("\"")) {
+					temp = temp.substring(1, temp.length() - 1);
+				}
+				if (boundary.indexOf("\"") != -1) {
+					temp = temp.substring(0, temp.indexOf("\""));
+				}
+			}
+			Attachment a = new Attachment();
+			a.parse(in, temp, baseFile);
 
-				out.println(name);
-				out.flush();
-				out.println(encoding);
-				out.flush();
-
-				while ( (temp  = in.readLine()) != null) {
-					if (temp.startsWith("--")) {
-						if (!temp.endsWith("--")) {
-							return ATTACHMENT;
-						} else {
-							return END;
-						}
+			while ((temp = in.readLine()) != null) {
+				if (temp.startsWith("--" + boundary)) {
+					if (!temp.endsWith("--")) {
+						a = new Attachment();
+						a.parse(in, boundary, baseFile);
+						break;
 					} else {
-						out.println(temp);
-						out.flush();
+						break;
 					}
 				}
+			}
+			return;
+		}
+
+		PrintWriter out = null;
+
+		try {
+			String temp = null;
+			fileName = baseFile;
+			boolean html = false;
+
+			if (contentDisposition != null) 
+				fileName = baseFile + ".attach." + name;
+			else if (contentType.indexOf("text/html") != -1) {
+				fileName = baseFile + ".message.html";
+				html = true;
+			} else if (contentType.indexOf("text/plain") != -1)
+				fileName = baseFile + ".message.txt";
+			else if (name != null) {
+				fileName = baseFile + ".other." + name;
 			} else {
-				// probably an inlined message
-				return AMESSAGE;
+				System.err.println(contentDisposition);
+				System.err.println(contentType);
+				throw new MessageParseException("Unknown type of attachment!");
+			}
+
+			out = new PrintWriter(
+				new BufferedOutputStream(
+					new FileOutputStream(fileName)
+				)
+			);
+
+			while ((temp = in.readLine()) != null) {
+				if (temp.startsWith("--" + boundary)) {
+					if (!temp.endsWith("--")) {
+						Attachment a = new Attachment();
+						a.parse(in, boundary, baseFile);
+						break;
+					} else {
+						break;
+					}
+				} else {
+					out.println(temp);
+					out.flush();
+				}
+			}
+		} finally {
+			if (out != null) {
+				out.close();
 			}
 		}
-		return MESSAGE;
+
+		MessageParser.filter(contentType, encoding, fileName);
 	}
 }
 /*
  * Changes:
  * $Log: Attachment.java,v $
+ * Revision 1.9  2003/03/06 20:14:32  fredde
+ * rewrote mailparsing system
+ *
  * Revision 1.8  2003/03/05 21:36:23  fredde
  * Huge improvements for html, mime and multipart messages
  *

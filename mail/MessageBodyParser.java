@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Parses the body of a message
  * @author Fredrik Ehnbom
- * @version $Id: MessageBodyParser.java,v 1.13 2003/03/05 21:36:23 fredde Exp $
+ * @version $Id: MessageBodyParser.java,v 1.14 2003/03/06 20:14:32 fredde Exp $
  */
 public class MessageBodyParser {
 
@@ -36,143 +36,7 @@ public class MessageBodyParser {
 	protected boolean html = false;
 	protected boolean mime = false;
 
-	public static String unMime(String m, boolean html) {
-		char[] check = "0123456789ABCDEF".toCharArray();
-		StringTokenizer tok = new StringTokenizer(m, " ", true);
-		String mime2 = "";
 
-		while (tok.hasMoreTokens()) {
-			String mime = tok.nextToken();
-
-			if (mime.indexOf("=") != -1) {
-				for (int index = mime.indexOf("=") + 1;;
-					index = mime.indexOf("=", index) + 1) {
-
-					if (index == 0) {
-						break;
-					} else if (index + 2 > mime.length()) {
-						break;
-					}
-					char[] hex = mime.substring(index,
-						index + 2).toCharArray();
-
-					boolean char1 = false;
-					boolean char2 = false;
-
-					for (int i = 0; i < 16; i++) {
-						if (hex[0] == check[i]) {
-							char1 = true;
-						}
-						if (hex[1] == check[i]) {
-							char2 = true;
-						}
-					}
-
-					if (char1 && char2) {
-						int asciiChar =
-							Integer.parseInt(
-							new String(hex), 16);
-						String begin = mime.substring(0,
-								index - 1);
-						String end = mime.substring(
-								index + 2,
-								mime.length());
-						if (html) {
-							mime = begin + "&#" +
-								asciiChar +
-								";" + end;
-						} else {
-							mime = begin +
-								(char) asciiChar
-								+ end;
-						}
-					}
-				}
-					mime2 += mime;
-			} else {
-					mime2 += mime;
-			}
-		}
-
-		return mime2;
-	}
-
-	protected String makeLink(String link) {
-		StringTokenizer tok = new StringTokenizer(link, " ", true);
-		link = "";
-
-		while (tok.hasMoreTokens()) {
-			String temp = tok.nextToken();
-
-			if (temp.indexOf("://") != -1 || temp.indexOf("www.") != -1) {
-				String tmp[] = MessageParser.parseLink(temp);
-
-				temp = "<a href=\"" + tmp[1] + "\">" + tmp[1] +
-						"</a>";
-				link += tmp[0] + temp + tmp[2];
-			} else {
-				link += temp;
-			}
-		}
-
-		return link;
-	}
-
-	public static String makeEmailLink(String mail) {
-		StringTokenizer tok = new StringTokenizer(mail, " ", true);
-
-		mail = "";
-
-		while (tok.hasMoreTokens()) {
-			String temp = tok.nextToken();
-
-			if (temp.indexOf("@") != -1) {
-				String tmp[] = MessageParser.parseLink(temp);
-
-				temp = "<a href=mailto:" + tmp[1] + ">" +
-								tmp[1] + "</a>";
-
-				mail += tmp[0] + temp + tmp[2];
-			} else {
-				mail += temp;
-			}
-		}
-
-		return mail;
-	}
-	public static String makeHtml(String html) {
-		StringTokenizer tok = new StringTokenizer(html, " ", true);
-
-		html = "";
-
-
-		while (tok.hasMoreTokens()) {
-			String temp = tok.nextToken();
-			boolean change = true;
-
-			while (change) {
-				change = false;
-
-				if (temp.indexOf("<") != -1) {
-					String begin = temp.substring(0, temp.indexOf("<"));
-					temp = temp.substring(temp.indexOf("<") + 1, temp.length());
-					temp = begin + "&lt;" + temp;
-
-					change = true;
-				}
-
-				if (temp.indexOf(">") != -1) {
-					String begin = temp.substring(0, temp.indexOf(">"));
-					temp = temp.substring(temp.indexOf(">") + 1, temp.length());
-					temp = begin + "&gt;" + temp;
-
-					change = true;
-				}
-			}
-			html += temp;
-		}
-		return html;
-	}
 
 	public MessageBodyParser(boolean html) {
 		this(html, false);
@@ -181,63 +45,13 @@ public class MessageBodyParser {
 		this.html = html;
 		this.mime = mime;
 	}
-
-	public int parse(BufferedReader in, PrintWriter out, String attachment)
-		throws IOException, MessageParseException
-	{
-		String temp = in.readLine();
-
-		for (;;) {
-			if (temp == null) {
-				throw new MessageParseException("Unexpected end of message.");
-			}
-
-			if (temp.equals(".")) {
-				return END;
-			}
-
-			if (temp.startsWith("--" + attachment)) {
-				if (temp.endsWith("--")) {
-					return END;
-				} else {
-					return ATTACHMENT;
-				}
-			}
-
-			if (temp.endsWith("=") && !temp.endsWith("==")) {
-				temp = temp.substring(0, temp.length() - 1);
-				temp += in.readLine();
-				continue;
-			}
-
-			if (mime && temp.indexOf("=") != -1) {
-				temp = unMime(temp, false);
-			}
-
-			if (!html && (temp.indexOf("<") != -1 || temp.indexOf(">") != -1)) {
-				temp = makeHtml(temp);
-			}
-
-			if (!html && temp.indexOf("@") != -1) {
-				if (temp.toLowerCase().indexOf("href=") == -1) {
-					temp = makeEmailLink(temp);
-				}
-			}
-
-			if (!html && (temp.indexOf("://") != -1 || temp.indexOf("www.") != -1)) {
-				if (temp.toLowerCase().indexOf("href=") == -1) {
-					temp = makeLink(temp);
-				}
-			}
-
-			out.println(temp);
-			temp = in.readLine();
-		}
-	}
 }
 /*
  * Changes:
  * $Log: MessageBodyParser.java,v $
+ * Revision 1.14  2003/03/06 20:14:32  fredde
+ * rewrote mailparsing system
+ *
  * Revision 1.13  2003/03/05 21:36:23  fredde
  * Huge improvements for html, mime and multipart messages
  *

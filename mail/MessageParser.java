@@ -22,18 +22,19 @@ import java.text.*;
 import java.io.*;
 import java.util.*;
 import org.gjt.fredde.yamm.YAMM;
+import org.gjt.fredde.yamm.encode.*;
 
 /**
  * Parses messages
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: MessageParser.java,v 1.19 2003/03/05 21:36:23 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.20 2003/03/06 20:14:32 fredde Exp $
  */
 public class MessageParser {
 
 	private int attachments = 0;
 
 	public String makeClickable(String click) {
-		return MessageBodyParser.makeEmailLink(click);
+		return Html.makeEmailLink(click);
 	}
 
 	public static String getEmail(String link) {
@@ -131,42 +132,13 @@ public class MessageParser {
 		return tmp;
 	}
 
-	private boolean skipMultipart(BufferedReader in, String boundary)
-		throws IOException, MessageParseException
-	{
-		// parse to the html-message
-		for (;;) {
-			String temp = in.readLine();
-			if (temp == null || temp.equals(".")) {
-				throw new MessageParseException("html-part of multipart message not found!");
-			} else if (temp.equals("--" + boundary)) {
-				Attachment a = new Attachment();
-				a.parse(in, null);
-				if (a.contentType != null) {
-					if (a.contentType.indexOf("text/html") != -1) {
-						return true;
-					} else if (a.contentType.indexOf("multipart/alternative") != -1) {
-						String boundary2 = "";
-						if (a.contentType.indexOf("boundary=") != -1) {
-							boundary2 = a.contentType.substring(a.contentType.indexOf("boundary=") + 9, a.contentType.length());
-							if (boundary2.startsWith("\"")) {
-								boundary2 = boundary2.substring(1, boundary2.length() - 1);
-							}
-							if (boundary2.indexOf("\"") != -1) {
-								boundary2 = boundary2.substring(0, boundary2.indexOf("\""));
-							}
-						}
-						return skipMultipart(in, boundary2);
-					}
-				}
-			}
-		}
-//		return false;
-	}
-
 	public MessageParser(BufferedReader in, PrintWriter out, String file)
 		throws IOException, MessageParseException
 	{
+
+		String contentType = null;
+		String encoding = null;
+
 		boolean html = false;
 		boolean mime = false;
 		file = file.substring(0, file.length() - 5);
@@ -194,23 +166,22 @@ public class MessageParser {
 				"</b></td><td>" + date + "</td></tr>");
 		}
 		if (mhp.getHeaderField("From") != null) {
-			String from = makeClickable(mhp.getHeaderField("From"));
+			String from = Html.makeEmailLink(Html.makeHtml(mhp.getHeaderField("From")));
 
 			out.println("<tr><td align=right><b>" + YAMM.getString("mail.from") +
 				"</b></td><td>" + from + "</td></tr>");
 		}
 		if (mhp.getHeaderField("To") != null) {
-			String to = makeClickable(mhp.getHeaderField("To"));
+			String to = Html.makeEmailLink(Html.makeHtml(mhp.getHeaderField("To")));
 			out.println("<tr><td align=right><b>" + YAMM.getString("mail.to") +
 				"</b></td><td>" + to + "</td></tr>");
 		}
 		if (mhp.getHeaderField("cc") != null) {
-			String cc = makeClickable(mhp.getHeaderField("cc"));
+			String cc = Html.makeEmailLink(Html.makeHtml(mhp.getHeaderField("cc")));
 			out.println("<tr><td align=right><b>cc:</b></td><td>" + cc + "</td></tr>");
 		}
 		if (mhp.getHeaderField("Reply-To") != null) {
-			String replyto = makeClickable(
-						mhp.getHeaderField("Reply-To"));
+			String replyto = Html.makeEmailLink(Html.makeHtml(mhp.getHeaderField("Reply-To")));
 
 			out.println("<tr><td align=right><b>" + 
 				YAMM.getString("mail.reply_to") + "</b></td><td>" +
@@ -229,7 +200,6 @@ public class MessageParser {
 		String boundary = null;
 
 		String temp = mhp.getHeaderField("Content-Type");
-		String contentType = "";
 		if (temp != null) {
 			contentType = temp.toLowerCase();
 			if (contentType.indexOf("boundary=") != -1) {
@@ -241,113 +211,138 @@ public class MessageParser {
 					boundary = boundary.substring(0, boundary.indexOf("\""));
 				}
 			}
+			if (contentType.indexOf("text/html") != -1) html = true;
+		}
+		if (mhp.getHeaderField("Content-Transfer-Encoding") != null) {
+			encoding = mhp.getHeaderField("Content-Transfer-Encoding").trim();
 		}
 
-		if (contentType.indexOf("multipart/alternative") != -1 && boundary != null) {
-			html = skipMultipart(in, boundary);
-		}
-		if (contentType.indexOf("text/html") != -1) html = true;
 
-		if (mhp.getHeaderField("MIME-Version") != null) {
+
+		if (mhp.getHeaderField("MIME-Version") != null && boundary != null) {
 			// expect a little mime message
-			if (!html && boundary != null) {
-				for (;;) {
-					if (in.readLine().equals("--" +	boundary)) {
-						Attachment a = new Attachment();
-						a.parse(in, null);
-						if (a.contentType != null) {
-							if (a.contentType.indexOf("text/html") != -1) {
-								html = true;
-							} else if (a.contentType.indexOf("multipart/alternative") != -1) {
-								String boundary2 = "";
-								if (a.contentType.indexOf("boundary=") != -1) {
-									boundary2 = a.contentType.substring(a.contentType.indexOf("boundary=") + 9, a.contentType.length());
-									if (boundary2.startsWith("\"")) {
-										boundary2 = boundary2.substring(1, boundary2.length() - 1);
-									}
-									if (boundary2.indexOf("\"") != -1) {
-										boundary2 = boundary2.substring(0, boundary2.indexOf("\""));
-									}
-								}
+			for (;;) {
+				if (in.readLine().equals("--" +	boundary)) {
+					Attachment a = new Attachment();
+					a.parse(in, boundary, file);
 
-								html = skipMultipart(in, boundary2);
-							}
-						}
-
-						break;
-					}
+					break;
 				}
 			}
 			mime = true;
 		}
 
-		if (!html)
-			out.println("<br><pre>");
+		if (boundary == null) {
+			PrintWriter o2 = null;
+			String name = null;
+			try {
+				name = file + ".message.html";
+				if (!html)
+					name = file + ".message.txt";
 
-		MessageBodyParser mbp = new MessageBodyParser(html, mime);
+				o2 = new PrintWriter(new BufferedOutputStream(new FileOutputStream(name)));
+				while ((temp = in.readLine()) != null) {
+					if (temp.equals(".")) break;
 
-		bigLoop:
-		for (;;) {
-			int test = mbp.parse(in, out, boundary);
-
-			if (test == MessageBodyParser.ATTACHMENT && contentType.indexOf("multipart/alternative") == -1) {
-				Attachment a = new Attachment();
-				PrintWriter atOut = null;
-				try {
-					atOut = new PrintWriter(
-						new BufferedOutputStream(
-							new FileOutputStream(file +	".attach." + attachments)
-						)
-					);
-
-
-					for (;;) {
-						// Attachment found
-						test = a.parse(in, atOut);
-
-						if (test == Attachment.MESSAGE && contentType.indexOf("multipart/alternative") == -1) {
-							break;
-						} else if (test == Attachment.ATTACHMENT) {
-							attachments++;
-							atOut.close();
-							atOut = new PrintWriter(
-								new	BufferedOutputStream(
-									new FileOutputStream(
-										file + ".attach." +	attachments
-									)
-								)
-							);
-							continue;
-						} else if (test == Attachment.AMESSAGE) {
-							if (a.name != null)
-								out.println("<b>" + a.name + "</b>:<br>");
-							atOut.close();
-							new File(file +	".attach." + attachments).delete();
-							break;
-						} else /* if (test == Attachment.END) */{
-							break bigLoop;
-						}
-					}
-				} finally {
-					if (atOut != null) {
-						atOut.close();
-					}
+					o2.println(temp);
 				}
-			} else if (test == MessageBodyParser.END) {
-				// end reached
-				break;
-			} else if (test == MessageBodyParser.ATTACHMENT) {
-				break;
+			} finally {
+				if (o2 != null) o2.close();
+			}
+			filter(contentType, encoding, name);
+		}
+
+		if (new File(file + ".message.html").exists()) {
+			temp = null;
+			BufferedReader in2 = null;
+			try {
+				in2 = new BufferedReader(new InputStreamReader(new FileInputStream(file + ".message.html")));
+				while ((temp = in2.readLine()) != null) {
+					out.println(temp);
+				}
+			} finally {
+				if (in2 != null) in2.close();
+			}
+		} else {
+			temp = null;
+			BufferedReader in2 = null;
+			try {
+				in2 = new BufferedReader(new InputStreamReader(new FileInputStream(file + ".message.txt")));
+				while ((temp = in2.readLine()) != null) {
+					out.println(temp);
+				}
+			} finally {
+				if (in2 != null) in2.close();
 			}
 		}
 
-		if (html)
-			out.println("</pre>");
 		out.println("</body>");
 		out.println("</html>");
 	}
+
+	public static void filter(String contentType, String encoding, String fileName)
+		throws IOException
+	{
+		if (encoding == null && fileName.indexOf(".message.") != -1) {
+			if (contentType == null || contentType.indexOf("text/html") == -1) {
+				File source = new File(fileName);
+				File target = new File(fileName + ".tmp");
+
+				new Html().encode(
+					new BufferedInputStream(new FileInputStream(source)),
+					new BufferedOutputStream(new FileOutputStream(target))
+				);
+				source.delete();
+				target.renameTo(source);
+			}
+		}
+
+		if (encoding == null) return;
+
+		if (fileName.indexOf(".attach.") != -1) {
+			// attached files are generally bigger than normal messages
+			// so we do the decoding (if needed) in a thread.
+			if (encoding.equalsIgnoreCase("base64")) {
+			
+			}
+		} else if (fileName.indexOf(".message.") != -1) {
+			File source = new File(fileName);
+			File target = new File(fileName + ".tmp");
+
+			if (encoding.equalsIgnoreCase("base64")) {
+				new Base64sun().decode(
+					new BufferedInputStream(new FileInputStream(source)),
+					new BufferedOutputStream(new FileOutputStream(target))
+				);
+				source.delete();
+				target.renameTo(source);
+			}
+
+			if (encoding.equalsIgnoreCase("quoted-printable")/*fileName.indexOf(".message.") != -1*/) {
+				new Mime().decode(
+					new BufferedInputStream(new FileInputStream(source)),
+					new BufferedOutputStream(new FileOutputStream(target))
+				);
+				source.delete();
+				target.renameTo(source);
+			}
+			if (contentType == null || contentType.indexOf("text/html") == -1) {
+				new Html().encode(
+					new BufferedInputStream(new FileInputStream(source)),
+					new BufferedOutputStream(new FileOutputStream(target))
+				);
+				source.delete();
+				target.renameTo(source);
+			}
+
+		}
+	}
+
 }
 /*
  * ChangeLog:
- * $log$
+ * $Log: MessageParser.java,v $
+ * Revision 1.20  2003/03/06 20:14:32  fredde
+ * rewrote mailparsing system
+ *
  */
