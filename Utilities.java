@@ -23,7 +23,7 @@ import java.util.Vector;
 /**
  * This Class provides some useful utilities
  * @author Fredrik Ehnbom
- * @version $Id: Utilities.java,v 1.2 2000/03/05 18:02:11 fredde Exp $
+ * @version $Id: Utilities.java,v 1.3 2000/03/15 13:41:38 fredde Exp $
  */
 public class Utilities {
 
@@ -31,7 +31,7 @@ public class Utilities {
 	 * Prints a debug message to YAMM.debug and the flushes
 	 * @param msg The message to print out
 	 */
-	public static void printDebug(String msg) {
+	public static void Debug(String msg) {
 		YAMM.debug.println(msg);
 		YAMM.debug.flush();
 	}
@@ -48,10 +48,10 @@ public class Utilities {
 		Vector delFile = new Vector(), delDir = new Vector();
 
 		if (debug)
-			printDebug("delfiles: Creating list of unneeded files...");
+			Debug("delfiles: Creating list of unneeded files...");
 		createDelList(delFile, delDir, new File(YAMM.home + "/tmp/"), debug);
 		if (debug)
-			printDebug("delfiles: Deleting unneeded files...");
+			Debug("delfiles: Deleting unneeded files...");
 
 		delFiles(delFile, debug);
 		delFiles(delDir, debug);
@@ -66,7 +66,7 @@ public class Utilities {
 
 		for (int i = 0; i < files.length; i++) {
 			if (debug)
-				printDebug("delfiles: added \"" + files[i]);
+				Debug("delfiles: added \"" + files[i]);
 
 			File dir2 = new File(dir, files[i]);
 
@@ -89,7 +89,7 @@ public class Utilities {
 			String file = delFile.elementAt(i).toString();
 
 			if (!new File(file).delete() && debug) {
-				printDebug("delfiles: Couldn't delete \"" + file + "\"");
+				Debug("delfiles: Couldn't delete \"" + file + "\"");
 			}
 		}
 	}
@@ -126,6 +126,9 @@ public class Utilities {
 /*
  * Changes:
  * $Log: Utilities.java,v $
+ * Revision 1.3  2000/03/15 13:41:38  fredde
+ * renamed printDebug to Debug
+ *
  * Revision 1.2  2000/03/05 18:02:11  fredde
  * added the printDebug command
  *
