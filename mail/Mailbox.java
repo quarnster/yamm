@@ -444,10 +444,13 @@ public class Mailbox {
 				}
 			} else {
 				while ((tmp = in.readLine()) != null) {
+					if (tmp.equals("")) continue;
+
 					long skip = Long.parseLong(
 						tmp.substring(
 						tmp.lastIndexOf(" ") + 1,
 						tmp.length()));
+
 
 					skip += status.length() + 13 +
 						System.getProperty
