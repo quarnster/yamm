@@ -53,7 +53,7 @@ public class YAMM extends JFrame implements HyperlinkListener
   public static    String                 yammVersion  = "0.7.2";
 
   /** The compileDate of YAMM */
-  public static    String                 compDate     = "19990409";
+  public static    String                 compDate     = "1999-06-21";
 
   /** the file that contains the current mail */
   public String		  mailPageString   = "file:///" + System.getProperty("user.home") + "/.yamm/tmp/";
@@ -65,9 +65,6 @@ public class YAMM extends JFrame implements HyperlinkListener
 
   /** The vector containing the attaced files. */
   static protected Vector                 attach;
-
-  /** The theme to use */
-//  static protected String                 theme        = "default";
 
   /** To check if the user has sun.misc.Base64Decoder */
   static protected boolean                base64       = false;
@@ -81,14 +78,8 @@ public class YAMM extends JFrame implements HyperlinkListener
   /** What's in the tree */
   static protected DefaultMutableTreeNode top;
 
-  /** If it should sort 1 to 10 or 10 to 1*/
-//  static protected boolean                firstSort    = true;
-
-  /** Which column that was sorted */
-//  static protected int                    sortedCol    = 0;
 
   /** The Table that lists the mails in listOfMails */
-//  public JTable       mailList;
   public mainTable      mailList;
 
   /** The JEditorPane for this frame */
@@ -211,10 +202,10 @@ public class YAMM extends JFrame implements HyperlinkListener
     }
 
     // the menubar
-    setJMenuBar(new mainMenu(this));
+    setJMenuBar(new mainMenu(this, res));
 
     // the toolbar
-    tbar = new mainToolBar(this);
+    tbar = new mainToolBar(this, res);
     getContentPane().add("North", tbar);
 
     // create a list of mails in the selected box
@@ -222,7 +213,7 @@ public class YAMM extends JFrame implements HyperlinkListener
 
     // handles some stuff for the table
     TableModel dataModel = new AbstractTableModel() {
-      final String headername[] = { "#",res.getString("SUBJECT"), res.getString("FROM"), res.getString("DATE") };
+      final String headername[] = { "#",res.getString("mail.subject"), res.getString("mail.from"), res.getString("mail.date") };
 
       public int getColumnCount() { return 4; }
       public int getRowCount() {  return  listOfMails.size(); }
@@ -255,7 +246,7 @@ public class YAMM extends JFrame implements HyperlinkListener
 //    mail.setWrapStyleWord(true);
 
     JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
-    JTPane.addTab(res.getString("MAIL"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), new JScrollPane(mail, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+    JTPane.addTab(res.getString("mail"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), new JScrollPane(mail, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
     class MyCellRenderer extends JLabel implements ListCellRenderer {
       protected boolean selected;
@@ -321,8 +312,8 @@ public class YAMM extends JFrame implements HyperlinkListener
 
     Box hori1 = Box.createHorizontalBox();
 
-    b = new JButton(res.getString("VEXT"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
-    b.setToolTipText(res.getString("VEXT"));
+    b = new JButton(res.getString("button.view_extract"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
+    b.setToolTipText(res.getString("button.view_extract"));
     b.addActionListener(BListener);
     hori1.add(b);
 
@@ -341,7 +332,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     Border ram = BorderFactory.createEtchedBorder();
     myList.setBorder(ram);
 
-    JTPane.addTab(res.getString("ATTACH"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
+    JTPane.addTab(res.getString("button.attach"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
 
     SPane = new JSplitPane(0, new JScrollPane(mailList), JTPane);
 
@@ -399,8 +390,8 @@ public class YAMM extends JFrame implements HyperlinkListener
     fileList(list, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
     StringTokenizer tok;
 
-    JMenu copy = new JMenu(res.getString("COPY")), move = new JMenu(res.getString("MOVE"));
-    JMenuItem row, delete = new JMenuItem(res.getString("DELETE")), reply = new JMenuItem(res.getString("REPLY"));
+    JMenu copy = new JMenu(res.getString("edit.copy")), move = new JMenu(res.getString("edit.move"));
+    JMenuItem row, delete = new JMenuItem(res.getString("button.delete")), reply = new JMenuItem(res.getString("button.reply"));
 
     delete.addActionListener(OtherMListener);
     reply.addActionListener(OtherMListener);
@@ -524,7 +515,7 @@ public class YAMM extends JFrame implements HyperlinkListener
         String arg = ((JButton)e.getSource()).getText();
 
         File box = new File(System.getProperty("user.home") + "/.yamm/" + inFolder.getSelectedItem() + "/" + jtfield.getText());
-        if(arg.equals(res.getString("OK"))) {
+        if(arg.equals(res.getString("button.ok"))) {
           if(box.exists()) System.out.println(box.toString() + " exists!");
 
           else {
@@ -542,7 +533,7 @@ public class YAMM extends JFrame implements HyperlinkListener
           }
         }
 
-        else if(arg.equals(res.getString("CANCEL"))) {
+        else if(arg.equals(res.getString("button.cancel"))) {
           dispose();
         }
       }
@@ -629,7 +620,7 @@ public class YAMM extends JFrame implements HyperlinkListener
         i++;
       }
 
-      if(kommando.equals(res.getString("DELETE"))) {
+      if(kommando.equals(res.getString("button.delete"))) {
 
         int[] mlist = mailList.getSelectedRows();
         int[] deleteList = new int[mlist.length];
@@ -662,7 +653,7 @@ public class YAMM extends JFrame implements HyperlinkListener
         try { mail.setPage(mailPage); }
         catch (IOException ioe) { System.err.println(ioe); }
       }
-      else if(kommando.equals(res.getString("REPLY"))) {
+      else if(kommando.equals(res.getString("button.reply"))) {
                         
         String[] mail = Mailbox.getMailForReplyHeaders(selectedbox, Integer.parseInt(mailList.getValueAt(mailList.getSelectedRow(), i).toString()));
 
@@ -676,7 +667,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     public void actionPerformed(ActionEvent e) {
       String arg = ((JButton)e.getSource()).getToolTipText();
      
-      if(arg.equals(res.getString("VEXT"))) {
+      if(arg.equals(res.getString("button.view_extract"))) {
 
         int whichAtt = myList.getSelectedIndex();
 
@@ -685,7 +676,6 @@ public class YAMM extends JFrame implements HyperlinkListener
           String encode = ((Vector)attach.elementAt(whichAtt)).elementAt(0).toString();
           String home = System.getProperty("user.home") + "/.yamm";
 
-          System.out.println("encode: " + encode + " filename: " + filename);
           if(filename.endsWith(".jpg") || filename.endsWith(".gif") || filename.endsWith(".JPG") || filename.endsWith(".GIF")) {
             new File("tmp").mkdir();
 
@@ -745,7 +735,8 @@ public class YAMM extends JFrame implements HyperlinkListener
   MouseListener mouseListener = new MouseAdapter() {
     public void mouseReleased(MouseEvent me) {
       if(me.isPopupTrigger()) myPopup.show(mailList, me.getX(), me.getY());
-      else get_mail();
+      else if(mailList.getSelectedRow() != -1) get_mail();
+
       if(mailList.getSelectedRow() != -1 && !(mailList.getSelectedRow() >= listOfMails.size())) { ((JButton)tbar.reply).setEnabled(true); ((JButton)tbar.print).setEnabled(true); ((JButton)tbar.forward).setEnabled(true);}
       else { ((JButton)tbar.reply).setEnabled(false); ((JButton)tbar.forward).setEnabled(false); ((JButton)tbar.print).setEnabled(false); }
     }

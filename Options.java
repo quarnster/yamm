@@ -67,7 +67,7 @@ public class Options extends JDialog {
       mre.printStackTrace();
       System.exit(1);
     }
-    setTitle(res.getString("SETTINGS"));
+    setTitle(res.getString("edit.settings"));
 
     JTPane = new JTabbedPane(JTabbedPane.LEFT);
 
@@ -75,17 +75,17 @@ public class Options extends JDialog {
     Box hori = Box.createHorizontalBox();
     Box vert2 = Box.createVerticalBox();
     
-    JButton b = new JButton(res.getString("ADD"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/new.gif") );
+    JButton b = new JButton(res.getString("button.add"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/new.gif") );
     b.addActionListener(BListener);
     vert.add(b);
     vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-    b = new JButton(res.getString("EDIT"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/edit.gif"));
+    b = new JButton(res.getString("edit"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/edit.gif"));
     b.addActionListener(BListener);
     vert.add(b);
     vert.add(Box.createRigidArea(new Dimension(10, 10)));
 
-    b = new JButton(res.getString("DELETE"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/delete.gif"));
+    b = new JButton(res.getString("button.delete"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/delete.gif"));
     b.addActionListener(BListener);
     vert.add(b);
     vert.add(Box.createRigidArea(new Dimension(10, 10)));
@@ -123,7 +123,7 @@ public class Options extends JDialog {
     vect2.add(vect1);
 
     TableModel dataModel = new AbstractTableModel() {
-      String temp[] = { res.getString("TYPE"), res.getString("ADDRESS")};
+      String temp[] = { res.getString("options.type"), res.getString("options.address")};
       public int getColumnCount() { return 2; }
       public int getRowCount() { return ((Vector)vect2).size(); }
       public Object getValueAt(int row, int col) { return ((Vector)vect2.elementAt(row)).elementAt(col); }
@@ -147,24 +147,19 @@ public class Options extends JDialog {
     hori.add(JSPane);
     hori.add(Box.createRigidArea(new Dimension(10, 10)));
     hori.add(vert);
-    JTPane.add(res.getString("SERVERS"), hori);
+    JTPane.add(res.getString("options.servers"), hori);
 
     vert = Box.createVerticalBox();
     filterConf(vert);   
-    JTPane.add(res.getString("FILTERS"), vert);
+    JTPane.add(res.getString("options.filters"), vert);
 
     hori = Box.createVerticalBox();
     identitetConfig(hori);
-    JTPane.add(res.getString("IDENTITY"), hori);
+    JTPane.add(res.getString("options.identity"), hori);
 
-/*
-    hori = Box.createVerticalBox();
-    VisualConfig(hori);
-    JTPane.add(res.getString("VISUAL"), hori);
-*/
     hori = Box.createHorizontalBox();
 
-    b = new JButton(res.getString("OK"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/ok.gif"));
+    b = new JButton(res.getString("button.ok"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/ok.gif"));
     b.addActionListener(BListener);
     hori.add(b);
     hori.add(Box.createRigidArea(new Dimension(10, 10)));
@@ -186,7 +181,7 @@ public class Options extends JDialog {
     JTField.setMinimumSize(new Dimension(35, 15));
     JTField.setText(props.getProperty("msgmaxsize", "0"));
 
-    JLabel myLabel = new JLabel(res.getString("MSG_BIGMSG"));
+    JLabel myLabel = new JLabel(res.getString("msg.bigmsg"));
     hori.add(Box.createRigidArea(new Dimension(10, 10)));
     hori.add(myLabel);
     hori.add(JTField);
@@ -194,7 +189,7 @@ public class Options extends JDialog {
     hori.add(myLabel);
     
     vbox.add(hori);
-    vbox.add(new JLabel(res.getString("MSG_BIGMSG2")));
+    vbox.add(new JLabel(res.getString("msg.bigmsg2")));
 
     final Vector list = new Vector();
 
@@ -258,7 +253,7 @@ public class Options extends JDialog {
     JPanel panel = new JPanel(new GridLayout(6, 1, 2, 2));
     panel.setMaximumSize(new Dimension(300, 100));
     panel.setMinimumSize(new Dimension(300, 100));
-    panel.add(new JLabel(res.getString("IDENTITY") + ":"));
+    panel.add(new JLabel(res.getString("options.identity") + ":"));
 
     name = new JTextField(props.getProperty("username", System.getProperty("user.name")));
     name.setMaximumSize(new Dimension(200, 20));
@@ -281,7 +276,7 @@ public class Options extends JDialog {
 
     Box hori = Box.createHorizontalBox();
 
-    panel.add(new JLabel(res.getString("SIGNATUR") + ":"));
+    panel.add(new JLabel(res.getString("options.signatur") + ":"));
     signatur = new JTextField();
     signatur.setMaximumSize(new Dimension(190, 90));
     signatur.setMinimumSize(new Dimension(190, 90));
@@ -291,7 +286,7 @@ public class Options extends JDialog {
 
     hori.add(Box.createRigidArea(new Dimension(5, 5)));
 
-    JButton b = new JButton(res.getString("BROWSE"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
+    JButton b = new JButton(res.getString("button.browse"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
     b.setMaximumSize(new Dimension(115, 1000)); 
     b.setMinimumSize(new Dimension(115, 1000));
     b.addActionListener(BListener);                                    
@@ -304,23 +299,23 @@ public class Options extends JDialog {
     public void actionPerformed(ActionEvent e) {
       String arg = ((JButton)e.getSource()).getText();
 
-      if(arg.equals(res.getString("ADD"))) {
+      if(arg.equals(res.getString("button.add"))) {
         EDIT(true);
       }
 
-      else if(arg.equals(res.getString("EDIT"))) {
+      else if(arg.equals(res.getString("edit"))) {
         EDIT(false);
       }
 
-      else if(arg.equals(res.getString("DELETE"))) {
+      else if(arg.equals(res.getString("button.delete"))) {
         DELETE();
       }
 
-      else if(arg.equals(res.getString("BROWSE"))) {
+      else if(arg.equals(res.getString("button.browse"))) {
         browse();
       }
 
-      else if(arg.equals(res.getString("OK"))) {
+      else if(arg.equals(res.getString("button.ok"))) {
         try {
           InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
           props = new Properties();
@@ -350,13 +345,13 @@ public class Options extends JDialog {
     public void actionPerformed(ActionEvent e) {
       String arg = ((JButton)e.getSource()).getText();
 
-      if(arg.equals(res.getString("ADD"))) {
+      if(arg.equals(res.getString("button.add"))) {
       }
 
-      else if(arg.equals(res.getString("EDIT"))) {
+      else if(arg.equals(res.getString("edit"))) {
       }
 
-      else if(arg.equals(res.getString("DELETE"))) {
+      else if(arg.equals(res.getString("button.delete"))) {
       }
     }
   };
@@ -411,7 +406,7 @@ public class Options extends JDialog {
         } catch (IOException propsioe) { System.err.println(propsioe); }
       }
 
-      JLabel myLabel = new JLabel(res.getString("TYPE"));
+      JLabel myLabel = new JLabel(res.getString("options.type"));
       getContentPane().add(myLabel);           
 
       String[] items = {"Pop3"};
@@ -421,7 +416,7 @@ public class Options extends JDialog {
 
       if(config.equals(System.getProperty("user.home") + "/.yamm/.config")) jcbox.setEnabled(false);
 
-      myLabel = new JLabel(res.getString("ADDRESS") + ":");
+      myLabel = new JLabel(res.getString("options.address") + ":");
       getContentPane().add(myLabel);           
 
       addrField = new JTextField();
@@ -434,7 +429,7 @@ public class Options extends JDialog {
       else if(!config.equals("new")) addrField.setText(props.getProperty("smtpserver"));
       getContentPane().add(addrField);
     
-      myLabel = new JLabel(res.getString("USERNAME") + ": ");
+      myLabel = new JLabel(res.getString("options.username") + ": ");
       getContentPane().add(myLabel);
 
       userField = new JTextField();
@@ -445,7 +440,7 @@ public class Options extends JDialog {
       else if(!config.equals("new")) userField.setText(props.getProperty("username"));
       getContentPane().add(userField);
 
-      myLabel = new JLabel(res.getString("PASSWORD") + ":");
+      myLabel = new JLabel(res.getString("options.password") + ":");
       getContentPane().add(myLabel);
 
       JPField = new JPasswordField();
@@ -456,11 +451,11 @@ public class Options extends JDialog {
       else if(!config.equals("new")) JPField.setText(YAMM.decrypt(props.getProperty("password")));
       getContentPane().add(JPField);
 
-      JButton b = new JButton(res.getString("OK"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/ok.gif"));
+      JButton b = new JButton(res.getString("button.ok"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/ok.gif"));
       b.addActionListener(BListener2);
       getContentPane().add(b);
 
-      b = new JButton(res.getString("CANCEL"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
+      b = new JButton(res.getString("button.cancel"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
       b.addActionListener(BListener2);
       getContentPane().add(b);
 
@@ -559,10 +554,10 @@ public class Options extends JDialog {
       public void actionPerformed(ActionEvent e) {
         String arg = ((JButton)e.getSource()).getText();
 
-        if(arg.equals(res.getString("OK"))) {
+        if(arg.equals(res.getString("button.ok"))) {
           if(saveServerConf()) dispose();
         }
-        else if(arg.equals(res.getString("CANCEL"))) {
+        else if(arg.equals(res.getString("button.cancel"))) {
           dispose();
         }
       }

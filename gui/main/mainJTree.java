@@ -108,7 +108,7 @@ public class mainJTree extends JTree {
     expandRow(0);
 
     // adds items to the myPopup JPopupMenu
-    JMenuItem NEW = new JMenuItem(res.getString("NEW")), delete = new JMenuItem(res.getString("DELETE"));
+    JMenuItem NEW = new JMenuItem(res.getString("file.new")), delete = new JMenuItem(res.getString("button.delete"));
 
     NEW.addActionListener(treepoplistener);
     delete.addActionListener(treepoplistener);
@@ -226,7 +226,7 @@ public class mainJTree extends JTree {
     public void actionPerformed(ActionEvent ae) {
       String kommando = ((JMenuItem)ae.getSource()).getText();
       
-      if(kommando.equals(res.getString("NEW"))) {
+      if(kommando.equals(res.getString("file.new"))) {
 //        new newBoxDialog(null);
       }
       else {

@@ -61,15 +61,16 @@ public class mainToolBar extends JToolBar {
    * Creates the toolbar.
    * @param frame2 The JFrame to use for error messages etc.
    */
-  public mainToolBar(JFrame frame2) {
+  public mainToolBar(JFrame frame2, ResourceBundle res) {
     frame = (YAMM)frame2;
+    this.res = res;
 
     try {
       InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
       props.load(in);
       in.close();
     } catch (IOException propsioe) { System.err.println(propsioe); }
-
+/*
     try {
       res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault());
     }
@@ -77,11 +78,11 @@ public class mainToolBar extends JToolBar {
       mre.printStackTrace();
       System.exit(1);
     }
-
+*/
     /* send mails in outbox get mail to inbox */
     b = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/recycle.gif"));
     b.setBorderPainted(false);
-    b.setToolTipText(res.getString("SENDGET"));
+    b.setToolTipText(res.getString("button.send_get"));
     b.addActionListener(BListener);
     add(b);
     addSeparator();
@@ -91,14 +92,14 @@ public class mainToolBar extends JToolBar {
     b = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/new_mail.gif"));
     b.addActionListener(BListener);
     b.setBorderPainted(false);
-    b.setToolTipText(res.getString("NMAIL"));
+    b.setToolTipText(res.getString("button.new_mail"));
     add(b);
 
     /* reply button */
     reply = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/reply.gif"));
     reply.addActionListener(BListener);
     reply.setBorderPainted(false);
-    reply.setToolTipText(res.getString("REPLY"));
+    reply.setToolTipText(res.getString("button.reply"));
     reply.setEnabled(false);
     add(reply);
 
@@ -106,14 +107,14 @@ public class mainToolBar extends JToolBar {
     forward = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/forward.gif"));
     forward.addActionListener(BListener);
     forward.setBorderPainted(false);
-    forward.setToolTipText(res.getString("FORWARD"));
+    forward.setToolTipText(res.getString("button.forward"));
     forward.setEnabled(false);
     add(forward);
 
     /* button to print page */
     print = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/print.gif"));
     print.setBorderPainted(false);
-    print.setToolTipText(res.getString("PRINT"));
+    print.setToolTipText(res.getString("button.print"));
     print.addActionListener(BListener);
     print.setEnabled(false);
     addSeparator();
@@ -122,7 +123,7 @@ public class mainToolBar extends JToolBar {
     /* button to exit from program */
     b = new JButton(new ImageIcon("org/gjt/fredde/yamm/images/buttons/exit.gif"));
     b.setBorderPainted(false);
-    b.setToolTipText(res.getString("EXIT"));
+    b.setToolTipText(res.getString("button.exit"));
     b.addActionListener(BListener);
     addSeparator();
     add(b);
@@ -132,15 +133,15 @@ public class mainToolBar extends JToolBar {
     public void actionPerformed(ActionEvent e) {
       String arg = ((JButton)e.getSource()).getToolTipText();
 
-      if(arg.equals(res.getString("NMAIL"))) {
+      if(arg.equals(res.getString("button.new_mail"))) {
         new YAMMWrite();
       }
  
-      else if(arg.equals(res.getString("SENDGET"))) {
+      else if(arg.equals(res.getString("button.send_get"))) {
         new SHMail(frame, "mailthread", (JButton)e.getSource()).start();
       }
 
-      else if(arg.equals(res.getString("REPLY"))) {
+      else if(arg.equals(res.getString("button.reply"))) {
   
       int i = 0;
 
@@ -154,11 +155,11 @@ public class mainToolBar extends JToolBar {
 //        String subject = res.getString("RE") + mail.substring(mail.indexOf("Subject:") + 8, mail.indexOf("\n", mail.indexOf("Subject:") + 8));
 //        String actualmail = from + " " + res.getString("WROTE") + "\n" + mail.substring(mail.indexOf("Begin:") + 8, mail.length());
 
-        YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[0] + " " + res.getString("WROTE") + "\n");
+        YAMMWrite yam = new YAMMWrite(mail[0], mail[1], mail[0] + " " + res.getString("mail.wrote") + "\n");
         Mailbox.getMailForReply(frame.selectedbox, Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString()), yam.myTextArea);
       }
 
-      else if(arg.equals(res.getString("FORWARD"))) {
+      else if(arg.equals(res.getString("button.forward"))) {
 
         int i = 0;
 
@@ -168,14 +169,11 @@ public class mainToolBar extends JToolBar {
         }
 
         String mail[] = Mailbox.getMailForReplyHeaders(frame.selectedbox, Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString()));
-//        String from = mail.substring(0, mail.indexOf("\n", 0));
-//        String subject = res.getString("RE") + mail.substring(mail.indexOf("Subject:") + 8, mail.indexOf("\n", mail.indexOf("Subject:") + 8));
-//        String actualmail = from + " " + res.getString("WROTE") + "\n";
 
-        YAMMWrite yam = new YAMMWrite("", mail[1], mail[0] + " " + res.getString("WROTE") + "\n");
+        YAMMWrite yam = new YAMMWrite("", mail[1], mail[0] + " " + res.getString("mail.wrote") + "\n");
         Mailbox.getMailForReply(frame.selectedbox, Integer.parseInt(((JTable)frame.mailList).getValueAt(((JTable)frame.mailList).getSelectedRow(), i).toString()), yam.myTextArea);
       }
-      else if(arg.equals(res.getString("PRINT"))) {
+      else if(arg.equals(res.getString("button.print"))) {
         int i = 0;
 
         while(i<4) {
@@ -185,7 +183,7 @@ public class mainToolBar extends JToolBar {
 
         new Print(frame, i);
       }
-      else if(arg.equals(res.getString("EXIT"))) {
+      else if(arg.equals(res.getString("button.exit"))) {
         Rectangle rv = new Rectangle();
         frame.getBounds(rv);
 

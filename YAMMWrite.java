@@ -98,12 +98,12 @@ public class YAMMWrite extends JFrame {
     }
    
     JMenuBar  Meny = new JMenuBar();
-    JMenu     arkiv = new JMenu(res.getString("FILEMENU"));
+    JMenu     arkiv = new JMenu(res.getString("file"));
     JMenuItem rad;
     Meny.add(arkiv);
 
     // Arkiv menyn
-    rad = new JMenuItem(res.getString("CANCEL"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
+    rad = new JMenuItem(res.getString("button.cancel"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
     rad.addActionListener(MListener);
     arkiv.add(rad);
 
@@ -115,25 +115,25 @@ public class YAMMWrite extends JFrame {
     hori1 = Box.createHorizontalBox();
     hori2 = Box.createHorizontalBox();
 
-    myButton = new JButton(res.getString("SEND"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/send.gif"));
+    myButton = new JButton(res.getString("button.send"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/send.gif"));
     myButton.addActionListener(BListener);
     hori1.add(myButton);
 
-    myButton = new JButton(res.getString("CANCEL"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
+    myButton = new JButton(res.getString("button.cancel"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/cancel.gif"));
     myButton.addActionListener(BListener);
     hori1.add(myButton);
 
-    myLabel = new JLabel(res.getString("TO"));
+    myLabel = new JLabel(res.getString("mail.to"));
     vert1.add(myLabel);
 
     myTextField1 = new JTextField();
     myTextField1.setMaximumSize(new Dimension(1200, 20));
     myTextField1.setMinimumSize(new Dimension(75, 20));
     myTextField1.setText(to);
-    myTextField1.setToolTipText(res.getString("TOFIELD"));
+    myTextField1.setToolTipText(res.getString("tofield.tooltip"));
     vert2.add(myTextField1);
 
-    myLabel = new JLabel(res.getString("SUBJECT"));
+    myLabel = new JLabel(res.getString("mail.subject"));
     vert1.add(myLabel);
 
     myTextField2 = new JTextField();
@@ -168,7 +168,7 @@ public class YAMMWrite extends JFrame {
     }
 
     JTabbedPane JTPane = new JTabbedPane(JTabbedPane.BOTTOM);
-    JTPane.addTab(res.getString("MAIL"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), new JScrollPane(myTextArea));
+    JTPane.addTab(res.getString("mail"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/mail.gif"), new JScrollPane(myTextArea));
 
     class MyCellRenderer extends JLabel implements ListCellRenderer {
       protected boolean selected;
@@ -237,11 +237,11 @@ public class YAMMWrite extends JFrame {
 
     hori1 = Box.createHorizontalBox();
 
-    myButton = new JButton(res.getString("ADD"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/new.gif"));
+    myButton = new JButton(res.getString("button.add"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/new.gif"));
     myButton.addActionListener(BListener);
     hori1.add(myButton);
 
-    myButton = new JButton(res.getString("DELETE"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/delete.gif"));
+    myButton = new JButton(res.getString("button.delete"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/delete.gif"));
     myButton.addActionListener(BListener);
     hori1.add(myButton);
 
@@ -262,7 +262,7 @@ public class YAMMWrite extends JFrame {
     myList.setBorder(ram);
 
 
-    JTPane.addTab(res.getString("ATTACH"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
+    JTPane.addTab(res.getString("button.attach"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/attach.gif"), myPanel);
    
     vert3.add(JTPane);
     getContentPane().add(vert3);
@@ -290,7 +290,7 @@ public class YAMMWrite extends JFrame {
     public void actionPerformed(ActionEvent e) {
       String arg = ((JButton)e.getSource()).getText();
 
-      if(arg.equals(res.getString("SEND"))) {
+      if(arg.equals(res.getString("button.send"))) {
         if(isSendReady()) {
           try {
             PrintWriter outFile = new PrintWriter(new FileOutputStream(System.getProperty("user.home") + "/.yamm/boxes/outbox", true));
@@ -357,11 +357,11 @@ public class YAMMWrite extends JFrame {
         }
       }
 
-      else if(arg.equals(res.getString("ADD"))) {
+      else if(arg.equals(res.getString("button.add"))) {
         addAttach();
       }
 
-      else if(arg.equals(res.getString("DELETE"))) {
+      else if(arg.equals(res.getString("button.delete"))) {
         int rem = myList.getSelectedIndex();
         if(rem != -1) {
           attach.remove(rem);
@@ -369,7 +369,7 @@ public class YAMMWrite extends JFrame {
         }
       }
 
-      else if(arg.equals(res.getString("CANCEL"))) {
+      else if(arg.equals(res.getString("button.cancel"))) {
         Rectangle rv = new Rectangle();
         getBounds(rv);
 
@@ -414,7 +414,7 @@ public class YAMMWrite extends JFrame {
     public void actionPerformed(ActionEvent ae) {
       String kommando = ((JMenuItem)ae.getSource()).getText();
 
-      if(kommando.equals(res.getString("CANCEL"))) {
+      if(kommando.equals(res.getString("button.cancel"))) {
         Rectangle rv = new Rectangle();
         getBounds(rv);
 
