@@ -49,7 +49,7 @@ public class YAMM extends JFrame implements HyperlinkListener
   static protected ResourceBundle         res;
 
   /** The box the user has selected. */
-  public String                 selectedbox  = System.getProperty("user.home") + "/.yamm/boxes/inbox";
+  public static String                 selectedbox  = System.getProperty("user.home") + "/.yamm/boxes/inbox";
 
   /** The version of YAMM */
   public static    String                 yammVersion  = "0.7.2";
@@ -334,6 +334,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     SPane.setBackground(Color.white);
     SPane.setMinimumSize(new Dimension(0, 0));
     SPane.setPreferredSize(new Dimension(300, 50));
+    SPane.setOneTouchExpandable(true);
 //    SPane.setOpaque(true);  // makes it look nicer/uglier
 
 
@@ -342,6 +343,7 @@ public class YAMM extends JFrame implements HyperlinkListener
 
     SPane2 = new JSplitPane(1, tree, SPane);
     SPane2.setDividerLocation(vsplit);
+    SPane2.setOneTouchExpandable(true);
     getContentPane().add("Center", SPane2);
 
     status = new statusRow();
