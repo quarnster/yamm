@@ -82,13 +82,14 @@ public class YAMM extends JFrame implements HyperlinkListener
   static protected DefaultMutableTreeNode top;
 
   /** If it should sort 1 to 10 or 10 to 1*/
-  static protected boolean                firstSort    = true;
+//  static protected boolean                firstSort    = true;
 
   /** Which column that was sorted */
-  static protected int                    sortedCol    = 0;
+//  static protected int                    sortedCol    = 0;
 
   /** The Table that lists the mails in listOfMails */
-  public JTable       mailList;
+//  public JTable       mailList;
+  public mainTable      mailList;
 
   /** The JEditorPane for this frame */
   public JEditorPane  mail;
@@ -187,7 +188,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     setBounds(mainx, mainy, mainw, mainh);
     getContentPane().setLayout(new BorderLayout());
 
-/*
+
     // if you want to redirekt the err stream to a file.
     // good for debugging
     try {
@@ -198,7 +199,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     catch (IOException ioe) {
       System.out.println(ioe);
     }
-*/
+
 
     // get the resources to use
     try {
@@ -231,26 +232,10 @@ public class YAMM extends JFrame implements HyperlinkListener
       public String getColumnName(int column) {  return headername[column]; }
     };
 
-    mailList = new JTable(dataModel);
-    TableColumn column = null;
-    column = mailList.getColumnModel().getColumn(3);
-    column.setPreferredWidth(100);
-    column.setMaxWidth(100);
-    column.setMinWidth(10);
-    column = mailList.getColumnModel().getColumn(0);
-    column.setPreferredWidth(20);
-    column.setMinWidth(10);
-    column.setMaxWidth(30);
+    mailList = new mainTable(dataModel, listOfMails);
 
-    mailList.setFont(new Font("Serif", 0, 12));
-    mailList.setRowHeight(14);
-    mailList.setSelectionMode(2);
-    mailList.setColumnSelectionAllowed(false);
-    mailList.setShowHorizontalLines(false);
-    mailList.setShowVerticalLines(false);
-
-    TMListener(mailList);
     mailList.addMouseListener(mouseListener);
+
 
     myPopup = new JPopupMenu("Test");
     myPopup.setInvoker(mailList);
@@ -259,14 +244,11 @@ public class YAMM extends JFrame implements HyperlinkListener
     createMLPopup(myPopup);
 
     mail = new JEditorPane();
-    
-//    mail = new yammJEditorPane();
     mail.setContentType("text/html");
     attach = new Vector();
     Mailbox.getMail(selectedbox, 0, attach, mailName);
     try { mail.setPage(mailPage); }
     catch (IOException ioe) { System.err.println(ioe); }
-//    mail.setText(mbox.getMail(selectedbox, 0, attach)); // sets the text to mail 0 in current selected box
     mail.setEditable(false);
     mail.addHyperlinkListener(this);
 //    mail.setLineWrap(true);
@@ -381,6 +363,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     show();
   }
 
+/*
   void SortFirst(int row) {
     for(int i = 0; i<listOfMails.size();i++) {
       Object temp = null;
@@ -408,6 +391,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     }
     mailList.updateUI();
   }
+*/
 
   void createMLPopup(JPopupMenu jpmenu) {
     Vector list = new Vector();
@@ -795,6 +779,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     }
   };
 
+/*
   void TMListener(JTable table) {
     final JTable tableView = table;
     tableView.setColumnSelectionAllowed(false);
@@ -827,7 +812,7 @@ public class YAMM extends JFrame implements HyperlinkListener
     JTableHeader th = tableView.getTableHeader();
     th.addMouseListener(lmListener);
   }
-
+*/
   class FLyssnare extends WindowAdapter {
     public void windowClosing(WindowEvent event) {
         Rectangle rv = new Rectangle();
