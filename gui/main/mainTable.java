@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.46 2003/03/11 15:17:15 fredde Exp $
+/*  $Id: mainTable.java,v 1.47 2003/03/14 23:18:05 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.46 $
+ * @version $Revision: 1.47 $
  */
 public class mainTable
 	extends JTable
@@ -51,21 +51,33 @@ public class mainTable
 	/** Which column that was sorted */
 	private static int		sortedCol = 0;
 
-	private static YAMM			yamm = null;
+	private static YAMM		yamm = null;
 	protected JPopupMenu		popup = null;
 	private static DragSource	drag = null;
 
+	private final static int COLUMN_NUM = 0;
+	private final static int COLUMN_INFO = 1;
+	private final static int COLUMN_SUBJECT = 2;
+	private final static int COLUMN_FROM = 3;
+	private final static int COLUMN_DATE = 4;
+
 	private final AbstractTableModel dataModel = new AbstractTableModel() {
 		DateParser dp = new DateParser(YAMM.getString("shortdate"));
+
+		public final ImageIcon inew = new ImageIcon(getClass().getResource("/images/info/new.png"));
+		public final ImageIcon iread = new ImageIcon(getClass().getResource("/images/info/read.png"));
+		public final ImageIcon ireplied = new ImageIcon(getClass().getResource("/images/info/replied.png"));
+
 		private final String headername[] = {
 	        	"#",
+			"S",
 			YAMM.getString("table.subject"),
 		        YAMM.getString("table.from"),
 	        	YAMM.getString("table.date")
 		};
 
 		public final int getColumnCount() {
-	        	return 4;
+	        	return 5;
 		}
 
 		public final int getRowCount() {
@@ -77,10 +89,17 @@ public class mainTable
 				return null;
 			}
 			switch (col) {
-				case 0: return "" + yamm.listOfMails[yamm.keyIndex[row]].id;
-				case 1: return yamm.listOfMails[yamm.keyIndex[row]].subject;
-				case 2: return yamm.listOfMails[yamm.keyIndex[row]].from;
-				case 3:
+				case COLUMN_NUM: return "" + yamm.keyIndex[row];
+				case COLUMN_INFO:
+					int status = yamm.listOfMails[yamm.keyIndex[row]].status;
+					if ((status & IndexEntry.STATUS_READ) != 0) {
+						return iread;
+					} else {
+						return inew;
+					}
+				case COLUMN_SUBJECT: return yamm.listOfMails[yamm.keyIndex[row]].subject;
+				case COLUMN_FROM: return yamm.listOfMails[yamm.keyIndex[row]].from;
+				case COLUMN_DATE:
 					String blah = "";
 					try {
 						blah = dp.parse(new Date(yamm.listOfMails[yamm.keyIndex[row]].date));
@@ -98,6 +117,10 @@ public class mainTable
 
 		public final String getColumnName(int column) {
 			return headername[column];
+		}
+		public final Class getColumnClass(int column) {
+			if (column == COLUMN_INFO) return ImageIcon.class;
+			else return String.class;
 		}
 	};
 
@@ -119,32 +142,53 @@ public class mainTable
 			this
 		);
 
-		TableColumn column = getColumnModel().getColumn(0);
+		TableColumnModel model = getColumnModel();
+		TableColumn column = model.getColumn(COLUMN_NUM);
 		column.setIdentifier("num");
 		column.setMinWidth(5);
 		column.setMaxWidth(1024);
 		column.setPreferredWidth(Integer.parseInt(YAMM.getProperty("num.width", "20")));
 
-		column = getColumnModel().getColumn(1);
+		column = model.getColumn(COLUMN_INFO);
+		column.setIdentifier("info");
+		column.setMinWidth(18);
+		column.setMaxWidth(18);
+		column.setPreferredWidth(18);
+
+		column = model.getColumn(COLUMN_SUBJECT);
 		column.setIdentifier("subject");
 		column.setMinWidth(5);
 		column.setMaxWidth(1024);
 		column.setPreferredWidth(Integer.parseInt(YAMM.getProperty("subject.width", "200")));
 
-		column = getColumnModel().getColumn(2);
+		column = model.getColumn(COLUMN_FROM);
 		column.setIdentifier("from");
 		column.setMinWidth(5);
 		column.setMaxWidth(1024);
 		column.setPreferredWidth(Integer.parseInt(YAMM.getProperty("from.width", "200")));
 
-		column = getColumnModel().getColumn(3);
+		column = model.getColumn(COLUMN_DATE);
 		column.setIdentifier("date");
 		column.setMinWidth(5);
 		column.setMaxWidth(1024);
 		column.setPreferredWidth(Integer.parseInt(YAMM.getProperty("date.width", "125")));
 
+		int index = model.getColumnIndex("num");
+		model.moveColumn(index, Integer.parseInt(YAMM.getProperty("num.index", "" + COLUMN_NUM)));
 
-		setRowHeight(12);
+		index = model.getColumnIndex("info");
+		model.moveColumn(index, Integer.parseInt(YAMM.getProperty("info.index", "" + COLUMN_INFO)));
+
+		index = model.getColumnIndex("subject");
+		model.moveColumn(index, Integer.parseInt(YAMM.getProperty("subject.index", "" + COLUMN_SUBJECT)));
+
+		index = model.getColumnIndex("from");
+		model.moveColumn(index, Integer.parseInt(YAMM.getProperty("from.index", "" + COLUMN_FROM)));
+
+		index = model.getColumnIndex("date");
+		model.moveColumn(index, Integer.parseInt(YAMM.getProperty("date.index", "" + COLUMN_DATE)));
+
+		setRowHeight(16);
 		setSelectionMode(2);
 		setColumnSelectionAllowed(false);
 		setShowHorizontalLines(false);
@@ -171,14 +215,12 @@ public class mainTable
 	}
 
 	public void save() {
-		TableColumn c = getColumnModel().getColumn(0);
-		YAMM.setProperty(c.getIdentifier().toString() + ".width", c.getWidth()+"");
-		c = getColumnModel().getColumn(1);
-		YAMM.setProperty(c.getIdentifier().toString() + ".width", c.getWidth()+"");
-		c = getColumnModel().getColumn(2);
-		YAMM.setProperty(c.getIdentifier().toString() + ".width", c.getWidth()+"");
-		c = getColumnModel().getColumn(3);
-		YAMM.setProperty(c.getIdentifier().toString() + ".width", c.getWidth()+"");
+		for (int i = 0; i < 5; i++) {
+			TableColumn c = getColumnModel().getColumn(i);
+			String id = c.getIdentifier().toString();
+			YAMM.setProperty(id + ".width", c.getWidth()+"");
+			YAMM.setProperty(id + ".index", "" + getColumnModel().getColumnIndex(id));
+		}
 
 		YAMM.setProperty("sorting.col", "" + sortedCol);
 		YAMM.setProperty("sorting.type", "" + firstSort);
@@ -241,9 +283,10 @@ public class mainTable
 
 			copy(tmp, start, mid, end);
 			switch (col) {
-				default: mergeDate(tmp, start, mid, end); break;
-				case 1:	 mergeSubject(tmp, start, mid, end); break;
-				case 2:  mergeFrom(tmp, start, mid, end); break;
+				default:		mergeNum(tmp, start, mid, end); break;
+				case COLUMN_SUBJECT:	mergeSubject(tmp, start, mid, end); break;
+				case COLUMN_FROM:	mergeFrom(tmp, start, mid, end); break;
+				case COLUMN_DATE:	mergeDate(tmp, start, mid, end); break;
 			}
 		}
 	}
@@ -255,6 +298,15 @@ public class mainTable
 			tmp[pos++] = yamm.keyIndex[i--];
 	}
 
+	void mergeNum(int[] tmp, int start, int mid, int end) {
+		int num = end - start;
+
+		for (int i = 0, j = num, k = start; i <= j; )
+			if (tmp[i] <= tmp[j])
+				yamm.keyIndex[k++] = tmp[i++];
+			else
+				yamm.keyIndex[k++] = tmp[j--];
+	}
 
 	void mergeFrom(int[] tmp, int start, int mid, int end) {
 		int num = end - start;
@@ -468,6 +520,7 @@ public class mainTable
 					dataModel.fireTableRowsUpdated(row, row);
 					yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
 					yamm.tree.update();
+					yamm.status.setStatus("");
 				}
 				changeButtonMode(true);
 				if (me.getClickCount() == 2) new MailReader(yamm.mailPage);
@@ -651,6 +704,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.47  2003/03/14 23:18:05  fredde
+ * save/restore column index. added status column with icons.
+ *
  * Revision 1.46  2003/03/11 15:17:15  fredde
  * better updating of the tree when doing various mail operations
  *
