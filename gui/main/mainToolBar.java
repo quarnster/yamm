@@ -1,4 +1,4 @@
-/*  $Id: mainToolBar.java,v 1.29 2003/04/04 18:03:48 fredde Exp $
+/*  $Id: mainToolBar.java,v 1.30 2003/04/13 16:38:28 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Revision: 1.29 $
+ * @version $Revision: 1.30 $
  */
 public class mainToolBar
 	extends JToolBar
@@ -189,7 +189,7 @@ public class mainToolBar
 				int selMail = frame.keyIndex[frame.mailList.getSelectedRow()];
 				long skip = frame.listOfMails[selMail].skip;
 
-				String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, skip);
+				String[] mail = Mailbox.getMailForReplyHeaders(frame.getMailbox(), skip);
 
 				if (!mail[2].startsWith(YAMM.getString("mail.re")) && !mail[2].startsWith("Re:")) {
 					mail[2] = YAMM.getString("mail.re") + " " + mail[2];
@@ -200,7 +200,7 @@ public class mainToolBar
 					mail[2], mail[0] + " " + YAMM.getString("mail.wrote") + "\n"
 				);
 				Mailbox.getMailForReply(
-					frame.selectedbox,
+					frame.getMailbox(),
 					selMail, skip,
 					yam.myTextArea
 				);
@@ -211,7 +211,7 @@ public class mainToolBar
 				long skip = frame.listOfMails[selMail].skip;
 
 				String mail[] = Mailbox.getMailForReplyHeaders(
-					frame.selectedbox,
+					frame.getMailbox(),
 					skip
 				);
 
@@ -224,7 +224,7 @@ public class mainToolBar
 					mail[2], mail[0] + " " + YAMM.getString("mail.wrote") + "\n"
 				);
 				Mailbox.getMailForReply(
-					frame.selectedbox,
+					frame.getMailbox(),
 					selMail, skip,
 					yam.myTextArea
 				);
@@ -253,6 +253,9 @@ public class mainToolBar
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.30  2003/04/13 16:38:28  fredde
+ * now uses yamm.set/getMailbox
+ *
  * Revision 1.29  2003/04/04 18:03:48  fredde
  * updated for Singleton stuff
  *

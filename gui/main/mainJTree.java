@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.39 2003/04/04 18:03:48 fredde Exp $
+/*  $Id: mainJTree.java,v 1.40 2003/04/13 16:37:43 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.39 $
+ * @version $Revision: 1.40 $
  */
 public class mainJTree
 	extends JTable
@@ -337,11 +337,11 @@ public class mainJTree
 			if (list.length == 0) return;
 			if (action.equals("move")) {
 				YAMM yamm = YAMM.getInstance();
-				Mailbox.moveMail(yamm.selectedbox, box, list);
-				Mailbox.createList(yamm.selectedbox, yamm);
+				Mailbox.moveMail(yamm.getMailbox(), box, list);
+				Mailbox.createList(yamm.getMailbox(), yamm);
 				yamm.mailList.update();
 			} else {
-				Mailbox.copyMail(YAMM.getInstance().selectedbox, box, list);
+				Mailbox.copyMail(YAMM.getInstance().getMailbox(), box, list);
 			}
 
 			Utilities.delUnNeededFiles();
@@ -417,7 +417,7 @@ public class mainJTree
 							!file.endsWith(Utilities.replace("/sent")) &&
 							!file.endsWith(Utilities.replace("/trash"))) {
 
-						yamm.selectedbox = "deleted";
+						yamm.setMailbox("deleted");
 						del.delete();
 						new File(Mailbox.getIndexName(file)).delete();
 						updateNodes();
@@ -436,7 +436,7 @@ public class mainJTree
 							JOptionPane.ERROR_MESSAGE
 						);
 					} else {
-						yamm.selectedbox = "deleted";
+						yamm.setMailbox("deleted");
 						updateNodes();
 					}
 				}
@@ -456,15 +456,10 @@ public class mainJTree
 					File box = new File(node.toString());
 
 					if (node.toString().equals("deleted") || !box.exists()) {
-						yamm.selectedbox = Utilities.replace(YAMM.home + "/boxes/inbox");
-						Mailbox.createList(yamm.selectedbox, yamm);
-						yamm.mailList.clearSelection();
-						yamm.mailList.update();
+						String mbox = Utilities.replace(YAMM.home + "/boxes/inbox");
+						yamm.setMailbox(mbox);
 					} else if (!box.isDirectory()) {
-						yamm.selectedbox = node.toString();
-						Mailbox.createList(yamm.selectedbox, yamm);
-						yamm.mailList.clearSelection();
-						yamm.mailList.update();
+						yamm.setMailbox(node.toString());
 					}
 				}
 
@@ -489,6 +484,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.40  2003/04/13 16:37:43  fredde
+ * now uses yamm.set/getMailbox
+ *
  * Revision 1.39  2003/04/04 18:03:48  fredde
  * updated for Singleton stuff
  *

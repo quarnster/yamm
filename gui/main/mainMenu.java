@@ -1,4 +1,4 @@
-/*  $Id: mainMenu.java,v 1.35 2003/04/04 18:03:48 fredde Exp $
+/*  $Id: mainMenu.java,v 1.36 2003/04/13 16:38:28 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.35 $
+ * @version $Revision: 1.36 $
  */
 public class mainMenu
 	extends JMenuBar
@@ -262,7 +262,7 @@ public class mainMenu
 					if (msg != -1) {
 						sourceViewer sv = new sourceViewer();
 						int ret = Mailbox.viewSource(
-							yamm.selectedbox, msg,
+							yamm.getMailbox(), msg,
 							skip,
 							sv.jtarea
 						);
@@ -290,7 +290,7 @@ public class mainMenu
 					int ret = jfs.showSaveDialog(yamm);
 
 					if (ret == JFileChooser.APPROVE_OPTION) {
-						String tmp = yamm.selectedbox;
+						String tmp = yamm.getMailbox();
 						String boxName = tmp.substring(
 							tmp.indexOf("boxes") +
 							6,
@@ -351,6 +351,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.36  2003/04/13 16:38:28  fredde
+ * now uses yamm.set/getMailbox
+ *
  * Revision 1.35  2003/04/04 18:03:48  fredde
  * updated for Singleton stuff
  *
