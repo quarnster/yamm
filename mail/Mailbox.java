@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.46 2003/03/09 17:44:33 fredde Exp $
+/*  $Id: Mailbox.java,v 1.47 2003/03/09 18:04:56 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.46 $
+ * @version $Revision: 1.47 $
  */
 public class Mailbox {
 
@@ -101,26 +101,6 @@ public class Mailbox {
 				if (in != null) in.close();
 			} catch (IOException ioe) {}
 		}
-	}
-
-	protected static String removeQuote(String quote) {
-		quote = quote.replace('\\', '|');
-
-		while (quote.indexOf("|") != -1) {
-			quote = quote.substring(0, quote.indexOf("|")) +
-				"\\\\" +
-				quote.substring(quote.indexOf("|") + 1);
-		}
-
-		quote = quote.replace('\"', '|');
-
-		while (quote.indexOf("|") != -1) {
-			quote = quote.substring(0, quote.indexOf("|")) +
-				"\\\"" +
-				quote.substring(quote.indexOf("|") + 1);
-		}
-
-		return quote;
 	}
 
 	public static int[] getUnread(String box) {
@@ -681,6 +661,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.47  2003/03/09 18:04:56  fredde
+ * removeQuote not needed anymore
+ *
  * Revision 1.46  2003/03/09 17:44:33  fredde
  * cleaned up. now uses the new index system
  *

@@ -1,4 +1,4 @@
-/*  $Id: IndexEntry.java,v 1.1 2003/03/09 17:42:24 fredde Exp $
+/*  $Id: IndexEntry.java,v 1.2 2003/03/09 18:04:56 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -53,8 +53,8 @@ public class IndexEntry {
 		if (from == null) from = "";
 		if (subject == null) subject = "";
 
-		subject = Mailbox.removeQuote(Mailbox.unMime(subject));
-		from = Mailbox.removeQuote(Mailbox.unMime(from));
+		subject = Mailbox.unMime(subject);
+		from = Mailbox.unMime(from);
 	}
 
 	public IndexEntry(RandomAccessFile in)
