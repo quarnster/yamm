@@ -95,7 +95,8 @@ public class Attachment {
 		}
 
 		if (encoding != null) {
-			if (!encoding.equals("7bit")) {
+			if (!encoding.equals("7bit") &&
+					!encoding.equals("quoted-printable")) {
 				String temp = null;
 				out.println(name);
 				out.flush();
