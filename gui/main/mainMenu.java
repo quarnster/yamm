@@ -1,5 +1,5 @@
-/*  mainMenu.java - mainMenu class
- *  Copyright (C) 1999-2001 Fredrik Ehnbom
+/*  $Id: mainMenu.java,v 1.30 2003/03/08 16:54:48 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Id: mainMenu.java,v 1.29 2003/03/05 15:58:31 fredde Exp $
+ * @version $Revision: 1.30 $
  */
 public class mainMenu
 	extends JMenuBar
@@ -192,7 +192,7 @@ public class mainMenu
 					"Ricardo A Mattar "
 				);
 			} else if (kommando.equals(YAMM.getString("help.bug_report"))) {
-				YAMMWrite yw = new YAMMWrite("fredde@gjt.org", "Bug report");
+				YAMMWrite yw = new YAMMWrite("\"Fredrik Ehnbom\" <fredde@gjt.org>", "Bug report");
 				JTextArea jt = yw.myTextArea;
 				jt.append("What is the problem?\n\n");
 				jt.append("How did you make it happen?\n\n");
@@ -332,6 +332,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.30  2003/03/08 16:54:48  fredde
+ * added my name to the to-field when submitting bug reports
+ *
  * Revision 1.29  2003/03/05 15:58:31  fredde
  * now displays the correct message when viewing source
  *
