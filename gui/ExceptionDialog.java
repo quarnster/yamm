@@ -48,6 +48,7 @@ public class ExceptionDialog extends JDialog {
 	/**
 	 * Creates a new ExceptionDialog with the default button names.
 	 * @param title The title of the Dialog.
+	 * @param error The exception or Error to display in this dialog
 	 */
 /*
 	public ExceptionDialog(String title, Throwable error) {
@@ -77,6 +78,7 @@ public class ExceptionDialog extends JDialog {
 
 		textArea = new JTextArea();
 		textArea.setText(error.toString());
+		textArea.setEditable(false);
 		getContentPane().add("Center", new JScrollPane(textArea));
 
 		JPanel buttonPanel = new JPanel();
