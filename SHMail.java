@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom
- * @version $Id: SHMail.java,v 1.21 2000/03/14 21:18:14 fredde Exp $
+ * @version $Id: SHMail.java,v 1.22 2000/03/18 14:51:29 fredde Exp $
  */
 public class SHMail extends Thread {
 
@@ -106,6 +106,13 @@ public class SHMail extends Thread {
 				sent = true;
 			}
 
+			int port = 110;
+			try {
+				port = Integer.parseInt(props.getProperty("port"));
+			} catch (Exception e) {
+				port = 110;
+			}
+
 			if (type != null && server != null &&
 					username != null && password != null) {
 				if (type.equals("pop3")) {
@@ -115,7 +122,7 @@ public class SHMail extends Thread {
 					Pop3 pop = null;
 
 					try { 
-						pop = new YammPop3(username, password, server, YAMM.home + "/boxes/.filter", 110, popdebug);
+						pop = new YammPop3(username, password, server, YAMM.home + "/boxes/.filter", port, popdebug);
 						int messages = pop.getMessageCount();
 
 						for (int j = 1; j <= messages; j++) {
@@ -137,11 +144,7 @@ public class SHMail extends Thread {
 							if (pop != null) {
 								pop.close();
 							}
-						} catch (Exception e) {
-//							new ExceptionDialog(YAMM.getString("msg.error"),
-//								e,
-//								YAMM.exceptionNames);
-						}
+						} catch (Exception e) {}
 					}
 				}
 			}
@@ -165,9 +168,6 @@ public class SHMail extends Thread {
 					new InputStreamReader(
 						new FileInputStream(YAMM.home + "/boxes/" +
 							YAMM.getString("box.outbox"))));
-//				PrintWriter out = null;
-
-//				PrintWriter mail = null; // = smtp.getOutputStream();
 
 				if (sent) { 
 					out = new PrintWriter(
@@ -179,7 +179,6 @@ public class SHMail extends Thread {
 				String temp = null, from2 = null, to2 = null;
 				int i = 1;
 
-//				boolean msg = false;
 
 				for (;;) {
 					temp = in.readLine();
@@ -213,8 +212,6 @@ public class SHMail extends Thread {
 						mail.println(from2 + "\n" + to2 + "\n" + temp);
 						if (sent) out.println(temp);
 
-//						msg = true;
-
 						for (;;) {
 							temp = in.readLine();
 
@@ -228,8 +225,6 @@ public class SHMail extends Thread {
 								frame.status.setStatus(YAMM.getString("server.send",
 														args));
 
-
-//								msg = false;
 								i++;
 								break;
 							}
@@ -243,12 +238,9 @@ public class SHMail extends Thread {
 							mail.println(temp);
 					}
 				}
-//				in.close();
-//				if (sent) out.close();
 				File file = new File(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
 				file.delete();
 				file.createNewFile();
-//				smtp.close();
 			} catch (IOException ioe) { 
 				new ExceptionDialog(YAMM.getString("msg.error"),
 							ioe,
@@ -288,6 +280,9 @@ public class SHMail extends Thread {
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.22  2000/03/18 14:51:29  fredde
+ * removed unused code, gets the port-number for pop3 from config
+ *
  * Revision 1.21  2000/03/14 21:18:14  fredde
  * better network cleanup
  *
