@@ -1,4 +1,4 @@
-/*  $Id: mainMenu.java,v 1.33 2003/03/14 23:18:46 fredde Exp $
+/*  $Id: mainMenu.java,v 1.34 2003/03/15 19:35:28 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.33 $
+ * @version $Revision: 1.34 $
  */
 public class mainMenu
 	extends JMenuBar
@@ -64,13 +64,13 @@ public class mainMenu
 
 		// the file menu
 		rad = new JMenuItem(YAMM.getString("file.new"),
-				new ImageIcon(getClass().getResource("/images/buttons/new_mail.gif")));
+				new ImageIcon(getClass().getResource("/images/buttons/new_mail.png")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		file.add(rad);
 
 		rad = new JMenuItem(YAMM.getString("file.save_as"),
-				new ImageIcon(getClass().getResource("/images/buttons/save_as.gif")));
+				new ImageIcon(getClass().getResource("/images/buttons/save_as.png")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		file.add(rad);
@@ -78,7 +78,7 @@ public class mainMenu
 		file.addSeparator();
 
 		rad = new JMenuItem(YAMM.getString("file.exit"),
-				new ImageIcon(getClass().getResource("/images/buttons/exit.gif")));
+				new ImageIcon(getClass().getResource("/images/buttons/exit.png")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		file.add(rad);
@@ -89,13 +89,13 @@ public class mainMenu
 		add(edit);
 
 		rad = new JMenuItem(YAMM.getString("edit.settings"),
-				new ImageIcon(getClass().getResource("/images/buttons/prefs.gif")));
+				new ImageIcon(getClass().getResource("/images/buttons/prefs.png")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		edit.add(rad);
 
 		rad = new JMenuItem(YAMM.getString("edit.view_source"),
-				new ImageIcon(getClass().getResource("/images/buttons/search.gif")));
+				new ImageIcon(getClass().getResource("/images/buttons/search.png")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		edit.add(rad);
@@ -106,19 +106,19 @@ public class mainMenu
 		add(help);
 
 		rad = new JMenuItem(YAMM.getString("help.about_you"),
-				new ImageIcon(getClass().getResource("/images/buttons/help.gif")));
+				new ImageIcon(getClass().getResource("/images/buttons/help.png")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		help.add(rad);
 
 		rad = new JMenuItem(YAMM.getString("help.about"),
-				new ImageIcon(getClass().getResource("/images/buttons/help.gif")));
+				new ImageIcon(getClass().getResource("/images/buttons/help.png")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		help.add(rad);
 
 		rad = new JMenuItem(YAMM.getString("help.license"),
-				new ImageIcon(getClass().getResource("/images/types/text.gif")));
+				new ImageIcon(getClass().getResource("/images/types/text.png")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		help.add(rad);
@@ -126,7 +126,7 @@ public class mainMenu
 		help.addSeparator();
 
 		rad = new JMenuItem(YAMM.getString("help.bug_report"),
-				new ImageIcon(getClass().getResource("/images/buttons/bug.gif")));
+				new ImageIcon(getClass().getResource("/images/buttons/bug.png")));
 		rad.addActionListener(MListener);
 		rad.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		help.add(rad);
@@ -208,9 +208,10 @@ public class mainMenu
 					yamm,
 					"Copyright (C) 1999-2003 Fredrik Ehnbom\n" +
 					YAMM.getString("info.about", args) + "\n" + 
-					"Tuomas Kuosmanen \n" +
-					"Rafael Escovar \n" + 
-					"Ricardo A Mattar ",
+					"Tuomas Kuosmanen\n" +
+					"Rafael Escovar\n" + 
+					"Ricardo A Mattar\n" + 
+					"Daniel Johnson",
 					YAMM.getString("help.about"),
 					JOptionPane.INFORMATION_MESSAGE
 				);
@@ -357,6 +358,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.34  2003/03/15 19:35:28  fredde
+ * .gif -> .png. Added Daniel Johnson
+ *
  * Revision 1.33  2003/03/14 23:18:46  fredde
  * added formating of mailsizes in about_me dialog
  *
