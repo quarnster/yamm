@@ -1,8 +1,9 @@
-JAVAC = javac
+JAVAC = jikes
+CLASSPATH = /usr/local/jdk1.2.2/jre/lib/rt.jar:.
 
 .SUFFIXES: .class .java
 .java.class:
-	$(JAVAC) -g $<
+	$(JAVAC) -classpath $(CLASSPATH) -g $<
 
 CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/util/UUEncoder.class \
@@ -14,6 +15,8 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
         org/gjt/fredde/util/gui/statusRow.class \
         org/gjt/fredde/util/gui/SplashScreen.class \
 	org/gjt/fredde/yamm/gui/AttachListRenderer.class \
+	org/gjt/fredde/yamm/gui/BoxTreeRenderer.class \
+	org/gjt/fredde/yamm/gui/MailTableRenderer.class \
 	org/gjt/fredde/yamm/gui/imageViewer.class \
 	org/gjt/fredde/yamm/gui/sourceViewer.class \
 	org/gjt/fredde/yamm/gui/confwiz/ConfigurationWizard.class \
@@ -37,7 +40,6 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/mail/Mailbox.class \
 	org/gjt/fredde/yamm/mail/Filter.class \
 	org/gjt/fredde/yamm/gui/main/extMItem.class \
-	org/gjt/fredde/yamm/gui/BoxTreeRenderer.class \
 	org/gjt/fredde/yamm/gui/main/mainToolBar.class \
 	org/gjt/fredde/yamm/gui/main/mainJTree.class \
 	org/gjt/fredde/yamm/gui/main/mainTable.class \
