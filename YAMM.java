@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.69 2003/04/19 11:53:09 fredde Exp $
+/*  $Id: YAMM.java,v 1.70 2003/04/27 07:58:26 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.69 $
+ * @version $Revision: 1.70 $
  */
 public class YAMM
 	extends JFrame
@@ -611,7 +611,6 @@ public class YAMM
 			long newOffset = 0;
 			long messageLen = 0;
 			long endPosition = 0;
-			int skipLen = 1 + File.separator.length();
 
 			try {
 				int BUFFERSIZE = 65536;
@@ -633,15 +632,24 @@ public class YAMM
 						endPosition = box.length();
 					}
 					messageLen = endPosition - entry.skip;
-					messageLen -= skipLen;
 
 					entry.skip += newOffset;
 					index.saveEntry(entry, i);
 
 
 					String blah = "From " + MessageParser.getEmail(entry.from) + " " + dateFormat.format(new Date(entry.date)) + "\n";
-					newOffset += blah.length() - skipLen;
+					newOffset += blah.length();
+
+					int x = in.read();
+
+					while (x == (int) '\n') {
+						newOffset--;
+						x = in.read();
+						messageLen--;
+					}
+					messageLen--;
 					out.write(blah.getBytes());
+					out.write(x);
 
 
 					while (messageLen > 0) {
@@ -649,7 +657,6 @@ public class YAMM
 						messageLen -= read;
 						out.write(buffer, 0, read);
 					}
-					in.skip(skipLen);
 				}
 
 
@@ -799,6 +806,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.70  2003/04/27 07:58:26  fredde
+ * fixed yamm2Mbox
+ *
  * Revision 1.69  2003/04/19 11:53:09  fredde
  * updated to work with the new mbox-format
  *
