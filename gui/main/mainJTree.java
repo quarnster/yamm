@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.29 2003/03/08 20:56:30 fredde Exp $
+/*  $Id: mainJTree.java,v 1.30 2003/03/08 21:44:07 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,11 +40,11 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.29 $
+ * @version $Revision: 1.30 $
  */
 public class mainJTree
 	extends JTable
-//	implements DropTargetListener
+	implements DropTargetListener
 {
 
 	private JPopupMenu treepop;
@@ -108,11 +108,13 @@ public class mainJTree
 		this.frame = frame2;
 		this.tbar = tbar2;
 		sentbox = YAMM.getProperty("sentbox", "true").equals("true");
-/*
-		new DropTarget(this, // component
-				DnDConstants.ACTION_COPY_OR_MOVE, // actions
-				this); //DropTargetListener
-*/ 
+
+		new DropTarget(
+			this, // component
+			DnDConstants.ACTION_COPY_OR_MOVE, // actions
+			this //DropTargetListener
+		);
+ 
 		setModel(dataModel);
 
 		setColumnSelectionAllowed(false);
@@ -126,8 +128,6 @@ public class mainJTree
 		column.setMaxWidth(50);
 		column.setPreferredWidth(50);
 
-//		BoxTreeRenderer rend = new BoxTreeRenderer();
-//		setCellRenderer(rend); //new myTreeRenderer());
 		tree = new TreeTableCellRenderer(this);
 		tree.setModel(new DefaultTreeModel(top));
 		BoxTreeRenderer brend = new BoxTreeRenderer();
@@ -139,8 +139,7 @@ public class mainJTree
 		rend.setHorizontalAlignment(JLabel.RIGHT);
 		setDefaultRenderer(int.class, rend);
 		tree.setSelectionModel(new DefaultTreeSelectionModel() {
-			// Extend the implementation of the constructor, as if:
-			/* public this() */ {
+			{
 				setSelectionModel(listSelectionModel);
 			}
 		});
@@ -170,6 +169,14 @@ public class mainJTree
 		mi.addActionListener(treepoplistener);
 		treepop.add(mi);
 		tree.setRowHeight(getRowHeight());
+
+		if (YAMM.getProperty("main.tree.switch", "false").equals("true"))
+			getColumnModel().moveColumn(1, 0);
+
+	}
+
+	public void save() {
+		YAMM.setProperty("main.tree.switch", "" + getColumnModel().getColumn(0).getIdentifier().equals("num"));
 	}
 
 	/**
@@ -192,7 +199,7 @@ public class mainJTree
 		((DefaultTreeModel) tree.getModel()).reload();
 		dataModel.fireTableDataChanged();
 	}
-/*
+
 	public void drop(DropTargetDropEvent e) {
 		try {
 			DataFlavor stringFlavor = DataFlavor.stringFlavor;
@@ -226,8 +233,8 @@ public class mainJTree
 	protected void doAction(String mails, Point p, int act) {
 		String action = (act == DnDConstants.ACTION_MOVE ? "move" : "copy");
 
-		TreePath tp = getPathForLocation(p.x, p.y);
-		String box = null; // = tp.getLastPathComponent().toString();
+		TreePath tp = tree.getPathForLocation(p.x, p.y);
+		String box = null;
 
 		if (tp != null) {
 			box = tp.getLastPathComponent().toString();
@@ -251,11 +258,11 @@ public class mainJTree
 			Utilities.delUnNeededFiles();
 			Mailbox.createList(frame.selectedbox, frame);
 			Mailbox.updateIndex(box);
-			updateUI();
-			frame.mailList.updateUI();
+			dataModel.fireTableDataChanged();
+			frame.mailList.update();
 		}
 	}
-*/
+
 
 	public void createNodes(DefaultMutableTreeNode top, File f) {
 		DefaultMutableTreeNode dir = null;
@@ -353,6 +360,7 @@ public class mainJTree
 						frame.mailList.clearSelection();
 						frame.mailList.update();
 					}
+
 					if (box.isDirectory()) {
 						int row = getSelectedRow();
 						if (tree.isCollapsed(row))
@@ -384,6 +392,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.30  2003/03/08 21:44:07  fredde
+ * saves column index. drag and drop working again
+ *
  * Revision 1.29  2003/03/08 20:56:30  fredde
  * Localization fixes
  *
