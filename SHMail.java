@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom
- * @version $Id: SHMail.java,v 1.28 2000/12/31 14:05:07 fredde Exp $
+ * @version $Id: SHMail.java,v 1.29 2003/03/06 23:04:42 fredde Exp $
  */
 public class SHMail extends Thread {
 
@@ -213,17 +213,17 @@ public class SHMail extends Thread {
 						to2 = temp;
 
 						if (temp.indexOf(",") == -1) {
-							smtp.to(temp.substring(4, temp.length()));
+							smtp.to(MessageParser.getEmail(temp.substring(4, temp.length())));
 						} else {
 							temp.trim();
 							temp = temp.substring(4, temp.length());
 
 							while (temp.endsWith(",")) {
-								smtp.to(temp.substring(0, temp.length()-1));
+								smtp.to(MessageParser.getEmail(temp.substring(0, temp.length()-1)));
 								temp = in.readLine().trim();
 								to2 += "\n      " + temp;
 							}
-							smtp.to(temp.substring(0, temp.length()));
+							smtp.to(MessageParser.getEmail(temp.substring(0, temp.length())));
 						}
 						if (sent) out.println(to2);
 					} else if (temp.startsWith("Subject:")) {
@@ -320,6 +320,9 @@ public class SHMail extends Thread {
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.29  2003/03/06 23:04:42  fredde
+ * only send email information with the smtp.to-command
+ *
  * Revision 1.28  2000/12/31 14:05:07  fredde
  * better progressbars
  *
