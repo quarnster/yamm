@@ -179,14 +179,8 @@ public class mainTable extends JTable implements DragGestureListener,
    * Sorts 1 -> 10
    */
   protected void SortFirst(int col) {
-    int numcol = 0;           
-              
-    while(numcol<4) {
-      if(getColumnName(numcol).equals("#")) { break; }
-      numcol++;                                       
-    }
 
-    if (col == numcol) {
+    if (col == 0) {
       for (int i = 0; i < listOfMails.size(); i++) {
         Object temp = null;
         for (int j = 0; j < listOfMails.size(); j++) {
@@ -230,14 +224,8 @@ public class mainTable extends JTable implements DragGestureListener,
    * Sorts 10 -> 1
    */
   protected void SortLast(int col) {
-    int numcol = 0;                  
-                   
-    while(numcol<4) {
-      if(getColumnName(numcol).equals("#")) { break; }
-      numcol++;                                       
-    }          
      
-    if (col == numcol) {
+    if (col == 0) {
       for (int i = 0; i < listOfMails.size(); i++) {
         Object temp = null;
         for (int j = 0; j < listOfMails.size(); j++) {
