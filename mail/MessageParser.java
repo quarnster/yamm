@@ -26,7 +26,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Parses messages
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: MessageParser.java,v 1.13 2000/04/01 21:26:41 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.14 2001/03/18 14:26:42 fredde Exp $
  */
 public class MessageParser {
 
@@ -212,9 +212,9 @@ public class MessageParser {
 		String contentType = "";
 		if (temp != null) {
 			contentType = temp.toLowerCase();
-			if (temp.indexOf("boundary=") != -1) {
+			if (contentType.indexOf("boundary=") != -1) {
 				boundary = temp.substring(
-					temp.indexOf("boundary=") + 9,
+					contentType.indexOf("boundary=") + 9,
 					temp.length());
 				if (boundary.startsWith("\"")) {
 					boundary = boundary.substring(1, boundary.length() - 1);
@@ -226,8 +226,7 @@ public class MessageParser {
 			// expect a little mime message
 			for (;;) {
 				if (boundary != null) {
-					if (in.readLine().equals("--" +
-								boundary)) {
+					if (in.readLine().equals("--" +	boundary)) {
 						new Attachment().parse(in,
 						null);
 						break;
