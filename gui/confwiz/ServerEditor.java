@@ -1,4 +1,4 @@
-/*  $Id: ServerEditor.java,v 1.4 2003/04/16 12:40:17 fredde Exp $
+/*  $Id: ServerEditor.java,v 1.5 2003/10/01 10:05:47 fredde Exp $
  *  Copyright (C) 2000-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Editor for the serversettings
  * @author Fredrik Ehnbom
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ServerEditor
 	extends JDialog
@@ -125,6 +125,7 @@ public class ServerEditor
 		JPanel panel = new JPanel();
 		type = new JComboBox(new Object[] {"pop3", "smtp"});
 		type.addActionListener(ComboListener);
+		type.setEnabled(false);
 		panel.add(type);
 		panel.setBorder(BorderFactory.createTitledBorder(new EtchedBorder(), YAMM.getString("confwiz.servers.type")));
 		gridbag.setConstraints(panel, c1);
@@ -362,6 +363,9 @@ public class ServerEditor
 /*
  * Changes:
  * $Log: ServerEditor.java,v $
+ * Revision 1.5  2003/10/01 10:05:47  fredde
+ * temporarely disabled type-box
+ *
  * Revision 1.4  2003/04/16 12:40:17  fredde
  * updated to include smtp-configuration also
  *
