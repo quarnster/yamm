@@ -398,7 +398,7 @@ public class Mailbox {
                 }
               }
 
-              if(!html && temp.indexOf("<") != -1 || temp.indexOf(">") != -1) temp = removeTags(temp);
+              if(!html && temp.indexOf("<") != -1 || temp.indexOf(">") != -1 || temp.indexOf("=") != -1) temp = removeTags(temp);
               if(temp.indexOf("://") != -1 && temp.indexOf("href=") == -1 && temp.indexOf("HREF=") == -1) {
                 int    protBegin = temp.indexOf("://");
                 int    space     = temp.indexOf(" ", protBegin + 3);
@@ -521,6 +521,17 @@ public class Mailbox {
       String end = html.substring(index, html.length());
       html = begin + "&gt;" + end;
     }
+    if(html.indexOf("=") != -1) {
+      index = 0;
+      for(;html.indexOf("=", index) != -1 && html.indexOf("=", index) + 2 <= html.length();) {
+        index = html.indexOf("=", index) + 1;
+
+        int htmlchar = Integer.parseInt(html.substring(index, index+2), 16);
+        String begin = html.substring(0, index -1);
+        String end = html.substring(index + 2, html.length());
+        html = begin + "&#" + htmlchar + ";" + end;
+      }
+    }
 
     return html;
   }
@@ -602,6 +613,17 @@ public class Mailbox {
 
             temp = in.readLine();
 
+            if(temp.indexOf("=") != -1) {
+              int index = 0;
+              for(;temp.indexOf("=", index) != -1 && temp.indexOf("=", index) + 2 <= temp.length();) {
+                index = temp.indexOf("=", index) + 1;
+                int htmlchar = Integer.parseInt(temp.substring(index, index +2), 16);
+                System.out.println("htmlchar: " + htmlchar);
+                String begin = temp.substring(0, index -1);
+                String end = temp.substring(index + 2, temp.length());
+                temp = begin + (char)htmlchar + end;
+              }
+            }
             if(temp == null) break;
             else if(temp.indexOf("MIME") != -1 || temp.indexOf("mime") != -1) {
               temp = in.readLine();
