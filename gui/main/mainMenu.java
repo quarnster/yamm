@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Id: mainMenu.java,v 1.25 2000/12/25 09:53:05 fredde Exp $
+ * @version $Id: mainMenu.java,v 1.26 2000/12/26 11:23:27 fredde Exp $
  */
 public class mainMenu
 	extends JMenuBar
@@ -229,25 +229,14 @@ public class mainMenu
 			} else if (kommando.equals(YAMM.getString("file.new"))) {
 				new YAMMWrite();
 			} else if (kommando.equals(YAMM.getString("edit.view_source"))) {
-				JTable tmp = frame.mailList;
+				mainTable tmp = frame.mailList;
 				int test = tmp.getSelectedRow();
 
-				if (test >= 0 &&
-					test < frame.listOfMails.size()) {
+				if (test >= 0 && test < frame.listOfMails.length) {
 
-					int i = 0;
+					int msg = tmp.getSelectedMessage();
 
-					while (i < 4) {
-						if (tmp.getColumnName(i).equals("#")) break;
-						i++;
-					}
-
-					int msg = Integer.parseInt(tmp.getValueAt(tmp.getSelectedRow(),i).toString());
-
-					long skip = Long.parseLong(
-						((Vector) frame.listOfMails.
-						elementAt(tmp.getSelectedRow())).elementAt(5).
-						toString());
+					long skip = Long.parseLong(frame.listOfMails[tmp.getSelectedRow()][5]);
 
 					if (msg != -1) {
 						sourceViewer sv = new sourceViewer();
@@ -270,8 +259,7 @@ public class mainMenu
 			} else if (kommando.equals(YAMM.getString("file.save_as"))) {
 				int test = frame.mailList.getSelectedMessage();
 
-				if (test != -1 && test <= frame.listOfMails.size()) {
-
+				if (test != -1 && test <= frame.listOfMails.length) {
 					JFileChooser jfs = new JFileChooser();
 					jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
 					jfs.setMultiSelectionEnabled(false);
@@ -341,6 +329,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.26  2000/12/26 11:23:27  fredde
+ * YAMM.listOfMails is now of type String[][]
+ *
  * Revision 1.25  2000/12/25 09:53:05  fredde
  * changed homepage url, cleaned up a little
  *

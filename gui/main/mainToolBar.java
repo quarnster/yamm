@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Id: mainToolBar.java,v 1.21 2000/08/09 16:38:32 fredde Exp $
+ * @version $Id: mainToolBar.java,v 1.22 2000/12/26 11:24:13 fredde Exp $
  */
 public class mainToolBar extends JToolBar {
 
@@ -98,8 +98,8 @@ public class mainToolBar extends JToolBar {
 		if (frame.text) {
 			reply.setText(YAMM.getString("button.reply"));
 		}
-		reply.setFont(new Font("SansSerif", Font.PLAIN, 10));    
-		setAlign(reply, content);                           
+		reply.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		setAlign(reply, content);
 		reply.addActionListener(BListener);
 		reply.setBorderPainted(false);
 		reply.setToolTipText(YAMM.getString("button.reply.tooltip"));
@@ -114,8 +114,8 @@ public class mainToolBar extends JToolBar {
 		if (frame.text) {
 			forward.setText(YAMM.getString("button.forward"));
 		}
-		forward.setFont(new Font("SansSerif", Font.PLAIN, 10));    
-		setAlign(forward, content);                           
+		forward.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		setAlign(forward, content);
 		forward.addActionListener(BListener);
 		forward.setBorderPainted(false);
 		forward.setToolTipText(
@@ -134,8 +134,8 @@ public class mainToolBar extends JToolBar {
 		if (frame.text) {
 			print.setText(YAMM.getString("button.print"));
 		}
-		print.setFont(new Font("SansSerif", Font.PLAIN, 10));    
-		setAlign(print, content);                           
+		print.setFont(new Font("SansSerif", Font.PLAIN, 10));
+		setAlign(print, content);
 		print.setBorderPainted(false);
 		print.setToolTipText(YAMM.getString("button.print.tooltip"));
 		print.addActionListener(BListener);
@@ -200,22 +200,24 @@ public class mainToolBar extends JToolBar {
 								i).toString());
 
 				long skip = Long.parseLong(
-					((Vector) frame.listOfMails.elementAt(
-					frame.mailList.getSelectedRow())
-					).elementAt(5).toString());
+					frame.listOfMails[frame.mailList.getSelectedRow()][5]
+				);
 
 				String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, skip);
 
-				if (!mail[3].startsWith(YAMM.getString("mail.re")) &&
-						!mail[3].startsWith("Re:")) {
+				if (!mail[3].startsWith(YAMM.getString("mail.re")) && !mail[3].startsWith("Re:")) {
 					mail[3] = YAMM.getString("mail.re") + " " + mail[3];
 				}
 
-				YAMMWrite yam = new YAMMWrite(mail[2], mail[1],
-					mail[3], mail[0] + YAMM.getString("mail.wrote") + "\n");
-				Mailbox.getMailForReply(frame.selectedbox,
-								selMail, skip,
-								yam.myTextArea);
+				YAMMWrite yam = new YAMMWrite(
+					mail[2], mail[1],
+					mail[3], mail[0] + YAMM.getString("mail.wrote") + "\n"
+				);
+				Mailbox.getMailForReply(
+					frame.selectedbox,
+					selMail, skip,
+					yam.myTextArea
+				);
 			} else if (arg.equals(YAMM.getString("button.forward.tooltip"))) {
 				int i = 0;
 
@@ -232,25 +234,29 @@ public class mainToolBar extends JToolBar {
 								i).toString());
 
 				long skip = Long.parseLong(
-					((Vector) frame.listOfMails.elementAt(
-					frame.mailList.getSelectedRow())
-					).elementAt(5).toString());
+					frame.listOfMails[frame.mailList.getSelectedRow()][5]
+				);
 
 				String mail[] = Mailbox.getMailForReplyHeaders(
-							frame.selectedbox, skip);
+					frame.selectedbox,
+					skip
+				);
 
-				if (!mail[3].startsWith(YAMM.getString("mail.fwd")) &&
-						!mail[3].startsWith("Fwd:")) {
+				if (!mail[3].startsWith(YAMM.getString("mail.fwd")) && !mail[3].startsWith("Fwd:")) {
 					mail[3] = YAMM.getString("mail.fwd") +	" " + mail[3];
 				}
 
-				YAMMWrite yam = new YAMMWrite("", mail[1],
-							mail[3], mail[0] +
-						YAMM.getString("mail.wrote") +
-									"\n");
-				Mailbox.getMailForReply(frame.selectedbox,
-								selMail, skip,
-								yam.myTextArea);
+				YAMMWrite yam = new YAMMWrite(
+					"", mail[1],
+					mail[3], mail[0] +
+					YAMM.getString("mail.wrote") +
+					"\n"
+				);
+				Mailbox.getMailForReply(
+					frame.selectedbox,
+					selMail, skip,
+					yam.myTextArea
+				);
 			} else if (arg.equals(YAMM.getString("button.print.tooltip"))) {
 				PrintJob pj = frame.getToolkit().getPrintJob(frame, "print", null);
 
@@ -273,6 +279,9 @@ public class mainToolBar extends JToolBar {
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.22  2000/12/26 11:24:13  fredde
+ * YAMM.listOfMails is now of type String[][]
+ *
  * Revision 1.21  2000/08/09 16:38:32  fredde
  * readability fixes and is now floatable in icononly mode
  *

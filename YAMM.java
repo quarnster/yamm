@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.51 2000/12/25 09:50:48 fredde Exp $
+ * @version $Id: YAMM.java,v 1.52 2000/12/26 11:21:11 fredde Exp $
  */
 public class YAMM
 	extends JFrame
@@ -61,7 +61,7 @@ public class YAMM
 	public static String version  = "0.7.7";
 
 	/** The compileDate of YAMM */
-	public static String compDate = Utilities.cvsToDate("$Date: 2000/12/25 09:50:48 $");
+	public static String compDate = Utilities.cvsToDate("$Date: 2000/12/26 11:21:11 $");
 
 	/** the file that contains the current mail */
 	public String mailPageString = "file:///" + home + "/tmp/cache/";
@@ -75,7 +75,7 @@ public class YAMM
 	public static boolean base64enc = false;
 
 	/** The vector containing the mails of a box */
-	public Vector listOfMails = new Vector();
+	public String[][] listOfMails;
 
 	/** The properties to get configuration stuff from */
 	static protected Properties props = new Properties();
@@ -208,7 +208,7 @@ public class YAMM
 		getContentPane().add("North", tbar);
 
 		// create a list of mails in the selected box
-		Mailbox.createList(selectedbox, listOfMails);
+		Mailbox.createList(selectedbox, this);
 
 		// the tablemodel for the maillist table
 
@@ -690,6 +690,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.52  2000/12/26 11:21:11  fredde
+ * YAMM.listOfMails is now of type String[][]
+ *
  * Revision 1.51  2000/12/25 09:50:48  fredde
  * Some cleanups
  *

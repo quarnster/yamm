@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.34 2000/12/25 09:54:16 fredde Exp $
+ * @version $Id: mainTable.java,v 1.35 2000/12/26 11:23:49 fredde Exp $
  */
 public class mainTable
 	extends JTable
@@ -68,14 +68,14 @@ public class mainTable
 		}
 
 	        public final int getRowCount() {
-			return  frame.listOfMails.size();
+			return  frame.listOfMails.length;
 	        }
 
 		public final Object getValueAt(int row, int col) {
-	        	if (row >= frame.listOfMails.size()) {
+	        	if (row >= frame.listOfMails.length) {
 		        	return null;
 			} else {
-	        		return  ((Vector) frame.listOfMails.elementAt(row)).elementAt(col);
+	        		return  frame.listOfMails[row][col];
 		        }
 		}
 
@@ -243,43 +243,31 @@ public class mainTable
 	 */
 	private void SortFirst(int col) {
 		if (frame.listOfMails == null) return;
+
+		String[] temp = null;
 		if (col == 0) {
-			for (int i = 0; i < frame.listOfMails.size(); i++) {
-				Object temp = null;
-				for (int j = 0; j < frame.listOfMails.size(); j++) {
-					Vector v = (Vector) frame.listOfMails.elementAt(i);
-					int one = Integer.parseInt(v.elementAt(col).toString());
-
-					v = (Vector) frame.listOfMails.elementAt(j);
-
-					int two = Integer.parseInt(v.elementAt(col).toString());
-
-					v = frame.listOfMails;
+			for (int i = 0; i < frame.listOfMails.length; i++) {
+				for (int j = 0; j < frame.listOfMails.length; j++) {
+					int one = Integer.parseInt(frame.listOfMails[i][col]);
+					int two = Integer.parseInt(frame.listOfMails[j][col]);
 
 					if (one < two) {
-						temp = v.elementAt(j);
-						v.setElementAt(v.elementAt(i), j);
-						v.setElementAt(temp, i);
+						temp = frame.listOfMails[j];
+						frame.listOfMails[j] = frame.listOfMails[i];
+						frame.listOfMails[i] = temp;
 					}
 				}
 			}
 		} else {
-			for (int i = 0; i < frame.listOfMails.size(); i++) {
-				Object temp = null;
-				for (int j = 0; j < frame.listOfMails.size(); j++) {
+			for (int i = 0; i < frame.listOfMails.length; i++) {
+				for (int j = 0; j < frame.listOfMails.length; j++) {
+					String s1 = frame.listOfMails[i][col].toLowerCase();
+					String s2 = frame.listOfMails[j][col].toLowerCase();
 
-					Vector v = (Vector) frame.listOfMails.elementAt(i);
-					String s1 = v.elementAt(col).toString();
-
-					v = (Vector) frame.listOfMails.elementAt(j);
-					String s2 = v.elementAt(col).toString();
-
-					v = frame.listOfMails;
-
-					if (s1.toLowerCase().compareTo(s2.toLowerCase()) < 0) {
-						temp = v.elementAt(j);
-						v.setElementAt(v.elementAt(i), j);
-						v.setElementAt(temp, i);
+					if (s1.compareTo(s2.toLowerCase()) < 0) {
+						temp = frame.listOfMails[j];
+						frame.listOfMails[j] = frame.listOfMails[i];
+						frame.listOfMails[i] = temp;
 					}
 				}
 			}
@@ -292,41 +280,31 @@ public class mainTable
 	 */
 	private void SortLast(int col) {
 		if (frame.listOfMails == null) return;
+		String[] temp = null;
+
 		if (col == 0) {
-			for (int i = 0; i < frame.listOfMails.size(); i++) {
-				Object temp = null;
-				for (int j = 0; j < frame.listOfMails.size(); j++) {
-					Vector v = (Vector) frame.listOfMails.elementAt(i);
-					int one = Integer.parseInt(v.elementAt(col).toString());
-
-					v = (Vector) frame.listOfMails.elementAt(j);
-					int two = Integer.parseInt(v.elementAt(col).toString());
-
-					v = frame.listOfMails;
+			for (int i = 0; i < frame.listOfMails.length; i++) {
+				for (int j = 0; j < frame.listOfMails.length; j++) {
+					int one = Integer.parseInt(frame.listOfMails[i][col]);
+					int two = Integer.parseInt(frame.listOfMails[j][col]);
 
 					if (one > two) {
-						temp = v.elementAt(j);
-						v.setElementAt(v.elementAt(i), j);
-						v.setElementAt(temp, i);
+						temp = frame.listOfMails[j];
+						frame.listOfMails[j] = frame.listOfMails[i];
+						frame.listOfMails[i] = temp;
 					}
 				}
 			}
 		}  else {
-			for (int i = 0; i < frame.listOfMails.size(); i++) {
-				Object temp = null;
-				for (int j = 0; j < frame.listOfMails.size(); j++) {
-					Vector v = (Vector) frame.listOfMails.elementAt(i);
-					String s1 = v.elementAt(col).toString();
-
-					v = (Vector) frame.listOfMails.elementAt(j);
-					String s2 = v.elementAt(col).toString();
-
-					v = frame.listOfMails;
+			for (int i = 0; i < frame.listOfMails.length; i++) {
+				for (int j = 0; j < frame.listOfMails.length; j++) {
+					String s1 = frame.listOfMails[i][col].toLowerCase();
+					String s2 = frame.listOfMails[j][col].toLowerCase();
 
 					if (s1.toLowerCase().compareTo(s2.toLowerCase()) > 0) {
-						temp = v.elementAt(j);
-						v.setElementAt(v.elementAt(i), j);
-						v.setElementAt(temp, i);
+						temp = frame.listOfMails[j];
+						frame.listOfMails[j] = frame.listOfMails[i];
+						frame.listOfMails[i] = temp;
 					}
 				}
 			}
@@ -505,15 +483,13 @@ public class mainTable
 			}
 
 			if (getSelectedRow() != -1) {
-				Vector v = (Vector) frame.listOfMails.elementAt(getSelectedRow());
-
 				String outbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
 
-				if (v.elementAt(4).toString().equals("Unread") && !frame.selectedbox.equals(outbox)) {
-					long skip = Long.parseLong(((Vector) frame.listOfMails.elementAt(getSelectedRow())).elementAt(5).toString());
+				if (frame.listOfMails[getSelectedRow()][4].equals("Unread") && !frame.selectedbox.equals(outbox)) {
+					long skip = Long.parseLong(frame.listOfMails[getSelectedRow()][5]);
 
 					Mailbox.setStatus(frame.selectedbox, getSelectedMessage(), skip, "Read");
-					Mailbox.createList(frame.selectedbox, frame.listOfMails);
+					Mailbox.createList(frame.selectedbox, frame);
 
 					frame.tree.repaint();
 					update();
@@ -530,26 +506,15 @@ public class mainTable
 		}
 
 		void get_mail() {
-			int i = 0;
+			long skip = Long.parseLong(frame.listOfMails[getSelectedRow()][5]);
 
-			while (i < 4) {
-				if (getColumnName(i).equals("#")) {
-					break;
-				}
-				i++;
-			}
-
-			long skip = Long.parseLong(((Vector) frame.listOfMails.elementAt(getSelectedRow())).elementAt(5).toString());
-			int whatMail = Integer.parseInt(getValueAt(getSelectedRow(), i).toString());
-
-			Mailbox.getMail(frame.selectedbox, whatMail, skip);
+			Mailbox.getMail(frame.selectedbox, getSelectedMessage(), skip);
 			try {
 				String boxName = frame.selectedbox.substring(
 					frame.selectedbox.indexOf("boxes") + 6,
 					frame.selectedbox.length()) + "/";
 
-				frame.mailPage = new URL(frame.mailPageString +
-						boxName + whatMail + ".html");
+				frame.mailPage = new URL(frame.mailPageString +	boxName + getSelectedMessage() + ".html");
 			} catch (MalformedURLException mue) {
 				new ExceptionDialog(YAMM.getString("msg.error"), mue, YAMM.exceptionNames);
 			}
@@ -592,7 +557,7 @@ public class mainTable
 
 				Arrays.sort(deleteList);
 				Mailbox.deleteMail(frame.selectedbox, deleteList);
-				Mailbox.createList(frame.selectedbox, frame.listOfMails);
+				Mailbox.createList(frame.selectedbox, frame);
 
 //				updateUI();
 				Mailbox.updateIndex(frame.selectedbox);
@@ -600,7 +565,7 @@ public class mainTable
 				frame.tree.updateUI();
 				update();
 
-				if (frame.listOfMails.size() < 0) {
+				if (frame.listOfMails.length < 0) {
 					return;
 				}
 
@@ -639,7 +604,7 @@ public class mainTable
 				Arrays.sort(deleteList);
 
 				Mailbox.deleteMail(frame.selectedbox, deleteList);
-				Mailbox.createList(frame.selectedbox, frame.listOfMails);
+				Mailbox.createList(frame.selectedbox, frame);
 
 				Mailbox.updateIndex(frame.selectedbox);
 				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")));
@@ -654,7 +619,7 @@ public class mainTable
 				}
 
 				int msgnum = Integer.parseInt(getValueAt(getSelectedRow(), i).toString());
-				long skip = Long.parseLong(((Vector) frame.listOfMails.elementAt(msgnum)).elementAt(5).toString());
+				long skip = Long.parseLong(frame.listOfMails[msgnum][5]);
 
 				String[] mail = Mailbox.getMailForReplyHeaders(frame.selectedbox, skip);
 
@@ -732,7 +697,7 @@ public class mainTable
 
 			Arrays.sort(moveList);
 			Mailbox.moveMail(frame.selectedbox, name, moveList);
-			Mailbox.createList(frame.selectedbox, frame.listOfMails);
+			Mailbox.createList(frame.selectedbox, frame);
 			Mailbox.updateIndex(name);
 			updateUI();
 			frame.tree.updateUI();
@@ -742,6 +707,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.35  2000/12/26 11:23:49  fredde
+ * YAMM.listOfMails is now of type String[][]
+ *
  * Revision 1.34  2000/12/25 09:54:16  fredde
  * a little cleaned up
  *

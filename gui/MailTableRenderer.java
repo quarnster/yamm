@@ -28,10 +28,11 @@ import org.gjt.fredde.yamm.Utilities;
 /**
  * The renderer for the mailtable
  * @author Fredrik Ehnbom
- * @version $Id: MailTableRenderer.java,v 1.2 2000/07/16 17:48:36 fredde Exp $
+ * @version $Id: MailTableRenderer.java,v 1.3 2000/12/26 11:22:17 fredde Exp $
  */
-public class MailTableRenderer extends DefaultTableCellRenderer {
-
+public class MailTableRenderer
+	extends DefaultTableCellRenderer
+{
 	/**
 	 * Used for various stuff
 	 */
@@ -46,20 +47,18 @@ public class MailTableRenderer extends DefaultTableCellRenderer {
 	}
 
 	public Component getTableCellRendererComponent(
-				JTable table,
-				Object value,
-				boolean isSelected,
-				boolean hasFocus,
-				int row,
-				int column) {
-
+		JTable table,
+		Object value,
+		boolean isSelected,
+		boolean hasFocus,
+		int row,
+		int column
+	) {
 		setValue(value);
 
-		Vector v = (Vector) yamm.listOfMails.elementAt(row);
 		String outbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
 
-		if (!v.elementAt(4).toString().equals("Unread") ||
-				outbox.equals(yamm.selectedbox)) {
+		if (!yamm.listOfMails[row][4].equals("Unread") || outbox.equals(yamm.selectedbox)) {
 			setForeground(Color.black);
 		} else {
 			setForeground(Color.blue);
@@ -77,6 +76,9 @@ public class MailTableRenderer extends DefaultTableCellRenderer {
 /*
  * Changes:
  * $Log: MailTableRenderer.java,v $
+ * Revision 1.3  2000/12/26 11:22:17  fredde
+ * YAMM.listOfMails is now of type String[][]
+ *
  * Revision 1.2  2000/07/16 17:48:36  fredde
  * lots of Windows compatiblity fixes
  *
