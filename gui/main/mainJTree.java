@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.46 2003/06/08 08:55:31 fredde Exp $
+/*  $Id: mainJTree.java,v 1.47 2003/06/08 18:49:56 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.46 $
+ * @version $Revision: 1.47 $
  */
 public class mainJTree
 	extends JTable
@@ -463,7 +463,6 @@ public class mainJTree
 			else if (getSelectedRow() != -1) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode)(tree.getPathForRow(getSelectedRow()).getLastPathComponent());
 				YAMM yamm = YAMM.getInstance();
-				mainToolBar tbar = yamm.tbar;
 
 				if (!(node.toString()).equals(YAMM.getString("box.boxes"))) {
 					File box = new File(node.toString());
@@ -478,9 +477,9 @@ public class mainJTree
 
 				if ( ((mainTable)yamm.mailList).getSelectedRow() != -1 &&
 						!(((JTable)yamm.mailList).getSelectedRow() >= yamm.listOfMails.length)) {
-					yamm.mailList.changeButtonMode(true);
+					yamm.toolbar.changeButtonMode(true);
 				} else {
-					yamm.mailList.changeButtonMode(false);
+					yamm.toolbar.changeButtonMode(false);
 				}
 
 			}
@@ -493,6 +492,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.47  2003/06/08 18:49:56  fredde
+ * changeButtonMode moved to toolbar
+ *
  * Revision 1.46  2003/06/08 08:55:31  fredde
  * sets a blank document when moving mail
  *

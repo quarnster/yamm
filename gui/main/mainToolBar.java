@@ -1,4 +1,4 @@
-/*  $Id: mainToolBar.java,v 1.32 2003/06/07 09:08:16 fredde Exp $
+/*  $Id: mainToolBar.java,v 1.33 2003/06/08 18:49:56 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,20 +30,20 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The toolbar for the main class
  * @author
- * @version $Revision: 1.32 $
+ * @version $Revision: 1.33 $
  */
 public class mainToolBar
 	extends JToolBar
 {
 
 	/** The forward button */
-	public BorderButton forward;
+	private BorderButton forward;
 
 	/** The reply button */
-	public BorderButton reply;
+	private BorderButton reply;
 
 	/** The delete button */
-	public BorderButton delete;
+	private BorderButton delete;
 
 	/** The print button */
 //	public BorderButton print;
@@ -176,6 +176,13 @@ public class mainToolBar
 		add(b);
 	}
 
+	public void changeButtonMode(boolean b) {
+		reply.setEnabled(b);
+		//print.setEnabled(b);
+		forward.setEnabled(b);
+		delete.setEnabled(b);
+	}
+
 	protected void setAlign(BorderButton b, String content) {
 		if (content.equals("North"))  {
 			b.setHorizontalTextPosition(AbstractButton.CENTER);
@@ -234,6 +241,9 @@ public class mainToolBar
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.33  2003/06/08 18:49:56  fredde
+ * changeButtonMode moved to toolbar
+ *
  * Revision 1.32  2003/06/07 09:08:16  fredde
  * BorderButton + delete button
  *
