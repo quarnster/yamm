@@ -1,7 +1,10 @@
-YAMM 0.7.2
+YAMM - Yet Another Mail Manager
 
 Copyright (C) 1999 Fredrik Ehnbom
 See 'COPYING' for licence information.
+
+See 'docs/INSTALL' for installation instructions.
+
 
 Filters:
     Right now you have to hack the filters manually in '<home>/.yamm/.filters'
@@ -21,7 +24,7 @@ Filters:
       If the subject contains test, then move to the box test-files.
 
 Author:
-    Fredrik Ehnbom <fredrik.ehnbom@linux.nu>
+    Fredrik Ehnbom <fredde@gjt.org>
 
 Thanks to:
     Tuomas Kuosmanen <tigert@gimp.org>

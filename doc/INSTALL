@@ -1,4 +1,4 @@
-YAMM 0.7.2
+YAMM - Yet Another Mail Manager
 
 Copyright (C) 1999 Fredrik Ehnbom
 See 'COPYING' for licence information.
@@ -6,6 +6,20 @@ See 'COPYING' for licence information.
 Please make sure you have jre or jdk 1.2 installed.
 If you do not have one of these, goto http://java.sun.com:80/products/jdk/1.2
 
-Then you have to figure out how to do the rest by yourself...
+Once you have the jdk (or jre) up and running untar the file with for example:
+
+'tar xvfz yamm-<version>.tar.gz'
+
+Windows users can untar it with winzip (http://www.winzip.com).
+Then change directory to 'yamm-<version>/source' and type:
+
+'java org.gjt.fredde.yamm.YAMM'
+
+to run it or:
+
+'make'
+
+to rebuild it. (Rebuilding requires jdk and make)
+
 
 Have fun!

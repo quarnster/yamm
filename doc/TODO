@@ -3,8 +3,6 @@ TODO list for YAMM
 ******** Visual stuff ********
 
   - More Drag and Drop
-  - Button modes: text only, text and pictures, pictures only
-  - unread messages should be bold.
   - boxes should display how many unread messages they have
   - Maybe my own plaf-skin
 
@@ -15,7 +13,10 @@ TODO list for YAMM
   - the ability to edit mails in the outbox
   - user should be able to send mails directly instead of keeping
     them in the outbox
-  - Plugins (ex. clock, spellchecker, content-viewer etc...)
+  - Create a new up to date Configuration utility
+  - Pack it all together in a jar-file
+  - More debugging info.
+  - Resend mails that is in the 'sent'-box
 
 ********* Protocols **********
 
@@ -30,8 +31,7 @@ Go ahead and mail me your opinions!
 
 ********* Known Bugs *********
 
-  - UUEncoder encodes the last line wrong... Any ideas?
-  - sorting sorts 1, 10, 11, etc, 2, 20, 21, etc, 3, 30, 31 etc
-  - It has problems with dateformats other than "EEE, dd MMM yyyy hh:mm:ss"
-  - Moving a mail from one box to the same will cause the moved mail to
-    disappear
+  - It has problems with some dateformats
+  - DND in the JTable doesn't work in Linux
+  - Last character in the uuencoded/uudecoded file always gets different than
+    in the original file.

@@ -1,3 +1,18 @@
+0.7.3:
+    Added:
+      -button modes: text, icon or both
+      -More dateformats supported
+      -You can delete mails by clicking the "Delete"-key when in the mailList
+      -You can now choose if you want to display the splashscreen at startup
+      -Unread messages are displayed in blue
+
+    Fixed/changed:
+      -"Re:" or "Fwd:" is added to the mails subject when replying or forwarding
+      -the mailList's background is now white even if there's no mail in the box
+      -Sorting now sorts 0, 1, ..., 9, 10, 11 instead of 0, 1, 10, 11, ..., 2, 3
+      -Mailhandling system rewrite
+      -Plus lots of bugfixes and code cleanups.
+
 0.7.2:
     Added:
       -some javadoc things to sourcecode
