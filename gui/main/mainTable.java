@@ -668,7 +668,7 @@ public class mainTable extends JTable implements DragGestureListener,
 
       try { 
         String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes") + 6, frame.selectedbox.length()) + "/"; 
-        frame.mailPage = new URL(frame.mailPageString + boxName + getSelectedRow() + "html"); 
+        frame.mailPage = new URL(frame.mailPageString + boxName + getSelectedRow() + ".html"); 
       }
       catch (MalformedURLException mue) { 
         Object[] args = {mue.toString()};
