@@ -1,4 +1,4 @@
-/*  $Id: Html.java,v 1.1 2003/03/06 20:18:46 fredde Exp $
+/*  $Id: Html.java,v 1.2 2003/07/19 20:20:14 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -33,9 +33,11 @@ public class Html
 
 			if (temp.indexOf("://") != -1 || temp.indexOf("www.") != -1) {
 				String tmp[] = MessageParser.parseLink(temp);
+				if (temp.indexOf("://") != -1)
+					temp = "<a href=\"" + tmp[1] + "\">" + tmp[1] + "</a>";
+				else
+					temp = "<a href=\"http://" + tmp[1] + "\">" + tmp[1] + "</a>";
 
-				temp = "<a href=\"" + tmp[1] + "\">" + tmp[1] +
-						"</a>";
 				link += tmp[0] + temp + tmp[2];
 			} else {
 				link += temp;
@@ -111,9 +113,9 @@ public class Html
 			in = new BufferedReader(new InputStreamReader(is));
 			out = new PrintWriter(os);
 
-			out.println("<pre>");
 
 			String temp = in.readLine();
+			out.println("<pre wrap cols=\"80\">");
 
 			while (true) {
 				if (temp == null) {
