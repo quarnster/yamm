@@ -57,14 +57,15 @@ public class imageViewer extends JFrame {
       getContentPane().setLayout(new BorderLayout());
       filename = image;
 
-      System.out.println("viewing " + image);
-      JScrollPane jspane = new JScrollPane(new imagePanel(image), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+      imagePanel ip = new imagePanel(image);
+      JScrollPane jspane = new JScrollPane(ip, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
       getContentPane().add("Center", jspane);
 
       Dimension screen = getToolkit().getScreenSize();
 
-      setBounds((screen.width -400)/2, (screen.height - 300)/2, 400, 300);
+      Dimension im = ip.getMaximumSize();
+      setBounds((screen.width - im.width + 20)/2, (screen.height - im.height + 70)/2, im.width + 20, im.height + 70);
 
       addWindowListener(new WindowAdapter() {
         public void windowClosing(WindowEvent evt) {
