@@ -185,7 +185,7 @@ public class mainJTree extends JTree implements DropTargetListener {
       box = null;
     }
 
-    if(!box.endsWith(".g") && !box.equals("Mail Boxes") && box != null) {
+    if(box != null && !box.endsWith(".g") && !box.equals("Mail Boxes")) {
       StringTokenizer tok = new StringTokenizer(mails);
       int[] list = new int[tok.countTokens()];
 
@@ -199,6 +199,7 @@ public class mainJTree extends JTree implements DropTargetListener {
       else
         Mailbox.copyMail(frame.selectedbox, box, list);
 
+      frame.delUnNeededFiles();
       Mailbox.createList(frame.selectedbox, frame.listOfMails);
       frame.mailList.updateUI();
     }
