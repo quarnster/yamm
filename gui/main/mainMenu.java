@@ -122,7 +122,7 @@ public class mainMenu extends JMenuBar {
     rad.addActionListener(MListener);
     help.add(rad);
 
-    rad = new JMenuItem(res.getString("help.bug_report"));
+    rad = new JMenuItem(res.getString("help.bug_report"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/bug.gif"));
     rad.addActionListener(MListener);
     help.add(rad);
   }
@@ -132,32 +132,7 @@ public class mainMenu extends JMenuBar {
       String kommando = ((JMenuItem)ae.getSource()).getText();
 
       if(kommando.equals(res.getString("file.exit"))) {
-
-        Rectangle rv = new Rectangle();
-        frame.getBounds(rv);
-
-        try {
-          InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props.load(in);
-          in.close();
-        } catch (IOException propsioe) { System.err.println(propsioe); }
-
-        props.setProperty("mainx", new Integer(rv.x).toString());
-        props.setProperty("mainy", new Integer(rv.y).toString());
-        props.setProperty("mainw", new Integer(rv.width).toString());
-        props.setProperty("mainh", new Integer(rv.height).toString());
-//        props.setProperty("vsplit", new Integer(((JSplitPane)frame.SPane2).getDividerLocation()).toString());
-//        props.setProperty("hsplit", new Integer(((JSplitPane)frame.SPane).getDividerLocation()).toString());
-
-        try {
-          OutputStream out = new FileOutputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props.store(out, "YAMM configuration file");
-          out.close();
-        } catch(IOException propsioe) { System.err.println(propsioe); }
-
-        frame.dispose();
-
-        System.exit(0);
+        frame.Exit();
       }
       else if(kommando.equals(res.getString("help.about_you"))) {
         String host = null, ipaddress = null;
@@ -191,6 +166,9 @@ public class mainMenu extends JMenuBar {
                     + "Compiledate: " + YAMM.compDate + "\n"
                     + "Homepage: http://www.gjt.org/~fredde/\n"
                     + "E-mail: <fredde@gjt.org>\n"
+                    + "\n"
+                    + "This program is part of the Giant Java Tree.\n"
+                    + "For more info please visit http://www.gjt.org\n"
                     + "\n"
                     + "Most icons are made or based on icons made\n"
                     + "by Tuomas Kuosmanen <tigert@gimp.org>");

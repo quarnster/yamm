@@ -173,28 +173,7 @@ public class mainToolBar extends JToolBar {
         new Print(frame, i);
       }
       else if(arg.equals(res.getString("button.exit"))) {
-        Rectangle rv = new Rectangle();
-        frame.getBounds(rv);
-
-        try {
-          InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props.load(in);
-          in.close();
-        } catch (IOException propsioe) { System.err.println(propsioe); }
-
-        props.setProperty("mainx", new Integer(rv.x).toString());
-        props.setProperty("mainy", new Integer(rv.y).toString());
-        props.setProperty("mainw", new Integer(rv.width).toString());
-        props.setProperty("mainh", new Integer(rv.height).toString());
-
-        try {
-          OutputStream out = new FileOutputStream(System.getProperty("user.home") + "/.yamm/.config");
-          props.store(out, "YAMM configuration file");
-          out.close();
-        } catch(IOException propsioe) { System.err.println(propsioe); }
-
-        frame.dispose();
-        System.exit(0);
+        frame.Exit();
       }
     }
   };
