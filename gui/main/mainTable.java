@@ -321,7 +321,9 @@ public class mainTable extends JTable implements DragGestureListener,
 					YAMM.getString("button.delete"));
 		JMenuItem reply = new JMenuItem(YAMM.getString("button.reply")); 
 		delete.addActionListener(OtherMListener);
+		delete.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		reply.addActionListener(OtherMListener);
+		reply.setFont(new Font("SansSerif", Font.PLAIN, 10));
 
 		jpmenu.add(reply);
 		jpmenu.addSeparator();
@@ -329,6 +331,7 @@ public class mainTable extends JTable implements DragGestureListener,
 							boxHome, KMListener);
 		createPopCommand(jpmenu, YAMM.getString("edit.move"), list2,
 							boxHome, FMListener);
+		jpmenu.addSeparator();
 		jpmenu.add(delete);
 	}
 
@@ -343,6 +346,7 @@ public class mainTable extends JTable implements DragGestureListener,
 			dname = dname.substring(0, dname.length() - 2);
 		}
 		JMenu m = new JMenu(dname);
+		m.setFont(new Font("SansSerif", Font.PLAIN, 10));
 
 		for (int j = 0; j < flist.size(); j++) {
 			String fpath = flist.elementAt(j).toString();
@@ -365,6 +369,8 @@ public class mainTable extends JTable implements DragGestureListener,
 					extMItem mitem = new extMItem(fname);
 					mitem.setFullName(fpath);
 					mitem.addActionListener(list);
+					mitem.setFont(new Font("SansSerif",
+							Font.PLAIN, 10));
 					flist.remove(j);
 					j--;
 					m.add(mitem);
@@ -381,6 +387,8 @@ public class mainTable extends JTable implements DragGestureListener,
 	private void createPopCommand(JPopupMenu menu, String menuName,
 			Vector flist, String base, ActionListener list) {
 		JMenu m = new JMenu(menuName);
+		m.setFont(new Font("SansSerif", Font.PLAIN, 10));
+
 		for (int j = 0; j < flist.size(); j++) {
 			String fpath = flist.elementAt(j).toString();
                                               
@@ -401,6 +409,10 @@ public class mainTable extends JTable implements DragGestureListener,
 				} else {
 					extMItem mitem = new extMItem(fname);
 					mitem.setFullName(fpath);
+					mitem.setFont(new Font("SansSerif",
+								Font.PLAIN,
+								10)
+					);
 					mitem.addActionListener(list);
 					flist.remove(j);
 					j--;

@@ -238,6 +238,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     Box hori1 = Box.createHorizontalBox();
 
     JButton b = new JButton();
+    b.setFont(new Font("SansSerif", Font.PLAIN, 10));
     if (text) {
       b.setText(res.getString("button.view_extract"));
     }
