@@ -1,5 +1,5 @@
 JAVAC = jikes
-CLASSPATH = /usr/local/jdk1.2.2/jre/lib/rt.jar:.
+CLASSPATH = /usr/local/jdk1.3/jre/lib/rt.jar:.
 
 .SUFFIXES: .class .java
 .java.class:
@@ -27,6 +27,8 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/gui/confwiz/ControlPanel.class \
 	org/gjt/fredde/yamm/gui/confwiz/ServerEditor.class \
 	org/gjt/fredde/yamm/gui/confwiz/ProfileEditor.class \
+	org/gjt/fredde/yamm/gui/confwiz/FiltersConfTab.class \
+	org/gjt/fredde/yamm/gui/confwiz/FilterEditor.class \
 	org/gjt/fredde/yamm/encode/Base64Decode.class \
 	org/gjt/fredde/yamm/encode/Base64Encode.class \
 	org/gjt/fredde/yamm/encode/UUDecode.class \
