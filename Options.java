@@ -24,6 +24,7 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 import javax.swing.table.*;
+import org.gjt.fredde.util.SimpleCrypt;
 import org.gjt.fredde.util.gui.MsgDialog;
 
 /**
@@ -411,7 +412,9 @@ public class Options extends JDialog {
       JPField.setMinimumSize(new Dimension(200, 20));
 
       if(config.equals(System.getProperty("user.home") + "/.yamm/.config")) JPField.setEnabled(false);
-      else if(!config.equals("new")) JPField.setText(YAMM.decrypt(props.getProperty("password")));
+      else if(!config.equals("new")) {
+        JPField.setText(new SimpleCrypt("myKey").decrypt(props.getProperty("password")));
+      }
       getContentPane().add(JPField);
 
       JButton b = new JButton(YAMM.getString("button.ok"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/ok.gif"));
@@ -426,6 +429,8 @@ public class Options extends JDialog {
     }
 
     boolean saveServerConf() {
+        SimpleCrypt crypt = new SimpleCrypt("myKey");
+
         if(config.equals("new")) {
           File server = new File(System.getProperty("user.home") + "/.yamm/servers/" + addrField.getText());
 
@@ -442,7 +447,7 @@ public class Options extends JDialog {
               props.setProperty("type", "pop3");
               props.setProperty("server",  addrField.getText());
               props.setProperty("username",    userField.getText());
-              props.setProperty("password",    YAMM.encrypt(new String(JPField.getPassword())));
+              props.setProperty("password", crypt.encrypt(new String(JPField.getPassword())));
 
               props.store(out, "Server Config file");
 
@@ -473,7 +478,7 @@ public class Options extends JDialog {
             props = new Properties();
             props.setProperty("server",  addrField.getText());
             props.setProperty("username",    userField.getText());
-            props.setProperty("password",    YAMM.encrypt(new String(JPField.getPassword())));
+            props.setProperty("password",    crypt.encrypt(new String(JPField.getPassword())));
             props.setProperty("type", "pop3");
 
             props.store(out, "Server Config file");

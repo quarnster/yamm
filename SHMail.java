@@ -22,6 +22,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import org.gjt.fredde.util.SimpleCrypt;
 import org.gjt.fredde.util.net.*;
 import org.gjt.fredde.util.gui.MsgDialog;
 import org.gjt.fredde.yamm.mail.*;
@@ -37,6 +38,8 @@ public class SHMail extends Thread {
 
   static protected boolean sent = false;
 
+  static protected boolean debug = false;
+
   JButton knappen;
   YAMM frame;
 
@@ -51,6 +54,9 @@ public class SHMail extends Thread {
     knappen = knapp;
     knappen.setEnabled(false);
     frame = frame1;
+    if (frame.version.indexOf("CVS") != -1) {
+      debug = true;
+    }
   }
 
   /**
@@ -73,10 +79,10 @@ public class SHMail extends Thread {
       } catch (IOException propsioe) { System.err.println(propsioe); }
 
 
-      String type = props.getProperty("type");
-      String server = props.getProperty("server");
+      String type     = props.getProperty("type");
+      String server   = props.getProperty("server");
       String username = props.getProperty("username");
-      String password = YAMM.decrypt(props.getProperty("password"));
+      String password = new SimpleCrypt("myKey").decrypt(props.getProperty("password"));
       boolean del = false;
       if(YAMM.getProperty("delete", "false").equals("true")) del = true;
       if(YAMM.getProperty("sentbox", "false").equals("true")) sent = true;
@@ -87,7 +93,7 @@ public class SHMail extends Thread {
           frame.status.setStatus(YAMM.getString("server.contact", argstmp));
 
           try { 
-            Pop3 pop = new Pop3(username, password, server, YAMM.home + "/boxes/.filter");
+            Pop3 pop = new Pop3(username, password, server, YAMM.home + "/boxes/.filter", 110, debug);
             int messages = pop.getMessageCount();
 
             for(int j = 1; j<=messages;j++) {
@@ -128,7 +134,7 @@ public class SHMail extends Thread {
       frame.status.setStatus(YAMM.getString("server.send", argstmp));
       frame.status.progress(0);
       try { 
-        Smtp smtp = new Smtp(YAMM.getProperty("smtpserver"));
+        Smtp smtp = new Smtp(YAMM.getProperty("smtpserver"), 25, debug);
         BufferedReader in = new BufferedReader(
                             new InputStreamReader(
                             new FileInputStream(YAMM.home + "/boxes/" +
