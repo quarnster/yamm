@@ -30,6 +30,7 @@ public class Base64Decode extends Thread {
     super(name);
     this.filename = filename;
     this.target = target;
+    System.out.println("filename: " + filename + " target: " + target);
   }
 
   public void start() {
@@ -39,16 +40,16 @@ public class Base64Decode extends Thread {
   public void run() {
     makeBase64(target);
     try{
-      InputStream is = new BufferedInputStream(new FileInputStream(filename));
-      OutputStream os = new BufferedOutputStream(new FileOutputStream(target + ".tmp"));
+      InputStream is = new BufferedInputStream(new FileInputStream(target + ".tmp"));
+      OutputStream os = new BufferedOutputStream(new FileOutputStream(target));
       BASE64Decoder b64dc = new BASE64Decoder();
       b64dc.decodeBuffer(is, os);
-      String end = filename.toString().substring(filename.toString().lastIndexOf("."), filename.toString().length()).toLowerCase();
+      String end = target.substring(target.lastIndexOf("."), target.length()).toLowerCase();
       is.close();
       os.close();
 
       if(end.equals(".gif") || end.equals(".jpg")) {
-        new imageViewer(filename.toString());
+        new imageViewer(filename);
       }
     }
     catch (IOException e) {
@@ -58,10 +59,14 @@ public class Base64Decode extends Thread {
   protected void makeBase64(String t) {
     String temp;
     try {
-      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(target)));
+      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
       PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(target + ".tmp")));
 
-      for(int i = 0; i < 4; i++) in.readLine();
+      for(;;) {
+        temp = in.readLine();
+      
+        if(temp.equals("")) break;
+      }
 
       for(;;) {
         temp = in.readLine();
