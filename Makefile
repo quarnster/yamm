@@ -54,6 +54,8 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/mail/DateParser.class \
 	org/gjt/fredde/yamm/mail/Mailbox.class \
 	org/gjt/fredde/yamm/mail/Filter.class \
+	org/gjt/fredde/yamm/mail/Index.class \
+	org/gjt/fredde/yamm/mail/IndexEntry.class \
 	org/gjt/fredde/yamm/gui/main/extMItem.class \
 	org/gjt/fredde/yamm/gui/main/mainToolBar.class \
 	org/gjt/fredde/yamm/gui/main/mainJTree.class \
