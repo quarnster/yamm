@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.59 2003/03/08 20:55:50 fredde Exp $
+/*  $Id: YAMM.java,v 1.60 2003/03/08 21:43:15 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.59 $
+ * @version $Revision: 1.60 $
  */
 public class YAMM
 	extends JFrame
@@ -65,7 +65,7 @@ public class YAMM
 	public static String selectedbox = Utilities.replace(home + "/boxes/");
 
 	/** The version of YAMM */
-	public static String version  = "0.8 $Date: 2003/03/08 20:55:50 $";
+	public static String version  = "0.8 $Date: 2003/03/08 21:43:15 $";
 
 	/** The compileDate of YAMM */
 	public static String compDate = Utilities.getCompileDate();
@@ -463,6 +463,7 @@ public class YAMM
 		getBounds(rv);
 
 		mailList.save();
+		tree.save();
 		props.setProperty("mainx", "" + rv.x);
 		props.setProperty("mainy", "" + rv.y);
 		props.setProperty("mainw", "" + rv.width);
@@ -686,6 +687,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.60  2003/03/08 21:43:15  fredde
+ * added tree.save()
+ *
  * Revision 1.59  2003/03/08 20:55:50  fredde
  * fixed the gray instead of white background problem
  *
