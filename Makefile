@@ -18,6 +18,11 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/encode/Base64Decode.class \
 	org/gjt/fredde/yamm/encode/UUDecode.class \
 	org/gjt/fredde/yamm/encode/UUEncode.class \
+	org/gjt/fredde/yamm/mail/Attachment.class \
+	org/gjt/fredde/yamm/mail/MessageHeaderParser.class \
+	org/gjt/fredde/yamm/mail/MessageBodyParser.class \
+	org/gjt/fredde/yamm/mail/DateParser.class \
+	org/gjt/fredde/yamm/mail/MessageParser.class \
 	org/gjt/fredde/yamm/mail/Mailbox.class \
 	org/gjt/fredde/yamm/mail/Filter.class \
 	org/gjt/fredde/yamm/gui/main/extMItem.class \
