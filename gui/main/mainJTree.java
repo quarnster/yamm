@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.35 2003/03/10 20:00:05 fredde Exp $
+/*  $Id: mainJTree.java,v 1.36 2003/03/11 15:17:48 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.35 $
+ * @version $Revision: 1.36 $
  */
 public class mainJTree
 	extends JTable
@@ -56,7 +56,7 @@ public class mainJTree
 
 	public Hashtable unreadTable = new Hashtable();
 
-	public final AbstractTableModel dataModel = new AbstractTableModel() {
+	private final AbstractTableModel dataModel = new AbstractTableModel() {
 		private final String headername[] = {
 	        	YAMM.getString("box.boxes"),
 			YAMM.getString("box.unread")
@@ -264,6 +264,16 @@ public class mainJTree
 		}
 	}
 
+	public void update() {
+		int row = getSelectedRow();
+		if (row != -1)
+			dataModel.fireTableRowsUpdated(row, row);
+		else
+			fullUpdate();
+	}
+	public void fullUpdate() {
+		dataModel.fireTableRowsUpdated(1, dataModel.getRowCount());
+	}
 
 	public void createNodes(DefaultMutableTreeNode top, File f) {
 		DefaultMutableTreeNode dir = null;
@@ -321,6 +331,7 @@ public class mainJTree
 
 						yamm.selectedbox = "deleted";
 						del.delete();
+						new File(Mailbox.getIndexName(file)).delete();
 						updateNodes();
 
 						yamm.mailList.popup = new JPopupMenu();
@@ -393,6 +404,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.36  2003/03/11 15:17:48  fredde
+ * added update methods. Also delete index when deleting a box
+ *
  * Revision 1.35  2003/03/10 20:00:05  fredde
  * only update mailList when needed
  *
