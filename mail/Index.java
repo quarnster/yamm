@@ -1,4 +1,4 @@
-/*  $Id: Index.java,v 1.5 2003/03/15 19:27:24 fredde Exp $
+/*  $Id: Index.java,v 1.6 2003/04/19 11:54:51 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@ package org.gjt.fredde.yamm.mail;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 import java.text.*;
 
 import org.gjt.fredde.yamm.YAMM;
@@ -147,20 +148,21 @@ public class Index {
 
 		raf = new RandomAccessFile(indexFile, "rw");
 		if (Mailbox.hasMail(boxFile)) {
-			BufferedReader in = null;
+			RandomAccessFile in = null;
 
 			try {
 				MessageHeaderParser mhp = new MessageHeaderParser();
 				DateParser dp = new DateParser();
 				String temp = null;
 
-				in = new BufferedReader(new InputStreamReader(new FileInputStream(boxFile)));
+				int length = boxFile.length();
+				in = new RandomAccessFile(new File(boxFile), "r");
 				write();
 
 
 
 				try {
-					skipnum = mhp.parse(in);
+					mhp.parse(in);
 				} catch (MessageParseException mpe) {
 					new ExceptionDialog(
 						YAMM.getString("msg.error"),
@@ -176,14 +178,10 @@ public class Index {
 
 				for (;;) {
 					temp = in.readLine();
-					if (temp == null) break;
-
-					skipnum += temp.length() + System.getProperty("line.separator").length();
-
-					if (temp.startsWith("Content-Disposition") && temp.toLowerCase().indexOf("attachment") != -1) {
+					if (temp != null && temp.startsWith("Content-Disposition") && temp.toLowerCase().indexOf("attachment") != -1) {
 						attachment = true;
 					}
-					if (temp.equals(".")) {
+					if (temp == null || Pattern.matches("From .* [a-zA-Z]{3} [a-zA-Z]{3} {1,2}[0-9]{1,2} [0-9]{2}:[0-9]{2}:[0-9]{2} [0-9]{4}", temp)) {
 						date = mhp.getHeaderField("Date");
 						if (date != null) {
 							try {
@@ -212,6 +210,9 @@ public class Index {
 							break;
 						}
 						attachment = false;
+					}
+					if (temp != null) {
+						skipnum = in.getFilePointer();
 					}
 				}
 				in.close();
