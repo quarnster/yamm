@@ -24,7 +24,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import org.gjt.fredde.util.SimpleCrypt;
 import org.gjt.fredde.util.net.*;
-import org.gjt.fredde.util.gui.MsgDialog;
+import org.gjt.fredde.util.gui.ExceptionDialog;
 import org.gjt.fredde.yamm.mail.*;
 import org.gjt.fredde.yamm.YAMM;
 
@@ -33,210 +33,224 @@ import org.gjt.fredde.yamm.YAMM;
  */
 public class SHMail extends Thread {
 
-   /** Properties for smtpserver etc */
-  static protected Properties props = new Properties();
+	/** Properties for smtpserver etc */
+	static protected Properties props = new Properties();
 
-  static protected boolean sent = false;
+	/**
+	 * Wheter or not the messages should be putted in the "sent"-box
+	 * after sending it
+	 */
+	static protected boolean sent = false;
 
-  static protected boolean debug = false;
+	/** If debugging info should be printed */
+	static protected boolean debug = false;
 
-  JButton knappen;
-  YAMM frame;
+	JButton knappen;
+	YAMM frame;
 
-  /**
-   * Disables the send/get-button and inits some stuff
-   * @param frame1 the frame that will be used for error-msg etc.
-   * @param name the name of this thread.
-   * @param knapp the button to disable.
-   */
-  public SHMail(YAMM frame1, String name, JButton knapp) {
-    super(name);
-    knappen = knapp;
-    knappen.setEnabled(false);
-    frame = frame1;
-    if (YAMM.getProperty("debug.sendget", "false").equals("true")) {
-      debug = true;
-    }
-  }
+	/**
+	 * Disables the send/get-button and inits some stuff
+	 * @param frame1 the frame that will be used for error-msg etc.
+	 * @param name the name of this thread.
+	 * @param knapp the button to disable.
+	 */
+	public SHMail(YAMM frame1, String name, JButton knapp) {
+		super(name);
+		knappen = knapp;
+		knappen.setEnabled(false);
+		frame = frame1;
 
-  /**
-   * Creates a new progress-dialog, checks for server configuration-files and
-   * connects to the servers with a config-file.
-   */
-  public void run() {
-    frame.status.progress(0);
-    frame.status.setStatus("");
+		if (YAMM.getProperty("debug.sendget", "false").equals("true")) {
+			debug = true;
+		}
+	}
 
-    File files[] = new File(YAMM.home + "/servers/").listFiles();
+	/**
+	 * Creates a new progress-dialog, checks for server configuration-files
+	 * and connects to the servers with a config-file.
+	 */
+	public void run() {
+		frame.status.progress(0);
+		frame.status.setStatus("");
 
-    for(int i=0;i<files.length;i++) {
-      /* load the config */
+		File files[] = new File(YAMM.home + "/servers/").listFiles();
 
-      try {
-        InputStream in = new FileInputStream(files[i]);
-        props.load(in);
-        in.close();
-      } catch (IOException propsioe) { System.err.println(propsioe); }
+		for (int i = 0; i < files.length; i++) {
+			/* load the config */
 
+			try {
+				InputStream in = new FileInputStream(files[i]);
+				props.load(in);
+				in.close();
+			} catch (IOException propsioe) {
+				new ExceptionDialog(YAMM.getString("msg.error"),
+						propsioe,
+						YAMM.exceptionNames);
+			}
 
-      String type     = props.getProperty("type");
-      String server   = props.getProperty("server");
-      String username = props.getProperty("username");
-      String password = new SimpleCrypt("myKey").decrypt(props.getProperty("password"));
-      boolean del = false;
-      if(YAMM.getProperty("delete", "true").equals("true")) del = true;
-      if(YAMM.getProperty("sentbox", "true").equals("true")) sent = true;
+			String type     = props.getProperty("type");
+			String server   = props.getProperty("server");
+			String username = props.getProperty("username");
+			String password = new SimpleCrypt("myKey").decrypt(
+						props.getProperty("password"));
+			boolean del = false;
+			if (YAMM.getProperty("delete", "true").equals("true")) {
+				del = true;
+			}
+			if (YAMM.getProperty("sentbox","true").equals("true")) {
+				sent = true;
+			}
 
-      if(type != null && server != null && username != null && password != null) {
-        if(type.equals("pop3")) {
-          Object[] argstmp = {server};
-          frame.status.setStatus(YAMM.getString("server.contact", argstmp));
+			if (type != null && server != null &&
+					username != null && password != null) {
+				if (type.equals("pop3")) {
+					Object[] argstmp = {server};
+					frame.status.setStatus(YAMM.getString("server.contact", argstmp));
 
-          try { 
-            Pop3 pop = new Pop3(username, password, server, YAMM.home + "/boxes/.filter", 110, debug);
-            int messages = pop.getMessageCount();
+					Pop3 pop = null;
 
-            for(int j = 1; j<=messages;j++) {
-              Object[] args = {"" + j, "" + messages};
-              frame.status.setStatus(YAMM.getString("server.get", args));
+					try { 
+						pop = new Pop3(username, password, server, YAMM.home + "/boxes/.filter", 110, debug);
+						int messages = pop.getMessageCount();
 
-              frame.status.progress(100-((100*messages-100*(j-1))/messages));
-              pop.getMessage(j);
-              if(del) pop.deleteMessage(j);
-            }
-            frame.status.setStatus(YAMM.getString("msg.done"));
-            frame.status.progress(100);
-            pop.close();
-          }
-          catch (IOException ioe) {
-            Object[] args = {ioe.toString()}; 
-            new MsgDialog(frame, YAMM.getString("msg.error"),
-                                 YAMM.getString("msg.exception", args)); 
-          }
-        }
-        else new MsgDialog(frame, YAMM.getString("msg.error"), 
-                                  YAMM.getString("server.bad"));
-      }
-    }
+						for (int j = 1; j <= messages; j++) {
+							Object[] args = {"" + j, "" + messages};
+							frame.status.setStatus(YAMM.getString("server.get", args));
 
-   /* load the config */
-/*
-   try {
-     InputStream in = new FileInputStream(YAMM.home + "/.config");
-     props = new Properties();
-     props.load(in);
-     in.close();
-    } catch (IOException propsioe) { System.err.println(propsioe); }
-*/
+							frame.status.progress(100-((100*messages-100*(j-1))/messages));
+							pop.getMessage(j);
 
-    if(YAMM.getProperty("smtpserver") != null && Mailbox.hasMail(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"))) {
-      Object[] argstmp = {""};
-      frame.status.setStatus(YAMM.getString("server.send", argstmp));
-      frame.status.progress(0);
-      try { 
-        Smtp smtp = new Smtp(YAMM.getProperty("smtpserver"), 25, debug);
-        BufferedReader in = new BufferedReader(
-                            new InputStreamReader(
-                            new FileInputStream(YAMM.home + "/boxes/" +
-                                                YAMM.getString("box.outbox"))));
-        PrintWriter out = null;
-
-        if(sent) { 
-          out = new PrintWriter(
-                new BufferedOutputStream(
-                new FileOutputStream(YAMM.home + YAMM.sep + "boxes" + YAMM.sep +
-                                     YAMM.getString("box.sent"), true)));
-        }
-
-        String temp = null, from2 = null, to2 = null;
-        int i = 1;
-
-        for(;;) {
-          temp = in.readLine();
+							if (del) pop.deleteMessage(j);
+						}
+						frame.status.setStatus(YAMM.getString("msg.done"));
+						frame.status.progress(100);
+					} catch (IOException ioe) {
+						new ExceptionDialog(YAMM.getString("msg.error"),
+							ioe, YAMM.exceptionNames); 
+					} finally {
+						try {
+							if (pop != null) {
+								pop.close();
+							}
+						} catch (Exception e) {
+							new ExceptionDialog(YAMM.getString("msg.error"),
+								e,
+								YAMM.exceptionNames);
+						}
+					}
+				}
+			}
+		}
 
 
-          if(temp == null) break;
-          if(sent) out.println(temp);
+		if (YAMM.getProperty("smtpserver") != null &&
+				Mailbox.hasMail(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"))) {
+			Object[] argstmp = {"1"};
+			frame.status.setStatus(YAMM.getString("server.send", argstmp));
+			frame.status.progress(0);
 
-          if(temp.startsWith("From:")) {
-            smtp.from(temp.substring(temp.indexOf("<") + 1, temp.indexOf(">")));
-            from2 = temp;
-          }
+			try { 
+				Smtp smtp = new Smtp(YAMM.getProperty("smtpserver"), 25, debug);
+				BufferedReader in = new BufferedReader(
+					new InputStreamReader(
+						new FileInputStream(YAMM.home + "/boxes/" +
+							YAMM.getString("box.outbox"))));
+				PrintWriter out = null;
 
-          else if(temp.startsWith("To:")) {
-            to2 = temp;
-            if(temp.indexOf(",") == -1) smtp.to(temp.substring(4, temp.length()));
+				if (sent) { 
+					out = new PrintWriter(
+					new BufferedOutputStream(
+						new FileOutputStream(YAMM.home + YAMM.sep + "boxes" +
+						YAMM.sep + YAMM.getString("box.sent"), true)));
+				}
 
-            else {
-              temp.trim();
-              temp = temp.substring(4, temp.length());
-              while(temp.endsWith(",")) {
-                smtp.to(temp.substring(0, temp.length()-1));
-                temp = in.readLine().trim();
-                to2 += "\n      " + temp;
-              }
-              smtp.to(temp.substring(0, temp.length()-1));
-              to2 += "\n      " + temp;
-              temp = in.readLine();
-            }
-          }
+				String temp = null, from2 = null, to2 = null;
+				int i = 1;
 
-          else if(temp.startsWith("Subject:")) {
-            PrintWriter mail = smtp.getOutputStream();
-            mail.println(from2 + "\n" + to2 + "\n" + temp);
+				for (;;) {
+					temp = in.readLine();
 
-            for(;;) {
-              temp = in.readLine();
 
-              if(temp == null) break;
+					if (temp == null) break;
+					if (sent) out.println(temp);
 
-              if(sent) out.println(temp);
+					if (temp.startsWith("From:")) {
+						smtp.from(temp.substring(temp.indexOf("<") + 1, temp.indexOf(">")));
+						from2 = temp;
+					} else if (temp.startsWith("To:")) {
+						to2 = temp;
 
-              if(temp.equals(".")) {
-                smtp.sendMessage();
-                Object[] args = {"" + i};
-                frame.status.setStatus(YAMM.getString("server.send", args));
-                
-                i++;
-                break;
-              }
-              mail.println(temp);
-            }
-          }
-        }
-        in.close();
-        if(sent) out.close();
-        File file = new File(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
-        file.delete();
-        file.createNewFile();
-        smtp.close();
+						if (temp.indexOf(",") == -1) {
+							smtp.to(temp.substring(4, temp.length()));
+						} else {
+							temp.trim();
+							temp = temp.substring(4, temp.length());
 
-      }
-      catch(IOException ioe) { 
-        Object[] args = {ioe.toString()};
-        new MsgDialog(frame, YAMM.getString("msg.error"),
-                             YAMM.getString("msg.exception", args)); 
-      }
-    }
-    frame.status.setStatus(YAMM.getString("msg.done"));
-    frame.status.progress(100);
+							while (temp.endsWith(",")) {
+								smtp.to(temp.substring(0, temp.length()-1));
+								temp = in.readLine().trim();
+								to2 += "\n      " + temp;
+							}
+							smtp.to(temp.substring(0, temp.length()-1));
+							to2 += "\n      " + temp;
+							temp = in.readLine();
+						}
+					} else if (temp.startsWith("Subject:")) {
+						PrintWriter mail = smtp.getOutputStream();
+						mail.println(from2 + "\n" + to2 + "\n" + temp);
 
-    if(Mailbox.hasMail(YAMM.home + "/boxes/.filter")) {
-      frame.status.setStatus(YAMM.getString("server.filter"));
-      frame.status.progress(0);
+						for (;;) {
+							temp = in.readLine();
 
-      try { new Filter(); }
-      catch (IOException ioe) { 
-        Object[] args = {ioe.toString()};
-        new MsgDialog(frame, YAMM.getString("msg.error"),
-                             YAMM.getString("msg.exception", args)); 
-      }
+							if (temp == null) break;
 
-      frame.status.setStatus(YAMM.getString("msg.done"));
-      frame.status.progress(100);
-    }
-    frame.status.setStatus("");
-    frame.status.progress(0); 
-    knappen.setEnabled(true);
-  }
+							if (sent) out.println(temp);
+
+							if (temp.equals(".")) {
+								smtp.sendMessage();
+								Object[] args = {"" + i};
+								frame.status.setStatus(YAMM.getString("server.send",
+														args));
+
+								i++;
+								break;
+							}
+							mail.println(temp);
+						}
+					}
+				}
+				in.close();
+				if (sent) out.close();
+				File file = new File(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
+				file.delete();
+				file.createNewFile();
+				smtp.close();
+			} catch (IOException ioe) { 
+				new ExceptionDialog(YAMM.getString("msg.error"),
+							ioe,
+						YAMM.exceptionNames); 
+			}
+		}
+		frame.status.setStatus(YAMM.getString("msg.done"));
+		frame.status.progress(100);
+
+		if (Mailbox.hasMail(YAMM.home + "/boxes/.filter")) {
+			frame.status.setStatus(YAMM.getString("server.filter"));
+			frame.status.progress(0);
+
+			try {
+				new Filter();
+			} catch (IOException ioe) { 
+				new ExceptionDialog(YAMM.getString("msg.error"),
+						ioe,
+						YAMM.exceptionNames); 
+			}
+
+			frame.status.setStatus(YAMM.getString("msg.done"));
+			frame.status.progress(100);
+		}
+		frame.status.setStatus("");
+		frame.status.progress(0); 
+		knappen.setEnabled(true);
+	}
 }
