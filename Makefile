@@ -65,7 +65,7 @@ jar: YAMM
 	org/gjt/fredde/util/*.class \
 	org/gjt/fredde/util/gui/*.class \
 	org/gjt/fredde/util/net/*.class \
-	YAMM_*.properties \
+	YAMM*.properties \
 	images/
 
 clean:
