@@ -1,4 +1,4 @@
-/*  $Id: mainToolBar.java,v 1.30 2003/04/13 16:38:28 fredde Exp $
+/*  $Id: mainToolBar.java,v 1.31 2003/04/16 12:42:32 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import org.gjt.fredde.yamm.SHMail;
 /**
  * The toolbar for the main class
  * @author
- * @version $Revision: 1.30 $
+ * @version $Revision: 1.31 $
  */
 public class mainToolBar
 	extends JToolBar
@@ -185,50 +185,11 @@ public class mainToolBar
 			} else if (arg.equals(YAMM.getString("button.send_get.tooltip"))) {
 				new SHMail(YAMM.getInstance(), "mailthread", (JButton)e.getSource()).start();
 			} else if (arg.equals(YAMM.getString("button.reply.tooltip"))) {
-				YAMM frame = YAMM.getInstance();
-				int selMail = frame.keyIndex[frame.mailList.getSelectedRow()];
-				long skip = frame.listOfMails[selMail].skip;
-
-				String[] mail = Mailbox.getMailForReplyHeaders(frame.getMailbox(), skip);
-
-				if (!mail[2].startsWith(YAMM.getString("mail.re")) && !mail[2].startsWith("Re:")) {
-					mail[2] = YAMM.getString("mail.re") + " " + mail[2];
-				}
-
-				YAMMWrite yam = new YAMMWrite(
-					mail[0], mail[1],
-					mail[2], mail[0] + " " + YAMM.getString("mail.wrote") + "\n"
-				);
-				Mailbox.getMailForReply(
-					frame.getMailbox(),
-					selMail, skip,
-					yam.myTextArea
-				);
-				yam.sign();
+				YAMMWrite yam = new YAMMWrite();
+				yam.reply();
 			} else if (arg.equals(YAMM.getString("button.forward.tooltip"))) {
-				YAMM frame = YAMM.getInstance();
-				int selMail = frame.keyIndex[frame.mailList.getSelectedRow()];
-				long skip = frame.listOfMails[selMail].skip;
-
-				String mail[] = Mailbox.getMailForReplyHeaders(
-					frame.getMailbox(),
-					skip
-				);
-
-				if (!mail[2].startsWith(YAMM.getString("mail.re")) && !mail[2].startsWith("Re:")) {
-					mail[2] = YAMM.getString("mail.re") + " " + mail[2];
-				}
-
-				YAMMWrite yam = new YAMMWrite(
-					mail[0], mail[1],
-					mail[2], mail[0] + " " + YAMM.getString("mail.wrote") + "\n"
-				);
-				Mailbox.getMailForReply(
-					frame.getMailbox(),
-					selMail, skip,
-					yam.myTextArea
-				);
-				yam.sign();
+				YAMMWrite yam = new YAMMWrite();
+				yam.forward();
 /*
 			} else if (arg.equals(YAMM.getString("button.print.tooltip"))) {
 				PrintJob pj = frame.getToolkit().getPrintJob(frame, "print", null);
@@ -253,6 +214,9 @@ public class mainToolBar
 /*
  * Changes:
  * $Log: mainToolBar.java,v $
+ * Revision 1.31  2003/04/16 12:42:32  fredde
+ * now uses YAMMWrite.reply/forward
+ *
  * Revision 1.30  2003/04/13 16:38:28  fredde
  * now uses yamm.set/getMailbox
  *
