@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.35 2000/12/26 11:23:49 fredde Exp $
+ * @version $Id: mainTable.java,v 1.36 2000/12/31 14:10:59 fredde Exp $
  */
 public class mainTable
 	extends JTable
@@ -55,7 +55,7 @@ public class mainTable
 	protected JPopupMenu		popup = null;
 	private static DragSource	drag = null;
 
-	private final TableModel dataModel = new AbstractTableModel() {
+	private final AbstractTableModel dataModel = new AbstractTableModel() {
 		private final String headername[] = {
 	        	"#",
 			YAMM.getString("table.subject"),
@@ -272,7 +272,7 @@ public class mainTable
 				}
 			}
 		}
-		updateUI();
+		repaint();
 	}
 
 	/**
@@ -309,7 +309,7 @@ public class mainTable
 				}
 			}
 		}
-		updateUI();
+		repaint();
 	}
 
 	public void createPopup(JPopupMenu jpmenu) {
@@ -471,7 +471,7 @@ public class mainTable
 	public void update() {
 		if (!firstSort) SortFirst(sortedCol);
 		else SortLast(sortedCol);
-		updateUI();
+		dataModel.fireTableDataChanged();
 	}
 
 	private MouseListener mouseListener = new MouseAdapter() {
@@ -559,10 +559,9 @@ public class mainTable
 				Mailbox.deleteMail(frame.selectedbox, deleteList);
 				Mailbox.createList(frame.selectedbox, frame);
 
-//				updateUI();
 				Mailbox.updateIndex(frame.selectedbox);
 				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")));
-				frame.tree.updateUI();
+				frame.tree.repaint();
 				update();
 
 				if (frame.listOfMails.length < 0) {
@@ -608,7 +607,7 @@ public class mainTable
 
 				Mailbox.updateIndex(frame.selectedbox);
 				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.trash")));
-				frame.tree.updateUI();
+				frame.tree.repaint();
 
 				update();
 				changeButtonMode(false);
@@ -667,7 +666,7 @@ public class mainTable
 			Arrays.sort(copyList);
 			Mailbox.copyMail(frame.selectedbox, name, copyList);
 			Mailbox.updateIndex(name);
-			frame.tree.updateUI();
+			frame.tree.repaint();
 		}
 	};
 
@@ -699,14 +698,18 @@ public class mainTable
 			Mailbox.moveMail(frame.selectedbox, name, moveList);
 			Mailbox.createList(frame.selectedbox, frame);
 			Mailbox.updateIndex(name);
-			updateUI();
-			frame.tree.updateUI();
+			update();
+
+			frame.tree.repaint();
 		}
 	};
 }
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.36  2000/12/31 14:10:59  fredde
+ * replaced updateUI's with repaint where I could.
+ *
  * Revision 1.35  2000/12/26 11:23:49  fredde
  * YAMM.listOfMails is now of type String[][]
  *
