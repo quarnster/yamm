@@ -27,12 +27,12 @@ import java.io.*;
 /**
  * This class parses attachments
  * @author Fredrik Ehnbom
- * @version $Id: Attachment.java,v 1.14 2003/04/04 15:38:07 fredde Exp $
+ * @version $Id: Attachment.java,v 1.15 2003/10/01 10:05:08 fredde Exp $
  */
 public class Attachment {
 
 	public static final int ERROR		= -1;
-	public static final int END			=  0;
+	public static final int END		=  0;
 	public static final int MESSAGE 	=  1;
 	public static final int ATTACHMENT 	=  2;
 	public static final int AMESSAGE 	=  3;
@@ -139,7 +139,7 @@ public class Attachment {
 			else if (contentType.indexOf("text/html") != -1) {
 				fileName = baseFile + ".message.html";
 				html = true;
-			} else if (contentType.indexOf("text/plain") != -1)
+			} else if (contentType.indexOf("text/plain") != -1 || contentType.indexOf("message/") != -1)
 				fileName = baseFile + ".message.txt";
 			else if (name != null) {
 				fileName = baseFile + ".attach." + name;
@@ -207,6 +207,9 @@ public class Attachment {
 /*
  * Changes:
  * $Log: Attachment.java,v $
+ * Revision 1.15  2003/10/01 10:05:08  fredde
+ * let through messages of type 'message/*'
+ *
  * Revision 1.14  2003/04/04 15:38:07  fredde
  * now appends to the outputfile
  *
