@@ -154,7 +154,8 @@ public class Mailbox {
 
 			for (;;) {
 				temp = in.readLine();
-				skipnum += temp.length() + 1;
+				skipnum += temp.length() + System.getProperty
+						("line.separator").length();
 
 				if (temp == null) {
 					break;
@@ -448,7 +449,9 @@ public class Mailbox {
 						tmp.lastIndexOf(" ") + 1,
 						tmp.length()));
 
-					skip += status.length() + 14;
+					skip += status.length() + 13 +
+						System.getProperty
+						("line.separator").length();
 
 					tmp = tmp.substring(0,
 						tmp.lastIndexOf(" ") + 1);

@@ -54,7 +54,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   static protected ResourceBundle         res;
 
   /** The box the user has selected. */
-  public static String                 selectedbox  = home + "/boxes/";
+  public static String                 selectedbox = home + sep + "boxes" + sep;
 
   /** The version of YAMM */
   public static    String                 version  = "0.7.4";

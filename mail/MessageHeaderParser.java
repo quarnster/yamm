@@ -56,7 +56,8 @@ public class MessageHeaderParser {
 				throw new MessageParseException("Unexpected " +
 							"end of message.");
 			}
-			skipnum += temp.length() + 1;
+			skipnum += temp.length() + System.getProperty
+					("line.separator").length();
 
 			if (temp.startsWith(" ") || temp.startsWith("\t")) {
 				value += " " + temp.trim();
