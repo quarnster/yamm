@@ -21,9 +21,7 @@ package org.gjt.fredde.yamm.gui.main;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.event.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Component;
+import java.awt.*;
 import java.util.*;
 import java.io.File;
 import java.io.IOException;
@@ -80,6 +78,7 @@ public class mainTable extends JTable {
     setColumnSelectionAllowed(false);
     setShowHorizontalLines(false);
     setShowVerticalLines(false);
+    setIntercellSpacing(new Dimension(0, 0));
     myRenderer rend = new myRenderer();
     rend.setFont(new Font("SansSerif", Font.PLAIN, 12));
     setDefaultRenderer(getColumnClass(0), rend /* new myRenderer() */ );
@@ -136,12 +135,8 @@ public class mainTable extends JTable {
     String boxHome = System.getProperty("user.home") + YAMM.sep +
                      ".yamm" + YAMM.sep + "boxes";
     
-    fileList(list, new File(System.getProperty("user.home") +
-                            YAMM.sep +  ".yamm" + YAMM.sep +
-                            "boxes" + YAMM.sep));
-    fileList(list2, new File(System.getProperty("user.home") + 
-                             YAMM.sep + ".yamm" + YAMM.sep +
-                             "boxes" + YAMM.sep));
+    fileList(list, new File(boxHome + YAMM.sep));
+    fileList(list2, new File(boxHome + YAMM.sep));
     
     JMenuItem row, delete = new JMenuItem(res.getString("button.delete")),
               reply = new JMenuItem(res.getString("button.reply")); 
@@ -340,12 +335,11 @@ public class mainTable extends JTable {
       int whatMail = Integer.parseInt(frame.mailList.getValueAt(frame.mailList.getSelectedRow(), i).toString());
  
 
-      frame.attach = new Vector();
+//      frame.attach = new Vector();
  
       Mailbox.getMail(frame.selectedbox,whatMail /* , frame.attach, frame.mailName */);
       try {
         String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes") + 6, frame.selectedbox.length()) + "/"; 
-        System.out.println("boxName: " + boxName);
         frame.mailPage = new URL(frame.mailPageString + boxName + whatMail + ".html");
       }
       catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
@@ -353,6 +347,7 @@ public class mainTable extends JTable {
       try { frame.mail.setPage(frame.mailPage); }
       catch (IOException ioe) { new MsgDialog(frame, res.getString("msg.error"), ioe.toString()); }
 
+      frame.createAttachList();
       frame.myList.updateUI();
     }
   };
@@ -392,7 +387,7 @@ public class mainTable extends JTable {
         Mailbox.getMail(frame.selectedbox, frame.mailList.getSelectedRow() /*, frame.attach, frame.mailName */);
 
         try { 
-          String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes/") + 6, frame.selectedbox.length()) + "/"; 
+          String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes") + 6, frame.selectedbox.length()) + "/"; 
           frame.mailPage = new URL(frame.mailPageString + boxName + frame.mailList.getSelectedRow()  + ".html"); 
         }
         catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
@@ -473,7 +468,7 @@ public class mainTable extends JTable {
       Mailbox.getMail(frame.selectedbox, frame.mailList.getSelectedRow());
 
       try { 
-        String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes/") + 6, frame.selectedbox.length()) + "/"; 
+        String boxName = frame.selectedbox.substring(frame.selectedbox.indexOf("boxes") + 6, frame.selectedbox.length()) + "/"; 
         frame.mailPage = new URL(frame.mailPageString + boxName + frame.mailList.getSelectedRow() + "html"); 
       }
       catch (MalformedURLException mue) { new MsgDialog(frame, res.getString("msg.error"), mue.toString()); }
