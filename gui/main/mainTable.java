@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.54 2003/04/27 08:03:13 fredde Exp $
+/*  $Id: mainTable.java,v 1.55 2003/06/06 10:49:38 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.54 $
+ * @version $Revision: 1.55 $
  */
 public class mainTable
 	extends JTable
@@ -415,7 +415,7 @@ public class mainTable
 
 		JMenuItem row = null;
 		JMenuItem delete = new JMenuItem(YAMM.getString("button.delete"));
-		JMenuItem reply = new JMenuItem(YAMM.getString("button.reply"));
+		JMenuItem reply = new JMenuItem(YAMM.getString("table.reply"));
 		delete.addActionListener(OtherMListener);
 		delete.setFont(new Font("SansSerif", Font.PLAIN, 10));
 		reply.addActionListener(OtherMListener);
@@ -716,7 +716,7 @@ public class mainTable
 
 				changeButtonMode(false);
 				clearSelection();
-			} else if (kommando.equals(YAMM.getString("button.reply"))) {
+			} else if (kommando.equals(YAMM.getString("table.reply"))) {
 				if (getSelectedRow() == -1) {
 					return;
 				}
@@ -785,6 +785,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.55  2003/06/06 10:49:38  fredde
+ * button.reply -> table.reply
+ *
  * Revision 1.54  2003/04/27 08:03:13  fredde
  * sorts move/copy popup
  *
