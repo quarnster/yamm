@@ -1,4 +1,4 @@
-/*  $Id: mainJTree.java,v 1.28 2003/03/08 15:21:12 fredde Exp $
+/*  $Id: mainJTree.java,v 1.29 2003/03/08 20:56:30 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The tree for the main window
  * @author Fredrik Ehnbom
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 public class mainJTree
 	extends JTable
@@ -58,8 +58,8 @@ public class mainJTree
 
 	public final AbstractTableModel dataModel = new AbstractTableModel() {
 		private final String headername[] = {
-	        	"box",
-			"unread"
+	        	YAMM.getString("box.boxes"),
+			YAMM.getString("box.unread")
 		};
 
 		public final int getColumnCount() {
@@ -384,6 +384,9 @@ public class mainJTree
 /*
  * Changes:
  * $Log: mainJTree.java,v $
+ * Revision 1.29  2003/03/08 20:56:30  fredde
+ * Localization fixes
+ *
  * Revision 1.28  2003/03/08 15:21:12  fredde
  * unreadTable and dataModel made public. Update models instead of updateUI
  *
