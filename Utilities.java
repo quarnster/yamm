@@ -19,13 +19,30 @@ package org.gjt.fredde.yamm;
 
 import java.io.File;
 import java.util.Vector;
+import java.util.StringTokenizer;
 
 /**
  * This Class provides some useful utilities
  * @author Fredrik Ehnbom
- * @version $Id: Utilities.java,v 1.3 2000/03/15 13:41:38 fredde Exp $
+ * @version $Id: Utilities.java,v 1.4 2000/07/16 17:48:36 fredde Exp $
  */
-public class Utilities {
+public final class Utilities {
+
+	/**
+	 * Replaces the /'s with this systems file separator
+	 * @param str The string to do the replacement to
+	 */
+	public static String replace(String str) {
+		StringTokenizer tok = new StringTokenizer(str, "/");
+		String tmp = tok.nextToken();
+		String sep = System.getProperty("file.separator");
+
+		while (tok.hasMoreTokens()) {
+			tmp += sep + tok.nextToken();
+		}
+
+		return tmp;
+	}
 
 	/**
 	 * Prints a debug message to YAMM.debug and the flushes
@@ -126,6 +143,9 @@ public class Utilities {
 /*
  * Changes:
  * $Log: Utilities.java,v $
+ * Revision 1.4  2000/07/16 17:48:36  fredde
+ * lots of Windows compatiblity fixes
+ *
  * Revision 1.3  2000/03/15 13:41:38  fredde
  * renamed printDebug to Debug
  *

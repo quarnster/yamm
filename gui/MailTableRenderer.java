@@ -23,11 +23,12 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import org.gjt.fredde.yamm.YAMM;
+import org.gjt.fredde.yamm.Utilities;
 
 /**
  * The renderer for the mailtable
  * @author Fredrik Ehnbom
- * @version $Id: MailTableRenderer.java,v 1.1 2000/03/19 17:18:33 fredde Exp $
+ * @version $Id: MailTableRenderer.java,v 1.2 2000/07/16 17:48:36 fredde Exp $
  */
 public class MailTableRenderer extends DefaultTableCellRenderer {
 
@@ -55,8 +56,7 @@ public class MailTableRenderer extends DefaultTableCellRenderer {
 		setValue(value);
 
 		Vector v = (Vector) yamm.listOfMails.elementAt(row);
-		String outbox = YAMM.home + YAMM.sep + "boxes" +
-				YAMM.sep + YAMM.getString("box.outbox");
+		String outbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
 
 		if (!v.elementAt(4).toString().equals("Unread") ||
 				outbox.equals(yamm.selectedbox)) {
@@ -77,6 +77,9 @@ public class MailTableRenderer extends DefaultTableCellRenderer {
 /*
  * Changes:
  * $Log: MailTableRenderer.java,v $
+ * Revision 1.2  2000/07/16 17:48:36  fredde
+ * lots of Windows compatiblity fixes
+ *
  * Revision 1.1  2000/03/19 17:18:33  fredde
  * The renderer that used to be in main/mainTable.java
  *

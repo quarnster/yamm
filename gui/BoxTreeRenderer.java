@@ -28,7 +28,7 @@ import org.gjt.fredde.yamm.mail.Mailbox;
 /**
  * The renderer for the mailbox tree
  * @author Fredrik Ehnbom
- * @version $Id: BoxTreeRenderer.java,v 1.4 2000/03/15 11:13:45 fredde Exp $
+ * @version $Id: BoxTreeRenderer.java,v 1.5 2000/07/16 17:48:36 fredde Exp $
  */
 public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
                                                                    
@@ -62,7 +62,7 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 				int     row,     
 				boolean hasFocus) {
 		String s = value.toString();
-		StringTokenizer tok = new StringTokenizer(s, YAMM.sep);
+		StringTokenizer tok = new StringTokenizer(s, System.getProperty("file.separator"));
 		String thisbox = null;
 
 		while (tok.hasMoreTokens()) {
@@ -73,11 +73,9 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 			if (thisbox.equals(YAMM.getString("box.inbox"))) {
 				setIcon(inbox);
 			} else if (thisbox.equals(YAMM.getString("box.outbox"))
-					|| thisbox.equals(
-						YAMM.getString("box.sent"))) {
+					|| thisbox.equals(YAMM.getString("box.sent"))) {
 				setIcon(outbox);
-			} else if (thisbox.equals(
-						YAMM.getString("box.trash"))) {
+			} else if (thisbox.equals(YAMM.getString("box.trash"))) {
 				setIcon(trash);
 			} else setIcon(box);
 		} else if (!leaf) {
@@ -137,6 +135,9 @@ public class BoxTreeRenderer extends JLabel implements TreeCellRenderer {
 /*
  * Changes:
  * $Log: BoxTreeRenderer.java,v $
+ * Revision 1.5  2000/07/16 17:48:36  fredde
+ * lots of Windows compatiblity fixes
+ *
  * Revision 1.4  2000/03/15 11:13:45  fredde
  * boxes now show if and how many unread messages they have
  *

@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Id: mainMenu.java,v 1.22 2000/03/15 13:43:00 fredde Exp $
+ * @version $Id: mainMenu.java,v 1.23 2000/07/16 17:48:36 fredde Exp $
  */
 public class mainMenu extends JMenuBar {
 
@@ -310,7 +310,7 @@ public class mainMenu extends JMenuBar {
 						tmp = frame.mailPageString;
 						boxName = tmp.substring(8,
 							tmp.length()) +
-							boxName + YAMM.sep + 
+							boxName + File.separator + 
 							frame.mailList.
 							getSelectedRow() +
 							".html";
@@ -362,6 +362,9 @@ public class mainMenu extends JMenuBar {
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.23  2000/07/16 17:48:36  fredde
+ * lots of Windows compatiblity fixes
+ *
  * Revision 1.22  2000/03/15 13:43:00  fredde
  * added YAMM.compDate to bug report
  *

@@ -21,6 +21,7 @@ package org.gjt.fredde.yamm.mail;
 import java.io.*;
 import java.util.*;
 import org.gjt.fredde.yamm.YAMM;
+import org.gjt.fredde.yamm.Utilities;
 
 /**
  * A class that filters incoming messages
@@ -40,11 +41,7 @@ public class Filter {
 		Mailbox.createFilterList(list);
 
 		try {
-			in = new BufferedReader(
-					new InputStreamReader(
-					new FileInputStream(YAMM.home +
-								YAMM.sep +
-								".filters")));
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(Utilities.replace(YAMM.home + "/.filters"))));
 
 			String temp = null;
 
@@ -55,8 +52,7 @@ public class Filter {
 					break;
 				}
 
-				StringTokenizer tok = new StringTokenizer(temp,
-									";");
+				StringTokenizer tok = new StringTokenizer(temp, ";");
 				String con1 = tok.nextToken();
 				String con2 = tok.nextToken();
 				String con3 = tok.nextToken();
@@ -74,53 +70,29 @@ public class Filter {
 
 				if (con2.equals("is")) {
 					for (int i = 0; i < list.size(); i++) {
-						Vector v = (Vector)
-							list.elementAt(i);
-						String temp2 =
-							v.elementAt(type).
-								toString();
-						if (temp2.equalsIgnoreCase(
-									con3)) {
+						Vector v = (Vector) list.elementAt(i);
+						String temp2 = v.elementAt(type).toString();
+						if (temp2.equalsIgnoreCase(con3)) {
 							list.remove(i);
 							cheat[0] = i;
-							String target = YAMM.home +
-									YAMM.sep +
-									"boxes/" +
-									exec;
-							Mailbox.moveMail(
-								YAMM.home +
-								YAMM.sep +
-								"boxes/.filter",
-								target , cheat);
+							String target = Utilities.replace(YAMM.home + "/boxes/" + exec);
+							Mailbox.moveMail(Utilities.replace(YAMM.home + "/boxes/.filter"), target , cheat);
 							changedBoxes.put(target, target);
 							i--;
 						}
 					}
 				} else if (con2.equals("contains")) {
 					for (int i = 0; i < list.size(); i++) {
-						Vector v = (Vector)
-							list.elementAt(i);
-						String temp2 =
-							v.elementAt(type).
-								toString();
+						Vector v = (Vector) list.elementAt(i);
+						String temp2 = v.elementAt(type). toString();
 
-						if (temp2.toLowerCase().
-								indexOf(con3.
-								toLowerCase())
-									!= -1) {
+						if (temp2.toLowerCase().indexOf(con3.toLowerCase()) != -1) {
 							list.remove(i);
 							cheat[0] = i;
 
-							String target = YAMM.home +
-									YAMM.sep +
-									"boxes/" +
-									exec;
+							String target = Utilities.replace(YAMM.home + "/boxes/" + exec);
 
-							Mailbox.moveMail(
-								YAMM.home +
-								YAMM.sep +
-								"boxes/.filter",
-								target, cheat);
+							Mailbox.moveMail(Utilities.replace(YAMM.home + "/boxes/.filter"), target, cheat);
 							changedBoxes.put(target, target);
 							i--;
 						}
@@ -132,19 +104,14 @@ public class Filter {
 		}
 
 		cheat[0] = 0;
-		if (Mailbox.hasMail(YAMM.home + "/boxes/.filter")) {
-			changedBoxes.put(YAMM.home + "/boxes/" + YAMM.getString("box.inbox"),
-						YAMM.home + "/boxes/" + YAMM.getString("box.inbox"));
+		if (Mailbox.hasMail(Utilities.replace(YAMM.home + "/boxes/.filter"))) {
+			changedBoxes.put(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox")), Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox")));
 		}
-		while (Mailbox.hasMail(YAMM.home + "/boxes/.filter")) {
-			Mailbox.moveMail(YAMM.home + "/boxes/.filter",
-						YAMM.home + "/boxes/" +
-						YAMM.getString("box.inbox"),
-									cheat);
+		while (Mailbox.hasMail(Utilities.replace(YAMM.home + "/boxes/.filter"))) {
+			Mailbox.moveMail(Utilities.replace(YAMM.home + "/boxes/.filter"), Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.inbox")), cheat);
 		}
 		for (Enumeration e = changedBoxes.elements(); e.hasMoreElements(); ) {
 			Mailbox.updateIndex(e.nextElement().toString());
 		}
 	}
 }
-

@@ -42,27 +42,27 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * The big Main-class of YAMM
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.48 2000/04/15 13:27:54 fredde Exp $
+ * @version $Id: YAMM.java,v 1.49 2000/07/16 17:48:36 fredde Exp $
  */
 public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 
 	/** The file separator */
-	public static String sep = File.separator;
+//	public static String sep = File.separator;
 
 	/** The home of yamm */
-	public static String home = System.getProperty("user.home") + sep + ".yamm";
+	public static String home = Utilities.replace(System.getProperty("user.home") + "/.yamm");
 
 	/** To get the Language strings for buttons, menus, etc... */
 	static protected ResourceBundle         res;
 
 	/** The box the user has selected. */
-	public static String selectedbox = home + sep + "boxes" + sep;
+	public static String selectedbox = Utilities.replace(home + "/boxes/");
 
 	/** The version of YAMM */
 	public static String version  = "0.7.7";
 
 	/** The compileDate of YAMM */
-	public static String compDate = Utilities.cvsToDate("$Date: 2000/04/15 13:27:54 $");
+	public static String compDate = Utilities.cvsToDate("$Date: 2000/07/16 17:48:36 $");
 
 	/** the file that contains the current mail */
 	public String mailPageString = "file:///" + home + "/tmp/cache/";
@@ -656,7 +656,8 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 				props.getClass().getResource("/images/logo.gif"));
 		}
 
-		selectedbox += res.getString("box.inbox");
+		selectedbox += "/" + res.getString("box.inbox");
+		selectedbox = Utilities.replace(selectedbox);
 
 		String[] tmp = {
 			res.getString("exception.ok"),
@@ -669,11 +670,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 		if (firstRun) {
 			try {
 				String user = System.getProperty("user.name");
-				SimpleDateFormat dateFormat =
-					new SimpleDateFormat("EEE, dd MMM yyyy"+						" HH:mm:ss zzz", Locale.US);
+				SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy"+						" HH:mm:ss zzz", Locale.US);
 
-				InetAddress myInetaddr =
-						InetAddress.getLocalHost();
+				InetAddress myInetaddr = InetAddress.getLocalHost();
 				String host = myInetaddr.getHostName();
 				if (host == null) host = "localhost";
 
@@ -724,6 +723,9 @@ public class YAMM extends JFrame implements HyperlinkListener /*, Printable */ {
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.49  2000/07/16 17:48:36  fredde
+ * lots of Windows compatiblity fixes
+ *
  * Revision 1.48  2000/04/15 13:27:54  fredde
  * version tag changed to 0.7.7
  *

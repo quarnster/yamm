@@ -25,12 +25,13 @@ import java.util.*;
 import javax.swing.*;
 import org.gjt.fredde.util.gui.*;
 import org.gjt.fredde.yamm.YAMM;
+import org.gjt.fredde.yamm.Utilities;
 
 
 /**
  * Class used for creating new groups
  * @author Fredrik Ehnbom
- * @version $Id: NewGroupDialog.java,v 1.2 2000/03/15 14:03:54 fredde Exp $
+ * @version $Id: NewGroupDialog.java,v 1.3 2000/07/16 17:48:36 fredde Exp $
  */
 public class NewGroupDialog extends JDialog {
 	private JComboBox  group = null;
@@ -50,7 +51,7 @@ public class NewGroupDialog extends JDialog {
 
 		getContentPane().add(new JLabel(YAMM.getString("options.group")));
 		Vector vect = new Vector();
-		createGroupList(vect, new File(System.getProperty("user.home") + "/.yamm/boxes/"));
+		createGroupList(vect, new File(Utilities.replace(YAMM.home + "/.yamm/boxes/")));
 
 		NewBoxDialog.removeDotG(vect);
 		group = new JComboBox( vect );
@@ -75,17 +76,17 @@ public class NewGroupDialog extends JDialog {
 	 * Creates a list of all the groups
 	 */
 	public static void createGroupList(Vector vect, File f) {
-		String sep = YAMM.sep;
+//		String sep = YAMM.sep;
 		String home = YAMM.home;
 
-		if ((f.toString()).equals(home + sep + "boxes")) {
-			vect.add(sep);
+		if ((f.toString()).equals(Utilities.replace(home + "/boxes"))) {
+			vect.add(System.getProperty("file.separator"));
 			String list[] = f.list();
 			for (int i = 0; i < list.length; i++)
 				createGroupList(vect, new File(f, list[i]));
 		} else if (f.isDirectory() && f.toString().endsWith(".g")) {
 			String dir = f.toString();
-			dir = dir.substring((home + sep + "boxes").length(), dir.length() -2);
+			dir = dir.substring((Utilities.replace(home + "/boxes")).length(), dir.length() -2);
 			vect.add(dir);
 
 			String list[] = f.list();
@@ -111,10 +112,7 @@ public class NewGroupDialog extends JDialog {
 					}
 					gName = temp;
 				}
-				File box = new File(System.getProperty("user.home") +
-							"/.yamm/boxes/" +
-							gName +
-							jtfield.getText() + ".g");
+				File box = new File(Utilities.replace(YAMM.home + "/.yamm/boxes/" + gName + jtfield.getText() + ".g"));
 
 				if (box.exists()) {
 					new MsgDialog(yamm, YAMM.getString("msg.error"),
@@ -138,6 +136,9 @@ public class NewGroupDialog extends JDialog {
 /*
  * Changes:
  * $Log: NewGroupDialog.java,v $
+ * Revision 1.3  2000/07/16 17:48:36  fredde
+ * lots of Windows compatiblity fixes
+ *
  * Revision 1.2  2000/03/15 14:03:54  fredde
  * oops, forgot the log and id tags...
  *

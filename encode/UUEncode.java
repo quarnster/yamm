@@ -30,8 +30,8 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * Encodes file in the uuencode format
  */
 public class UUEncode {
-	protected String filename;
-	protected DataOutputStream out;
+	private String filename;
+	private DataOutputStream out;
 
 	/**
 	 * Encodes all files in the specified vector
@@ -39,35 +39,25 @@ public class UUEncode {
 	 */
 	public UUEncode(Vector attach) {
 		try {
-			out = new DataOutputStream(new BufferedOutputStream(
-				new FileOutputStream(YAMM.home + "/boxes/" +
-					YAMM.getString("box.outbox"), true)));
+			out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"), true)));
 
 			out.writeBytes("--AttachThis");
 			for (int i = 0; i < attach.size(); i++) {
-				StringTokenizer tok = new StringTokenizer(
-						attach.elementAt(i).toString(),
-								YAMM.sep);
+				StringTokenizer tok = new StringTokenizer(attach.elementAt(i).toString(), File.separator);
 
-				URL url = new URL("file:///" +
-						attach.elementAt(i).toString());
+				URL url = new URL("file:///" + attach.elementAt(i).toString());
 				URLConnection uc = url.openConnection();
 				uc.connect(); 
 				String ctype = uc.getContentType();
 
 				if (!(tok.countTokens() <= 1)) {
-					for (; 1 < tok.countTokens();
-							tok.nextToken());
+					for (; 1 < tok.countTokens(); tok.nextToken());
 				}
 				filename = tok.nextToken();
 
-        
-				out.writeBytes("\nContent-Type: " + ctype +
-						"; name=\"" + filename +
-					"\"\nContent-Transfer-Encoding: " +
-							" x-uuencode" +
-					"\nContent-Disposition: attachment; " +
-					"filename=\"" + filename + "\"\n\n");
+				out.writeBytes(	"\nContent-Type: " + ctype + "; name=\"" + filename +
+						"\"\nContent-Transfer-Encoding: " + " x-uuencode" +
+						"\nContent-Disposition: attachment; " +	"filename=\"" + filename + "\"\n\n");
 				encodeFile(attach.elementAt(i).toString());
 
 				if (i + 1 < attach.size()) {
@@ -91,16 +81,13 @@ public class UUEncode {
 	 */
 	protected void encodeFile(String file) {
 		try {
-			DataInputStream in = new DataInputStream(
-						new FileInputStream(file));
+			DataInputStream in = new DataInputStream(new FileInputStream(file));
 
 			UUEncoder uuenc = new UUEncoder(filename);
 			uuenc.encode(in, out);
 			in.close();
 		} catch (IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-					ioe,
-					YAMM.exceptionNames);
+			new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
 		}
 	}
 }

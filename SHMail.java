@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom
- * @version $Id: SHMail.java,v 1.26 2000/04/01 21:26:14 fredde Exp $
+ * @version $Id: SHMail.java,v 1.27 2000/07/16 17:48:36 fredde Exp $
  */
 public class SHMail extends Thread {
 
@@ -162,27 +162,23 @@ public class SHMail extends Thread {
 			PrintWriter out = null;
 			PrintWriter mail = null;
 
-			try { 
+			try {
 				smtp = new YammSmtp(YAMM.getProperty("smtpserver"), 25, smtpdebug);
 				in = new BufferedReader(
 					new InputStreamReader(
-						new FileInputStream(YAMM.home + "/boxes/" +
-							YAMM.getString("box.outbox"))));
+						new FileInputStream(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"))));
 
-				if (sent) { 
+				if (sent) {
 					out = new PrintWriter(
 					new BufferedOutputStream(
-						new FileOutputStream(YAMM.home + YAMM.sep + "boxes" +
-						YAMM.sep + YAMM.getString("box.sent"), true)));
+						new FileOutputStream(YAMM.home + "/boxes/" + YAMM.getString("box.sent"), true)));
 				}
 
 				String temp = null, from2 = null, to2 = null;
 				int i = 1;
 
-
 				for (;;) {
 					temp = in.readLine();
-
 
 					if (temp == null) break;
 
@@ -240,13 +236,13 @@ public class SHMail extends Thread {
 							mail.println(temp);
 					}
 				}
-				File file = new File(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
+				in.close();
+
+				File file = new File(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox")));
 				file.delete();
 				file.createNewFile();
 			} catch (IOException ioe) { 
-				new ExceptionDialog(YAMM.getString("msg.error"),
-							ioe,
-						YAMM.exceptionNames); 
+				new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames); 
 			} finally {
 				try {
 					if (in != null) in.close();
@@ -256,7 +252,7 @@ public class SHMail extends Thread {
 				} catch (IOException ioe) {}
 			}
 			if (sent) {
-				Mailbox.updateIndex(YAMM.home + "/boxes/" + YAMM.getString("box.sent"));
+				Mailbox.updateIndex(Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.sent")));
 				frame.tree.updateUI();
 			}
 		}
@@ -288,6 +284,9 @@ public class SHMail extends Thread {
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.27  2000/07/16 17:48:36  fredde
+ * lots of Windows compatiblity fixes
+ *
  * Revision 1.26  2000/04/01 21:26:14  fredde
  * email parsing fixed...
  *

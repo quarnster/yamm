@@ -28,7 +28,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Id: Mailbox.java,v 1.34 2000/04/15 13:05:44 fredde Exp $
+ * @version $Id: Mailbox.java,v 1.35 2000/07/16 17:48:36 fredde Exp $
  */
 public class Mailbox {
 
@@ -125,22 +125,17 @@ public class Mailbox {
 		String date = null;
 		String status = null;
 		String temp = null;
-		int sep = whichBox.lastIndexOf(YAMM.sep);
+		int sep = whichBox.lastIndexOf(File.separator);
 
-		String target = whichBox.substring(0, sep + 1) +
-				"." + 
-				whichBox.substring(sep + 1, whichBox.length()) +
-				".index";
+		String target = whichBox.substring(0, sep + 1) + "." + whichBox.substring(sep + 1, whichBox.length()) + ".index";
 
 		BufferedReader in = null;
 		PrintWriter out = null;
 
 		try {
-			in = new BufferedReader(new InputStreamReader(
-						new FileInputStream(whichBox)));
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(whichBox)));
+			out   = new PrintWriter(new BufferedOutputStream(new FileOutputStream(target)));
 
-			out   = new PrintWriter(new BufferedOutputStream(
-						new FileOutputStream(target)));
 			int i = 0;
 			int unread = 0;
 
@@ -152,9 +147,7 @@ public class Mailbox {
 				try {
 					skipnum = mhp.parse(in);
 				} catch (MessageParseException mpe) {
-					new ExceptionDialog(YAMM.getString("msg.error"),
-						mpe,
-						YAMM.exceptionNames);
+					new ExceptionDialog(YAMM.getString("msg.error"), mpe, YAMM.exceptionNames);
 				}
 
 				subject = mhp.getHeaderField("Subject");
@@ -166,35 +159,28 @@ public class Mailbox {
 					status = "Unread";
 					unread++;
 				}
-				if (from == null)
-					from = "";
-				if (subject == null)
-					subject = "";
-
+				if (from == null) from = "";
+				if (subject == null) subject = "";
 
 				subject = removeQuote(subject);
 				subject = unMime(subject);
 				from = removeQuote(from);
 
-
 				for (;;) {
 					temp = in.readLine();
-					if (temp == null)
-						break;
+					if (temp == null) break;
 
-					skipnum += temp.length() + System.getProperty
-							("line.separator").length();
+					skipnum += temp.length() + System.getProperty("line.separator").length();
 
 					if (temp.equals(".")) {
 						out.print(i + " ");
 
 						if (subject != null) {
-							out.print("\"" + subject +
-								"\" ");
+							out.print("\"" + subject + "\" ");
 						} else {
 							out.print("\"\" ");
 						}
-                                         
+
 						if (from != null) {
 							out.print("\"" + from + "\" ");
 						} else {
@@ -211,7 +197,7 @@ public class Mailbox {
 							out.print("\"" +date + "\" ");
 						} else {
 							out.print("\"\" ");
-						}                                   
+						}
 
 						out.print("\"" + status + "\" ");
 
@@ -229,8 +215,8 @@ public class Mailbox {
 						subject = mhp.getHeaderField("Subject");
 						from    = mhp.getHeaderField("From");
 						date    = mhp.getHeaderField("Date");
-						status  = mhp.getHeaderField("YAMM-" +
-								"Status");
+						status  = mhp.getHeaderField("YAMM-Status");
+
 						if (status == null) {
 							status = "Unread";
 							unread++;
@@ -274,9 +260,7 @@ public class Mailbox {
 				out.println("0, 0");
 			}
 		} catch(IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-					ioe,
-					YAMM.exceptionNames);
+			new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
 		} finally {
 			try {
 				if (in != null) in.close();
@@ -286,14 +270,8 @@ public class Mailbox {
 	}
 
 	public static int[] getUnread(String box) {
-
-		int sep = box.lastIndexOf(YAMM.sep);
-
-		String box2 = box.substring(0, sep + 1) +
-				"." + 
-				box.substring(sep + 1, box.length()) +
-				".index";
-
+		int sep = box.lastIndexOf(File.separator);
+		String box2 = box.substring(0, sep + 1) + "." + box.substring(sep + 1, box.length()) + ".index";
 		File indexfile = new File(box2);
 
 		if (!indexfile.exists()) {
@@ -306,14 +284,10 @@ public class Mailbox {
 		int unread[] = new int[2];
 
 		try {
-			in = new BufferedReader(new InputStreamReader(
-						new FileInputStream(box2)));
-
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(box2)));
 			tmp = in.readLine();
 		} catch (IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-					ioe,
-					YAMM.exceptionNames);
+			new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
 		} finally {
 			try {
 				if (in != null) in.close();
@@ -328,7 +302,6 @@ public class Mailbox {
 
 		return unread;
 	}
-	
 
 	/**
 	 * Creates a list with the mails in this box.
@@ -345,13 +318,9 @@ public class Mailbox {
 		mailList.clear();
 		mailList.ensureCapacity(getUnread(whichBox)[0]);
 		Vector vec1 = new Vector(6);
-		int sep = whichBox.lastIndexOf(YAMM.sep);
+		int sep = whichBox.lastIndexOf(File.separator);
 
-		String box = whichBox.substring(0, sep + 1) +
-				"." + 
-				whichBox.substring(sep + 1, whichBox.length()) +
-				".index";
-
+		String box = whichBox.substring(0, sep + 1) + "." + whichBox.substring(sep + 1, whichBox.length()) + ".index";
 		int i = 0;
 
 		if (!hasMail(whichBox)) {
@@ -367,24 +336,20 @@ public class Mailbox {
 		}
 
 		BufferedReader in = null;
-		
+
 		try {
-			in = new BufferedReader(new InputStreamReader(
-						new FileInputStream(box)));
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(box)));
 
 			in.readLine(); // skip messages, unread messages header
 			StreamTokenizer tok = new StreamTokenizer(in);
-			
+
 			for (;;) {
 				if (tok.nextToken() == StreamTokenizer.TT_EOF) {
 					break;
 				}
 
-
-
 				int num = (int) tok.nval;
-				vec1.insertElementAt(
-					Integer.toString(num), 0);
+				vec1.insertElementAt(Integer.toString(num), 0);
 
 				tok.nextToken();
 				vec1.insertElementAt(tok.sval, 1);
@@ -404,12 +369,9 @@ public class Mailbox {
 				mailList.insertElementAt(vec1, i);
 				vec1 = new Vector(6);
 				i++;
-
 			}
 		} catch(IOException ioe) {
-			new ExceptionDialog(YAMM.getString("msg.error"),
-					ioe,
-					YAMM.exceptionNames);
+			new ExceptionDialog(YAMM.getString("msg.error"), ioe, YAMM.exceptionNames);
 		} finally {
 			try {
 				if (in != null) in.close();
@@ -437,9 +399,7 @@ public class Mailbox {
 		BufferedReader in = null;
 
 		try {
-			in = new BufferedReader(new InputStreamReader(
-					new FileInputStream(YAMM.home +
-							"/boxes/.filter")));
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(YAMM.home + "/boxes/.filter")));
 
 			MessageHeaderParser mhp = new MessageHeaderParser();
 
@@ -515,7 +475,7 @@ public class Mailbox {
 	private static void setIndexStatus(String whichBox, int whichmail,
 								String status) {
 
-		int sep = whichBox.lastIndexOf(YAMM.sep);
+		int sep = whichBox.lastIndexOf(File.separator);
 		String box = whichBox.substring(0, sep + 1) +
 				"." + 
 				whichBox.substring(sep + 1, whichBox.length()) +
@@ -703,12 +663,11 @@ public class Mailbox {
 	 * @param attach Which vector to add attachments to
 	 */
 	public static void getMail(String whichBox, int whichmail, long skip) {
-		String  temp = YAMM.home + YAMM.sep;
+		String  temp = YAMM.home + File.separator;
 		int attaches = 0;
 
 		String tempdir = temp + "tmp/";
-		String boxpath = whichBox.substring(whichBox.indexOf("boxes") +
-							6, whichBox.length());
+		String boxpath = whichBox.substring(whichBox.indexOf("boxes") +	6, whichBox.length());
 		File   cache = new File(tempdir + "cache/" + boxpath + "/");
 		File   out   = new File(cache, whichmail + ".html");
 
@@ -1441,6 +1400,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.35  2000/07/16 17:48:36  fredde
+ * lots of Windows compatiblity fixes
+ *
  * Revision 1.34  2000/04/15 13:05:44  fredde
  * close out-/inputstream before renaming file
  *
