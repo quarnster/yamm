@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.42 2003/03/09 17:51:35 fredde Exp $
+ * @version $Id: mainTable.java,v 1.43 2003/03/10 09:46:34 fredde Exp $
  */
 public class mainTable
 	extends JTable
@@ -470,7 +470,7 @@ public class mainTable
 			} else if (getSelectedRow() != -1) {
 				get_mail();
 
-				String outbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
+				String outbox = Utilities.replace(YAMM.home + "/boxes/outbox");
 				int row = getSelectedRow();
 				int msg = yamm.keyIndex[row];
 
@@ -479,9 +479,10 @@ public class mainTable
 
 					Mailbox.setStatus(yamm, yamm.selectedbox, getSelectedMessage(), yamm.listOfMails[msg], IndexEntry.STATUS_READ);
 
-					update();
+					dataModel.fireTableRowsUpdated(row, row);
 					yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
-					yamm.tree.dataModel.fireTableDataChanged();
+					row = yamm.tree.getSelectedRow();
+					yamm.tree.dataModel.fireTableRowsUpdated(row, row);
 				}
 				changeButtonMode(true);
 				if (me.getClickCount() == 2) new MailReader(yamm.mailPage);
@@ -543,7 +544,9 @@ public class mainTable
 
 				update();
 				yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
-				yamm.tree.dataModel.fireTableDataChanged();
+				int row = yamm.tree.getSelectedRow();
+				yamm.tree.dataModel.fireTableRowsUpdated(row, row);
+
 
 				if (yamm.listOfMails.length < 0) {
 					return;
@@ -580,7 +583,8 @@ public class mainTable
 
 				update();
 				yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
-				yamm.tree.dataModel.fireTableDataChanged();
+				int row = yamm.tree.getSelectedRow();
+				yamm.tree.dataModel.fireTableRowsUpdated(row, row);
 
 				changeButtonMode(false);
 				clearSelection();
@@ -632,7 +636,8 @@ public class mainTable
 			Mailbox.copyMail(yamm.selectedbox, name, copyList);
 			update();
 			yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
-			yamm.tree.dataModel.fireTableDataChanged();
+			int row = yamm.tree.getSelectedRow();
+			yamm.tree.dataModel.fireTableRowsUpdated(row, row);
 		}
 	};
 
@@ -657,13 +662,17 @@ public class mainTable
 			Mailbox.createList(yamm.selectedbox, yamm);
 			update();
 			yamm.tree.unreadTable.put(yamm.selectedbox, Mailbox.getUnread(yamm.selectedbox));
-			yamm.tree.dataModel.fireTableDataChanged();
+			int row = yamm.tree.getSelectedRow();
+			yamm.tree.dataModel.fireTableRowsUpdated(row, row);
 		}
 	};
 }
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.43  2003/03/10 09:46:34  fredde
+ * non localized box filenames. Uses dataModel.fireTableRowsUpdated instead of DataChanged
+ *
  * Revision 1.42  2003/03/09 17:51:35  fredde
  * now uses the new index system. variable frame renamed to yamm
  *
