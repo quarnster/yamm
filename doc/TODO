@@ -1,6 +1,42 @@
 TODO list for YAMM
 
-- rename Mime-encoder to quoted-printable encoder
+
+
+*********************************
+*********************************
+*********************************
+*********************************
+
+
+
+- Link profiles with smtp-servers.
+- default smtp-server
+- username and password for smtp-servers
+- mail Pablo to get an updated translation
+
+
+
+*********************************
+*********************************
+*********************************
+*********************************
+
+
+
+
+
+From Pablo Rodriguez
+
+-a draft folder in which messages can be saved while they're being composed 
+(right now the options are to send a message or to erase it after composing).
+
+-different smtp servers (I guess it would be useful to link identities with 
+pop3 and smtp servers).
+
+-authentication with login and password (the same as pop3) on smtp servers.
+
+----------------------------------------------------
+
 - TreeTable maillist
 - In-Reply-To: stuff
 - LookAndFeel stuff
@@ -14,13 +50,11 @@ TODO list for YAMM
 - handle attached images that are supposed to be shown in html messages
 - mark all messages as read
 - Fully replace the uuencode/base64-classes with the new Encoder/Decoder-interfaces
-- Fix support for "=?"-subjects
 - fix imageviewer
 - inline stuff that's supposed to be inlined
 - fix "ImageIcon column not showing ImageIcon"-bug
 - "save rendered mail/save raw mail"
-- change mail when pressing up/down in the maillist
-- doubleclick in attachlist
+- doubleclick in attachlist to open attachment
 - make the cancel-button in the status field work or remove it
 - autocheck mail every X minutes
 
@@ -50,8 +84,6 @@ TODO list for YAMM
   - IMAP (This is not as usual as pop3)
 
   - NNTP (news you know...)
-
-  - Local mail on unix-systems
 
 Go ahead and mail me your opinion!
 

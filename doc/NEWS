@@ -1,3 +1,16 @@
+since 0.9:
+	Adds/fixes/changes:
+		-"?="-subjects are now parsed as they should
+		-now appends to the message.*-temp files
+		-Mime encoder class renamed to its "real" name QuotedPrintable
+		-boxes with unread mail gets bold
+		-The recipient is shown for delivered/to-be-delivered messages (ie, in the outbox and sent box :))
+		-Now includes the date in the "Sender wrote"-string
+		-Option to leave mail on server
+		-Mailboxes are now in standard unix mbox format
+		-Now changes the mail when pressing up or down in the maillist
+
+
 0.9:
 	Adds/fixes/changes:
 		-Nicer looking "message-info" panel
