@@ -43,6 +43,9 @@ import org.gjt.fredde.yamm.encode.*;
  */
 public class YAMM extends JFrame implements HyperlinkListener
 {
+
+  public static String sep = File.separator;
+
   /** To get the Language strings for buttons, menus, etc... */
   static protected ResourceBundle         res;
 
