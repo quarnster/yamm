@@ -28,6 +28,7 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/gui/confwiz/ServerEditor.class \
 	org/gjt/fredde/yamm/gui/confwiz/ProfileEditor.class \
 	org/gjt/fredde/yamm/encode/Base64Decode.class \
+	org/gjt/fredde/yamm/encode/Base64Encode.class \
 	org/gjt/fredde/yamm/encode/UUDecode.class \
 	org/gjt/fredde/yamm/encode/UUEncode.class \
 	org/gjt/fredde/yamm/mail/Attachment.class \
