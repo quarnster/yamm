@@ -55,8 +55,9 @@ public class mainMenu extends JMenuBar {
    * Makes the menu, adds a menulistener etc...
    * @param frame2 The JFrame that will be used when displaying error messages etc
    */
-  public mainMenu(JFrame frame2) {
+  public mainMenu(JFrame frame2, ResourceBundle res) {
     frame = (YAMM)frame2;
+    this.res = res;
 
     try {
       InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
@@ -64,6 +65,7 @@ public class mainMenu extends JMenuBar {
       in.close();
     } catch (IOException propsioe) { System.err.println(propsioe); }
 
+/*
     try {
       res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault());
     }
@@ -71,52 +73,56 @@ public class mainMenu extends JMenuBar {
       mre.printStackTrace();
       System.exit(1);
     }
-
-    JMenu file = new JMenu(res.getString("FILEMENU"));
+*/
+    JMenu file = new JMenu(res.getString("file"));
     JMenuItem rad;
     add(file);
 
 
     // the file menu
-    rad = new JMenuItem(res.getString("NEW"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/new_mail.gif"));
+    rad = new JMenuItem(res.getString("file.new"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/new_mail.gif"));
     rad.addActionListener(MListener);
     file.add(rad);
 
-    rad = new JMenuItem(res.getString("SAVEAS"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/save_as.gif"));
+    rad = new JMenuItem(res.getString("file.save_as"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/save_as.gif"));
     rad.addActionListener(MListener);
     file.add(rad);
 
     file.addSeparator();
 
-    rad = new JMenuItem(res.getString("EXIT"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/exit.gif"));
+    rad = new JMenuItem(res.getString("file.exit"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/exit.gif"));
     rad.addActionListener(MListener);
     file.add(rad);
 
     // the edit menu
-    JMenu edit = new JMenu(res.getString("EDIT"));
+    JMenu edit = new JMenu(res.getString("edit"));
     add(edit);
 
-    rad = new JMenuItem(res.getString("SETTINGS"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/prefs.gif"));
+    rad = new JMenuItem(res.getString("edit.settings"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/prefs.gif"));
     rad.addActionListener(MListener);
     edit.add(rad);
 
-    rad = new JMenuItem(res.getString("VSOURCE"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
+    rad = new JMenuItem(res.getString("edit.view_source"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
     rad.addActionListener(MListener);
     edit.add(rad);
 
     // the help menu
-    JMenu help = new JMenu(res.getString("HELPMENU"));
+    JMenu help = new JMenu(res.getString("help"));
     add(help);
 
-    rad = new JMenuItem(res.getString("HELP_ABOUTYOU"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/help.gif"));
+    rad = new JMenuItem(res.getString("help.about_you"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/help.gif"));
     rad.addActionListener(MListener);
     help.add(rad);
 
-    rad = new JMenuItem(res.getString("HELP_ABOUT"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/help.gif"));
+    rad = new JMenuItem(res.getString("help.about"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/help.gif"));
     rad.addActionListener(MListener);
     help.add(rad);
 
-    rad = new JMenuItem(res.getString("LICENSE"), new ImageIcon("org/gjt/fredde/yamm/images/types/text.gif"));
+    rad = new JMenuItem(res.getString("help.license"), new ImageIcon("org/gjt/fredde/yamm/images/types/text.gif"));
+    rad.addActionListener(MListener);
+    help.add(rad);
+
+    rad = new JMenuItem(res.getString("help.bug_report"));
     rad.addActionListener(MListener);
     help.add(rad);
   }
@@ -125,7 +131,7 @@ public class mainMenu extends JMenuBar {
     public void actionPerformed(ActionEvent ae) {
       String kommando = ((JMenuItem)ae.getSource()).getText();
 
-      if(kommando.equals(res.getString("EXIT"))) {
+      if(kommando.equals(res.getString("file.exit"))) {
 
         Rectangle rv = new Rectangle();
         frame.getBounds(rv);
@@ -153,7 +159,7 @@ public class mainMenu extends JMenuBar {
 
         System.exit(0);
       }
-      else if(kommando.equals(res.getString("HELP_ABOUTYOU"))) {
+      else if(kommando.equals(res.getString("help.about_you"))) {
         String host = null, ipaddress = null;
 
         try {
@@ -166,20 +172,20 @@ public class mainMenu extends JMenuBar {
         if (ipaddress == null) ipaddress = "unknown";
         if (host == null) host = "unknown";
 
-        new MsgDialog(null, res.getString("HELP_ABOUTYOU"),
-                      res.getString("OS") + " : " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "\n"
-                    + res.getString("CPU") + " : " + System.getProperty("os.arch") + "\n"
-                    + res.getString("IPADDRESS") + " : " + ipaddress + "\n"
-                    + res.getString("HOST") + " : " + host + "\n"
-                    + res.getString("JVERSION") + " : " + System.getProperty("java.version") + "\n"
-                    + res.getString("JVENDOR") + " : " + System.getProperty("java.vendor") + "\n"
-                    + res.getString("JVENDHOME") + " : " + System.getProperty("java.vendor.url") + "\n"
-                    + res.getString("USERNAME") + " : " + System.getProperty("user.name") + "\n"
-                    + res.getString("USERHOME") + " : " + System.getProperty("user.home"));
+        new MsgDialog(null, res.getString("help.about_you"),
+                      res.getString("info.os") + " : " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "\n"
+                    + res.getString("info.cpu") + " : " + System.getProperty("os.arch") + "\n"
+                    + res.getString("info.ipaddress") + " : " + ipaddress + "\n"
+                    + res.getString("info.host") + " : " + host + "\n"
+                    + res.getString("info.java.version") + " : " + System.getProperty("java.version") + "\n"
+                    + res.getString("info.java.vendor") + " : " + System.getProperty("java.vendor") + "\n"
+                    + res.getString("info.java.vendor.url") + " : " + System.getProperty("java.vendor.url") + "\n"
+                    + res.getString("info.username") + " : " + System.getProperty("user.name") + "\n"
+                    + res.getString("info.user.home") + " : " + System.getProperty("user.home"));
       }
 
-      else if(kommando.equals(res.getString("HELP_ABOUT"))) {
-        new MsgDialog(null, res.getString("HELP_ABOUT"),
+      else if(kommando.equals(res.getString("help.about"))) {
+        new MsgDialog(null, res.getString("help.about"),
                       "Copyright (C) 1999 Fredrik Ehnbom\n"
                     + "YAMM-version: " + YAMM.yammVersion + "\n"
                     + "Compiledate: " + YAMM.compDate + "\n"
@@ -190,18 +196,59 @@ public class mainMenu extends JMenuBar {
                     + "by Tuomas Kuosmanen <tigert@gimp.org>");
                     
       }
-      else if(kommando.equals(res.getString("LICENSE"))) {
-        new MsgDialog(null, res.getString("LICENSE"), "Yet Another Mail Manager " + YAMM.yammVersion + " E-Mail Client\nCopyright (C) 1999 Fredrik Ehnbom\n\nThis program is free software; you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation; either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program; if not, write to the Free Software\nFoundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA", MsgDialog.OK, JLabel.LEFT);
+      else if(kommando.equals(res.getString("help.bug_report"))) {
+        YAMMWrite yw = new YAMMWrite("fredde@gjt.org", "Bug report");
+         JTextArea jt = yw.myTextArea;
+         jt.append("What is the problem?\n\n");
+         jt.append("How did you make it happen?\n\n");
+         jt.append("Can you make it happen again?\n\n");
+         jt.append("\nAnd now some info about your system:\n");
+         p("java.version", jt);
+         p("java.vendor", jt);
+         p("java.vendor.url", jt);
+         p("java.home", jt);
+         p("java.vm.specification.version", jt);
+         p("java.vm.specification.vendor", jt); 
+         p("java.vm.specification.name", jt);
+         p("java.vm.version", jt);
+         p("java.vm.vendor", jt);
+         p("java.vm.name", jt);
+         p("java.specification.version", jt);
+         p("java.specification.vendor", jt);
+         p("java.specification.name", jt);
+         p("java.class.version", jt);
+         p("java.class.path", jt);
+         p("os.name", jt);
+         p("os.arch", jt);
+         p("os.version", jt);
+      }
+      else if(kommando.equals(res.getString("help.license"))) {
+        new MsgDialog(null, res.getString("help.license"), 
+                      "Yet Another Mail Manager " + YAMM.yammVersion + " E-Mail Client\nCopyright (C) 1999 Fredrik Ehnbom\n" +
+                      "\n" +
+                      "This program is free software; you can redistribute it and/or modify\n" +
+                      "it under the terms of the GNU General Public License as published by\n" +
+                      "the Free Software Foundation; either version 2 of the License, or\n" +
+                      "(at your option) any later version.\n" +
+                      "\n" +
+                      "This program is distributed in the hope that it will be useful,\n" +
+                      "but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
+                      "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" +
+                      "GNU General Public License for more details.\n" +
+                      "\n" +
+                      "You should have received a copy of the GNU General Public License\n" +
+                      "along with this program; if not, write to the Free Software\n" +
+                      "Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA", MsgDialog.OK, JLabel.LEFT);
       }  
-      else if(kommando.equals(res.getString("SETTINGS"))) {
+      else if(kommando.equals(res.getString("edit.settings"))) {
         new Options(frame);
       }
-      else if(kommando.equals(res.getString("NEW"))) {
+      else if(kommando.equals(res.getString("file.new"))) {
         new YAMMWrite();
       }
-      else if(kommando.equals(res.getString("VSOURCE"))) {
+      else if(kommando.equals(res.getString("edit.view_source"))) {
         int test = ((JTable)frame.mailList).getSelectedRow();
-        if(test != -1 && test <= frame.listOfMails.size()) {
+        if(test >= 0 && test < frame.listOfMails.size()) {
           int i = 0;
 
           while(i<4) {
@@ -213,7 +260,7 @@ public class mainMenu extends JMenuBar {
           if(msg != -1) Mailbox.viewSource(frame.selectedbox, msg, new sourceViewer().jtarea);
         }
       }
-      else if(kommando.equals(res.getString("SAVEAS"))) {
+      else if(kommando.equals(res.getString("file.save_as"))) {
         int test = ((JTable)frame.mailList).getSelectedRow();
         if(test != -1 && test <= frame.listOfMails.size()) {
           JFileChooser jfs = new JFileChooser();
@@ -229,6 +276,10 @@ public class mainMenu extends JMenuBar {
         }
       }
     }
+    void p(String prop, JTextArea ta) {
+      ta.append(prop + " : " + System.getProperty(prop) + "\n");
+    }
+
   };
 
   protected class filter extends FileFilter {
