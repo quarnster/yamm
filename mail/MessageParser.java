@@ -1,4 +1,4 @@
-/*  $Id: MessageParser.java,v 1.22 2003/03/07 10:53:29 fredde Exp $
+/*  $Id: MessageParser.java,v 1.23 2003/03/07 20:22:47 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * Parses messages
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: MessageParser.java,v 1.22 2003/03/07 10:53:29 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.23 2003/03/07 20:22:47 fredde Exp $
  */
 public class MessageParser {
 
@@ -60,6 +60,7 @@ public class MessageParser {
 		"[",
 		"\"",
 		"\'",
+		"\t",
 	};
 	private static String[] endList = new String[] {
 		")",
@@ -322,6 +323,9 @@ public class MessageParser {
 /*
  * ChangeLog:
  * $Log: MessageParser.java,v $
+ * Revision 1.23  2003/03/07 20:22:47  fredde
+ * added \\t to the start link list
+ *
  * Revision 1.22  2003/03/07 10:53:29  fredde
  * filter fixes
  *
