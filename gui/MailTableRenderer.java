@@ -29,7 +29,7 @@ import org.gjt.fredde.yamm.Utilities;
 /**
  * The renderer for the mailtable
  * @author Fredrik Ehnbom
- * @version $Id: MailTableRenderer.java,v 1.6 2003/03/10 09:44:06 fredde Exp $
+ * @version $Id: MailTableRenderer.java,v 1.7 2003/03/15 19:32:11 fredde Exp $
  */
 public class MailTableRenderer
 	extends DefaultTableCellRenderer
@@ -60,15 +60,17 @@ public class MailTableRenderer
 		String outbox = Utilities.replace(YAMM.home + "/boxes/outbox");
 
 		if ((yamm.listOfMails[yamm.keyIndex[row]].status & IndexEntry.STATUS_READ) != 0 || outbox.equals(yamm.selectedbox)) {
-			setForeground(Color.black);
+			setFont(getFont().deriveFont(Font.PLAIN));
 		} else {
-			setForeground(Color.blue);
+			setFont(getFont().deriveFont(Font.BOLD));
 		}
 
 		if (isSelected) {
-			setBackground(new Color(204, 204, 255));
+			setBackground(UIManager.getColor("textHighlight"));
+			setForeground(UIManager.getColor("textHighlightText"));
 		} else {
-			setBackground(Color.white);
+			setBackground(UIManager.getColor("control"));
+			setForeground(UIManager.getColor("controlText"));
 		}
 
 		return this;
@@ -77,6 +79,9 @@ public class MailTableRenderer
 /*
  * Changes:
  * $Log: MailTableRenderer.java,v $
+ * Revision 1.7  2003/03/15 19:32:11  fredde
+ * get colors from UIManager. bold font when unread mail
+ *
  * Revision 1.6  2003/03/10 09:44:06  fredde
  * non localized box filenames
  *
