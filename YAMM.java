@@ -1,4 +1,4 @@
-/*  YAMM.java - main class
+/*  $Id: YAMM.java,v 1.55 2001/05/27 08:56:33 fredde Exp $
  *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.54 2001/04/21 09:31:20 fredde Exp $
+ * @version $Id: YAMM.java,v 1.55 2001/05/27 08:56:33 fredde Exp $
  */
 public class YAMM
 	extends JFrame
@@ -337,7 +337,7 @@ public class YAMM
 				new YAMMWrite(link);
 			} else {
 				try {
-					new Browser(link);
+					Browser.open(link);
 				} catch (InterruptedException ie) {
 					new ExceptionDialog(
 						YAMM.getString("msg.error"),
@@ -683,6 +683,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.55  2001/05/27 08:56:33  fredde
+ * replaced deprecationed code thanks to wYRd
+ *
  * Revision 1.54  2001/04/21 09:31:20  fredde
  * drag and drop from attachlist
  *
