@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.Utilities;
 /**
  * Class used for creating new groups
  * @author Fredrik Ehnbom
- * @version $Id: NewGroupDialog.java,v 1.3 2000/07/16 17:48:36 fredde Exp $
+ * @version $Id: NewGroupDialog.java,v 1.4 2001/05/24 08:08:55 fredde Exp $
  */
 public class NewGroupDialog extends JDialog {
 	private JComboBox  group = null;
@@ -51,7 +51,7 @@ public class NewGroupDialog extends JDialog {
 
 		getContentPane().add(new JLabel(YAMM.getString("options.group")));
 		Vector vect = new Vector();
-		createGroupList(vect, new File(Utilities.replace(YAMM.home + "/.yamm/boxes/")));
+		createGroupList(vect, new File(Utilities.replace(YAMM.home + "/boxes/")));
 
 		NewBoxDialog.removeDotG(vect);
 		group = new JComboBox( vect );
@@ -112,7 +112,7 @@ public class NewGroupDialog extends JDialog {
 					}
 					gName = temp;
 				}
-				File box = new File(Utilities.replace(YAMM.home + "/.yamm/boxes/" + gName + jtfield.getText() + ".g"));
+				File box = new File(Utilities.replace(YAMM.home + "/boxes/" + gName + jtfield.getText() + ".g"));
 
 				if (box.exists()) {
 					new MsgDialog(yamm, YAMM.getString("msg.error"),
@@ -136,6 +136,10 @@ public class NewGroupDialog extends JDialog {
 /*
  * Changes:
  * $Log: NewGroupDialog.java,v $
+ * Revision 1.4  2001/05/24 08:08:55  fredde
+ * Changed some strings from YAMM.home + "/.yamm/..."
+ * to just YAMM.home + "/...", thanks to wYRd
+ *
  * Revision 1.3  2000/07/16 17:48:36  fredde
  * lots of Windows compatiblity fixes
  *
