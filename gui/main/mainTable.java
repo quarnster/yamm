@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Id: mainTable.java,v 1.37 2001/03/18 17:07:21 fredde Exp $
+ * @version $Id: mainTable.java,v 1.38 2003/03/05 15:07:02 fredde Exp $
  */
 public class mainTable
 	extends JTable
@@ -75,7 +75,7 @@ public class mainTable
 			if (row >= frame.listOfMails.length) {
 				return null;
 			} else {
-				return  frame.listOfMails[row][col];
+				return  frame.listOfMails[frame.keyIndex[row]][col];
 			}
 		}
 
@@ -244,30 +244,30 @@ public class mainTable
 	private void SortFirst(int col) {
 		if (frame.listOfMails == null) return;
 
-		String[] temp = null;
+		int temp = -1;
 		if (col == 0) {
 			for (int i = 0; i < frame.listOfMails.length; i++) {
 				for (int j = 0; j < frame.listOfMails.length; j++) {
-					int one = Integer.parseInt(frame.listOfMails[i][col]);
-					int two = Integer.parseInt(frame.listOfMails[j][col]);
+					int one = Integer.parseInt(frame.listOfMails[frame.keyIndex[i]][col]);
+					int two = Integer.parseInt(frame.listOfMails[frame.keyIndex[j]][col]);
 
 					if (one < two) {
-						temp = frame.listOfMails[j];
-						frame.listOfMails[j] = frame.listOfMails[i];
-						frame.listOfMails[i] = temp;
+						temp = frame.keyIndex[j];
+						frame.keyIndex[j] = frame.keyIndex[i];
+						frame.keyIndex[i] = temp;
 					}
 				}
 			}
 		} else {
 			for (int i = 0; i < frame.listOfMails.length; i++) {
 				for (int j = 0; j < frame.listOfMails.length; j++) {
-					String s1 = frame.listOfMails[i][col].toLowerCase();
-					String s2 = frame.listOfMails[j][col].toLowerCase();
+					String s1 = frame.listOfMails[frame.keyIndex[i]][col].toLowerCase();
+					String s2 = frame.listOfMails[frame.keyIndex[j]][col].toLowerCase();
 
 					if (s1.compareTo(s2.toLowerCase()) < 0) {
-						temp = frame.listOfMails[j];
-						frame.listOfMails[j] = frame.listOfMails[i];
-						frame.listOfMails[i] = temp;
+						temp = frame.keyIndex[j];
+						frame.keyIndex[j] = frame.keyIndex[i];
+						frame.keyIndex[i] = temp;
 					}
 				}
 			}
@@ -279,31 +279,31 @@ public class mainTable
 	 */
 	private void SortLast(int col) {
 		if (frame.listOfMails == null) return;
-		String[] temp = null;
+		int temp = -1;
 
 		if (col == 0) {
 			for (int i = 0; i < frame.listOfMails.length; i++) {
 				for (int j = 0; j < frame.listOfMails.length; j++) {
-					int one = Integer.parseInt(frame.listOfMails[i][col]);
-					int two = Integer.parseInt(frame.listOfMails[j][col]);
+					int one = Integer.parseInt(frame.listOfMails[frame.keyIndex[i]][col]);
+					int two = Integer.parseInt(frame.listOfMails[frame.keyIndex[j]][col]);
 
 					if (one > two) {
-						temp = frame.listOfMails[j];
-						frame.listOfMails[j] = frame.listOfMails[i];
-						frame.listOfMails[i] = temp;
+						temp = frame.keyIndex[j];
+						frame.keyIndex[j] = frame.keyIndex[i];
+						frame.keyIndex[i] = temp;
 					}
 				}
 			}
 		}  else {
 			for (int i = 0; i < frame.listOfMails.length; i++) {
 				for (int j = 0; j < frame.listOfMails.length; j++) {
-					String s1 = frame.listOfMails[i][col].toLowerCase();
-					String s2 = frame.listOfMails[j][col].toLowerCase();
+					String s1 = frame.listOfMails[frame.keyIndex[i]][col].toLowerCase();
+					String s2 = frame.listOfMails[frame.keyIndex[j]][col].toLowerCase();
 
 					if (s1.toLowerCase().compareTo(s2.toLowerCase()) > 0) {
-						temp = frame.listOfMails[j];
-						frame.listOfMails[j] = frame.listOfMails[i];
-						frame.listOfMails[i] = temp;
+						temp = frame.keyIndex[j];
+						frame.keyIndex[j] = frame.keyIndex[i];
+						frame.keyIndex[i] = temp;
 					}
 				}
 			}
@@ -455,9 +455,13 @@ public class mainTable
 		th.addMouseListener(lmListener);
 	}
 
-	public void update() {
+	public void sort() {
 		if (!firstSort) SortFirst(sortedCol);
 		else SortLast(sortedCol);
+	}
+
+	public void update() {
+		sort();
 		dataModel.fireTableDataChanged();
 	}
 
@@ -467,20 +471,26 @@ public class mainTable
 				popup.show(mainTable.this, me.getX(), me.getY());
 			} else if (getSelectedRow() != -1) {
 				get_mail();
-			}
 
-			if (getSelectedRow() != -1) {
-				String outbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
+				Thread t = new Thread() {
+					public void run() {
+						String outbox = Utilities.replace(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
+						int row = getSelectedRow();
 
-				if (frame.listOfMails[getSelectedRow()][4].equals("Unread") && !frame.selectedbox.equals(outbox)) {
-					long skip = Long.parseLong(frame.listOfMails[getSelectedRow()][5]);
+						if (frame.listOfMails[frame.keyIndex[row]][4].equals("Unread") && !frame.selectedbox.equals(outbox)) {
+							long skip = Long.parseLong(frame.listOfMails[frame.keyIndex[row]][5]);
 
-					Mailbox.setStatus(frame.selectedbox, getSelectedMessage(), skip, "Read");
-					Mailbox.createList(frame.selectedbox, frame);
+							Mailbox.setStatus(frame, frame.selectedbox, getSelectedMessage(), skip, "Read");
 
-					update();
-					frame.tree.updateUI();
-				}
+							sort();
+							dataModel.fireTableRowsUpdated(row, row);
+//							update();
+							frame.tree.updateUI();
+							setEditingRow(row);
+						}
+					}
+				};
+				SwingUtilities.invokeLater(t);
 				changeButtonMode(true);
 			} else {
 				changeButtonMode(false);
@@ -493,7 +503,7 @@ public class mainTable
 		}
 
 		void get_mail() {
-			long skip = Long.parseLong(frame.listOfMails[getSelectedRow()][5]);
+			long skip = Long.parseLong(frame.listOfMails[frame.keyIndex[getSelectedRow()]][5]);
 
 			Mailbox.getMail(frame.selectedbox, getSelectedMessage(), skip);
 			try {
@@ -694,6 +704,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.38  2003/03/05 15:07:02  fredde
+ * Now uses YAMM.keyIndex. Uses a thread to update Mailstatus for previously unread mail.
+ *
  * Revision 1.37  2001/03/18 17:07:21  fredde
  * updated
  *
