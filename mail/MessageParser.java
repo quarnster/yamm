@@ -26,7 +26,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Parses messages
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Id: MessageParser.java,v 1.17 2003/03/05 15:10:43 fredde Exp $
+ * @version $Id: MessageParser.java,v 1.18 2003/03/05 15:59:54 fredde Exp $
  */
 public class MessageParser {
 
@@ -56,18 +56,21 @@ public class MessageParser {
 		" ",
 		"(",
 		"<",
+		"[",
 		"\"",
-		"\'"
+		"\'",
 	};
 	private static String[] endList = new String[] {
 		")",
 		">",
+		"]",
 		"<",
 		"&gt;",
 		"\"",
 		"\'",
 		"&nbsp;",
 		"!",
+		",",
 	};
 
 	public static String[] parseLink(String link) {
