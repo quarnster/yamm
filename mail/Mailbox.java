@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.58 2003/06/06 10:51:18 fredde Exp $
+/*  $Id: Mailbox.java,v 1.59 2003/06/18 20:48:18 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.58 $
+ * @version $Revision: 1.59 $
  */
 public class Mailbox {
 
@@ -52,24 +52,21 @@ public class Mailbox {
 
 		while (subject.indexOf("=?") != -1) {
 			String start = subject.substring(0, subject.indexOf("=?"));
-			String end   = subject.substring(subject.indexOf("?=") + 2,
-								subject.length());
 			int iso = subject.indexOf("?", start.length() + 2) + 1;
 			String encoding = subject.substring(iso, subject.indexOf("?", iso+1));
-			subject      = subject.substring(iso + 1 + encoding.length(),
-							subject.indexOf("?="));
+			int off = iso + 1 + encoding.length();
+			String end   = subject.substring(subject.indexOf("?=", off) + 2, subject.length());
+			subject      = subject.substring(off, subject.indexOf("?=", off));
 
 			subject = subject.replace('_', ' ');
-//			start = start.replace('_', ' ');
-//			end = end.replace('_', ' ');
 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			ByteArrayInputStream in = new ByteArrayInputStream(subject.getBytes());
 			Decoder dec = null;
 
-			if (encoding.equals("B")) {
+			if (encoding.equalsIgnoreCase("B")) {
 				dec = new Base64sun();
-			} else if (encoding.equals("Q")) {
+			} else if (encoding.equalsIgnoreCase("Q")) {
 				dec = new QuotedPrintable();
 			}
 			try {
@@ -879,6 +876,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.59  2003/06/18 20:48:18  fredde
+ * fixed unMime
+ *
  * Revision 1.58  2003/06/06 10:51:18  fredde
  * unread is now the total number of unread messages
  *
