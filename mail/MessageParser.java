@@ -86,6 +86,18 @@ public class MessageParser {
 				stuff = true;
 			}
 
+			if (temp.startsWith("&lt;")) {
+				temp = temp.substring(4, temp.length());
+				begin = begin + "&lt;";
+				stuff = true;
+			}
+
+			if (temp.endsWith("&gt;")) {
+				temp = temp.substring(0, temp.length() - 4);
+				end  = "&gt;" + end;
+				stuff = true;
+			}
+
 			if (temp.startsWith("\"")) {
 				temp = temp.substring(1, temp.length());
 				begin = begin + "\"";

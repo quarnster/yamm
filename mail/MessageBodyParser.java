@@ -33,6 +33,8 @@ public class MessageBodyParser {
 
 	protected boolean html = false;
 
+	protected boolean htmlMsg = false;
+
 	public static String unMime(String m, boolean html) {
 		char[] check = "0123456789ABCDEF".toCharArray();
 		StringTokenizer tok = new StringTokenizer(m);
@@ -143,6 +145,39 @@ public class MessageBodyParser {
 
 		return mail;
 	}
+	public static String makeHtml(String html) {
+		StringTokenizer tok = new StringTokenizer(html);
+
+		html = "";
+
+
+		while (tok.hasMoreTokens()) {
+			String temp = tok.nextToken();
+			boolean change = true;
+
+			while (change) {
+				change = false;
+
+				if (temp.indexOf("<") != -1) {
+					String begin = temp.substring(0, temp.indexOf("<"));
+					temp = temp.substring(temp.indexOf("<") + 1, temp.length());
+					temp = begin + "&lt;" + temp;
+
+					change = true;
+				}
+
+				if (temp.indexOf(">") != -1) {
+					String begin = temp.substring(0, temp.indexOf(">"));
+					temp = temp.substring(temp.indexOf(">") + 1, temp.length());
+					temp = begin + "&gt;" + temp;
+
+					change = true;
+				}
+			}
+			html += temp + " ";
+		}
+		return html;
+	}
 
 	public MessageBodyParser(boolean html) {
 		this.html = html;
@@ -158,6 +193,12 @@ public class MessageBodyParser {
 			if (temp == null) {
 				throw new MessageParseException("Unexpected" +
 							"end of message.");
+			}
+
+			if (!htmlMsg && temp.toLowerCase().indexOf("html")
+					!= -1 && temp.indexOf("<") != -1 &&
+					temp.indexOf(".") == -1) {
+				htmlMsg = true;
 			}
 
 			if (temp.equals(".")) {
@@ -180,6 +221,11 @@ public class MessageBodyParser {
 
 			if (temp.indexOf("=") != -1) {
 				temp = unMime(temp, html);
+			}
+
+			if (!htmlMsg && (temp.indexOf("<") != -1 ||
+						temp.indexOf(">") != -1)) {
+				temp = makeHtml(temp);
 			}
 
 			if (temp.indexOf("@") != -1) {
