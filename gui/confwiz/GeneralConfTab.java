@@ -21,15 +21,29 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.plaf.*;
 
 import org.gjt.fredde.yamm.YAMM;
 
 /**
  * The configurationtab for the generalsettings
  * @author Fredrik Ehnbom
- * @version $Id: GeneralConfTab.java,v 1.1 2000/02/28 13:49:33 fredde Exp $
+ * @version $Id: GeneralConfTab.java,v 1.2 2003/03/15 19:34:18 fredde Exp $
  */
 public class GeneralConfTab extends JPanel {
+
+	final JComboBox plafBox;
+	UIManager.LookAndFeelInfo[] info = UIManager.getInstalledLookAndFeels();
+
+	protected DefaultComboBoxModel model = new DefaultComboBoxModel() {
+		public Object getElementAt(int index) {
+			return info[index].getName();
+		}
+
+		public int getSize() {
+			return info.length;
+		}
+	};
 
 	/**
 	 * Creates a new GeneralConfTab
@@ -70,23 +84,33 @@ public class GeneralConfTab extends JPanel {
 		add(rb);
 
 		JLabel plaf = new JLabel(YAMM.getString("confwiz.general.plaf"));
-//		gbs.gridx = gbs.RELATIVE;
 		gbs.gridwidth = gbs.RELATIVE;
 		gb.setConstraints(plaf, gbs);
 		add(plaf);
 
-		final JTextField plafField = new JTextField(YAMM.getProperty("plaf", ""));
-		plafField.addFocusListener(new FocusAdapter() {
+		plafBox = new JComboBox(model);
+		plafBox.addFocusListener(new FocusAdapter() {
 			public void focusLost(FocusEvent e) {
-				YAMM.setProperty("plaf", plafField.getText());
+				String name = info[plafBox.getSelectedIndex()].getClassName();
+				YAMM.setProperty("plaf", name);
 			}
 		});
+		if (YAMM.getProperty("plaf") != null) {
+			String pl = YAMM.getProperty("plaf");
+			for (int i = 0; i < info.length; i++) {
+				if (info[i].getClassName().equals(pl)) {
+					plafBox.setSelectedIndex(i);
+					break;
+				}
+			}
+		}
+
 		gbs.gridx = gbs.RELATIVE;
 		gbs.fill  = gbs.HORIZONTAL;
 		gbs.gridwidth = gbs.REMAINDER;
 		gbs.weightx = 0.1;
-		gb.setConstraints(plafField, gbs);
-		add(plafField);
+		gb.setConstraints(plafBox, gbs);
+		add(plafBox);
 	}
 
 
@@ -110,6 +134,9 @@ public class GeneralConfTab extends JPanel {
 /*
  * Changes:
  * $Log: GeneralConfTab.java,v $
+ * Revision 1.2  2003/03/15 19:34:18  fredde
+ * plaf selection is now a JComboBox instead of a JTextField
+ *
  * Revision 1.1  2000/02/28 13:49:33  fredde
  * files for the configuration wizard
  *
