@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.67 2003/04/04 18:02:42 fredde Exp $
+/*  $Id: YAMM.java,v 1.68 2003/04/13 16:34:37 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.67 $
+ * @version $Revision: 1.68 $
  */
 public class YAMM
 	extends JFrame
@@ -58,7 +58,7 @@ public class YAMM
 	private static ResourceBundle         res;
 
 	/** The box the user has selected. */
-	public static String selectedbox = Utilities.replace(home + "/boxes/");
+	private String currentMailbox = Utilities.replace(home + "/boxes/inbox");
 
 	/** The version of YAMM */
 	public static String version  = "0.9";
@@ -222,7 +222,7 @@ public class YAMM
 		getContentPane().add("North", tbar);
 
 		// create a list of mails in the selected box
-		Mailbox.createList(selectedbox, this);
+		Mailbox.createList(currentMailbox, this);
 
 		// the tablemodel for the maillist table
 
@@ -231,7 +231,7 @@ public class YAMM
 		mail.setEditable(false);
 		mail.addHyperlinkListener(this);
 
-		Mailbox.getMail(selectedbox, 0, 0);
+		Mailbox.getMail(currentMailbox, 0, 0);
 		try {
 			mail.setPage(mailPage);
 		} catch (IOException ioe) {
@@ -337,6 +337,17 @@ public class YAMM
 	}
 
 
+	public void setMailbox(String mailbox) {
+		currentMailbox = mailbox;
+		Mailbox.createList(currentMailbox, this);
+		mailList.clearSelection();
+		mailList.updateFull();
+	}
+
+	public String getMailbox() {
+		return currentMailbox;
+	}
+
 	/**
 	 * Checks if the link is a mailto:-link. If it is, it starts a
 	 * write-window with the specified mailto:-address,
@@ -427,9 +438,9 @@ public class YAMM
 	public void createAttachList() {
 		attach.clear();
 
-		String boxName = selectedbox.substring(
-				selectedbox.indexOf("boxes") + 6,
-				selectedbox.length()) + "/";
+		String boxName = currentMailbox.substring(
+				currentMailbox.indexOf("boxes") + 6,
+				currentMailbox.length()) + "/";
 
 		String base = home +  "/tmp/cache/" + boxName;
 
@@ -661,9 +672,6 @@ public class YAMM
 				props.getClass().getResource("/images/logo.png"));
 		}
 
-		selectedbox += "/inbox";
-		selectedbox = Utilities.replace(selectedbox);
-
 		String[] tmp = {
 			res.getString("exception.ok"),
 			res.getString("exception.more"),
@@ -694,6 +702,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.68  2003/04/13 16:34:37  fredde
+ * added set/getMailbox
+ *
  * Revision 1.67  2003/04/04 18:02:42  fredde
  * implemented Singleton stuff
  *
