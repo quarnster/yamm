@@ -100,7 +100,7 @@ public class SHMail extends Thread {
             }
             frame.status.setStatus(YAMM.getString("msg.done"));
             frame.status.progress(100);
-            pop.closeConnection();
+            pop.close();
           }
           catch (IOException ioe) {
             Object[] args = {ioe.toString()}; 
@@ -203,7 +203,7 @@ public class SHMail extends Thread {
         File file = new File(YAMM.home + "/boxes/" + YAMM.getString("box.outbox"));
         file.delete();
         file.createNewFile();
-        smtp.closeConnection();
+        smtp.close();
 
       }
       catch(IOException ioe) { 
