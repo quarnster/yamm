@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.62 2003/03/10 09:41:21 fredde Exp $
+/*  $Id: YAMM.java,v 1.63 2003/03/10 12:30:27 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.62 $
+ * @version $Revision: 1.63 $
  */
 public class YAMM
 	extends JFrame
@@ -65,7 +65,7 @@ public class YAMM
 	public static String selectedbox = Utilities.replace(home + "/boxes/");
 
 	/** The version of YAMM */
-	public static String version  = "0.8 $Date: 2003/03/10 09:41:21 $";
+	public static String version  = "0.8";
 
 	/** The compileDate of YAMM */
 	public static String compDate = Utilities.getCompileDate();
@@ -678,7 +678,7 @@ public class YAMM
 
 		profiler = new Profiler();
 		nFrame = new YAMM();
-		nFrame.setTitle("Yet Another Mail Manager " + version);
+		nFrame.setTitle("Yet Another Mail Manager " + version + " " + compDate);
 		if (splash != null) splash.dispose();
 	}
 }
@@ -686,6 +686,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.63  2003/03/10 12:30:27  fredde
+ * version stuff change
+ *
  * Revision 1.62  2003/03/10 09:41:21  fredde
  * non localized box filenames
  *
