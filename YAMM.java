@@ -43,14 +43,17 @@ import org.gjt.fredde.yamm.encode.*;
  */
 public class YAMM extends JFrame implements HyperlinkListener, Printable
 {
-
+  /** The file separator */
   public static String sep = File.separator;
+
+  /** The home of yamm */
+  public static String home = System.getProperty("user.home") + sep + ".yamm";
 
   /** To get the Language strings for buttons, menus, etc... */
   static protected ResourceBundle         res;
 
   /** The box the user has selected. */
-  public static String                 selectedbox  = System.getProperty("user.home") + "/.yamm/boxes/inbox";
+  public static String                 selectedbox  = home + "/boxes/inbox";
 
   /** The version of YAMM */
   public static    String                 yammVersion  = "0.7.2";
@@ -59,9 +62,8 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   public static    String                 compDate     = "1999-06-21";
 
   /** the file that contains the current mail */
-  public String		  mailPageString   = "file:///" + System.getProperty("user.home") + "/.yamm/tmp/cache/";
-  public URL	          mailPage; //     = new URL("file:/" + System.getProperty("user.home") + "/.yamm/tmp/mail.html");
-//  public boolean	  mailName = false;
+  public String		  mailPageString   = "file:///" + home + "/tmp/cache/";
+  public URL	          mailPage;
 
   /** The encryption key */
   public static    char[]                 encKey       = "myKey".toCharArray();
@@ -146,7 +148,6 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   public YAMM() {
     Mailbox.getMail(selectedbox, 0 /* , attach  , mailName */);
     try { 
-      //String boxName = selectedBox
       mailPage = new URL(mailPageString + "/inbox/" + "0.html"); 
     }
     catch (MalformedURLException mue) { System.err.println(mue); }
@@ -164,12 +165,10 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
     // load the config
     try {
-      InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
+      InputStream in = new FileInputStream(home + "/.config");
       props.load(in);
       in.close();
     } catch (IOException propsioe) { System.err.println(propsioe); }
-//    Locale.setDefault(new Locale(props.getProperty("", (Locale.getDefault()).toString())));
-//    theme = props.getProperty("theme", "default");
 
     // get the main window's settings and default them if an exception is caught 
     mainx = Integer.parseInt(props.getProperty("mainx", "0"));
@@ -258,18 +257,47 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
         String end = s;
 
-        if(end.indexOf(".") != -1) end = end.substring(end.lastIndexOf(".") + 1, end.length());
+        if(end.indexOf(".") != -1) 
+          end = end.substring(end.lastIndexOf(".") + 1, end.length());
 
-        if(end.equalsIgnoreCase("gif") || end.equalsIgnoreCase("jpg") || end.equalsIgnoreCase("bmp") || end.equalsIgnoreCase("xpm") || end.equalsIgnoreCase("jpeg") || end.equalsIgnoreCase("xcf") || end.equalsIgnoreCase("png"))
+        if(end.equalsIgnoreCase("gif") || 
+           end.equalsIgnoreCase("jpg") || 
+           end.equalsIgnoreCase("bmp") || 
+           end.equalsIgnoreCase("xpm") || 
+           end.equalsIgnoreCase("jpeg") || 
+           end.equalsIgnoreCase("xcf") || 
+           end.equalsIgnoreCase("png"))
           setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/image.gif"));
 
-        else if(end.equalsIgnoreCase("htm") || end.equalsIgnoreCase("html") || end.equalsIgnoreCase("txt") || end.equalsIgnoreCase("doc") || end.equalsIgnoreCase("c") || end.equalsIgnoreCase("cc") || end.equalsIgnoreCase("cpp") || end.equalsIgnoreCase("h") || end.equalsIgnoreCase("java"))
+        else if(end.equalsIgnoreCase("htm") || 
+                end.equalsIgnoreCase("html") || 
+                end.equalsIgnoreCase("txt") || 
+                end.equalsIgnoreCase("doc") || 
+                end.equalsIgnoreCase("c") || 
+                end.equalsIgnoreCase("cc") || 
+                end.equalsIgnoreCase("cpp") || 
+                end.equalsIgnoreCase("h") || 
+                end.equalsIgnoreCase("java"))
           setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/text.gif"));
 
-        else if(end.equalsIgnoreCase("wav") || end.equalsIgnoreCase("au") || end.equalsIgnoreCase("mp3") || end.equalsIgnoreCase("mod") || end.equalsIgnoreCase("xm") || end.equalsIgnoreCase("midi") || end.equalsIgnoreCase("mid"))
+        else if(end.equalsIgnoreCase("wav") || 
+                end.equalsIgnoreCase("au") || 
+                end.equalsIgnoreCase("mp3") || 
+                end.equalsIgnoreCase("mod") || 
+                end.equalsIgnoreCase("xm") || 
+                end.equalsIgnoreCase("midi") || 
+                end.equalsIgnoreCase("mid"))
           setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/sound.gif"));
 
-        else if(end.equalsIgnoreCase("zip") || end.equalsIgnoreCase("jar") || end.equalsIgnoreCase("rpm") || end.equalsIgnoreCase("deb") || end.equalsIgnoreCase("arj") || end.equalsIgnoreCase("gz") || end.equalsIgnoreCase("tar") || end.equalsIgnoreCase("tgz") || end.equalsIgnoreCase("z"))
+        else if(end.equalsIgnoreCase("zip") || 
+                end.equalsIgnoreCase("jar") || 
+                end.equalsIgnoreCase("rpm") || 
+                end.equalsIgnoreCase("deb") || 
+                end.equalsIgnoreCase("arj") || 
+                end.equalsIgnoreCase("gz") || 
+                end.equalsIgnoreCase("tar") || 
+                end.equalsIgnoreCase("tgz") || 
+                end.equalsIgnoreCase("z"))
           setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/packed.gif"));
 
         else setIcon(new ImageIcon("org/gjt/fredde/yamm/images/types/unknown.gif"));
@@ -369,9 +397,36 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
       }
 
       else {
-        try{ Runtime.getRuntime().exec("start " + e.getURL()); }
-        catch(IOException ioe) { new MsgDialog(this, "Error!", ioe.toString()); }
-      }        
+        try {
+          String cmd = null;
+
+          if(isWindows()) {
+            cmd = "start " + e.getURL();
+            Runtime.getRuntime().exec(cmd);
+          }
+          else {
+            cmd = "netscape -remote openURL(" + e.getURL() + ")";
+
+            Process p = Runtime.getRuntime().exec(cmd);
+
+            try {
+              int exitcode = p.waitFor();
+
+              if(exitcode != 0) {
+                cmd = "netscape " + e.getURL();
+
+                Runtime.getRuntime().exec(cmd);
+              }
+            }
+            catch (InterruptedException ie) { 
+              new MsgDialog(this, res.getString("msg.error"), ie.toString());
+            }
+          }
+        }
+        catch(IOException ioe) { 
+          new MsgDialog(this, res.getString("msg.error"), ioe.toString()); 
+        }
+      }
     }
     else if(e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
       mail.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -379,6 +434,15 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     else if(e.getEventType() == HyperlinkEvent.EventType.EXITED) {
       mail.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
+  }
+
+  /**
+   * Checks if the OS is windows.
+   * @return true if it is or false if it's not.
+   */
+  protected boolean isWindows() {
+    if(System.getProperty("os.name").indexOf("Windows") != -1) return true;
+    else return false;
   }
 
   ActionListener BListener = new ActionListener() {
@@ -392,17 +456,17 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
           String filename = ((Vector)attach.elementAt(whichAtt)).elementAt(0).toString();
           String encode = ((Vector)attach.elementAt(whichAtt)).elementAt(1).toString();
           String file = ((Vector)attach.elementAt(whichAtt)).elementAt(2).toString();
-          String home = System.getProperty("user.home") + "/.yamm/tmp/" + filename;
+          String target = home  + "/tmp/" + filename;
 
           if(filename.endsWith(".jpg") || filename.endsWith(".gif") || filename.endsWith(".JPG") || filename.endsWith(".GIF")) {
             if(encode.equalsIgnoreCase("base64")) {
               if(base64) {
-                new Base64Decode("B64Decode " + filename, file, home).start();
+                new Base64Decode("B64Decode " + filename, file, target).start();
               }
               else new MsgDialog("No Support for base64 encoded files..."); // System.out.println("No support for base64 encoded files...");
             }
             if(encode.equalsIgnoreCase("x-uuencode")) {
-              new UUDecode(null, "UUDecode " + filename, file, home, true).start();
+              new UUDecode(null, "UUDecode " + filename, file, target, true).start();
             }
           }
           else if(encode.equalsIgnoreCase("base64")) {
@@ -441,24 +505,20 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
   public void createAttachList() {
     attach = new Vector();
-//    Vector tmp = new Vector();
     String boxName = selectedbox.substring(selectedbox.indexOf("boxes") + 6, 
                                            selectedbox.length()) + "/";
 
-    String base = System.getProperty("user.home") + "/.yamm/tmp/cache/" + boxName;
+    String base = home +  "/tmp/cache/" + boxName;
     int msgNum = mailList.getSelectedRow();
-//    if(msgNum == null) msgNum = 0;
     String[] test = new File(base).list();
 
     for(int i = 0; i < test.length; i++ ) {
-      if(test[i].indexOf(msgNum + ".attach.") != -1) addinfo(base + test[i], attach); // tmp.add(test[i]);
+      if(test[i].indexOf(msgNum + ".attach.") != -1) 
+        addinfo(base + test[i], attach);
     }
-
-//    for(int i = 0;
   }
 
   protected void addinfo(String where, Vector attach) {
-//    System.out.println("where: "  + where);
     Vector tmp = new Vector();
     String temp = null;
 
@@ -485,21 +545,6 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     tmp.add(where);
     attach.add(tmp);
   }
-/*
-  protected void createAttachList(Vector list File dir) {
-    String files[] = dir.list();
-
-    for(int i = 0; i < files.length;i++) {
-      System.out.println("added \"" + files[i]);
-      File dir2 = new File(dir, files[i]);
-      if(dir2.isDirectory()) {
-        delDir.add(dir2);
-        createDelList(delFile, delDir, dir2);
-      }
-      else delFile.add(dir2);
-    }
-  }
-*/
 
   public int print(Graphics g, PageFormat pageFormat,
                         int pageIndex) throws PrinterException {
@@ -514,7 +559,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
     getBounds(rv);
 
     try {
-      InputStream in = new FileInputStream(System.getProperty("user.home") + "/.yamm/.config");
+      InputStream in = new FileInputStream(home + "/.config");
       props.load(in);
       in.close();
     } catch (IOException propsioe) { System.err.println(propsioe); }
@@ -528,7 +573,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
 
     try {
-      OutputStream out = new FileOutputStream(System.getProperty("user.home") + "/.yamm/.config");
+      OutputStream out = new FileOutputStream(home + "/.config");
       props.store(out, "YAMM configuration file");
       out.close();
     } catch(IOException propsioe) { System.err.println(propsioe); }
@@ -541,7 +586,7 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
   public void delUnNeededFiles(){
     Vector delFile = new Vector(), delDir = new Vector();
     System.out.println("Creating list of unneeded files...");
-    createDelList(delFile, delDir, new File(System.getProperty("user.home") + "/.yamm/tmp/"));
+    createDelList(delFile, delDir, new File(home + "/tmp/"));
     System.out.println("\nDeleting unneeded files...");
     delFiles(delFile);
     delFiles(delDir);
@@ -589,7 +634,6 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
     if(!(new File(System.getProperty("user.home") + "/.yamm/boxes")).exists()) {
       try {
-        String home = System.getProperty("user.home");
         String user = System.getProperty("user.name");
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
         InetAddress myInetaddr = InetAddress.getLocalHost();
@@ -597,9 +641,9 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
 
         if(host == null) host = "localhost";
 
-        (new File(home + "/.yamm/servers")).mkdirs();
-        (new File(home + "/.yamm/boxes")).mkdirs();
-        PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(home + "/.yamm/boxes/inbox")));
+        (new File(home + "/servers")).mkdirs();
+        (new File(home + "/boxes")).mkdirs();
+        PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(home + "/boxes/inbox")));
 
         out.println("Date: " + dateFormat.format(new Date()));
         out.println("From: Fredrik Ehnbom <fredde@gjt.org>");
@@ -611,11 +655,11 @@ public class YAMM extends JFrame implements HyperlinkListener, Printable
         out.println("\nBest regards,\n\nFredrik Ehnbom\n</html>\n.\n");
         out.close();
 
-        (new File(home + "/.yamm/boxes/outbox")).createNewFile();
-        (new File(home + "/.yamm/boxes/trash")).createNewFile();
-        (new File(home + "/.yamm/.config")).createNewFile();
-        (new File(home + "/.yamm/.filters")).createNewFile();
-        (new File(home + "/.yamm/tmp")).mkdirs();
+        (new File(home + "/boxes/outbox")).createNewFile();
+        (new File(home + "/boxes/trash")).createNewFile();
+        (new File(home + "/.config")).createNewFile();
+        (new File(home + "/.filters")).createNewFile();
+        (new File(home + "/tmp")).mkdirs();
       } catch(IOException ioe) { new MsgDialog(nFrame, "Error!", ioe.toString()); }
     }
     String result;
