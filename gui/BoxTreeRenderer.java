@@ -1,4 +1,4 @@
-/*  $Id: BoxTreeRenderer.java,v 1.10 2003/03/15 19:31:35 fredde Exp $
+/*  $Id: BoxTreeRenderer.java,v 1.11 2003/03/15 20:38:37 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -28,7 +28,7 @@ import org.gjt.fredde.yamm.mail.Mailbox;
 /**
  * The renderer for the mailbox tree
  * @author Fredrik Ehnbom
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class BoxTreeRenderer
 	extends JLabel
@@ -96,8 +96,8 @@ public class BoxTreeRenderer
 			setBackground(UIManager.getColor("textHighlight"));
 			setForeground(UIManager.getColor("textHighlightText"));
 		} else {
-			setBackground(UIManager.getColor("inactiveCaption"));
-			setForeground(UIManager.getColor("inactiveCaptionText"));
+			setBackground(UIManager.getColor("window"));
+			setForeground(UIManager.getColor("windowText"));
 		}
 
 		return this;
@@ -106,6 +106,9 @@ public class BoxTreeRenderer
 /*
  * Changes:
  * $Log: BoxTreeRenderer.java,v $
+ * Revision 1.11  2003/03/15 20:38:37  fredde
+ * fixed plaf stuff
+ *
  * Revision 1.10  2003/03/15 19:31:35  fredde
  * .gif -> .png. get colors from UIManager
  *

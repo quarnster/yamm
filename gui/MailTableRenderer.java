@@ -29,7 +29,7 @@ import org.gjt.fredde.yamm.Utilities;
 /**
  * The renderer for the mailtable
  * @author Fredrik Ehnbom
- * @version $Id: MailTableRenderer.java,v 1.7 2003/03/15 19:32:11 fredde Exp $
+ * @version $Id: MailTableRenderer.java,v 1.8 2003/03/15 20:38:37 fredde Exp $
  */
 public class MailTableRenderer
 	extends DefaultTableCellRenderer
@@ -69,8 +69,8 @@ public class MailTableRenderer
 			setBackground(UIManager.getColor("textHighlight"));
 			setForeground(UIManager.getColor("textHighlightText"));
 		} else {
-			setBackground(UIManager.getColor("control"));
-			setForeground(UIManager.getColor("controlText"));
+			setBackground(UIManager.getColor("window"));
+			setForeground(UIManager.getColor("windowText"));
 		}
 
 		return this;
@@ -79,6 +79,9 @@ public class MailTableRenderer
 /*
  * Changes:
  * $Log: MailTableRenderer.java,v $
+ * Revision 1.8  2003/03/15 20:38:37  fredde
+ * fixed plaf stuff
+ *
  * Revision 1.7  2003/03/15 19:32:11  fredde
  * get colors from UIManager. bold font when unread mail
  *

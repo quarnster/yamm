@@ -1,4 +1,4 @@
-/*  $Id: AttachListRenderer.java,v 1.3 2003/03/15 19:31:01 fredde Exp $
+/*  $Id: AttachListRenderer.java,v 1.4 2003/03/15 20:38:37 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@ import javax.swing.*;
  * This is the renderer for the Attach list.
  * It gives text files a text icon, sound files a sound icon etc. etc.
  * @author Fredrik Ehnbom
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class AttachListRenderer
 	extends JLabel
@@ -120,8 +120,8 @@ public class AttachListRenderer
 			setBackground(UIManager.getColor("textHighlight"));
 			setForeground(UIManager.getColor("textHighlightText"));
 		} else {
-			setBackground(UIManager.getColor("control"));
-			setForeground(UIManager.getColor("controlText"));
+			setBackground(UIManager.getColor("window"));
+			setForeground(UIManager.getColor("windowText"));
 		}
 
 		return this;
@@ -130,6 +130,9 @@ public class AttachListRenderer
 /*
  * Changes:
  * $Log: AttachListRenderer.java,v $
+ * Revision 1.4  2003/03/15 20:38:37  fredde
+ * fixed plaf stuff
+ *
  * Revision 1.3  2003/03/15 19:31:01  fredde
  * .gif -> .png. get colors from UIManager
  *
