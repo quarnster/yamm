@@ -38,10 +38,11 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Id: mainMenu.java,v 1.24 2000/08/09 16:34:46 fredde Exp $
+ * @version $Id: mainMenu.java,v 1.25 2000/12/25 09:53:05 fredde Exp $
  */
-public class mainMenu extends JMenuBar {
-
+public class mainMenu
+	extends JMenuBar
+{
 	/**
 	 * This frame is used to do som framestuff
 	 */
@@ -177,7 +178,7 @@ public class mainMenu extends JMenuBar {
 				Object[] args = {
 					YAMM.version,
 					YAMM.compDate,
-					"http://www.gjt.org/~fredde/yamm.html",
+					"http://www.gjt.org/~fredde/yamm/",
 					"<fredde@gjt.org>"
 				};
 
@@ -199,7 +200,7 @@ public class mainMenu extends JMenuBar {
 				p("java.vendor.url", jt);
 				p("java.home", jt);
 				p("java.vm.specification.version", jt);
-				p("java.vm.specification.vendor", jt); 
+				p("java.vm.specification.vendor", jt);
 				p("java.vm.specification.name", jt);
 				p("java.vm.version", jt);
 				p("java.vm.vendor", jt);
@@ -216,7 +217,7 @@ public class mainMenu extends JMenuBar {
 				jt.append("YAMM.compDate: " + YAMM.compDate);
 			} else if (kommando.equals(YAMM.getString("help.license"))) {
 				new MsgDialog(null,
-					YAMM.getString("help.license"), 
+					YAMM.getString("help.license"),
 					"Yet Another Mail Manager " +
 					YAMM.version + " E-Mail Client\n" +
 					"Copyright (C) 1999-2000 Fredrik Ehnbom\n" +
@@ -267,10 +268,9 @@ public class mainMenu extends JMenuBar {
 					}
 				}
 			} else if (kommando.equals(YAMM.getString("file.save_as"))) {
-				int test = ((JTable)frame.mailList).getSelectedRow();
+				int test = frame.mailList.getSelectedMessage();
 
-				if (test != -1 &&
-					test <= frame.listOfMails.size()) {
+				if (test != -1 && test <= frame.listOfMails.size()) {
 
 					JFileChooser jfs = new JFileChooser();
 					jfs.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -289,9 +289,9 @@ public class mainMenu extends JMenuBar {
 						tmp = frame.mailPageString;
 						boxName = tmp.substring(8,
 							tmp.length()) +
-							boxName + File.separator + 
+							boxName + File.separator +
 							frame.mailList.
-							getSelectedRow() +
+							getSelectedMessage() +
 							".html";
 
 						new File(boxName).renameTo(
@@ -310,8 +310,10 @@ public class mainMenu extends JMenuBar {
 
 	};
 
-	protected class filter extends FileFilter {
-		public boolean accept(File f) {
+	private final class filter
+		extends FileFilter
+	{
+		public final boolean accept(File f) {
 			if (f.isDirectory()) {
 				return true;
 			}
@@ -339,6 +341,9 @@ public class mainMenu extends JMenuBar {
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.25  2000/12/25 09:53:05  fredde
+ * changed homepage url, cleaned up a little
+ *
  * Revision 1.24  2000/08/09 16:34:46  fredde
  * readability fixes and changed 1999 to 1999-2000
  *
