@@ -31,7 +31,7 @@ import org.gjt.fredde.util.gui.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Id: YAMMWrite.java,v 1.19 2000/03/15 13:41:14 fredde Exp $
+ * @version $Id: YAMMWrite.java,v 1.20 2000/03/26 15:27:08 fredde Exp $
  */
 public class YAMMWrite extends JFrame {
 
@@ -41,9 +41,11 @@ public class YAMMWrite extends JFrame {
 	/** The textarea for writing in the message */
 	public JTextArea      myTextArea;
 
-	protected JTextField  myTextField1;
-	protected JTextField  myTextField2;
-	protected JList       myList;
+	private JTextField  toField = new JTextField();
+	private JTextField  subjectField = new JTextField();
+	private JTextField  ccField = new JTextField();
+	private JComboBox   fromField = new JComboBox();
+	private JList       myList;
 
 
 	/**
@@ -72,7 +74,7 @@ public class YAMMWrite extends JFrame {
 	}
 
 	public YAMMWrite(String to, String subject, String body) {
-		setTitle(subject);
+		super(subject);
 
 		setBounds(
 			Integer.parseInt(YAMM.getProperty("writex", "0")),
@@ -94,8 +96,7 @@ public class YAMMWrite extends JFrame {
 
 		setJMenuBar(Meny);
 
-		Box vert1 = Box.createHorizontalBox();
-		Box vert2 = Box.createHorizontalBox();
+		Box fields = Box.createHorizontalBox();
 		Box vert3 = Box.createVerticalBox();
 		Box hori1 = Box.createHorizontalBox();
 		Box hori2 = Box.createHorizontalBox();
@@ -129,37 +130,70 @@ public class YAMMWrite extends JFrame {
 		myButton.setHorizontalTextPosition(AbstractButton.CENTER);
 		myButton.setVerticalTextPosition(AbstractButton.BOTTOM);
 		hori1.add(myButton);
+		vert3.add(hori1);
 
-		JLabel myLabel = new JLabel(YAMM.getString("mail.to") + "  ");
-		vert1.add(myLabel);
+		FontMetrics fm = getFontMetrics(new Font("Dialog", Font.BOLD, 12));
+		int height = 25;
+		Dimension size = new Dimension(fm.stringWidth(YAMM.getString("mail.subject")) + 25, height);
 
-		myTextField1 = new JTextField();
-		myTextField1.setMaximumSize(new Dimension(1200, 20));
-		myTextField1.setMinimumSize(new Dimension(75, 20));
-		myTextField1.setText(to);
-		myTextField1.setToolTipText(YAMM.getString("tofield.tooltip"));
-		vert1.add(myTextField1);
+		JLabel myLabel = new JLabel(YAMM.getString("mail.to"));
+		myLabel.setMaximumSize(size);
+		myLabel.setMinimumSize(size);
+		fields.add(myLabel);
 
-		myLabel = new JLabel(YAMM.getString("mail.subject") + "  ");
-		vert2.add(myLabel);
+		toField.setMaximumSize(new Dimension(1200, height));
+		toField.setMinimumSize(new Dimension(75, height));
+		toField.setText(to);
+		toField.setToolTipText(YAMM.getString("tofield.tooltip"));
+		fields.add(toField);
 
-		myTextField2 = new JTextField();
-		myTextField2.addKeyListener(new KeyAdapter(){
+		vert3.add(fields);
+		fields = Box.createHorizontalBox();
+
+		myLabel = new JLabel(YAMM.getString("mail.from"));
+		myLabel.setMaximumSize(size);
+		myLabel.setMinimumSize(size);
+		fields.add(myLabel);
+
+		fromField.setMaximumSize(new Dimension(1200, height));
+		fromField.setMinimumSize(new Dimension(75, height));
+		fromField.setFont(toField.getFont());
+		fromField.setEditable(true);
+		fields.add(fromField);
+
+		vert3.add(fields);
+		fields = Box.createHorizontalBox();
+
+		myLabel = new JLabel(YAMM.getString("mail.subject"));
+		myLabel.setMaximumSize(size);
+		myLabel.setMinimumSize(size);
+		fields.add(myLabel);
+
+		subjectField.addKeyListener(new KeyAdapter(){
 			public void keyReleased(KeyEvent ke) {
-				setTitle(myTextField2.getText());
+				setTitle(subjectField.getText());
 			}
 			public void keyPressed(KeyEvent ke) {
-				setTitle(myTextField2.getText());
+				setTitle(subjectField.getText());
 			}
 		});
-		myTextField2.setMaximumSize(new Dimension(1200, 20));
-		myTextField2.setMinimumSize(new Dimension(75, 20));
-		myTextField2.setText(subject);
-		vert2.add(myTextField2);
+		subjectField.setMaximumSize(new Dimension(1200, height));
+		subjectField.setMinimumSize(new Dimension(75, height));
+		subjectField.setText(subject);
+		fields.add(subjectField);
 
-		vert3.add(hori1);
-		vert3.add(vert1);
-		vert3.add(vert2);
+		vert3.add(fields);
+		fields = Box.createHorizontalBox();
+
+		myLabel = new JLabel(YAMM.getString("mail.cc"));
+		myLabel.setMaximumSize(size);
+		myLabel.setMinimumSize(size);
+		fields.add(myLabel);
+
+		ccField.setMaximumSize(new Dimension(1200, height));
+		ccField.setMinimumSize(new Dimension(75, height));
+		fields.add(ccField);
+		vert3.add(fields);
 
 		myTextArea = new JTextArea();
 		myTextArea.setText(body);
@@ -225,7 +259,7 @@ public class YAMMWrite extends JFrame {
 			}
 		};
 
-		myList = new JList(/* attach */ dataModel);
+		myList = new JList(dataModel);
 		myList.setCellRenderer(new AttachListRenderer());
 		myPanel.add("Center", myList);
 		myPanel.add("South", hori1);
@@ -245,7 +279,7 @@ public class YAMMWrite extends JFrame {
 	}
 
 	boolean isSendReady() {
-		String TF1 = myTextField1.getText();
+		String TF1 = toField.getText();
 
 		if (TF1.indexOf('@') != -1) {
 			return true;
@@ -254,12 +288,120 @@ public class YAMMWrite extends JFrame {
 		}
 	}
 
+	/**
+	 * Send this letter
+	 */
+	public void send() {
+		PrintWriter outFile = null;
+		try {
+			outFile = new PrintWriter(
+				new FileOutputStream(
+					YAMM.home + "/boxes/" +
+					YAMM.getString("box.outbox"),
+					true
+				)
+			);
+			SimpleDateFormat df = new SimpleDateFormat(	
+					"EEE, dd MMM yyyy " +
+					"HH:mm:ss zzz",
+					Locale.US
+			);
+
+			String to   = toField.getText();
+			String from = fromField.getSelectedItem().toString();
+			String cc   = ccField.getText();
+			String temp = null;
+			StringTokenizer tok = new StringTokenizer(to, ",");
+
+			to = "";
+			while (tok.hasMoreTokens()) {
+				temp = tok.nextToken().trim();
+
+				if (to.equals("")) {
+					to = temp;
+				} else {
+					to += "      " + temp;
+				}
+
+				if (tok.hasMoreTokens()) {
+					to += ",\n";
+				}
+			}
+			if (!cc.equals("")) {
+				tok = new StringTokenizer(cc, ",");
+
+				cc = "";
+				while (tok.hasMoreTokens()) {
+					temp = tok.nextToken().trim();
+
+					if (cc.equals("")) {
+						cc = temp;
+					} else {
+						cc += "      " + temp;
+					}
+
+					if (tok.hasMoreTokens()) {
+						cc += ",\n";
+					}
+				}
+				to += "\ncc: " + cc;
+			}
+
+			outFile.println(
+				"Date: " + df.format(new Date()) +
+				"\nFrom: " + from +
+				"\nTo: " + to +
+				"\nSubject: " + subjectField.getText() +
+				"\nX-Mailer: Yet Another Mail Manager " + YAMM.version
+			);
+
+			if (attach.size() == 0) {
+				outFile.println(
+					"\n" + myTextArea.getText() +
+					"\n" +
+					"\n." +
+					"\n"
+				);
+			} else {
+				outFile.println(
+					"MIME-Version: 1.0" +
+					"\nContent-Type: multipart/mixed; boundary=\"AttachThis\"" +
+					"\n" +
+					"\nThis is a multi-part message in MIME format." +
+					"\n" +
+					"\n--AttachThis" +
+					"\nContent-Type: text/plain; charset=us-ascii" +
+					"\nContent-Transfer-Encoding: 7bit" +
+					"\n" +
+					"\n" + myTextArea.getText() +
+					"\n" +
+					"\n"
+				);
+			}
+			outFile.close();
+			if (attach.size() > 0) {
+				new UUEncode(attach);
+			}
+		} catch (IOException ioe) {
+			new ExceptionDialog(
+				YAMM.getString("msg.error"),
+				ioe,
+				YAMM.exceptionNames);
+		} finally {
+			if (outFile != null) {
+				outFile.close();
+			}
+		}
+	}
+	
 	ActionListener BListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			String arg = ((JButton)e.getSource()).getText();
 
 			if (arg.equals(YAMM.getString("button.send")) &&
 								isSendReady()) {
+				send();
+/*
 				try {
 					PrintWriter outFile = new PrintWriter(
 						new FileOutputStream(
@@ -274,7 +416,7 @@ public class YAMMWrite extends JFrame {
 							Locale.US
 						);
 
-					String to = myTextField1.getText();
+					String to = toField.getText();
 					String to2 = "";
 					String temp = null;
 					StringTokenizer tok =
@@ -304,7 +446,7 @@ public class YAMMWrite extends JFrame {
 							" ") + ">" +
 						"\nTo: " + to2 +
 						"\nSubject: " +
-						myTextField2.getText() +
+						subjectField.getText() +
 						"\nX-Mailer: " +
 						"Yet Another Mail Manager " +
 						YAMM.version + "\n\n" +
@@ -320,7 +462,7 @@ public class YAMMWrite extends JFrame {
 								" ") + ">" +
 						"\nTo: " + to2 +
 						"\nSubject: " +
-						myTextField2.getText() +
+						subjectField.getText() +
 						"\nX-Mailer: " +
 						"Yet Another Mail Manager " +
 						YAMM.version +
@@ -350,7 +492,7 @@ public class YAMMWrite extends JFrame {
 						ioe,
 						YAMM.exceptionNames);
 				}
-
+*/
 				Rectangle rv = new Rectangle();
 				getBounds(rv);
 
@@ -461,6 +603,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.20  2000/03/26 15:27:08  fredde
+ * added cc- and fromfields among other fixes
+ *
  * Revision 1.19  2000/03/15 13:41:14  fredde
  * cleaned up
  *
