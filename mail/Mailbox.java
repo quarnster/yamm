@@ -302,7 +302,7 @@ public class Mailbox {
 
               date = dateFormat3.format(nisse);
             } catch (ParseException pe) { System.err.println(pe); date = " ";}
-	    outFile.println("<b>" + res.getString("DATE") + "</b> " + date + "<br>");
+	    outFile.println("<b>" + res.getString("mail.date") + "</b> " + date + "<br>");
           }
         }
 
@@ -314,11 +314,11 @@ public class Mailbox {
             String from = "test";
             if(temp.indexOf("<") != -1 && temp.indexOf(">") != -1) {
               from = temp.substring(temp.lastIndexOf("<") + 1, temp.lastIndexOf(">"));
-		outFile.println("<b>" + res.getString("FROM") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
+		outFile.println("<b>" + res.getString("mail.from") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
             }
             else {
               from = temp.substring(6, temp.length());
-              outFile.println("<b>" + res.getString("FROM") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
+              outFile.println("<b>" + res.getString("mail.from") + "</b> <a href=\"mailto:" + from + "\">" + temp.substring(6, temp.length()) + "</a><br>");
             }
             wait = false;
           }
@@ -339,7 +339,7 @@ public class Mailbox {
             }
 
             if(temp.indexOf("<br>") == -1) temp += "<br>";
-            outFile.println("<b>" + res.getString("TO") + "</b> " + temp);
+            outFile.println("<b>" + res.getString("mail.to") + "</b> " + temp);
           }
         }
 
@@ -347,11 +347,11 @@ public class Mailbox {
           String reply = "test";
           if(temp.indexOf("<") != -1 && temp.indexOf(">") != -1) {
             reply = temp.substring(temp.lastIndexOf("<") + 1, temp.lastIndexOf(">"));
-            outFile.println("<b>" + res.getString("REPLY-TO") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
+            outFile.println("<b>" + res.getString("mail.reply_to") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
           }
           else {
             reply = temp.substring(6, temp.length());
-            outFile.println("<b>" + res.getString("REPLY-TO") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
+            outFile.println("<b>" + res.getString("mail.reply_to") + "</b> <a href=\"mailto:" + reply + "\">" + temp.substring(10, temp.length()) + "</a><br>");
           }
         }
 
@@ -365,7 +365,7 @@ public class Mailbox {
         else if(temp.startsWith("Subject:")) {
           if(i == whichmail) {
             if(temp.indexOf("<br>") == -1) temp += "<br>";
-            outFile.println("<b>" + res.getString("SUBJECT") + "</b> " + temp.substring(8, temp.length()));
+            outFile.println("<b>" + res.getString("mail.subject") + "</b> " + temp.substring(8, temp.length()));
           }
         }
 
@@ -443,16 +443,14 @@ public class Mailbox {
                 if(temp2.endsWith("&gt;")) temp2 = temp2.substring(0, temp2.length()-4);
                 if(temp2.startsWith("&lt;")) temp = temp2.substring(4, temp2.length());
 
-                System.out.println(temp2);
                 temp = begin + "<a href=\"mailto:" + temp2 + "\">" + temp2 + "</a>" + end;
               }
 
               else if(temp.startsWith("--" + boundary)) {
                 String encode = null, filename = null;
                 temp = in.readLine();
-                System.out.println("Boundary!");
 
-                if(!temp.equals("") && temp.indexOf("message") == -1 && temp.indexOf("text/") == -1) {
+                if(!temp.equals("") && temp.indexOf("message") == -1) {
                   for(;;) {
                     if(temp == null) break;
 
@@ -465,7 +463,6 @@ public class Mailbox {
                     if(temp.indexOf("name=") != -1) {
                       filename = temp.substring(temp.indexOf("=\"") + 2, temp.indexOf("\"", temp.indexOf("=")+ 2));
                     }
-                    System.out.println("filename: " + filename + " encode: " + encode);
                     if(encode != null && filename != null) {
                       Vector vect1 = new Vector();
                       vect1.add(encode);
@@ -684,6 +681,7 @@ public class Mailbox {
    * @param whichmail Which mail to export
    * @param jtarea The JTextArea to append the message to
    */
+/*
   public static void getMailForPrint(String whichBox, int whichmail, Book bk) {
 
     String  temp = null, boundary = null;
@@ -797,7 +795,7 @@ public class Mailbox {
       System.out.println("Error: " + ioe);
     }
   }
-
+*/
 
   /**
    * Deletes the specified mail. Returns false if it fails.
