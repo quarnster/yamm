@@ -1,4 +1,4 @@
-0.8.1:
+since 0.8:
 	Added:
 		-Nicer looking "message-info" panel
 		-You can drop files in the write attachment list from your desktop
@@ -8,6 +8,10 @@
 		-Shows name of textfile-attachments that are inlined
 		-The *.index files are no longer shown when choosing browse
 		 in the filter configuration dialog
+		-Major speedup fixes when browsing your mailboxes. Especially when
+		 reading previously unread mail.
+		-Better linkparsing system.
+		-Better handling of html-mails
 
 0.8:
 	Added:
