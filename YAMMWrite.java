@@ -109,8 +109,9 @@ public class YAMMWrite extends JFrame {
 
     setJMenuBar(Meny);
 
-    vert1 = Box.createVerticalBox();
-    vert2 = Box.createVerticalBox();
+    vert1 = Box.createHorizontalBox();
+    vert2 = Box.createHorizontalBox();
+//    vert2 = Box.createVerticalBox();
     vert3 = Box.createVerticalBox();
     hori1 = Box.createHorizontalBox();
     hori2 = Box.createHorizontalBox();
@@ -123,7 +124,8 @@ public class YAMMWrite extends JFrame {
     myButton.addActionListener(BListener);
     hori1.add(myButton);
 
-    myLabel = new JLabel(res.getString("mail.to"));
+    myLabel = new JLabel(res.getString("mail.to") + "  ");
+//    panel.add(myLabel);
     vert1.add(myLabel);
 
     myTextField1 = new JTextField();
@@ -131,10 +133,12 @@ public class YAMMWrite extends JFrame {
     myTextField1.setMinimumSize(new Dimension(75, 20));
     myTextField1.setText(to);
     myTextField1.setToolTipText(res.getString("tofield.tooltip"));
-    vert2.add(myTextField1);
+//    panel.add(myTextField1);
+    vert1.add(myTextField1);
 
-    myLabel = new JLabel(res.getString("mail.subject"));
-    vert1.add(myLabel);
+    myLabel = new JLabel(res.getString("mail.subject") + "  ");
+//    panel.add(myLabel);
+    vert2.add(myLabel);
 
     myTextField2 = new JTextField();
     myTextField2.addKeyListener(new KeyAdapter(){
@@ -144,13 +148,15 @@ public class YAMMWrite extends JFrame {
     myTextField2.setMaximumSize(new Dimension(1200, 20));
     myTextField2.setMinimumSize(new Dimension(75, 20));
     myTextField2.setText(subject);
+//    panel.add(myTextField2);
     vert2.add(myTextField2);
 
-    hori2.add(vert1);
-    hori2.add(vert2);
+//    hori2.add(vert1);
+//    hori2.add(vert2);
 
     vert3.add(hori1);
-    vert3.add(hori2);
+    vert3.add(vert1);
+    vert3.add(vert2);
 
     myTextArea = new JTextArea();
     myTextArea.setText(body);

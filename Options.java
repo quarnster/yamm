@@ -60,7 +60,7 @@ public class Options extends JDialog {
     Dimension screen = getToolkit().getScreenSize();
 
     setBounds((screen.width - 450)/2, (screen.height - 250)/2, 450, 250);
-    setResizable(false);
+//    setResizable(false);
 
     try { res = ResourceBundle.getBundle("org.gjt.fredde.yamm.resources.YAMM", Locale.getDefault()); }
     catch (MissingResourceException mre) {
@@ -251,12 +251,12 @@ public class Options extends JDialog {
     } catch (IOException propsioe) { System.err.println(propsioe); }
 
     JPanel panel = new JPanel(new GridLayout(6, 1, 2, 2));
-    panel.setMaximumSize(new Dimension(300, 100));
+    panel.setMaximumSize(new Dimension(600, 100));
     panel.setMinimumSize(new Dimension(300, 100));
-    panel.add(new JLabel(res.getString("options.identity") + ":"));
+    panel.add(new JLabel(res.getString("options.name") + ":"));
 
     name = new JTextField(props.getProperty("username", System.getProperty("user.name")));
-    name.setMaximumSize(new Dimension(200, 20));
+    name.setMaximumSize(new Dimension(400, 20));
     name.setMinimumSize(new Dimension(200, 20));
     panel.add(name);
 
@@ -270,7 +270,7 @@ public class Options extends JDialog {
 
     email = new JTextField(props.getProperty("email", System.getProperty("user.name") + "@" + host));
 
-    email.setMaximumSize(new Dimension(200, 20));
+    email.setMaximumSize(new Dimension(400, 20));
     email.setMinimumSize(new Dimension(200, 20));
     panel.add(email);
 
@@ -278,7 +278,7 @@ public class Options extends JDialog {
 
     panel.add(new JLabel(res.getString("options.signatur") + ":"));
     signatur = new JTextField();
-    signatur.setMaximumSize(new Dimension(190, 90));
+    signatur.setMaximumSize(new Dimension(400, 90));
     signatur.setMinimumSize(new Dimension(190, 90));
     signatur.setText(props.getProperty("signatur"));
 
@@ -287,7 +287,7 @@ public class Options extends JDialog {
     hori.add(Box.createRigidArea(new Dimension(5, 5)));
 
     JButton b = new JButton(res.getString("button.browse"), new ImageIcon("org/gjt/fredde/yamm/images/buttons/search.gif"));
-    b.setMaximumSize(new Dimension(115, 1000)); 
+    b.setMaximumSize(new Dimension(230, 1000)); 
     b.setMinimumSize(new Dimension(115, 1000));
     b.addActionListener(BListener);                                    
     hori.add(b);
