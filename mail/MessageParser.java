@@ -98,6 +98,18 @@ public class MessageParser {
 				stuff = true;
 			}
 
+			if (temp.startsWith("\'")) {
+				temp = temp.substring(1, temp.length());
+				begin = begin + "\'";
+				stuff = true;
+			}
+
+			if (temp.endsWith("\'")) {
+				temp = temp.substring(0, temp.length() - 1);
+				end = "\'" + end;
+				stuff = true;
+			}
+
 			if (stuff != true) {
 				break;
 			} else {
