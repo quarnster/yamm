@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Parses the body of a message
  * @author Fredrik Ehnbom
- * @version $Id: MessageBodyParser.java,v 1.10 2001/03/18 17:08:20 fredde Exp $
+ * @version $Id: MessageBodyParser.java,v 1.11 2003/03/05 15:09:35 fredde Exp $
  */
 public class MessageBodyParser {
 
@@ -111,7 +111,7 @@ public class MessageBodyParser {
 		while (tok.hasMoreTokens()) {
 			String temp = tok.nextToken();
 
-			if (temp.indexOf("://") != -1) {
+			if (temp.indexOf("://") != -1 || temp.indexOf("www.") != -1) {
 				String tmp[] = MessageParser.parseLink(temp);
 
 				temp = "<a href=\"" + tmp[1] + "\">" + tmp[1] +
@@ -182,7 +182,11 @@ public class MessageBodyParser {
 	}
 
 	public MessageBodyParser(boolean html) {
+		this(html, false);
+	}
+	public MessageBodyParser(boolean html, boolean htmlMsg) {
 		this.html = html;
+		this.htmlMsg = htmlMsg;
 	}
 
 	public int parse(BufferedReader in, PrintWriter out, String attachment)
@@ -217,7 +221,7 @@ public class MessageBodyParser {
 				continue;
 			}
 
-			if (temp.indexOf("=") != -1) {
+			if (temp.indexOf("=") != -1 && temp.indexOf("://") == -1 && temp.indexOf("www") == -1) {
 				temp = unMime(temp, html);
 			}
 
@@ -232,7 +236,7 @@ public class MessageBodyParser {
 				}
 			}
 
-			if (temp.indexOf("://") != -1) {
+			if (temp.indexOf("://") != -1 || temp.indexOf("www.") != -1) {
 				if (temp.toLowerCase().indexOf("href=") == -1) {
 					temp = makeLink(temp);
 				}
@@ -246,6 +250,9 @@ public class MessageBodyParser {
 /*
  * Changes:
  * $Log: MessageBodyParser.java,v $
+ * Revision 1.11  2003/03/05 15:09:35  fredde
+ * no longer unmimes links. also treats strings containing www. as links.
+ *
  * Revision 1.10  2001/03/18 17:08:20  fredde
  * cleaned up
  *
