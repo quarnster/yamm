@@ -1,5 +1,5 @@
-/*  AttachListRenderer.java - The renderer for Attachment lists
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+/*  $Id: AttachListRenderer.java,v 1.3 2003/03/15 19:31:01 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,27 +25,32 @@ import javax.swing.*;
  * This is the renderer for the Attach list.
  * It gives text files a text icon, sound files a sound icon etc. etc.
  * @author Fredrik Ehnbom
- * @version $Id: AttachListRenderer.java,v 1.2 2000/03/05 18:02:53 fredde Exp $
+ * @version $Revision: 1.3 $
  */
-public class AttachListRenderer extends JLabel implements ListCellRenderer {
-
-	/** Tells if the last item configurated was selected or not */
-	protected boolean selected;
+public class AttachListRenderer
+	extends JLabel
+	implements ListCellRenderer
+{
 
 	/** Images */
-	public final ImageIcon image = new ImageIcon(getClass().getResource("/images/types/image.gif"));
+	public final ImageIcon image = new ImageIcon(getClass().getResource("/images/types/image.png"));
 
 	/** Text */
-	public final ImageIcon text = new ImageIcon(getClass().getResource("/images/types/text.gif"));
+	public final ImageIcon text = new ImageIcon(getClass().getResource("/images/types/text.png"));
                                  
 	/** Sound */
-	public final ImageIcon sound = new ImageIcon(getClass().getResource("/images/types/sound.gif"));
+	public final ImageIcon sound = new ImageIcon(getClass().getResource("/images/types/sound.png"));
 
 	/** Packed */
-	public final ImageIcon packed = new ImageIcon(getClass().getResource("/images/types/packed.gif"));
+	public final ImageIcon packed = new ImageIcon(getClass().getResource("/images/types/packed.png"));
 
 	/** Unknown */
-	public final ImageIcon unknown = new ImageIcon(getClass().getResource("/images/types/unknown.gif"));
+	public final ImageIcon unknown = new ImageIcon(getClass().getResource("/images/types/unknown.png"));
+
+	public AttachListRenderer() {
+		super();
+		setOpaque(true);
+	}
 
 	/**
 	 * The Renderer
@@ -111,43 +116,23 @@ public class AttachListRenderer extends JLabel implements ListCellRenderer {
 			setIcon(unknown);
 		}
 
-		this.selected = selected;
-		return this;
-	}
-
-	/**
-	 * paint is subclassed to draw the background correctly.  JLabel
-	 * currently does not allow backgrounds other than white, and it
-	 * will also fill behind the icon.  Something that isn't desirable.
-	 */
-	public void paint(Graphics g) {
-		Color            bColor;
-		Icon             currentI = getIcon();
-
 		if (selected) {
-			bColor = new Color(204, 204, 255);
-		} else if (getParent() != null) {
-			bColor = getParent().getBackground();
+			setBackground(UIManager.getColor("textHighlight"));
+			setForeground(UIManager.getColor("textHighlightText"));
 		} else {
-			bColor = getBackground();
+			setBackground(UIManager.getColor("control"));
+			setForeground(UIManager.getColor("controlText"));
 		}
-		g.setColor(bColor);
 
-		if (currentI != null && getText() != null) {
-			int offset = (currentI.getIconWidth()
-					+ getIconTextGap());
-
-			g.fillRect(offset, 0, getWidth() - 1 - offset,
-							getHeight() - 1);
-		} else {
-			g.fillRect(0, 0, getWidth()-1, getHeight()-1);
-		}
-		super.paint(g);
+		return this;
 	}
 }
 /*
  * Changes:
  * $Log: AttachListRenderer.java,v $
+ * Revision 1.3  2003/03/15 19:31:01  fredde
+ * .gif -> .png. get colors from UIManager
+ *
  * Revision 1.2  2000/03/05 18:02:53  fredde
  * now gets the images used for the jar-file
  *

@@ -1,4 +1,4 @@
-/*  $Id: BoxTreeRenderer.java,v 1.9 2003/03/10 09:43:48 fredde Exp $
+/*  $Id: BoxTreeRenderer.java,v 1.10 2003/03/15 19:31:35 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -28,32 +28,29 @@ import org.gjt.fredde.yamm.mail.Mailbox;
 /**
  * The renderer for the mailbox tree
  * @author Fredrik Ehnbom
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class BoxTreeRenderer
 	extends JLabel
 	implements TreeCellRenderer
 {
-	/** Whether or not the item that was last configured is selected. */
-	protected boolean selected;
-
 	/** The icon for the inbox */
-	public final ImageIcon inbox = new ImageIcon(getClass().getResource("/images/boxes/inbox.gif"));
+	public final ImageIcon inbox = new ImageIcon(getClass().getResource("/images/boxes/inbox.png"));
 
 	/** The icon for the outbox */
-	public final ImageIcon outbox = new ImageIcon(getClass().getResource("/images/boxes/outbox.gif"));
+	public final ImageIcon outbox = new ImageIcon(getClass().getResource("/images/boxes/outbox.png"));
 
 	/** The icon for the trashcan */
-	public final ImageIcon trash = new ImageIcon(getClass().getResource("/images/boxes/trash.gif"));
+	public final ImageIcon trash = new ImageIcon(getClass().getResource("/images/boxes/trash.png"));
 
 	/** The icon for other boxes */
-	public final ImageIcon box = new ImageIcon(getClass().getResource("/images/boxes/box.gif"));
+	public final ImageIcon box = new ImageIcon(getClass().getResource("/images/boxes/box.png"));
 
 	/** The icon for closed dirs */
-	public final ImageIcon dir = new ImageIcon(getClass().getResource("/images/boxes/dir.gif"));
+	public final ImageIcon dir = new ImageIcon(getClass().getResource("/images/boxes/dir.png"));
 
 	/** The icon for open dirs */
-	public final ImageIcon dir2 = new ImageIcon(getClass().getResource("/images/boxes/dir2.gif"));
+	public final ImageIcon dir2 = new ImageIcon(getClass().getResource("/images/boxes/dir2.png"));
 
 	public Component getTreeCellRendererComponent(
 		JTree   tree,
@@ -95,16 +92,23 @@ public class BoxTreeRenderer
 		} else {
 			setText(thisbox);
 		}
+		if (selected) {
+			setBackground(UIManager.getColor("textHighlight"));
+			setForeground(UIManager.getColor("textHighlightText"));
+		} else {
+			setBackground(UIManager.getColor("inactiveCaption"));
+			setForeground(UIManager.getColor("inactiveCaptionText"));
+		}
 
-		setForeground(Color.black);
-
-		this.selected = selected;
 		return this;
 	}
 }
 /*
  * Changes:
  * $Log: BoxTreeRenderer.java,v $
+ * Revision 1.10  2003/03/15 19:31:35  fredde
+ * .gif -> .png. get colors from UIManager
+ *
  * Revision 1.9  2003/03/10 09:43:48  fredde
  * non localized box filenames
  *
