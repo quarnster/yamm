@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.47 2003/03/14 23:18:05 fredde Exp $
+/*  $Id: mainTable.java,v 1.48 2003/03/15 19:36:38 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.47 $
+ * @version $Revision: 1.48 $
  */
 public class mainTable
 	extends JTable
@@ -57,9 +57,10 @@ public class mainTable
 
 	private final static int COLUMN_NUM = 0;
 	private final static int COLUMN_INFO = 1;
-	private final static int COLUMN_SUBJECT = 2;
-	private final static int COLUMN_FROM = 3;
-	private final static int COLUMN_DATE = 4;
+	private final static int COLUMN_ATTACHMENT = 2;
+	private final static int COLUMN_SUBJECT = 3;
+	private final static int COLUMN_FROM = 4;
+	private final static int COLUMN_DATE = 5;
 
 	private final AbstractTableModel dataModel = new AbstractTableModel() {
 		DateParser dp = new DateParser(YAMM.getString("shortdate"));
@@ -67,17 +68,19 @@ public class mainTable
 		public final ImageIcon inew = new ImageIcon(getClass().getResource("/images/info/new.png"));
 		public final ImageIcon iread = new ImageIcon(getClass().getResource("/images/info/read.png"));
 		public final ImageIcon ireplied = new ImageIcon(getClass().getResource("/images/info/replied.png"));
+		public final ImageIcon iattachment = new ImageIcon(getClass().getResource("/images/info/attachment.png"));
 
 		private final String headername[] = {
 	        	"#",
-			"S",
+			YAMM.getString("table.S"),
+			YAMM.getString("table.A"),
 			YAMM.getString("table.subject"),
 		        YAMM.getString("table.from"),
 	        	YAMM.getString("table.date")
 		};
 
 		public final int getColumnCount() {
-	        	return 5;
+	        	return 6;
 		}
 
 		public final int getRowCount() {
@@ -85,17 +88,24 @@ public class mainTable
 		}
 
 		public final Object getValueAt(int row, int col) {
+			int status = yamm.listOfMails[yamm.keyIndex[row]].status;
+
 			if (row >= yamm.listOfMails.length) {
 				return null;
 			}
 			switch (col) {
 				case COLUMN_NUM: return "" + yamm.keyIndex[row];
 				case COLUMN_INFO:
-					int status = yamm.listOfMails[yamm.keyIndex[row]].status;
 					if ((status & IndexEntry.STATUS_READ) != 0) {
 						return iread;
 					} else {
 						return inew;
+					}
+				case COLUMN_ATTACHMENT:
+					if ((status & IndexEntry.STATUS_ATTACHMENT) != 0) {
+						return iattachment;
+					} else {
+						return null;
 					}
 				case COLUMN_SUBJECT: return yamm.listOfMails[yamm.keyIndex[row]].subject;
 				case COLUMN_FROM: return yamm.listOfMails[yamm.keyIndex[row]].from;
@@ -119,7 +129,7 @@ public class mainTable
 			return headername[column];
 		}
 		public final Class getColumnClass(int column) {
-			if (column == COLUMN_INFO) return ImageIcon.class;
+			if (column == COLUMN_INFO || column == COLUMN_ATTACHMENT) return ImageIcon.class;
 			else return String.class;
 		}
 	};
@@ -151,9 +161,15 @@ public class mainTable
 
 		column = model.getColumn(COLUMN_INFO);
 		column.setIdentifier("info");
-		column.setMinWidth(18);
-		column.setMaxWidth(18);
-		column.setPreferredWidth(18);
+		column.setMinWidth(16);
+		column.setMaxWidth(16);
+		column.setPreferredWidth(16);
+
+		column = model.getColumn(COLUMN_ATTACHMENT);
+		column.setIdentifier("attachment");
+		column.setMinWidth(16);
+		column.setMaxWidth(16);
+		column.setPreferredWidth(16);
 
 		column = model.getColumn(COLUMN_SUBJECT);
 		column.setIdentifier("subject");
@@ -178,6 +194,9 @@ public class mainTable
 
 		index = model.getColumnIndex("info");
 		model.moveColumn(index, Integer.parseInt(YAMM.getProperty("info.index", "" + COLUMN_INFO)));
+
+		index = model.getColumnIndex("attachment");
+		model.moveColumn(index, Integer.parseInt(YAMM.getProperty("attachment.index", "" + COLUMN_ATTACHMENT)));
 
 		index = model.getColumnIndex("subject");
 		model.moveColumn(index, Integer.parseInt(YAMM.getProperty("subject.index", "" + COLUMN_SUBJECT)));
@@ -215,7 +234,7 @@ public class mainTable
 	}
 
 	public void save() {
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 6; i++) {
 			TableColumn c = getColumnModel().getColumn(i);
 			String id = c.getIdentifier().toString();
 			YAMM.setProperty(id + ".width", c.getWidth()+"");
@@ -284,6 +303,8 @@ public class mainTable
 			copy(tmp, start, mid, end);
 			switch (col) {
 				default:		mergeNum(tmp, start, mid, end); break;
+				case COLUMN_INFO:	mergeInfo(tmp, start, mid, end); break;
+				case COLUMN_ATTACHMENT: mergeAttachment(tmp, start, mid, end); break;
 				case COLUMN_SUBJECT:	mergeSubject(tmp, start, mid, end); break;
 				case COLUMN_FROM:	mergeFrom(tmp, start, mid, end); break;
 				case COLUMN_DATE:	mergeDate(tmp, start, mid, end); break;
@@ -303,6 +324,29 @@ public class mainTable
 
 		for (int i = 0, j = num, k = start; i <= j; )
 			if (tmp[i] <= tmp[j])
+				yamm.keyIndex[k++] = tmp[i++];
+			else
+				yamm.keyIndex[k++] = tmp[j--];
+	}
+
+	void mergeInfo(int[] tmp, int start, int mid, int end) {
+		int num = end - start;
+
+		for (int i = 0, j = num, k = start; i <= j; ) {
+			int s1 = yamm.listOfMails[tmp[i]].status & (~IndexEntry.STATUS_ATTACHMENT&0xff);
+			int s2 = yamm.listOfMails[tmp[j]].status & (~IndexEntry.STATUS_ATTACHMENT&0xff);
+			if (s1 <= s2)
+				yamm.keyIndex[k++] = tmp[i++];
+			else
+				yamm.keyIndex[k++] = tmp[j--];
+		}
+	}
+
+	void mergeAttachment(int[] tmp, int start, int mid, int end) {
+		int num = end - start;
+
+		for (int i = 0, j = num, k = start; i <= j; )
+			if ((yamm.listOfMails[tmp[i]].status & IndexEntry.STATUS_ATTACHMENT) <= (yamm.listOfMails[tmp[j]].status & IndexEntry.STATUS_ATTACHMENT))
 				yamm.keyIndex[k++] = tmp[i++];
 			else
 				yamm.keyIndex[k++] = tmp[j--];
@@ -704,6 +748,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.48  2003/03/15 19:36:38  fredde
+ * added attachment column. added sorting by status and sorting by attachment
+ *
  * Revision 1.47  2003/03/14 23:18:05  fredde
  * save/restore column index. added status column with icons.
  *
