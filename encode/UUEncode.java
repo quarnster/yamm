@@ -60,7 +60,9 @@ public class UUEncode {
         
         out.writeBytes("\nContent-Type: " + ctype + "; name=\"" + filename + "\"\nContent-Transfer-Encoding: x-uuencode\nContent-Disposition: attachment; filename=\"" + filename + "\"\n\n");
         encodeFile(attach.elementAt(i).toString());
-        out.writeBytes("\n--AttachThis");
+
+        if(i+1 < attach.size()) out.writeBytes("\n--AttachThis");
+        else out.writeBytes("\n--AttachThis--");
       }
       out.writeBytes("\n.\n\n");
       out.close();

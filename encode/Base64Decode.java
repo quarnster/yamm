@@ -24,11 +24,12 @@ import org.gjt.fredde.yamm.gui.imageViewer;
 
 public class Base64Decode extends Thread {
 
-  File filename;
+  String filename, target;
 
-  public Base64Decode(String name, File whichfile) {
+  public Base64Decode(String name, String filename, String target) {
     super(name);
-    filename = whichfile;
+    this.filename = filename;
+    this.target = target;
   }
 
   public void start() {
@@ -36,9 +37,10 @@ public class Base64Decode extends Thread {
   }
 
   public void run() {
+    makeBase64(target);
     try{
-      InputStream is = new BufferedInputStream(new FileInputStream(System.getProperty("user.home") + "/.yamm/tmp/encode"));
-      OutputStream os = new BufferedOutputStream(new FileOutputStream(filename));
+      InputStream is = new BufferedInputStream(new FileInputStream(filename));
+      OutputStream os = new BufferedOutputStream(new FileOutputStream(target + ".tmp"));
       BASE64Decoder b64dc = new BASE64Decoder();
       b64dc.decodeBuffer(is, os);
       String end = filename.toString().substring(filename.toString().lastIndexOf("."), filename.toString().length()).toLowerCase();
@@ -53,6 +55,28 @@ public class Base64Decode extends Thread {
       System.err.println(e);
     }
   }
+  protected void makeBase64(String t) {
+    String temp;
+    try {
+      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(target)));
+      PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(target + ".tmp")));
+
+      for(int i = 0; i < 4; i++) in.readLine();
+
+      for(;;) {
+        temp = in.readLine();
+
+        if(temp == null) break;
+
+        out.println(temp);
+      }
+      in.close();
+      out.close();
+    }
+    catch(IOException ioe) {
+      System.err.println(ioe);
+    }
+  }   
 }
 
 

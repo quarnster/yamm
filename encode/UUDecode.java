@@ -30,6 +30,7 @@ public class UUDecode extends Thread{
   byte[]  outputBuffer;
   int     count = 0;
   String    filename;
+  String  target;
   JFrame  frame;
   boolean view;
 
@@ -40,11 +41,12 @@ public class UUDecode extends Thread{
    * @param whichFile The file to Decode
    * @param wannaView If the user wants to View the file
    */
-  public UUDecode(JFrame frame1, String name, String whichFile, boolean wannaView) {
+  public UUDecode(JFrame frame1, String name, String whichFile, String target,  boolean wannaView) {
     super(name);
     filename = whichFile;
     frame = frame1;
     view = wannaView;
+    this.target = target;
   }
 
   /**
@@ -52,9 +54,10 @@ public class UUDecode extends Thread{
    */
   public void run() {
     try {
-      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(System.getProperty("user.home") + "/.yamm/tmp/encode")));
-      DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(filename)));
-      in.readLine();
+      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
+      DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(target)));
+
+      for(int i = 0; i < 5; i++) in.readLine();
 
       for(;;) {
         temp = in.readLine();
@@ -82,14 +85,9 @@ public class UUDecode extends Thread{
     }
 
     if(view) {
-/*
-      if(filename.endsWith(".zip") || filename.endsWith(".jar")) {
-        new ZipTool(filename);
-      }
-*/
-      String end = filename.substring(filename.length() - 4, filename.length());
+      String end = target.substring(target.length() - 4, target.length());
       if(end.equalsIgnoreCase(".jpg") || end.equalsIgnoreCase(".gif")) {
-        new imageViewer(filename);
+        new imageViewer(target);
       }
     }
   }
