@@ -23,11 +23,13 @@ import org.gjt.fredde.yamm.YAMM;
 
 /**
  * The ConfigurationWizard is used to configure the settings in YAMM
+ *
  * @author Fredrik Ehnbom
- * @version $Id: ConfigurationWizard.java,v 1.4 2000/04/01 20:51:21 fredde Exp $
+ * @version $Id: ConfigurationWizard.java,v 1.5 2000/12/31 14:06:52 fredde Exp $
  */
-public class ConfigurationWizard extends JDialog {
-
+public class ConfigurationWizard
+	extends JDialog
+{
 	/**
 	 * Creates a new ConfigurationWizard
 	 */
@@ -41,9 +43,10 @@ public class ConfigurationWizard extends JDialog {
 		jtpane.addTab(YAMM.getString("confwiz.generaltab"), new GeneralConfTab());
 		jtpane.addTab(YAMM.getString("confwiz.identitiestab"), new IdentitiesConfTab(this));
 		jtpane.addTab(YAMM.getString("confwiz.serverstab"), new ServersConfTab(this));
+		jtpane.addTab(YAMM.getString("confwiz.filterstab"), new FiltersConfTab(this));
 		jtpane.addTab(YAMM.getString("confwiz.debugtab"), new DebugConfTab());
-		
-		getContentPane().add("Center", jtpane);		
+
+		getContentPane().add("Center", jtpane);
 
 		getContentPane().add("South", new ControlPanel(this));
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -54,6 +57,9 @@ public class ConfigurationWizard extends JDialog {
 /*
  * Changes:
  * $Log: ConfigurationWizard.java,v $
+ * Revision 1.5  2000/12/31 14:06:52  fredde
+ * added filters tab
+ *
  * Revision 1.4  2000/04/01 20:51:21  fredde
  * fixed to make the profiling system work
  *
