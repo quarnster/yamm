@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Parses the body of a message
  * @author Fredrik Ehnbom
- * @version $Id: MessageBodyParser.java,v 1.11 2003/03/05 15:09:35 fredde Exp $
+ * @version $Id: MessageBodyParser.java,v 1.12 2003/03/05 16:00:27 fredde Exp $
  */
 public class MessageBodyParser {
 
@@ -39,7 +39,7 @@ public class MessageBodyParser {
 
 	public static String unMime(String m, boolean html) {
 		char[] check = "0123456789ABCDEF".toCharArray();
-		StringTokenizer tok = new StringTokenizer(m);
+		StringTokenizer tok = new StringTokenizer(m, " ", true);
 		String mime2 = "";
 
 		while (tok.hasMoreTokens()) {
@@ -95,9 +95,9 @@ public class MessageBodyParser {
 						}
 					}
 				}
-				mime2 += mime + " ";
+					mime2 += mime;
 			} else {
-				mime2 += mime + " ";
+					mime2 += mime;
 			}
 		}
 
@@ -105,7 +105,7 @@ public class MessageBodyParser {
 	}
 
 	protected String makeLink(String link) {
-		StringTokenizer tok = new StringTokenizer(link);
+		StringTokenizer tok = new StringTokenizer(link, " ", true);
 		link = "";
 
 		while (tok.hasMoreTokens()) {
@@ -116,9 +116,9 @@ public class MessageBodyParser {
 
 				temp = "<a href=\"" + tmp[1] + "\">" + tmp[1] +
 						"</a>";
-				link += tmp[0] + temp + tmp[2] + " ";
+				link += tmp[0] + temp + tmp[2];
 			} else {
-				link += temp + " ";
+				link += temp;
 			}
 		}
 
@@ -126,7 +126,7 @@ public class MessageBodyParser {
 	}
 
 	public static String makeEmailLink(String mail) {
-		StringTokenizer tok = new StringTokenizer(mail);
+		StringTokenizer tok = new StringTokenizer(mail, " ", true);
 
 		mail = "";
 
@@ -139,16 +139,16 @@ public class MessageBodyParser {
 				temp = "<a href=mailto:" + tmp[1] + ">" +
 								tmp[1] + "</a>";
 
-				mail += tmp[0] + temp + tmp[2] + " ";
+				mail += tmp[0] + temp + tmp[2];
 			} else {
-				mail += temp + " ";
+				mail += temp;
 			}
 		}
 
 		return mail;
 	}
 	public static String makeHtml(String html) {
-		StringTokenizer tok = new StringTokenizer(html);
+		StringTokenizer tok = new StringTokenizer(html, " ", true);
 
 		html = "";
 
@@ -176,7 +176,7 @@ public class MessageBodyParser {
 					change = true;
 				}
 			}
-			html += temp + " ";
+			html += temp;
 		}
 		return html;
 	}
@@ -250,6 +250,9 @@ public class MessageBodyParser {
 /*
  * Changes:
  * $Log: MessageBodyParser.java,v $
+ * Revision 1.12  2003/03/05 16:00:27  fredde
+ * Layout fixes
+ *
  * Revision 1.11  2003/03/05 15:09:35  fredde
  * no longer unmimes links. also treats strings containing www. as links.
  *
