@@ -1,4 +1,4 @@
-/*  $Id: YAMMWrite.java,v 1.33 2003/04/13 16:35:18 fredde Exp $
+/*  $Id: YAMMWrite.java,v 1.34 2003/04/16 12:39:33 fredde Exp $
  *  Copyright (C) 1999-2001 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import org.gjt.fredde.yamm.mail.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Revision: 1.33 $
+ * @version $Revision: 1.34 $
  */
 public class YAMMWrite extends JFrame {
 
@@ -291,6 +291,88 @@ public class YAMMWrite extends JFrame {
 		show();
 	}
 
+	private MessageHeaderParser baseReply() {
+		YAMM frame = YAMM.getInstance();
+		int selMail = frame.keyIndex[frame.mailList.getSelectedRow()];
+		long skip = frame.listOfMails[selMail].skip;
+		String from;
+		String to;
+
+		MessageHeaderParser mhp = Mailbox.getMailHeaders(frame.getMailbox(), skip);
+		DateParser d = new DateParser(YAMM.getString("yammwrite.wrote.date"));
+		String date;
+		try {
+			date = d.parse(mhp.getHeaderField("Date"));
+		} catch (Exception e) {
+			try {
+				date = d.parse(new Date());
+			} catch (Exception e2) { date = ""; }
+		}
+
+		from = mhp.getHeaderField("From");
+		to = mhp.getHeaderField("To");
+
+		if (from == null) from = "";
+		if (to == null) to = "";
+
+		myTextArea.setText(YAMM.getString("yammwrite.wrote", new Object[] {from, date}) + "\n");
+		if (!to.equals("")) {
+			String prof = YAMM.profiler.getProfileString(to);
+			if (prof == null) {
+				JOptionPane.showMessageDialog(
+					this,
+					YAMM.getString("yammwrite.profile"),
+					YAMM.getString("msg.warning"),
+					JOptionPane.ERROR_MESSAGE
+				);
+			}
+			fromField.addItem(to);
+			if (prof != null)
+				fromField.setSelectedItem(prof);
+			else
+				fromField.setSelectedItem(to);
+		} else if (fromField.getItemCount() != 0) {
+			fromField.setSelectedIndex(YAMM.profiler.getDefault());
+		}
+		if (mhp.getHeaderField("Reply-To") != null) {
+			from = mhp.getHeaderField("Reply-To");
+		}
+
+		toField.setText(from);
+
+		Mailbox.getMailForReply(
+			frame.getMailbox(),
+			selMail, skip,
+			myTextArea
+		);
+		sign();
+		return mhp;
+	}
+
+	public void reply() {
+		MessageHeaderParser mhp = baseReply();
+		String subject = mhp.getHeaderField("Subject");
+		subject = Mailbox.unMime(subject);
+		if (subject == null) subject = "";
+		if (!subject.startsWith(YAMM.getString("mail.re")) && !subject.startsWith("Re:")) {
+			subject = YAMM.getString("mail.re") + " " + subject;
+		}
+		subjectField.setText(subject);
+		setTitle(subject);
+	}
+
+	public void forward() {
+		MessageHeaderParser mhp = baseReply();
+		String subject = mhp.getHeaderField("Subject");
+		subject = Mailbox.unMime(subject);
+		if (subject == null) subject = "";
+		if (!subject.startsWith(YAMM.getString("mail.fwd")) && !subject.startsWith("Fwd:")) {
+			subject = YAMM.getString("mail.fwd") + " " + subject;
+		}
+		subjectField.setText(subject);
+		setTitle(subject);
+	}
+
 	public void sign() {
 		FileInputStream in = null;
 		if (fromField.getSelectedItem() == null) {
@@ -528,6 +610,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.34  2003/04/16 12:39:33  fredde
+ * added reply() and forward()
+ *
  * Revision 1.33  2003/04/13 16:35:18  fredde
  * sets index.from to recipient
  *
