@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.55 2003/04/19 11:55:41 fredde Exp $
+/*  $Id: Mailbox.java,v 1.56 2003/04/19 12:07:17 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.55 $
+ * @version $Revision: 1.56 $
  */
 public class Mailbox {
 
@@ -49,37 +49,36 @@ public class Mailbox {
 			return subject;
 		}
 
-		
+		while (subject.indexOf("=?") != -1) {
+			String start = subject.substring(0, subject.indexOf("=?"));
+			String end   = subject.substring(subject.indexOf("?=") + 2,
+								subject.length());
+			int iso = subject.indexOf("?", start.length() + 2) + 1;
+			String encoding = subject.substring(iso, subject.indexOf("?", iso+1));
+			subject      = subject.substring(iso + 1 + encoding.length(),
+							subject.indexOf("?="));
 
-		String start = subject.substring(0, subject.indexOf("=?"));
-		String end   = subject.substring(subject.lastIndexOf("?=") + 2,
-							subject.length());
-		int iso = subject.indexOf("?", start.length() + 2) + 1;
-		String encoding = subject.substring(iso, subject.indexOf("?", iso+1));
-		subject      = subject.substring(iso + 1 + encoding.length(),
-						subject.lastIndexOf("?="));
+			subject = subject.replace('_', ' ');
+//			start = start.replace('_', ' ');
+//			end = end.replace('_', ' ');
 
-		subject = subject.replace('_', ' ');
-		start = start.replace('_', ' ');
-		end = end.replace('_', ' ');
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			ByteArrayInputStream in = new ByteArrayInputStream(subject.getBytes());
+			Decoder dec = null;
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		ByteArrayInputStream in = new ByteArrayInputStream(subject.getBytes());
-		Decoder dec = null;
-
-		if (encoding.equals("B")) {
-			dec = new Base64sun();
-		} else if (encoding.equals("Q")) {
-			dec = new QuotedPrintable();
+			if (encoding.equals("B")) {
+				dec = new Base64sun();
+			} else if (encoding.equals("Q")) {
+				dec = new QuotedPrintable();
+			}
+			try {
+				dec.decode(in, out);
+				subject = out.toString();
+			} catch (Exception e) {
+			}
+			subject = start + subject + end;
 		}
-		try {
-			dec.decode(in, out);
-			subject = out.toString();
-		} catch (Exception e) {
-		}
-//		subject = Mime.unMime(subject, false);
-
-		return start + subject + end;
+		return subject;
 	}
 
 	public static String getIndexName(String box) {
@@ -881,6 +880,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.56  2003/04/19 12:07:17  fredde
+ * fixed unMime to work with strings containing multiple =?-entries
+ *
  * Revision 1.55  2003/04/19 11:55:41  fredde
  * saves messages to a .raw-file for getMail and viewSource
  *
