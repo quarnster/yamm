@@ -16,6 +16,12 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/gui/AttachListRenderer.class \
 	org/gjt/fredde/yamm/gui/imageViewer.class \
 	org/gjt/fredde/yamm/gui/sourceViewer.class \
+	org/gjt/fredde/yamm/gui/confwiz/ConfigurationWizard.class \
+	org/gjt/fredde/yamm/gui/confwiz/GeneralConfTab.class \
+	org/gjt/fredde/yamm/gui/confwiz/IdentitiesConfTab.class \
+	org/gjt/fredde/yamm/gui/confwiz/ServersConfTab.class \
+	org/gjt/fredde/yamm/gui/confwiz/DebugConfTab.class \
+	org/gjt/fredde/yamm/gui/confwiz/ControlPanel.class \
 	org/gjt/fredde/yamm/encode/Base64Decode.class \
 	org/gjt/fredde/yamm/encode/UUDecode.class \
 	org/gjt/fredde/yamm/encode/UUEncode.class \
@@ -38,7 +44,10 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/SHMail.class \
 	org/gjt/fredde/yamm/Options.class \
 	org/gjt/fredde/yamm/YAMMWrite.class \
-	org/gjt/fredde/yamm/YAMM.class
+	org/gjt/fredde/yamm/YAMM.class \
+	org/gjt/fredde/yamm/YammPop3.class \
+	org/gjt/fredde/yamm/YammSmtp.class \
+	org/gjt/fredde/yamm/Utilities.class
 
 
 all: YAMM

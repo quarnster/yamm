@@ -1,5 +1,5 @@
 /*  SHMail.java - sends and gets mail
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ import org.gjt.fredde.yamm.YAMM;
 
 /**
  * Sends and gets mail
+ * @author Fredrik Ehnbom
+ * @version $Id: SHMail.java,v 1.18 2000/02/28 13:44:29 fredde Exp $
  */
 public class SHMail extends Thread {
 
@@ -42,8 +44,12 @@ public class SHMail extends Thread {
 	 */
 	static protected boolean sent = false;
 
-	/** If debugging info should be printed */
-	static protected boolean debug = false;
+	/** If pop-debugging info should be printed */
+	static private boolean popdebug = false;
+
+	/** If smtp-debugging info should be printed */
+	static private boolean smtpdebug = false;
+
 
 	JButton knappen;
 	YAMM frame;
@@ -60,9 +66,8 @@ public class SHMail extends Thread {
 		knappen.setEnabled(false);
 		frame = frame1;
 
-		if (YAMM.getProperty("debug.sendget", "false").equals("true")) {
-			debug = true;
-		}
+		if (YAMM.getProperty("debug.pop", "false").equals("true")) popdebug = true;
+		if (YAMM.getProperty("debug.smtp", "false").equals("true")) smtpdebug = true;
 	}
 
 	/**
@@ -110,7 +115,7 @@ public class SHMail extends Thread {
 					Pop3 pop = null;
 
 					try { 
-						pop = new Pop3(username, password, server, YAMM.home + "/boxes/.filter", 110, debug);
+						pop = new YammPop3(username, password, server, YAMM.home + "/boxes/.filter", 110, popdebug);
 						int messages = pop.getMessageCount();
 
 						for (int j = 1; j <= messages; j++) {
@@ -150,7 +155,7 @@ public class SHMail extends Thread {
 			frame.status.progress(0);
 
 			try { 
-				Smtp smtp = new Smtp(YAMM.getProperty("smtpserver"), 25, debug);
+				Smtp smtp = new YammSmtp(YAMM.getProperty("smtpserver"), 25, smtpdebug);
 				BufferedReader in = new BufferedReader(
 					new InputStreamReader(
 						new FileInputStream(YAMM.home + "/boxes/" +
@@ -254,3 +259,10 @@ public class SHMail extends Thread {
 		knappen.setEnabled(true);
 	}
 }
+/*
+ * Changes
+ * $Log: SHMail.java,v $
+ * Revision 1.18  2000/02/28 13:44:29  fredde
+ * added new classes
+ *
+ */
