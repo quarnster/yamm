@@ -1,21 +1,20 @@
 /*  Smtp.java - The Simple Mail Transfer Protocol class
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package org.gjt.fredde.util.net;
 
 import java.net.*;
@@ -66,17 +65,19 @@ import java.io.*;
  * 	}
  * }
  * </pre></code>
+ * @author Fredrik Ehnbom <fredde@gjt.org>
+ * @version $Id: Smtp.java,v 1.5 2000/04/01 14:59:56 fredde Exp $
  */
 public class Smtp {
 
 	/** from the server */
-	protected BufferedReader in;
+	private BufferedReader in;
 
 	/** to the server */
-	protected PrintWriter    out;
+	private PrintWriter    out;
 
 	/** The socket to use for this connection */
-	protected Socket socket;
+	private Socket socket;
 
 	/** If the "conversation" between client and server should be showed */
 	protected boolean debug = false;
@@ -198,9 +199,16 @@ public class Smtp {
 	 * Prints out the debugging info
 	 * @param info The debuginfo to print out.
 	 */
-	protected void Debug(String info) {
+	private void Debug(String info) {
 		if (debug) {
 			System.err.println(info);
 		}
 	}
 }
+/*
+ * ChangeLog:
+ * $Log: Smtp.java,v $
+ * Revision 1.5  2000/04/01 14:59:56  fredde
+ * license for the package changed to LGPL
+ *
+ */
