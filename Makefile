@@ -23,6 +23,9 @@ CLASSES = org/gjt/fredde/util/UUDecoder.class \
 	org/gjt/fredde/yamm/mail/MessageBodyParser.class \
 	org/gjt/fredde/yamm/mail/DateParser.class \
 	org/gjt/fredde/yamm/mail/MessageParser.class \
+	org/gjt/fredde/yamm/mail/ReplyMessageParser.class \
+	org/gjt/fredde/yamm/mail/ReplyMessageBodyParser.class \
+	org/gjt/fredde/yamm/mail/DateParser.class \
 	org/gjt/fredde/yamm/mail/Mailbox.class \
 	org/gjt/fredde/yamm/mail/Filter.class \
 	org/gjt/fredde/yamm/gui/main/extMItem.class \
