@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.50 2003/03/10 21:49:37 fredde Exp $
+/*  $Id: Mailbox.java,v 1.51 2003/03/11 15:20:13 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.50 $
+ * @version $Revision: 1.51 $
  */
 public class Mailbox {
 
@@ -61,6 +61,11 @@ public class Mailbox {
 		subject = Mime.unMime(subject, false);
 
 		return start + subject + end;
+	}
+
+	public static String getIndexName(String box) {
+		int sep = box.lastIndexOf(File.separator);
+		return box.substring(0, sep + 1) + "." + box.substring(sep + 1) + ".index";
 	}
 
 	/**
@@ -740,6 +745,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.51  2003/03/11 15:20:13  fredde
+ * Added getIndexName
+ *
  * Revision 1.50  2003/03/10 21:49:37  fredde
  * moveMail: cleaned up, bug fixed. copyMail: implemented
  *
