@@ -11,11 +11,11 @@ Once you have the jdk (or jre) up and running untar the file with for example:
 'tar xvfz yamm-<version>.tar.gz'
 
 Windows users can untar it with winzip (http://www.winzip.com).
-Then change directory to 'yamm-<version>/source' and type:
+Then change directory to 'yamm-<version>' and type:
 
-'java org.gjt.fredde.yamm.YAMM'
+'java -jar yamm.jar'
 
-to run it or:
+to run it or change directory to 'yamm-<version>/source' and type:
 
 'make'
 

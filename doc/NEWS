@@ -1,3 +1,15 @@
+0.7.5:
+	Added:
+		-ExceptionDialog
+		-Replaced Options with ConfigurationWizard
+		-If the box have unread mail the number of unread messages is shown in the tree
+
+	Fixed/changed:
+		-sending mails to multiple receivers now works
+		-does now send attachments that other mail clients can read...
+		-Everything is in a jar archive
+		-And ofcourse lots of bugfixes!
+
 0.7.4:
 	Added:
 		-Mailbox indexing
@@ -7,6 +19,9 @@
 		-Lots of gui-fixes
 		-Message parsing fixes
 		-Lots of bug-fixes
+		-Print-button temporary removed
+		-You can now override the default locale setting with 
+		 locale.language and locale.country (both must be set)
 
 0.7.3:
     Added:
