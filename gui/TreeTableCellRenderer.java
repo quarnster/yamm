@@ -1,4 +1,4 @@
-/*  $Id: TreeTableCellRenderer.java,v 1.1 2003/03/08 13:53:16 fredde Exp $
+/*  $Id: TreeTableCellRenderer.java,v 1.2 2003/03/15 19:32:39 fredde Exp $
  *  Copyright (C) 2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -28,7 +28,7 @@ import org.gjt.fredde.yamm.Utilities;
 /**
  * A Tree TableCellRenderer 
  * @author Fredrik Ehnbom
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TreeTableCellRenderer
 	extends JTree
@@ -60,9 +60,9 @@ public class TreeTableCellRenderer
 		int column
 	) {
 		if (isSelected) {
-			setBackground(new Color(204, 204, 255));
+			setBackground(UIManager.getColor("textHighlight"));
 		} else {
-			setBackground(Color.white);
+			setBackground(UIManager.getColor("control"));
 		}
 
 
@@ -74,6 +74,9 @@ public class TreeTableCellRenderer
 /*
  * Changes:
  * $Log: TreeTableCellRenderer.java,v $
+ * Revision 1.2  2003/03/15 19:32:39  fredde
+ * get colors from UIManager
+ *
  * Revision 1.1  2003/03/08 13:53:16  fredde
  * A TreeTableCellRenderer
  *
