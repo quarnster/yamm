@@ -1,5 +1,5 @@
-/*  $Id: YAMM.java,v 1.58 2003/03/07 10:52:09 fredde Exp $
- *  Copyright (C) 1999-2001 Fredrik Ehnbom
+/*  $Id: YAMM.java,v 1.59 2003/03/08 20:55:50 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Id: YAMM.java,v 1.58 2003/03/07 10:52:09 fredde Exp $
+ * @version $Revision: 1.59 $
  */
 public class YAMM
 	extends JFrame
@@ -65,7 +65,7 @@ public class YAMM
 	public static String selectedbox = Utilities.replace(home + "/boxes/");
 
 	/** The version of YAMM */
-	public static String version  = "0.8";
+	public static String version  = "0.8 $Date: 2003/03/08 20:55:50 $";
 
 	/** The compileDate of YAMM */
 	public static String compDate = Utilities.getCompileDate();
@@ -303,14 +303,11 @@ public class YAMM
 		mailList.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
 		createAttachList();
 
-		// When the mails in the maillist doesn't take all the
-		// maillists space, this fix still paints the background
-		// in the maillists background color.
-		JPanel bgFix = new JPanel(new BorderLayout());
-		bgFix.setBackground(mailList.getBackground());
-		bgFix.add("Center", new JScrollPane(mailList));
+		JScrollPane spane = new JScrollPane(mailList);
+		spane.getViewport().setOpaque(true);
+		spane.getViewport().setBackground(Color.white);
 
-		SPane = new JSplitPane(0, bgFix, JTPane);
+		SPane = new JSplitPane(0, spane, JTPane);
 		SPane.setDividerLocation(hsplit);
 		SPane.setMinimumSize(new Dimension(0, 0));
 		SPane.setPreferredSize(new Dimension(300, 50));
@@ -318,7 +315,10 @@ public class YAMM
 
 		tree = new mainJTree(this, tbar);
 
-		SPane2 = new JSplitPane(1, tree, SPane);
+		spane = new JScrollPane(tree);
+		spane.getViewport().setOpaque(true);
+		spane.getViewport().setBackground(Color.white);
+		SPane2 = new JSplitPane(1, spane, SPane);
 		SPane2.setDividerLocation(vsplit);
 		SPane2.setOneTouchExpandable(true);
 		getContentPane().add("Center", SPane2);
@@ -686,6 +686,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.59  2003/03/08 20:55:50  fredde
+ * fixed the gray instead of white background problem
+ *
  * Revision 1.58  2003/03/07 10:52:09  fredde
  * Attachments work again now
  *
