@@ -1,4 +1,4 @@
-/*  $Id: mainTable.java,v 1.57 2003/06/06 17:08:23 fredde Exp $
+/*  $Id: mainTable.java,v 1.58 2003/06/07 09:07:55 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import org.gjt.fredde.util.gui.ExceptionDialog;
  * The Table for listing the mails subject, date and sender.
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.57 $
+ * @version $Revision: 1.58 $
  */
 public class mainTable
 	extends JTable
@@ -720,6 +720,7 @@ public class mainTable
 		yamm.tbar.reply.setEnabled(b);
 		//((JButton)yamm.tbar.print).setEnabled(b);
 		yamm.tbar.forward.setEnabled(b);
+		yamm.tbar.delete.setEnabled(b);
 	}
 
 	private ActionListener KMListener = new ActionListener() {
@@ -773,6 +774,9 @@ public class mainTable
 /*
  * Changes:
  * $Log: mainTable.java,v $
+ * Revision 1.58  2003/06/07 09:07:55  fredde
+ * added delete-button to main toolbar
+ *
  * Revision 1.57  2003/06/06 17:08:23  fredde
  * added method deleteSelected
  *
