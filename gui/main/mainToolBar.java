@@ -1,5 +1,5 @@
 /*  mainToolBar.java - The tool bar for the main-window
- *  Copyright (C) 1999 Fredrik Ehnbom
+ *  Copyright (C) 1999, 2000 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@ import org.gjt.fredde.yamm.SHMail;
 
 /**
  * The toolbar for the main class
+ * @author
+ * @version $Id: mainToolBar.java,v 1.16 2000/02/28 13:47:51 fredde Exp $
  */
 public class mainToolBar extends JToolBar {
 
@@ -45,7 +47,6 @@ public class mainToolBar extends JToolBar {
 
 	protected static String content = YAMM.getProperty("button.content",
 								"South");
-	JButton b;
 	YAMM frame;
 
 	/**
@@ -54,9 +55,10 @@ public class mainToolBar extends JToolBar {
 	 */
 	public mainToolBar(YAMM frame2) {
 		frame = frame2;
+		setFloatable(false);
 
 		/* send mails in outbox get mail to inbox */
-		b = new JButton();
+		JButton b = new JButton();
 		if (frame.ico) {
 			b.setIcon(new ImageIcon("org/gjt/fredde/yamm/images/" +
 							"buttons/recycle.gif"));
@@ -294,3 +296,10 @@ public class mainToolBar extends JToolBar {
 		}
 	};
 }
+/*
+ * Changes:
+ * $Log: mainToolBar.java,v $
+ * Revision 1.16  2000/02/28 13:47:51  fredde
+ * little cleanup and added changelog and some javadoc tags
+ *
+ */
