@@ -38,7 +38,7 @@ import org.gjt.fredde.yamm.YAMM;
  * The mainMenu class.
  * This is the menu that the mainwindow uses.
  * @author Fredrik Ehnbom
- * @version $Id: mainMenu.java,v 1.28 2001/03/18 17:07:02 fredde Exp $
+ * @version $Id: mainMenu.java,v 1.29 2003/03/05 15:58:31 fredde Exp $
  */
 public class mainMenu
 	extends JMenuBar
@@ -239,7 +239,7 @@ public class mainMenu
 
 					int msg = tmp.getSelectedMessage();
 
-					long skip = Long.parseLong(frame.listOfMails[tmp.getSelectedRow()][5]);
+					long skip = Long.parseLong(frame.listOfMails[msg][5]);
 
 					if (msg != -1) {
 						sourceViewer sv = new sourceViewer();
@@ -332,6 +332,9 @@ public class mainMenu
 /*
  * Changes:
  * $Log: mainMenu.java,v $
+ * Revision 1.29  2003/03/05 15:58:31  fredde
+ * now displays the correct message when viewing source
+ *
  * Revision 1.28  2001/03/18 17:07:02  fredde
  * updated
  *
