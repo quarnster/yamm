@@ -24,14 +24,22 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * This class sends mail and prints the debugmessages to YAMM.debug
  * @author Fredrik Ehnbom
- * @version $Id: YammSmtp.java,v 1.1 2000/02/28 13:51:24 fredde Exp $
+ * @version $Id: YammSmtp.java,v 1.2 2003/10/01 10:01:05 fredde Exp $
  */
-public class YammSmtp extends Smtp {
+public class YammSmtp
+	extends Smtp
+{
 
 	public YammSmtp(String server, int port, boolean debug) throws IOException {
 		super(server, port, debug);
 	}
 
+
+	public void sendMessage()
+		throws IOException
+	{
+		sendCommand("\r\n.\r", 250);
+	}
 
 	/**
 	 * Print the debugmessage to YAMM.debug
@@ -47,6 +55,9 @@ public class YammSmtp extends Smtp {
 /*
  * Changes:
  * $Log: YammSmtp.java,v $
+ * Revision 1.2  2003/10/01 10:01:05  fredde
+ * fixed for  some smtp-servers
+ *
  * Revision 1.1  2000/02/28 13:51:24  fredde
  * initial commit
  *
