@@ -1,4 +1,4 @@
-/*  $Id: Mailbox.java,v 1.53 2003/04/04 15:36:44 fredde Exp $
+/*  $Id: Mailbox.java,v 1.54 2003/04/16 12:44:59 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.gjt.fredde.yamm.encode.*;
 /**
  * A class that handels messages and information about messages
  * @author Fredrik Ehnbom
- * @version $Revision: 1.53 $
+ * @version $Revision: 1.54 $
  */
 public class Mailbox {
 
@@ -377,14 +377,11 @@ public class Mailbox {
 	 * Gets the from and subject field from specified message
 	 * @param whichBox Which box the message is in
 	 * @param whichmail Which mail to get the headers from
+	 * @deprecated Use getMailHeaders instead
 	 */
-	public static String[] getMailForReplyHeaders(String whichBox, long skip) {
-		String  temp = null;
-		String  from = null;
-		String  subject = null;
-		String  to = null;
-
+	public static MessageHeaderParser getMailHeaders(String whichBox, long skip) {
 		BufferedReader in = null;
+		MessageHeaderParser mhp = null;
 
 		try {
 			in = new BufferedReader(new InputStreamReader(
@@ -392,7 +389,7 @@ public class Mailbox {
 
 			in.skip(skip);
 
-			MessageHeaderParser mhp = new MessageHeaderParser();
+			mhp = new MessageHeaderParser();
 			try {
 				mhp.parse(in);
 			} catch (MessageParseException mpe) {
@@ -400,21 +397,6 @@ public class Mailbox {
 						mpe,
 						YAMM.exceptionNames);
 			}
-
-			if (mhp.getHeaderField("Reply-To") != null) {
-				from = mhp.getHeaderField("Reply-To");
-			} else {
-				from = mhp.getHeaderField("From");
-			}
-
-			subject = mhp.getHeaderField("Subject");
-			subject = unMime(subject);
-			to = mhp.getHeaderField("To");
-
-
-			if (subject == null) subject = "";
-			if (from == null) from = "";
-			if (to == null) to = "";
 		} catch (IOException ioe) {
 			new ExceptionDialog(YAMM.getString("msg.error"),
 				ioe,
@@ -425,13 +407,7 @@ public class Mailbox {
 			} catch (IOException ioe) {}
 		}
 
-		String[] ret = {
-				from,
-				to,
-				subject
-		};
-
-		return ret;
+		return mhp;
 	}
 
 	/**
@@ -862,6 +838,9 @@ public class Mailbox {
 /*
  * Changes:
  * $Log: Mailbox.java,v $
+ * Revision 1.54  2003/04/16 12:44:59  fredde
+ * replaced getMailForReplyHeaders with getMailHeaders
+ *
  * Revision 1.53  2003/04/04 15:36:44  fredde
  * now parses =?-strings as it should
  *
