@@ -1,5 +1,5 @@
-/*  YammPop3.java - get mail and print out debugging info
- *  Copyright (C) 1999, 2000 Fredrik Ehnbom
+/*  $Id: YammPop3.java,v 1.4 2003/04/19 11:56:52 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,17 +18,21 @@
 package org.gjt.fredde.yamm;
 
 import java.io.IOException;
+import java.text.*;
+import java.util.*;
 import org.gjt.fredde.util.net.Pop3;
 import org.gjt.fredde.yamm.YAMM;
+import org.gjt.fredde.yamm.mail.*;
 
 /**
  * This class gets mail from a server and prints out the debugging messages to
  * YAMM.debug.
  * @author Fredrik Ehnbom
- * @version $Id: YammPop3.java,v 1.3 2003/03/06 20:17:39 fredde Exp $
+ * @version $Revision: 1.4 $
  */
-public class YammPop3 extends Pop3 {
-
+public class YammPop3
+	extends Pop3
+{
 	public YammPop3(String user, String password, String server, String file, int port, boolean debug)
 		throws IOException
 	{
@@ -75,8 +79,27 @@ public class YammPop3 extends Pop3 {
 		if (!answer.toLowerCase().startsWith("-err")) {
 			int read = 0;
 
-			while (!".".equals(answer)) {
+			String temp = "";
+			String from = "someone";
+			SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", Locale.US);
+
+			while (!" ".equals(answer)) {
 				answer = in.readLine();
+				temp += answer + "\n";
+
+				frame.status.setStatus(YAMM.getString("server.get", args) + "   " + read + "/" + length );
+				frame.status.progress( (int) (((float) read / length) * 100) );
+
+				if (answer.startsWith("From:") && answer.indexOf("@") != -1) {
+					from = MessageParser.getEmail(answer);
+					break;
+				}
+			}
+
+			outFile.println("From " + from + " " + dateFormat.format(new Date(System.currentTimeMillis())));
+			outFile.print(temp);
+
+			while (!(answer = in.readLine()).equals(".")) {
 				outFile.println(answer);
 				read += answer.length() + 1;
 
@@ -91,6 +114,9 @@ public class YammPop3 extends Pop3 {
 /*
  * Changes:
  * $Log: YammPop3.java,v $
+ * Revision 1.4  2003/04/19 11:56:52  fredde
+ * updated to work with the new mbox-format
+ *
  * Revision 1.3  2003/03/06 20:17:39  fredde
  * Now getting message size with the pop3 command LIST
  *

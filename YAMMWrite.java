@@ -1,5 +1,5 @@
-/*  $Id: YAMMWrite.java,v 1.34 2003/04/16 12:39:33 fredde Exp $
- *  Copyright (C) 1999-2001 Fredrik Ehnbom
+/*  $Id: YAMMWrite.java,v 1.35 2003/04/19 11:53:28 fredde Exp $
+ *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,9 +34,11 @@ import org.gjt.fredde.yamm.mail.*;
 /**
  * The class for writing mails
  * @author Fredrik Ehnbom
- * @version $Revision: 1.34 $
+ * @version $Revision: 1.35 $
  */
-public class YAMMWrite extends JFrame {
+public class YAMMWrite
+	extends JFrame
+{
 
 	/** A list of files to attach to the mail */
 	static protected Vector         attach;
@@ -481,9 +483,10 @@ public class YAMMWrite extends JFrame {
 				}
 				to += "\ncc: " + cc;
 			}
-
+			SimpleDateFormat d2 = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", Locale.US);
 			outFile.println(
-				"Date: " + df.format(new Date()) +
+				"From " + MessageParser.getEmail(from) + " " + d2.format(new Date()) + 
+				"\nDate: " + df.format(new Date()) +
 				"\nFrom: " + from +
 				"\nTo: " + to +
 				"\nSubject: " + subjectField.getText() +
@@ -610,6 +613,9 @@ public class YAMMWrite extends JFrame {
 /*
  * Changes:
  * $Log: YAMMWrite.java,v $
+ * Revision 1.35  2003/04/19 11:53:28  fredde
+ * updated to work with the new mbox-format
+ *
  * Revision 1.34  2003/04/16 12:39:33  fredde
  * added reply() and forward()
  *

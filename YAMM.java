@@ -1,4 +1,4 @@
-/*  $Id: YAMM.java,v 1.68 2003/04/13 16:34:37 fredde Exp $
+/*  $Id: YAMM.java,v 1.69 2003/04/19 11:53:09 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import org.gjt.fredde.yamm.encode.*;
  * The big Main-class of YAMM
  *
  * @author Fredrik Ehnbom
- * @version $Revision: 1.68 $
+ * @version $Revision: 1.69 $
  */
 public class YAMM
 	extends JFrame
@@ -569,6 +569,8 @@ public class YAMM
 				new FileOutputStream(home + "/boxes/inbox"))
 			);
 
+			SimpleDateFormat d2 = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", Locale.US);
+			out.println("From fredde@gjt.org " + d2.format(new Date()));
 			out.println("Date: " + dateFormat.format(new Date()));
 			out.println("From: Fredrik Ehnbom <fredde@gjt.org>");
 			out.println("To: " + user + "@" + host);
@@ -591,6 +593,90 @@ public class YAMM
 			);
 		}
 	}
+
+	private static void yamm2Mbox(File box) {
+		if (box.isDirectory()) {
+			String[] list = box.list();
+
+			for (int i = 0; i < list.length; i++) {
+				if (!list[i].endsWith(".index")) {
+					yamm2Mbox(new File(box, list[i]));
+				}
+			}
+		} else {
+			System.out.println("converting mailbox: " + box);
+			BufferedInputStream in = null;
+			BufferedOutputStream out = null;
+
+			long newOffset = 0;
+			long messageLen = 0;
+			long endPosition = 0;
+			int skipLen = 1 + File.separator.length();
+
+			try {
+				int BUFFERSIZE = 65536;
+				byte[] buffer = new byte[BUFFERSIZE];
+
+				Index index = new Index(box.toString());
+				index.open();
+
+				in = new BufferedInputStream(new FileInputStream(box));
+				out = new BufferedOutputStream(new FileOutputStream(box + ".tmp"));
+				SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", Locale.US);
+
+				for (int i = 0; i < index.messageNum; i++) {
+					IndexEntry entry = index.getEntry(i);
+
+					if (i+1 < index.messageNum) {
+						endPosition = index.getEntry(i+1).skip;
+					} else {
+						endPosition = box.length();
+					}
+					messageLen = endPosition - entry.skip;
+					messageLen -= skipLen;
+
+					entry.skip += newOffset;
+					index.saveEntry(entry, i);
+
+
+					String blah = "From " + MessageParser.getEmail(entry.from) + " " + dateFormat.format(new Date(entry.date)) + "\n";
+					newOffset += blah.length() - skipLen;
+					out.write(blah.getBytes());
+
+
+					while (messageLen > 0) {
+						int read = in.read(buffer, 0, (int)Math.min(BUFFERSIZE, messageLen));
+						messageLen -= read;
+						out.write(buffer, 0, read);
+					}
+					in.skip(skipLen);
+				}
+
+
+				index.rewrite();
+
+				index.close();
+
+				in.close();
+				out.close();
+				box.delete();
+				new File(box + ".tmp").renameTo(box);
+			} catch (IOException ioe) {
+				new ExceptionDialog(
+					YAMM.getString("msg.error"),
+					ioe,
+					YAMM.exceptionNames
+				);
+			} finally {
+				try {
+					if (in != null) in.close();
+					if (out != null) out.close();
+				} catch (IOException ioe) {}
+			}
+
+		}
+	}
+
 
 	/**
 	 * Shows a SplashScreen while starting the program.
@@ -618,8 +704,19 @@ public class YAMM
 		}
 
 		// convert the old profile format to the new
-		if (new File(home + "/.config").exists() && !new File(home + "/.profiles").exists()) {
-			convert();
+		if (new File(home + "/.config").exists()) {
+			if (!new File(home + "/.profiles").exists()) {
+				// convert to the new multi profile-format
+				convert();
+			}
+
+			if (Utilities.parseIntSafe(props.getProperty("config.version")) < 2) {
+				// convert mailboxes from old YAMM-format to
+				// standard unix mbox format
+				yamm2Mbox(new File(home + "/boxes"));
+				props.setProperty("config.version", "2");
+			}
+
 		}
 
 		Locale l = Locale.getDefault();
@@ -702,6 +799,9 @@ public class YAMM
 /*
  * Changes
  * $Log: YAMM.java,v $
+ * Revision 1.69  2003/04/19 11:53:09  fredde
+ * updated to work with the new mbox-format
+ *
  * Revision 1.68  2003/04/13 16:34:37  fredde
  * added set/getMailbox
  *

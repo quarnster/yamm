@@ -1,4 +1,4 @@
-/*  $Id: SHMail.java,v 1.38 2003/04/16 12:37:35 fredde Exp $
+/*  $Id: SHMail.java,v 1.39 2003/04/19 11:52:52 fredde Exp $
  *  Copyright (C) 1999-2003 Fredrik Ehnbom
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@ package org.gjt.fredde.yamm;
 import java.io.*;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.regex.*;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import org.gjt.fredde.util.SimpleCrypt;
@@ -31,7 +32,7 @@ import org.gjt.fredde.yamm.YAMM;
 /**
  * Sends and gets mail
  * @author Fredrik Ehnbom <fredde@gjt.org>
- * @version $Revision: 1.38 $
+ * @version $Revision: 1.39 $
  */
 public class SHMail
 	extends Thread
@@ -227,14 +228,14 @@ public class SHMail
 						for (;;) {
 							temp = in.readLine();
 
-							if (temp == null) break;
+							if (temp != null) {
+								read += temp.length() + 1;
+								yamm.status.setStatus(mailStatus + "  " + read + "/" + length);
+								yamm.status.progress((int) (((float) read / length) * 100));
+							}
 
-							read += temp.length() + 1;
-							yamm.status.setStatus(mailStatus + "  " + read + "/" + length);
-							yamm.status.progress((int) (((float) read / length) * 100));
 
-
-							if (temp.equals(".")) {
+							if (temp == null || Pattern.matches("From .* [a-zA-Z]{3} [a-zA-Z]{3} {1,2}[0-9]{1,2} [0-9]{2}:[0-9]{2}:[0-9]{2} [0-9]{4}", temp)) {
 								smtp.sendMessage();
 
 								i++;
@@ -318,6 +319,9 @@ public class SHMail
 /*
  * Changes
  * $Log: SHMail.java,v $
+ * Revision 1.39  2003/04/19 11:52:52  fredde
+ * updated to work with the new mbox-format
+ *
  * Revision 1.38  2003/04/16 12:37:35  fredde
  * gets delete-property from server configuration
  *
