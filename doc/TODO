@@ -1,0 +1,96 @@
+TODO list for YAMM
+
+
+
+*********************************
+*********************************
+*********************************
+*********************************
+
+
+
+- Link profiles with smtp-servers.
+- default smtp-server
+- username and password for smtp-servers
+- mail Pablo to get an updated translation
+
+
+
+*********************************
+*********************************
+*********************************
+*********************************
+
+
+
+
+
+From Pablo Rodriguez
+
+-a draft folder in which messages can be saved while they're being composed 
+(right now the options are to send a message or to erase it after composing).
+
+-different smtp servers (I guess it would be useful to link identities with 
+pop3 and smtp servers).
+
+-authentication with login and password (the same as pop3) on smtp servers.
+
+----------------------------------------------------
+
+- TreeTable maillist
+- In-Reply-To: stuff
+- LookAndFeel stuff
+- Add support for UUencoded stuff (again)
+- Replied status for messages
+- more advanced filtering
+- replace all updateUI-stuff with something better
+- show size, num, unread num, new num and other info of current mailbox
+- show size of messages
+- update configuration wizard
+- handle attached images that are supposed to be shown in html messages
+- mark all messages as read
+- Fully replace the uuencode/base64-classes with the new Encoder/Decoder-interfaces
+- fix imageviewer
+- inline stuff that's supposed to be inlined
+- fix "ImageIcon column not showing ImageIcon"-bug
+- "save rendered mail/save raw mail"
+- doubleclick in attachlist to open attachment
+- make the cancel-button in the status field work or remove it
+- autocheck mail every X minutes
+- Selecting a debug-file should be done visually
+
+******** Visual stuff ********
+
+  - More Drag and Drop
+
+********** General ***********
+
+  - Address book
+
+  - Get rid of sun.misc.Base64Decoder...
+
+  - the ability to edit mails in the outbox
+
+  - user should be able to send mails directly instead of keeping
+    them in the outbox
+
+  - More debugging info.
+
+  - Resend mails that is in the 'sent'-box
+
+  - Some kind of PGP/GnuPG support
+
+******** Considering *********
+
+  - IMAP (This is not as usual as pop3)
+
+  - NNTP (news you know...)
+
+Go ahead and mail me your opinion!
+
+********* Known Bugs *********
+
+  - It has problems with some dateformats
+
+  - Last character in the uuencoded/uudecoded file always gets different than
+    in the original file.
